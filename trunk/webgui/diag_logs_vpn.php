@@ -68,14 +68,14 @@ function dump_clog($logfile, $tail) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title><?=gentitle("Diagnostics: System logs");?></title>
+<title><?=gentitle("Diagnostics: Logs");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Diagnostics: System logs</p>
+<p class="pgtitle">Diagnostics: Logs</p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
   <ul id="tabnav">
@@ -90,7 +90,7 @@ function dump_clog($logfile, $tail) {
     <td class="tabcont">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
 		  <td colspan="4" class="listtopic"> 
-			    Last <?=$nentries;?> firewall log entries</td>
+			    Last <?=$nentries;?> PPTP VPN log entries</td>
 			</tr>
 			<tr>
 			  <td class="listhdrr">Time</td>

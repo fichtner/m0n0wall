@@ -120,6 +120,7 @@ if ($_POST) {
 		if ($_POST['dns2'])
 			$config['system']['dnsserver'][] = $_POST['dns2'];
 		
+		$olddnsallowoverride = $config['system']['dnsallowoverride'];
 		$config['system']['dnsallowoverride'] = $_POST['dnsallowoverride'] ? true : false;
 		
 		if ($_POST['password']) {
@@ -142,6 +143,10 @@ if ($_POST) {
 			$retval |= services_dnsmasq_configure();
 			$retval |= system_timezone_configure();
  			$retval |= system_ntp_configure();
+ 			
+ 			if ($olddnsallowoverride != $config['system']['dnsallowoverride'])
+ 				$retval |= interfaces_wan_configure();
+ 			
 			config_unlock();
 		}
 		

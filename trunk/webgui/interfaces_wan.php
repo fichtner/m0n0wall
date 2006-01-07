@@ -69,6 +69,7 @@ if ($wancfg['ipaddr'] == "dhcp") {
 	$pconfig['ipaddr'] = $wancfg['ipaddr'];
 	$pconfig['subnet'] = $wancfg['subnet'];
 	$pconfig['gateway'] = $wancfg['gateway'];
+	$pconfig['pointtopoint'] = $wancfg['pointtopoint'];
 }
 
 $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
@@ -124,10 +125,13 @@ if ($_POST) {
 	if (($_POST['gateway'] && !is_ipaddr($_POST['gateway']))) {
 		$input_errors[] = "A valid gateway must be specified.";
 	}
+	if (($_POST['pointtopoint'] && !is_ipaddr($_POST['pointtopoint']))) {
+		$input_errors[] = "A valid point-to-point IP address must be specified.";
+	}
 	if (($_POST['provider'] && !is_domain($_POST['provider']))) {
 		$input_errors[] = "The service name contains invalid characters.";
 	}
-	if ($_POST['pppoe_idletimeout'] && !is_numericint($_POST['pppoe_idletimeout'])) {
+	if (($_POST['pppoe_idletimeout'] != "") && !is_numericint($_POST['pppoe_idletimeout'])) {
 		$input_errors[] = "The idle timeout value must be an integer.";
 	}
 	if (($_POST['pptp_local'] && !is_ipaddr($_POST['pptp_local']))) {
@@ -139,7 +143,7 @@ if ($_POST) {
 	if (($_POST['pptp_remote'] && !is_ipaddr($_POST['pptp_remote']))) {
 		$input_errors[] = "A valid PPTP remote IP address must be specified.";
 	}
-	if ($_POST['pptp_idletimeout'] && !is_numericint($_POST['pptp_idletimeout'])) {
+	if (($_POST['pptp_idletimeout'] != "") && !is_numericint($_POST['pptp_idletimeout'])) {
 		$input_errors[] = "The idle timeout value must be an integer.";
 	}
 	if (($_POST['bigpond_authserver'] && !is_domain($_POST['bigpond_authserver']))) {
@@ -171,6 +175,7 @@ if ($_POST) {
 		unset($wancfg['ipaddr']);
 		unset($wancfg['subnet']);
 		unset($wancfg['gateway']);
+		unset($wancfg['pointtopoint']);
 		unset($wancfg['dhcphostname']);
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
@@ -194,6 +199,8 @@ if ($_POST) {
 			$wancfg['ipaddr'] = $_POST['ipaddr'];
 			$wancfg['subnet'] = $_POST['subnet'];
 			$wancfg['gateway'] = $_POST['gateway'];
+			if (isset($wancfg['ispointtopoint']))
+				$wancfg['pointtopoint'] = $_POST['pointtopoint'];
 		} else if ($_POST['type'] == "DHCP") {
 			$wancfg['ipaddr'] = "dhcp";
 			$wancfg['dhcphostname'] = $_POST['dhcphostname'];
@@ -417,7 +424,7 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="4"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">General configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">General configuration</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">MAC address</td>
@@ -443,20 +450,31 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">Static IP configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">Static IP configuration</td>
                 </tr>
                 <tr> 
                   <td width="100" valign="top" class="vncellreq">IP address</td>
                   <td class="vtable"> <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
-                      <?php for ($i = 31; $i > 0; $i--): ?>
+                    <?php
+                      if (isset($wancfg['ispointtopoint']))
+                      	$snmax = 32;
+                      else
+                      	$snmax = 31;
+                      for ($i = $snmax; $i > 0; $i--): ?>
                       <option value="<?=$i;?>" <?php if ($i == $pconfig['subnet']) echo "selected"; ?>> 
                       <?=$i;?>
                       </option>
                       <?php endfor; ?>
                     </select></td>
-                </tr>
+                </tr><?php if (isset($wancfg['ispointtopoint'])): ?>
+                <tr>
+                  <td valign="top" class="vncellreq">Point-to-point IP address </td>
+                  <td class="vtable">
+                    <input name="pointtopoint" type="text" class="formfld" id="pointtopoint" size="20" value="<?=htmlspecialchars($pconfig['pointtopoint']);?>">
+                  </td>
+                </tr><?php endif; ?>
                 <tr> 
                   <td valign="top" class="vncellreq">Gateway</td>
                   <td class="vtable"> <input name="gateway" type="text" class="formfld" id="gateway" size="20" value="<?=htmlspecialchars($pconfig['gateway']);?>"> 
@@ -466,7 +484,7 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">DHCP client configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">DHCP client configuration</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">Hostname</td>
@@ -480,7 +498,7 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">PPPoE configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">PPPoE configuration</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>
@@ -515,7 +533,7 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">PPTP configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">PPTP configuration</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>
@@ -561,7 +579,7 @@ function type_change(enable_change,enable_change_pptp) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">BigPond Cable configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">BigPond Cable configuration</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>

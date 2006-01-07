@@ -42,6 +42,10 @@ if (isset($_POST['id']))
 	$id = $_POST['id'];
 
 if (isset($id) && $a_proxyarp[$id]) {
+	if ($a_proxyarp[$id]['interface'])
+		$pconfig['interface'] = $a_proxyarp[$id]['interface'];
+	else
+		$pconfig['interface'] = "wan";
 	if (isset($a_proxyarp[$id]['network']))
 		list($pconfig['subnet'], $pconfig['subnet_bits']) = explode("/", $a_proxyarp[$id]['network']);
 	else if (isset($a_proxyarp[$id]['range'])) {
@@ -50,6 +54,7 @@ if (isset($id) && $a_proxyarp[$id]) {
 	}
 	$pconfig['descr'] = $a_proxyarp[$id]['descr'];
 } else {
+	$pconfig['interface'] = "wan";
 	$pconfig['subnet_bits'] = 32;
 }
 
@@ -104,6 +109,7 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$arpent = array();
+		$arpent['interface'] = $_POST['interface'];
 		if ($_POST['type'] == "range") {
 			$arpent['range']['from'] = $_POST['range_from'];
 			$arpent['range']['to'] = $_POST['range_to'];
@@ -165,6 +171,21 @@ function typesel_change() {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="services_proxyarp_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
+                <tr> 
+                  <td width="22%" valign="top" class="vncellreq">Interface</td>
+                  <td width="78%" class="vtable">
+					<select name="interface" class="formfld">
+                      <?php $interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
+					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+					  }
+					  foreach ($interfaces as $iface => $ifacename): ?>
+                      <option value="<?=$iface;?>" <?php if ($iface == $pconfig['interface']) echo "selected"; ?>> 
+                      <?=htmlspecialchars($ifacename);?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select> </td>
+                </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Network</td>
                   <td class="vtable">

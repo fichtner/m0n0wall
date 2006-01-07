@@ -6,36 +6,43 @@
  * (modified for m0n0wall by Manuel Kasper <mk@neon1.net>)
  */
 
+require("guiconfig.inc");
+
 /* Execute a command, with a title, and generate an HTML table
  * showing the results.
  */
-function doCmdT($title, $command) {
+
+function doCmdT($title, $command, $isstr) {
     echo "<p>\n";
     echo "<a name=\"" . $title . "\">\n";
     echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
     echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
     echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
 	
-	if ($command == "dumpconfigxml") {
-		$fd = @fopen("/conf/config.xml", "r");
-		if ($fd) {
-			while (!feof($fd)) {
-				$line = fgets($fd);
-				/* remove password tag contents */
-				$line = preg_replace("/<password>.*?<\\/password>/", "<password>xxxxx</password>", $line);
-				$line = preg_replace("/<pre-shared-key>.*?<\\/pre-shared-key>/", "<pre-shared-key>xxxxx</pre-shared-key>", $line);
-				$line = str_replace("\t", "    ", $line);
-				echo htmlspecialchars($line,ENT_NOQUOTES);
-			}
-		}
-		fclose($fd);
+	if ($isstr) {
+		echo htmlspecialchars($command);
 	} else {
-		exec ($command . " 2>&1", $execOutput, $execStatus);
-		for ($i = 0; isset($execOutput[$i]); $i++) {
-			if ($i > 0) {
-				echo "\n";
+		if ($command == "dumpconfigxml") {
+			$fd = @fopen("/conf/config.xml", "r");
+			if ($fd) {
+				while (!feof($fd)) {
+					$line = fgets($fd);
+					/* remove password tag contents */
+					$line = preg_replace("/<password>.*?<\\/password>/", "<password>xxxxx</password>", $line);
+					$line = preg_replace("/<pre-shared-key>.*?<\\/pre-shared-key>/", "<pre-shared-key>xxxxx</pre-shared-key>", $line);
+					$line = str_replace("\t", "    ", $line);
+					echo htmlspecialchars($line,ENT_NOQUOTES);
+				}
 			}
-			echo htmlspecialchars($execOutput[$i],ENT_NOQUOTES);
+			fclose($fd);
+		} else {
+			exec ($command . " 2>&1", $execOutput, $execStatus);
+			for ($i = 0; isset($execOutput[$i]); $i++) {
+				if ($i > 0) {
+					echo "\n";
+				}
+				echo htmlspecialchars($execOutput[$i],ENT_NOQUOTES);
+			}
 		}
 	}
     echo "</pre></tr>\n";
@@ -51,7 +58,7 @@ function doCmd($command) {
 function defCmdT($title, $command) {
     global $commands;
     $title = htmlspecialchars($title,ENT_NOQUOTES);
-    $commands[] = array($title, $command);
+    $commands[] = array($title, $command, false);
 }
 
 /* Define a command, with a title which is the same as the command,
@@ -59,6 +66,13 @@ function defCmdT($title, $command) {
  */
 function defCmd($command) {
     defCmdT($command,$command);
+}
+
+/* Define a string, with a title, to be shown later. */
+function defStrT($title, $str) {
+    global $commands;
+    $title = htmlspecialchars($title,ENT_NOQUOTES);
+    $commands[] = array($title, $str, true);
 }
 
 /* List all of the commands as an index. */
@@ -76,7 +90,7 @@ function listCmds() {
 function execCmds() {
     global $commands;
     for ($i = 0; isset($commands[$i]); $i++ ) {
-        doCmdT($commands[$i][0], $commands[$i][1]);
+        doCmdT($commands[$i][0], $commands[$i][1], $commands[$i][2]);
     }
 }
 
@@ -90,6 +104,10 @@ defCmdT("ipfw show", "/sbin/ipfw show");
 defCmdT("ipnat -lv", "/sbin/ipnat -lv");
 defCmdT("ipfstat -v", "/sbin/ipfstat -v");
 defCmdT("ipfstat -nio", "/sbin/ipfstat -nio");
+
+defStrT("unparsed ipnat rules", filter_nat_rules_generate());
+defStrT("unparsed ipfilter rules", filter_rules_generate());
+defStrT("unparsed ipfw rules", shaper_rules_generate());
 
 defCmdT("resolv.conf","cat /etc/resolv.conf");
 

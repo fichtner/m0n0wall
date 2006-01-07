@@ -37,6 +37,22 @@ if (!is_array($config['filter']['rule'])) {
 filter_rules_sort();
 $a_filter = &$config['filter']['rule'];
 
+$if = $_GET['if'];
+if ($_POST['if'])
+	$if = $_POST['if'];
+	
+$iflist = array("lan" => "LAN", "wan" => "WAN");
+
+if ($config['pptpd']['mode'] == "server")
+	$iflist['pptp'] = "PPTP VPN";
+
+for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+	$iflist['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+}
+
+if (!$if || !isset($iflist[$if]))
+	$if = "lan";
+
 if ($_POST) {
 
 	$pconfig = $_POST;
@@ -58,32 +74,15 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_filter[$_GET['id']]) {
-		unset($a_filter[$_GET['id']]);
+if (isset($_POST['del_x'])) {
+	/* delete selected rules */
+	if (is_array($_POST['rule']) && count($_POST['rule'])) {
+		foreach ($_POST['rule'] as $rulei) {
+			unset($a_filter[$rulei]);
+		}
 		write_config();
 		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php");
-		exit;
-	}
-} else if ($_GET['act'] == "down") {
-	if ($a_filter[$_GET['id']] && $a_filter[$_GET['id']+1]) {
-		$tmp = $a_filter[$_GET['id']+1];
-		$a_filter[$_GET['id']+1] = $a_filter[$_GET['id']];
-		$a_filter[$_GET['id']] = $tmp;
-		write_config();
-		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php");
-		exit;
-	}
-} else if ($_GET['act'] == "up") {
-	if (($_GET['id'] > 0) && $a_filter[$_GET['id']]) {
-		$tmp = $a_filter[$_GET['id']-1];
-		$a_filter[$_GET['id']-1] = $a_filter[$_GET['id']];
-		$a_filter[$_GET['id']] = $tmp;
-		write_config();
-		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php");
+		header("Location: firewall_rules.php?if={$if}");
 		exit;
 	}
 } else if ($_GET['act'] == "toggle") {
@@ -91,7 +90,51 @@ if ($_GET['act'] == "del") {
 		$a_filter[$_GET['id']]['disabled'] = !isset($a_filter[$_GET['id']]['disabled']);
 		write_config();
 		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php");
+		header("Location: firewall_rules.php?if={$if}");
+		exit;
+	}
+} else {
+	/* yuck - IE won't send value attributes for image buttons, while Mozilla does - 
+	   so we use .x/.y to fine move button clicks instead... */
+	unset($movebtn);
+	foreach ($_POST as $pn => $pd) {
+		if (preg_match("/move_(\d+)_x/", $pn, $matches)) {
+			$movebtn = $matches[1];
+			break;
+		}
+	}
+	/* move selected rules before this rule */
+	if (isset($movebtn) && is_array($_POST['rule']) && count($_POST['rule'])) {
+		$a_filter_new = array();
+		
+		/* copy all rules < $movebtn and not selected */
+		for ($i = 0; $i < $movebtn; $i++) {
+			if (!in_array($i, $_POST['rule']))
+				$a_filter_new[] = $a_filter[$i];
+		}
+		
+		/* copy all selected rules */
+		for ($i = 0; $i < count($a_filter); $i++) {
+			if ($i == $movebtn)
+				continue;
+			if (in_array($i, $_POST['rule']))
+				$a_filter_new[] = $a_filter[$i];
+		}
+		
+		/* copy $movebtn rule */
+		if ($movebtn < count($a_filter))
+			$a_filter_new[] = $a_filter[$movebtn];
+		
+		/* copy all rules > $movebtn and not selected */
+		for ($i = $movebtn+1; $i < count($a_filter); $i++) {
+			if (!in_array($i, $_POST['rule']))
+				$a_filter_new[] = $a_filter[$i];
+		}
+		
+		$a_filter = $a_filter_new;
+		write_config();
+		touch($d_filterconfdirty_path);
+		header("Location: firewall_rules.php?if={$if}");
 		exit;
 	}
 }
@@ -114,24 +157,21 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The firewall rule configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+<?php foreach ($iflist as $ifent => $ifname):
+	if ($ifent == $if): ?>
+    <li class="tabact"><?=htmlspecialchars($ifname);?></li>
+<?php else: ?>
+    <li class="tabinact"><a href="firewall_rules.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
+<?php endif; ?>
+<?php endforeach; ?>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <?php $lastif = ""; for ($i = 0; isset($a_filter[$i]); $i++):
-				$filterent = $a_filter[$i];
-                if ($filterent['interface'] != $lastif):
-                if ($i):
-				?>
-                <tr>
-                  <td colspan="8" class="list" height="12"></td>
-				</tr>
-				<?php endif; ?>
-                <tr>
-                  <td colspan="7" class="listtopic"><?php
-				  $iflabels = array('lan' => 'LAN interface', 'wan' => 'WAN interface', 'pptp' => 'PPTP clients');
-				  for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++)
-				  	$iflabels['opt' . $j] = $config['interfaces']['opt' . $j]['descr'] . " interface";
-				  echo htmlspecialchars($iflabels[$filterent['interface']]); ?></td>
-				  <td class="list"></td>
-				</tr>
                 <tr>
                   <td width="5%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">Proto</td>
@@ -142,7 +182,11 @@ if ($_GET['act'] == "del") {
                   <td width="25%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
-				<?php $lastif = $filterent['interface']; endif; ?>
+				<?php $nrules = 0; for ($i = 0; isset($a_filter[$i]); $i++):
+					$filterent = $a_filter[$i];
+					if ($filterent['interface'] != $if)
+						continue;
+				?>
                 <tr valign="top">
                   <td class="listt">
 				  <?php if ($filterent['type'] == "block")
@@ -162,7 +206,7 @@ if ($_GET['act'] == "del") {
 							$textss = $textse = "";
 						}
 				  ?>
-				  <a href="?act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
+				  <a href="?if=<?=$if;?>&act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
 				  <?php if (isset($filterent['log'])):
 							$iconfn = "log_s";
 						if (isset($filterent['disabled']))
@@ -190,25 +234,43 @@ if ($_GET['act'] == "del") {
                     <?=$textss;?><?=htmlspecialchars($filterent['descr']);?>&nbsp;<?=$textse;?>
                   </td>
                   <td valign="middle" nowrap class="list">
-				    <a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a>
-					<?php if (($i > 0) && ($a_filter[$i-1]['interface'] == $filterent['interface'])): ?>
-					<a href="firewall_rules.php?act=up&id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0"></a>
-					<?php else: ?>
-					<img src="up_d.gif" width="17" height="17" border="0">
-					<?php endif; ?><br>
-					<a href="firewall_rules.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0"></a>
-					<?php if ($a_filter[$i+1]['interface'] == $filterent['interface']): ?>
-					<a href="firewall_rules.php?act=down&id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0"></a> 
-                    <?php else: ?>
-					<img src="down_d.gif" width="17" height="17" border="0">
-					<?php endif; ?>
-					<a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a>
+				    <table border="0" cellspacing="0" cellpadding="1">
+					<tr>
+					  <td><a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+					  <td align="center" valign="middle"><input type="checkbox" name="rule[]" value="<?=$i;?>" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
+					</tr>
+					<tr>
+					  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule"></td>
+					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a></td>
+					</tr>
+					</table>
 				  </td>
 				</tr>
-			  <?php endfor; ?>
+			  <?php $nrules++; endfor; ?>
+			  <?php if ($nrules == 0): ?>
+			  <td class="listt"></td>
+			  <td class="listlr" colspan="6" align="center" valign="middle">
+			  <span class="gray">
+			  No rules are currently defined for this interface.<br>
+			  All incoming connections on this interface will be blocked until you add pass rules.<br><br>
+			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="absmiddle"></a> button to add a new rule.</span>
+			  </td>
+			  <?php endif; ?>
                 <tr> 
                   <td class="list" colspan="7"></td>
-                  <td class="list"> <a href="firewall_rules_edit.php"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
+                  <td class="list">
+				    <table border="0" cellspacing="0" cellpadding="1">
+					<tr>
+				      <td>
+					  <?php if ($nrules == 0): ?><img src="left_d.gif" width="17" height="17" title="move selected rules to end" border="0"><?php else: ?><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules to end"><?php endif; ?></td>
+					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
+				    </tr>
+					<tr>
+					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
+					  <td></td>
+					</tr>
+				    </table>
+				  </td>
 				</tr>
               </table>
 			  <table border="0" cellspacing="0" cellpadding="0">
@@ -242,14 +304,18 @@ if ($_GET['act'] == "del") {
                   <td>log (disabled)</td>
                 </tr>
               </table>
-              <p>
-              <strong><span class="red">Hint:<br>
-              </span></strong>rules are evaluated on a first-match basis (i.e. 
-              the action of the first rule to match a packet will be executed). 
-              This means that if you use block rules, you'll have to pay attention 
-              to the rule order. Everything that isn't explicitly passed is blocked 
-              by default.</p>
-            </form>
+    </td>
+  </tr>
+</table>
+  <p>
+  <strong><span class="red">Hint:<br>
+  </span></strong>rules are evaluated on a first-match basis (i.e. 
+  the action of the first rule to match a packet will be executed). 
+  This means that if you use block rules, you'll have to pay attention 
+  to the rule order. Everything that isn't explicitly passed is blocked 
+  by default.</p>
+<input type="hidden" name="if" value="<?=$if;?>">
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>

@@ -31,6 +31,29 @@
 
 require("guiconfig.inc");
 
+$wancfg = &$config['interfaces']['wan'];
+
+if ($_POST) {
+	if ($_POST['submit'] == "Disconnect" || $_POST['submit'] == "Release") {
+		if ($wancfg['ipaddr'] == "dhcp")
+			interfaces_wan_dhcp_down();
+		else if ($wancfg['ipaddr'] == "pppoe")
+			interfaces_wan_pppoe_down();
+		else if ($wancfg['ipaddr'] == "pptp")
+			interfaces_wan_pptp_down();
+	} else if ($_POST['submit'] == "Connect" || $_POST['submit'] == "Renew") {
+		if ($wancfg['ipaddr'] == "dhcp")
+			interfaces_wan_dhcp_up();
+		else if ($wancfg['ipaddr'] == "pppoe")
+			interfaces_wan_pppoe_up();
+		else if ($wancfg['ipaddr'] == "pptp")
+			interfaces_wan_pptp_up();
+	} else {
+		header("Location: index.php");
+		exit;
+	}
+}
+
 function get_interface_info($ifdescr) {
 	
 	global $config, $g;
@@ -38,14 +61,15 @@ function get_interface_info($ifdescr) {
 	$ifinfo = array();
 	
 	/* find out interface name */
+	$ifinfo['hwif'] = $config['interfaces'][$ifdescr]['if'];
 	if ($ifdescr == "wan")
 		$ifinfo['if'] = get_real_wan_interface();
 	else
-		$ifinfo['if'] = $config['interfaces'][$ifdescr]['if'];
+		$ifinfo['if'] = $ifinfo['hwif'];
 	
 	/* run netstat to determine link info */
 	unset($linkinfo);
-	exec("/usr/bin/netstat -I " . $ifinfo['if'] . " -nWb -f link", $linkinfo);
+	exec("/usr/bin/netstat -I " . $ifinfo['hwif'] . " -nWb -f link", $linkinfo);
 	$linkinfo = preg_split("/\s+/", $linkinfo[1]);
 	if (preg_match("/\*$/", $linkinfo[0])) {
 		$ifinfo['status'] = "down";
@@ -53,7 +77,7 @@ function get_interface_info($ifdescr) {
 		$ifinfo['status'] = "up";
 	}
 	
-	if (($ifinfo['if'] != $g['pppoe_interface']) && (!strstr($ifinfo['if'],'tun'))) {
+	if (!strstr($ifinfo['if'],'tun')) {
 		$ifinfo['macaddr'] = $linkinfo[3];
 		$ifinfo['inpkts'] = $linkinfo[4];
 		$ifinfo['inerrs'] = $linkinfo[5];
@@ -69,36 +93,63 @@ function get_interface_info($ifdescr) {
 		$ifinfo['outbytes'] = $linkinfo[8];
 	}
 	
-	if ($ifinfo['status'] == "up") {
-		/* run netstat to determine inet info */
-		unset($inetinfo);
-		exec("/usr/bin/netstat -I " . $ifinfo['if'] . " -nWb -f inet", $inetinfo);
-		$inetinfo = preg_split("/\s+/", $inetinfo[1]);
-		
-		$ifinfo['ipaddr'] = $inetinfo[3];
-		
-		if ($ifdescr == "wan") {
-			/* run netstat to determine the default gateway */
-			unset($netstatrninfo);
-			exec("/usr/bin/netstat -rnf inet", $netstatrninfo);
-			
-			foreach ($netstatrninfo as $nsr) {
-				if (preg_match("/^default\s*(\S+)/", $nsr, $matches)) {
-					$ifinfo['gateway'] = $matches[1];
-				}
+	/* DHCP? -> see if dhclient is up */
+	if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "dhcp")) {
+		/* see if dhclient is up */
+		if ($ifinfo['status'] == "up" && file_exists("{$g['varrun_path']}/dhclient.pid"))
+			$ifinfo['dhcplink'] = "up";
+		else
+			$ifinfo['dhcplink'] = "down";
+	}
+	
+	/* PPPoE interface? -> get status from virtual interface */
+	if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "pppoe")) {
+		unset($linkinfo);
+		exec("/usr/bin/netstat -I " . $ifinfo['if'] . " -nWb -f link", $linkinfo);
+		$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+		if (preg_match("/\*$/", $linkinfo[0])) {
+			$ifinfo['pppoelink'] = "down";
+		} else {
+			/* get PPPoE link status for dial on demand */
+			unset($ifconfiginfo);
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+	
+			$ifinfo['pppoelink'] = "up";
+	
+			foreach ($ifconfiginfo as $ici) {
+				if (strpos($ici, 'LINK0') !== false)
+					$ifinfo['pppoelink'] = "down";
 			}
 		}
-		
-		/* try to determine netmask and media with ifconfig */
+	}
+	
+	/* PPTP interface? -> get status from virtual interface */
+	if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "pptp")) {
+		unset($linkinfo);
+		exec("/usr/bin/netstat -I " . $ifinfo['if'] . " -nWb -f link", $linkinfo);
+		$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+		if (preg_match("/\*$/", $linkinfo[0])) {
+			$ifinfo['pptplink'] = "down";
+		} else {
+			/* get PPTP link status for dial on demand */
+			unset($ifconfiginfo);
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+	
+			$ifinfo['pptplink'] = "up";
+	
+			foreach ($ifconfiginfo as $ici) {
+				if (strpos($ici, 'LINK0') !== false)
+					$ifinfo['pptplink'] = "down";
+			}
+		}
+	}
+	
+	if ($ifinfo['status'] == "up") {
+		/* try to determine media with ifconfig */
 		unset($ifconfiginfo);
-		exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+		exec("/sbin/ifconfig " . $ifinfo['hwif'], $ifconfiginfo);
 		
 		foreach ($ifconfiginfo as $ici) {
-			if (preg_match("/netmask (\S+)/", $ici, $matches) && !$ifinfo['subnet']) {
-				if (preg_match("/^0x/", $matches[1])) {
-					$ifinfo['subnet'] = long2ip(hexdec($matches[1]));
-				}
-			}
 			if (!isset($config['interfaces'][$ifdescr]['wireless'])) {
 				/* don't list media/speed for wireless cards, as it always
 				   displays 2 Mbps even though clients can connect at 11 Mbps */
@@ -120,42 +171,31 @@ function get_interface_info($ifdescr) {
 			}
 		}
 		
-		/* PPPoE only: get media from underlying ethernet interface */
-		if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "pppoe")) {
+		if ($ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down") {
+			/* try to determine IP address and netmask with ifconfig */
 			unset($ifconfiginfo);
-			exec("/sbin/ifconfig " . $config['interfaces']['wan']['if'], $ifconfiginfo);
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
 			
 			foreach ($ifconfiginfo as $ici) {
-				if (preg_match("/media: .*? \((.*?)\)/", $ici, $matches)) {
-					$ifinfo['media'] = $matches[1];
-				} else if (preg_match("/ether (.*)/", $ici, $matches)) {
-					$ifinfo['macaddr'] = $matches[1];
+				if (preg_match("/inet (\S+)/", $ici, $matches)) {
+					$ifinfo['ipaddr'] = $matches[1];
+				}
+				if (preg_match("/netmask (\S+)/", $ici, $matches)) {
+					if (preg_match("/^0x/", $matches[1]))
+						$ifinfo['subnet'] = long2ip(hexdec($matches[1]));
 				}
 			}
-
-			/* get pppoe link status for dial on demand */
-			unset($ifconfiginfo);
-			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
-
-			$ifinfo['pppoelink'] = "up";
-
-			foreach ($ifconfiginfo as $ici) {
-				if (strpos($ici, 'LINK0') !== false)
-					$ifinfo['pppoelink'] = "down";
-			}
-		}
-
-		/* get ppptp link status for dial on demand */
-		if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "pptp")) {
 			
-			unset($ifconfiginfo);
-			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
-
-			$ifinfo['pptplink'] = "up";
-
-			foreach ($ifconfiginfo as $ici) {
-				if (strpos($ici, 'LINK0') !== false)
-					$ifinfo['pptplink'] = "down";
+			if ($ifdescr == "wan") {
+				/* run netstat to determine the default gateway */
+				unset($netstatrninfo);
+				exec("/usr/bin/netstat -rnf inet", $netstatrninfo);
+				
+				foreach ($netstatrninfo as $nsr) {
+					if (preg_match("/^default\s*(\S+)/", $nsr, $matches)) {
+						$ifinfo['gateway'] = $matches[1];
+					}
+				}
 			}
 		}
 	}
@@ -174,7 +214,8 @@ function get_interface_info($ifdescr) {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-      <p class="pgtitle">Status: Interfaces</p>
+<p class="pgtitle">Status: Interfaces</p>
+<form action="" method="post">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <?php $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
 						
@@ -200,17 +241,38 @@ function get_interface_info($ifdescr) {
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['status']);?>
                 </td>
-              </tr><?php if ($ifinfo['pppoelink']): ?>
+              </tr><?php if ($ifinfo['dhcplink']): ?>
+			  <tr> 
+				<td width="22%" class="listhdrr">DHCP</td>
+				<td width="78%" class="listr"> 
+				  <?=htmlspecialchars($ifinfo['dhcplink']);?>&nbsp;&nbsp;
+				  <?php if ($ifinfo['dhcplink'] == "up"): ?>
+				  <input type="submit" name="submit" value="Release" class="formbtns">
+				  <?php else: ?>
+				  <input type="submit" name="submit" value="Renew" class="formbtns">
+				  <?php endif; ?>
+				</td>
+			  </tr><?php endif; if ($ifinfo['pppoelink']): ?>
               <tr> 
                 <td width="22%" class="listhdrr">PPPoE</td>
                 <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['pppoelink']);?>
+                  <?=htmlspecialchars($ifinfo['pppoelink']);?>&nbsp;&nbsp;
+				  <?php if ($ifinfo['pppoelink'] == "up"): ?>
+				  <input type="submit" name="submit" value="Disconnect" class="formbtns">
+				  <?php else: ?>
+				  <input type="submit" name="submit" value="Connect" class="formbtns">
+				  <?php endif; ?>
                 </td>
               </tr><?php  endif; if ($ifinfo['pptplink']): ?>
               <tr> 
                 <td width="22%" class="listhdrr">PPTP</td>
                 <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['pptplink']);?>
+                  <?=htmlspecialchars($ifinfo['pptplink']);?>&nbsp;&nbsp;
+				  <?php if ($ifinfo['pptplink'] == "up"): ?>
+				  <input type="submit" name="submit" value="Disconnect" class="formbtns">
+				  <?php else: ?>
+				  <input type="submit" name="submit" value="Connect" class="formbtns">
+				  <?php endif; ?>
                 </td>
               </tr><?php  endif; if ($ifinfo['macaddr']): ?>
               <tr> 
@@ -219,6 +281,7 @@ function get_interface_info($ifdescr) {
                   <?=htmlspecialchars($ifinfo['macaddr']);?>
                 </td>
               </tr><?php endif; if ($ifinfo['status'] != "down"): ?>
+			  <?php if ($ifinfo['dhcplink'] != "down" && $ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down"): ?>
 			  <?php if ($ifinfo['ipaddr']): ?>
               <tr> 
                 <td width="22%" class="listhdrr">IP address</td>
@@ -237,7 +300,10 @@ function get_interface_info($ifdescr) {
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['gateway']);?>
                 </td>
-              </tr><?php endif; ?><?php if ($ifinfo['media']): ?>
+              </tr><?php endif; if ($ifdescr == "wan" && file_exists("{$g['varetc_path']}/nameservers.conf")): ?>
+                <td width="22%" class="listhdrr">ISP DNS servers</td>
+                <td width="78%" class="listr"><?php echo nl2br(file_get_contents("{$g['varetc_path']}/nameservers.conf")); ?></td>
+			  <?php endif; endif; if ($ifinfo['media']): ?>
               <tr> 
                 <td width="22%" class="listhdrr">Media</td>
                 <td width="78%" class="listr"> 
@@ -278,6 +344,12 @@ function get_interface_info($ifdescr) {
 	      <?php endif; ?>
               <?php $i++; endforeach; ?>
             </table>
+</form>
+<p><strong class="red">Note:<br>
+</strong>Using dial-on-demand will bring the connection up again if any packet
+triggers it. To substantiate this point: disconnecting manually 
+will <strong>not</strong> prevent dial-on-demand from making connections
+to the outside! Don't use dial-on-demand if you want to make sure that the line is kept disconnected.
 <?php include("fend.inc"); ?>
 </body>
 </html>

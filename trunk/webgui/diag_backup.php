@@ -85,28 +85,28 @@ if ($_POST) {
             <form action="diag_backup.php" method="post" enctype="multipart/form-data">
             <?php if ($input_errors) print_input_errors($input_errors); ?>
             <?php if ($savemsg) print_info_box($savemsg); ?>
-              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <table width="100%" border="0" cellspacing="0" cellpadding="6">
                 <tr> 
                   <td colspan="2" class="listtopic">Backup configuration</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="baseline">&nbsp;</td>
-                  <td width="78%" class="listn"> 
+                  <td width="22%" valign="baseline" class="vncell">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
                     <p> Click this button to download the system configuration 
                       in XML format.<br>
                       <br>
-                      <input name="Submit" type="submit" class="formbtn" id="download" value="Download configuration">
-                      <br>
-                      &nbsp; <br>
-                      &nbsp; </p></td>
+                      <input name="Submit" type="submit" class="formbtn" id="download" value="Download configuration"></td>
+                </tr>
+                <tr> 
+                  <td colspan="2" class="list" height="12"></td>
                 </tr>
                 <tr> 
                   <td colspan="2" class="listtopic">Restore configuration</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="baseline">&nbsp;</td>
-                  <td width="78%" class="listn"> 
-                    <p> Open a m0n0wall configuration XML file and click the button 
+                  <td width="22%" valign="baseline" class="vncell">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
+                    Open a m0n0wall configuration XML file and click the button 
                       below to restore the configuration.<br>
                       <br>
                       <strong><span class="red">Note:</span></strong><br>
@@ -116,8 +116,7 @@ if ($_POST) {
                       <br>
                       <br>
                       <input name="Submit" type="submit" class="formbtn" id="restore" value="Restore configuration">
-                    </p>
-                    </td>
+                  </td>
                 </tr>
               </table>
             </form>

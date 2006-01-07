@@ -333,22 +333,11 @@ function interfaces_wan_configure() {
 		/* wait for processes to die */
 		sleep(2);
 		
-		/* remove dhclient.conf, if it exists */
-		if (file_exists("{$g['varetc_path']}/dhclient.conf")) {
-			unlink("{$g['varetc_path']}/dhclient.conf");
-		}
-		/* remove mpd.conf, if it exists */
-		if (file_exists("{$g['varetc_path']}/mpd.conf")) {
-			unlink("{$g['varetc_path']}/mpd.conf");
-		}
-		/* remove mpd.links, if it exists */
-		if (file_exists("{$g['varetc_path']}/mpd.links")) {
-			unlink("{$g['varetc_path']}/mpd.links");
-		}
-		/* remove wanip, if it exists */
-		if (file_exists("{$g['vardb_path']}/wanip")) {
-			unlink("{$g['vardb_path']}/wanip");
-		}
+		unlink_if_exists("{$g['varetc_path']}/dhclient.conf");
+		unlink_if_exists("{$g['varetc_path']}/mpd.conf");
+		unlink_if_exists("{$g['varetc_path']}/mpd.links");
+		unlink_if_exists("{$g['vardb_path']}/wanip");
+		unlink_if_exists("{$g['varetc_path']}/nameservers.conf");
 	}
 	
 	/* remove all addresses first */
@@ -393,8 +382,14 @@ function interfaces_wan_configure() {
 			break;
 			
 		default:
-			mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
-				escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']));
+			if (isset($wancfg['ispointtopoint']) && $wancfg['pointtopoint']) {
+				mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
+					escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']) . 
+					" " . escapeshellarg($wancfg['pointtopoint']) . " up");
+			} else {
+				mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
+					escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']));
+			}
 			
 			/* install default route */
 			mwexec("/sbin/route delete default");
@@ -419,6 +414,9 @@ function interfaces_wan_configure() {
 		
 		/* restart ez-ipupdate */
 		services_dyndns_configure();
+		
+		/* force DNS update */
+		services_dnsupdate_process();
 		
 		/* restart dnsmasq */
 		services_dnsmasq_configure();
@@ -462,6 +460,16 @@ EOD;
 		escapeshellarg($wancfg['if']));
 	
 	return 0;
+}
+
+function interfaces_wan_dhcp_down() {
+	mwexec("/sbin/dhclient -r");
+	sleep(3);
+}
+
+function interfaces_wan_dhcp_up() {
+	interfaces_wan_dhcp_configure();
+	sleep(3);
 }
 
 function interfaces_wan_pppoe_configure() {
@@ -516,8 +524,18 @@ EOD;
 	set link mtu 1492
 	set ipcp yes vjcomp
 	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
+
+EOD;
+
+	if (isset($config['system']['dnsallowoverride'])) {
+		$mpdconf .= <<<EOD
 	set ipcp enable req-pri-dns
 	set ipcp enable req-sec-dns
+
+EOD;
+	}
+	
+	$mpdconf .= <<<EOD
 	open iface
 
 EOD;
@@ -549,6 +567,18 @@ EOD;
 	mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pppoe");
 	
 	return 0;
+}
+
+function interfaces_wan_pppoe_down() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd.pid", "SIGUSR2");
+	sleep(3);
+}
+
+function interfaces_wan_pppoe_up() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd.pid", "SIGUSR1");
+	sleep(3);
 }
 
 function interfaces_wan_pptp_configure() {
@@ -586,7 +616,7 @@ EOD;
 	
 	if (isset($pptpcfg['ondemand'])) {
 		$mpdconf .= <<<EOD
-	set iface addrs {$pptpcfg['local']} {$pptpcfg['remote']}
+	set iface addrs 10.0.0.1 10.0.0.2
 
 EOD;
 	}
@@ -602,8 +632,18 @@ EOD;
 	set link accept chap
 	set ipcp no vjcomp
 	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
+
+EOD;
+	
+	if (isset($config['system']['dnsallowoverride'])) {
+		$mpdconf .= <<<EOD
 	set ipcp enable req-pri-dns
 	set ipcp enable req-sec-dns
+
+EOD;
+	}
+	
+	$mpdconf .= <<<EOD
 	open
 
 EOD;
@@ -639,6 +679,18 @@ EOD;
 	mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
 	
 	return 0;
+}
+
+function interfaces_wan_pptp_down() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd.pid", "SIGUSR2");
+	sleep(3);
+}
+
+function interfaces_wan_pptp_up() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd.pid", "SIGUSR1");
+	sleep(3);
 }
 
 function interfaces_wan_bigpond_configure($curwanip) {

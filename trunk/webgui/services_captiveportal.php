@@ -166,41 +166,26 @@ function radacct_change() {
 }
 
 function enable_change(enable_change) {
-	if (document.iform.enable.checked || enable_change) {
-		document.iform.cinterface.disabled = 0;
-		document.iform.idletimeout.disabled = 0;
-		document.iform.timeout.disabled = 0;
-		document.iform.redirurl.disabled = 0;
-		document.iform.radiusip.disabled = 0;
-		document.iform.radiusport.disabled = 0;
-		document.iform.radiuskey.disabled = 0;
-		document.iform.radacct_enable.disabled = 0;
-		document.iform.httpslogin_enable.disabled = 0;
-		document.iform.httpsname.disabled = 0;
-		document.iform.cert.disabled = 0;
-		document.iform.key.disabled = 0;
-		document.iform.logoutwin_enable.disabled = 0;
-		document.iform.nomacfilter.disabled = 0;
-		document.iform.htmlfile.disabled = 0;
-		document.iform.errfile.disabled = 0;
-	} else {
-		document.iform.cinterface.disabled = 1;
-		document.iform.idletimeout.disabled = 1;
-		document.iform.timeout.disabled = 1;
-		document.iform.redirurl.disabled = 1;
-		document.iform.radiusip.disabled = 1;
-		document.iform.radiusport.disabled = 1;
-		document.iform.radiuskey.disabled = 1;
-		document.iform.radacct_enable.disabled = 1;
-		document.iform.httpslogin_enable.disabled = 1;
-		document.iform.httpsname.disabled = 1;
-		document.iform.cert.disabled = 1;
-		document.iform.key.disabled = 1;
-		document.iform.logoutwin_enable.disabled = 1;
-		document.iform.nomacfilter.disabled = 1;
-		document.iform.htmlfile.disabled = 1;
-		document.iform.errfile.disabled = 1;
-	}
+	var endis;
+	endis = !(document.iform.enable.checked || enable_change);
+	
+	document.iform.cinterface.disabled = endis;
+	document.iform.idletimeout.disabled = endis;
+	document.iform.timeout.disabled = endis;
+	document.iform.redirurl.disabled = endis;
+	document.iform.radiusip.disabled = endis;
+	document.iform.radiusport.disabled = endis;
+	document.iform.radiuskey.disabled = endis;
+	document.iform.radacct_enable.disabled = endis;
+	document.iform.httpslogin_enable.disabled = endis;
+	document.iform.httpsname.disabled = endis;
+	document.iform.cert.disabled = endis;
+	document.iform.key.disabled = endis;
+	document.iform.logoutwin_enable.disabled = endis;
+	document.iform.nomacfilter.disabled = endis;
+	document.iform.htmlfile.disabled = endis;
+	document.iform.errfile.disabled = endis;
+	
 	if (enable_change && document.iform.radacct_enable.checked) {
 		document.iform.logoutwin_enable.checked = 1;
 	}
@@ -347,8 +332,7 @@ to access after they've authenticated.</td>
 		  <br>
 		<?php endif; ?>
 		  Upload an HTML file for the portal page here (leave blank to keep the current one). Make sure to include a form (POST to &quot;$PORTAL_ACTION$&quot;)
-with a submit button (name=&quot;accept&quot;). Include the &quot;auth_user&quot; and &quot;auth_pass&quot; input elements if RADIUS authentication is enabled. If RADIUS is enabled and no &quot;auth_user&quot; is present, authentication will always fail. If RADIUS is not enabled, you can omit both these input elements.
-When using HTTPS login, a hidden field with name=&quot;redirurl&quot; and value=&quot;$PORTAL_REDIRURL$&quot; has to be included as well. Example code for the form:<br>
+with a submit button (name=&quot;accept&quot;) and a hidden field with name=&quot;redirurl&quot; and value=&quot;$PORTAL_REDIRURL$&quot;. Include the &quot;auth_user&quot; and &quot;auth_pass&quot; input elements if RADIUS authentication is enabled. If RADIUS is enabled and no &quot;auth_user&quot; is present, authentication will always fail. If RADIUS is not enabled, you can omit both of these input elements. Example code for the form:<br>
 		  <br>
 		  <tt>&lt;form method=&quot;post&quot; action=&quot;$PORTAL_ACTION$&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_user&quot; type=&quot;text&quot;&gt;<br>

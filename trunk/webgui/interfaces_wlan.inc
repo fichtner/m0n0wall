@@ -98,7 +98,7 @@ function wireless_config_print() {
                   <td colspan="2" valign="top" height="16"></td>
 				</tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="vnsepcell">Wireless configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">Wireless configuration</td>
 				</tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Mode</td>

@@ -55,6 +55,7 @@ function filter_configure() {
 		$tcpidletimeout = $config['filter']['tcpidletimeout'];
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=480");
+	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=240");	/* SIP... */
 	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
@@ -379,12 +380,14 @@ EOD;
 			unset($sa);
 			
 			if ($route['interface'] == "lan") {
+				$ip = $lanip;
 				$sa = $lansa;
 				$sn = $lansn;
 				$if = $lanif;
 			} else if (strstr($route['interface'], "opt")) {
 				$oc = $optcfg[$route['interface']];
 				if ($oc['ip']) {
+					$ip = $oc['ip'];
 					$sa = $oc['sa'];
 					$sn = $oc['sn'];
 					$if = $oc['if'];	
@@ -393,6 +396,7 @@ EOD;
 			
 			if ($sa) {
 				$ipfrules .= <<<EOD
+skip 2 in on {$if} from any to {$ip}
 pass in quick on {$if} from {$sa}/{$sn} to {$route['network']}
 pass in quick on {$if} from {$route['network']} to {$sa}/{$sn}
 pass out quick on {$if} from {$sa}/{$sn} to {$route['network']}

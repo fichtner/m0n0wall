@@ -119,7 +119,7 @@ EOD;
 	if (isset($config['captiveportal']['httpslogin']))
 		$htmltext = str_replace("\$PORTAL_ACTION\$", "https://{$config['captiveportal']['httpsname']}:8001/", $htmltext);
 	else
-		$htmltext = str_replace("\$PORTAL_ACTION\$", "", $htmltext);
+		$htmltext = str_replace("\$PORTAL_ACTION\$", "http://{$config['interfaces'][$config['captiveportal']['interface']]['ipaddr']}:8000/", $htmltext);
 	
 	if (preg_match("/redirurl=(.*)/", $orig_request, $matches))
 		$redirurl = urldecode($matches[1]);
