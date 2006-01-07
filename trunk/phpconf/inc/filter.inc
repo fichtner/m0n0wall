@@ -74,6 +74,19 @@ function filter_configure() {
 	fwrite($fd, $ipfrules);
 	pclose($fd);
 	
+	/* set up MSS clamping */
+	$wanif = get_real_wan_interface();
+	
+	if ($config['interfaces']['wan']['mtu'])
+		$mssclamp = $config['interfaces']['wan']['mtu'] - 40;
+	else if ($config['interfaces']['wan']['ipaddr'] == "pppoe")
+		$mssclamp = 1452;
+	else
+		$mssclamp = 0;
+	
+	mwexec("/sbin/sysctl net.inet.ipf.fr_mssif={$wanif}");
+	mwexec("/sbin/sysctl net.inet.ipf.fr_mssclamp={$mssclamp}");
+	
 	if ($g['booting'])
 		echo "done\n";
 	
@@ -92,7 +105,7 @@ function filter_flush_state_table() {
 	return mwexec("/sbin/ipf -FS");
 }
 
-function filter_nat_rules_generate_if($if, $src, $dst, $target, $mssclamp) {
+function filter_nat_rules_generate_if($if, $src, $dst, $target) {
 
 	if ($target)
 		$tgt = $target . "/32";
@@ -100,9 +113,9 @@ function filter_nat_rules_generate_if($if, $src, $dst, $target, $mssclamp) {
 		$tgt = "0/32";
 
 	$natrule = <<<EOD
-map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp $mssclamp
-map $if $src $dst -> {$tgt} portmap tcp/udp auto $mssclamp
-map $if $src $dst -> {$tgt} $mssclamp
+map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp
+map $if $src $dst -> {$tgt} portmap tcp/udp auto
+map $if $src $dst -> {$tgt}
 
 EOD;
 
@@ -118,13 +131,6 @@ function filter_nat_rules_generate() {
 	$pptpdcfg = $config['pptpd'];
 	$wanif = get_real_wan_interface();
 	
-	if ($wancfg['mtu'])
-		$mssclamp = "mssclamp " . ($wancfg['mtu'] - 40);
-	else if ($wancfg['ipaddr'] == "pppoe")
-		$mssclamp = "mssclamp 1452";
-	else
-		$mssclamp = "";
-	
 	$lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
 	
 	$natrules = "";
@@ -136,7 +142,13 @@ function filter_nat_rules_generate() {
 				$sn = 32;
 			else
 				$sn = $natent['subnet'];
-			$natrules .= "bimap {$wanif} {$natent['internal']}/{$sn} -> {$natent['external']}/{$sn}\n";
+			
+			if (!$natent['interface'] || ($natent['interface'] == "wan"))
+				$natif = $wanif;
+			else
+				$natif = $config['interfaces'][$natent['interface']]['if'];
+			
+			$natrules .= "bimap {$natif} {$natent['internal']}/{$sn} -> {$natent['external']}/{$sn}\n";
 		}
 	}
 	
@@ -157,23 +169,42 @@ function filter_nat_rules_generate() {
 				}
 				$src .= $obent['source']['network'];
 				
-				$natrules .= filter_nat_rules_generate_if($wanif, $src, $dst,
-					$obent['target'], $mssclamp);
+				if (!$obent['interface'] || ($obent['interface'] == "wan"))
+					$natif = $wanif;
+				else
+					$natif = $config['interfaces'][$obent['interface']]['if'];
+				
+				$natrules .= filter_nat_rules_generate_if($natif, $src, $dst,
+					$obent['target']);
 			}
 		}	
 	} else {
 		/* standard outbound rules (one for each interface) */
 		$natrules .= filter_nat_rules_generate_if($wanif,
-			$lansa . "/" . $lancfg['subnet'], "", null, $mssclamp);
+			$lansa . "/" . $lancfg['subnet'], "", null);
 	
 		/* optional interfaces */
 		for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 			$optcfg = $config['interfaces']['opt' . $i];
 			
-			if (isset($optcfg['enable'])) {
+			if (isset($optcfg['enable']) && !$optcfg['bridge']) {
 				$optsa = gen_subnet($optcfg['ipaddr'], $optcfg['subnet']);
 				$natrules .= filter_nat_rules_generate_if($wanif, 
-					$optsa . "/" . $optcfg['subnet'], "", null, $mssclamp);
+					$optsa . "/" . $optcfg['subnet'], "", null);
+			}
+		}
+		
+		/* PPTP subnet */
+		if ($pptpdcfg['mode'] == "server") {
+			$natrules .= filter_nat_rules_generate_if($wanif,
+				$pptpdcfg['remoteip'] . "/" . $g['pptp_subnet'], "", null);
+		}
+		
+		/* static routes */
+		if (is_array($config['staticroutes']['route'])) {
+			foreach ($config['staticroutes']['route'] as $route) {
+				$natrules .= filter_nat_rules_generate_if($wanif,
+					$route['network'], "", null);
 			}
 		}
 	}
@@ -198,18 +229,21 @@ function filter_nat_rules_generate() {
 			else
 				$extaddr = "0/0";
 			
+			if (!$rule['interface'] || ($rule['interface'] == "wan"))
+				$natif = $wanif;
+			else
+				$natif = $config['interfaces'][$rule['interface']]['if'];
+			
 			if ((!$extport[1]) || ($extport[0] == $extport[1])) {
 				$natrules .=
-					"rdr $wanif {$extaddr} port {$extport[0]} -> {$target} " .
+					"rdr $natif {$extaddr} port {$extport[0]} -> {$target} " .
 					"port {$rule['local-port']} {$rule['protocol']}";
 			} else {
 				$natrules .=
-					"rdr $wanif {$extaddr} port {$extport[0]}-{$extport[1]} " .
+					"rdr $natif {$extaddr} port {$extport[0]}-{$extport[1]} " .
 					"-> {$target} " .
 					"port {$rule['local-port']} {$rule['protocol']}";
 			}
-			
-			$natrules .= " {$mssclamp}";
 				
 			$natrules .= "\n";
 		}
@@ -226,7 +260,7 @@ function filter_nat_rules_generate() {
 
 # PPTP
 rdr $wanif 0/0 port 0 -> $pptpdtarget port 0 gre
-rdr $wanif 0/0 port 1723 -> $pptpdtarget port 1723 tcp {$mssclamp}
+rdr $wanif 0/0 port 1723 -> $pptpdtarget port 1723 tcp
 
 EOD;
 	}
@@ -262,15 +296,21 @@ function filter_rules_generate() {
 			$oic['if'] = $oc['if'];
 			
 			if ($oc['bridge']) {
-				$oic['ip'] = $config['interfaces'][$oc['bridge']]['ipaddr'];
-				$oic['sn'] = $config['interfaces'][$oc['bridge']]['subnet'];
+				if (!strstr($oc['bridge'], "opt") || 
+					 isset($config['interfaces'][$oc['bridge']]['enable'])) {
+					if (is_ipaddr($config['interfaces'][$oc['bridge']]['ipaddr'])) {
+						$oic['ip'] = $config['interfaces'][$oc['bridge']]['ipaddr'];
+						$oic['sn'] = $config['interfaces'][$oc['bridge']]['subnet'];
+						$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
+					}
+				}
 				$oic['bridge'] = 1;
 			} else {
 				$oic['ip'] = $oc['ipaddr'];
 				$oic['sn'] = $oc['subnet'];
+				$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
 			}
 			
-			$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
 			$optcfg['opt' . $i] = $oic;
 			$ifgroups['opt' . $i] = ($i * 100) + 200;
 		}
@@ -308,7 +348,7 @@ EOD;
 
 	/* allow access to DHCP server on optional interfaces */
 	foreach ($optcfg as $on => $oc) {
-		if (isset($config['dhcpd'][$on]['enable'])) {
+		if (isset($config['dhcpd'][$on]['enable']) && (!$oc['bridge'])) {
 			$ipfrules .= <<<EOD
 
 # allow access to DHCP server on {$on}
@@ -317,6 +357,38 @@ pass in quick on {$oc['if']} proto udp from any port = 68 to {$oc['ip']} port = 
 pass out quick on {$oc['if']} proto udp from {$oc['ip']} port = 67 to any port = 68
 
 EOD;
+		}
+	}
+	
+	/* pass traffic between statically routed subnets and the subnet on the
+	   interface in question to avoid problems with complicated routing
+	   topologies */
+	if (is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
+		foreach ($config['staticroutes']['route'] as $route) {
+			unset($sa);
+			
+			if ($route['interface'] == "lan") {
+				$sa = $lansa;
+				$sn = $lansn;
+				$if = $lanif;
+			} else if (strstr($route['interface'], "opt")) {
+				$oc = $optcfg[$route['interface']];
+				if ($oc['ip']) {
+					$sa = $oc['sa'];
+					$sn = $oc['sn'];
+					$if = $oc['if'];	
+				}
+			}
+			
+			if ($sa) {
+				$ipfrules .= <<<EOD
+pass in quick on {$if} from {$sa}/{$sn} to {$route['network']}
+pass in quick on {$if} from {$route['network']} to {$sa}/{$sn}
+pass out quick on {$if} from {$sa}/{$sn} to {$route['network']}
+pass out quick on {$if} from {$route['network']} to {$sa}/{$sn}
+
+EOD;
+			}
 		}
 	}
 
@@ -363,7 +435,8 @@ EOD;
 
 	/* OPT spoof check */
 	foreach ($optcfg as $on => $oc) {
-		$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
+		if ($oc['ip'])
+			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
 	}
 	
 	/* block private networks on WAN? */
@@ -393,7 +466,8 @@ EOD;
 		$ipfrules .= filter_rules_ipsec_generate($lanif, $lanip);
 		
 		foreach ($optcfg as $on => $oc) {
-			$ipfrules .= filter_rules_ipsec_generate($oc['if'], $oc['ip']);
+			if ($oc['ip'])
+				$ipfrules .= filter_rules_ipsec_generate($oc['if'], $oc['ip']);
 		}
 	}
 
@@ -469,6 +543,17 @@ pass in quick proto tcp from any to $pptpdtarget port = 1723 keep state group 20
 EOD;
 	}
 	
+	/* BigPond client enabled? */
+	if ($wancfg['ipaddr'] == "bigpond") {
+		
+		$ipfrules .= <<<EOD
+
+# BigPond heartbeat rules
+pass in quick proto udp from any to any port = 5050 keep state group 200
+
+EOD;
+	}
+	
 	$i = 0;
 	
 	$ipfrules .= "\n# User-defined rules follow\n";
@@ -485,16 +570,20 @@ EOD;
 		/* does the rule deal with a PPTP interface? */
 		if ($rule['interface'] == "pptp") {
 		
-			if ($pptpdcfg['mode'] != "server")
+			if ($pptpdcfg['mode'] != "server") {
+				$i++;
 				continue;
+			}
 				
 			$nif = $g['n_pptp_units'];
 			$ispptp = true;
 		} else {
 			
 			if (strstr($rule['interface'], "opt")) {
-				if (!array_key_exists($rule['interface'], $optcfg))
+				if (!array_key_exists($rule['interface'], $optcfg)) {
+					$i++;
 					continue;
+				}
 			}
 			
 			$nif = 1;
@@ -503,24 +592,34 @@ EOD;
 		
 		if ($pptpdcfg['mode'] != "server") {
 			if (($rule['source']['network'] == "pptp") ||
-				($rule['destination']['network'] == "pptp"))
+				($rule['destination']['network'] == "pptp")) {
+					$i++;
 					continue;
+				}
 		}
 		
 		if ($rule['source']['network'] && strstr($rule['source']['network'], "opt")) {
-			if (!array_key_exists($rule['source']['network'], $optcfg))
+			if (!array_key_exists($rule['source']['network'], $optcfg)) {
+				$i++;
 				continue;
+			}
 		}
 		if ($rule['destination']['network'] && strstr($rule['destination']['network'], "opt")) {
-			if (!array_key_exists($rule['destination']['network'], $optcfg))
+			if (!array_key_exists($rule['destination']['network'], $optcfg)) {
+				$i++;
 				continue;
+			}
 		}
 		
 		/* check for unresolvable aliases */
-		if ($rule['source']['address'] && !alias_expand($rule['source']['address']))
+		if ($rule['source']['address'] && !alias_expand($rule['source']['address'])) {
+			$i++;
 			continue;
-		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address']))
+		}
+		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address'])) {
+			$i++;
 			continue;
+		}
 		
 		for ($iif = 0; $iif < $nif; $iif++) {
 			
@@ -590,8 +689,8 @@ EOD;
 				$src = alias_expand($rule['source']['address']);
 			}
 			
-			if (!$src) {
-				printf("No source address found in rule $i\n");
+			if (!$src || ($src == "/")) {
+				//printf("No source address found in rule $i\n");
 				break;
 			}
 			
@@ -644,8 +743,8 @@ EOD;
 				$dst = alias_expand($rule['destination']['address']);
 			}
 			
-			if (!$dst) {
-				printf("No destination address found in rule $i\n");
+			if (!$dst || ($dst == "/")) {
+				//printf("No destination address found in rule $i\n");
 				break;
 			}
 			

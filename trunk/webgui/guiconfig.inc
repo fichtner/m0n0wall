@@ -37,6 +37,10 @@ if (!$omit_nocacheheaders) {
 	header("Pragma: no-cache");
 }
 
+/* parse the configuration and include all configuration functions */
+require_once("config.inc");
+require_once("functions.inc");
+
 $d_natconfdirty_path = $g['varrun_path'] . "/nat.conf.dirty";
 $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
 $d_ipsecconfdirty_path = $g['varrun_path'] . "/ipsec.conf.dirty";
@@ -50,6 +54,8 @@ $d_proxyarpdirty_path = $g['varrun_path'] . "/proxyarp.dirty";
 $d_fwupenabled_path = $g['varrun_path'] . "/fwup.enabled";
 $d_firmwarelock_path = $g['varrun_path'] . "/firmware.lock";
 $d_sysrebootreqd_path = $g['varrun_path'] . "/sysreboot.reqd";
+$d_passthrumacsdirty_path = $g['varrun_path'] . "/passthrumacs.dirty";
+$d_allowedipsdirty_path = $g['varrun_path'] . "/allowedips.dirty";
 
 if (file_exists($d_firmwarelock_path)) {
 	if (!$d_isfwfile) {
@@ -60,14 +66,11 @@ if (file_exists($d_firmwarelock_path)) {
 	}
 }
 
-/* parse the configuration and include all configuration functions */
-require_once("config.inc");
-require_once("functions.inc");
-
 /* some well knows ports */
 $wkports = array(21 => "FTP", 22 => "SSH", 23 => "Telnet", 25 => "SMTP", 53 => "DNS", 80 => "HTTP",
 				 110 => "POP3", 143 => "IMAP", 443 => "HTTPS");
 
+$iptos = array("lowdelay", "throughput", "reliability", "mincost", "congestion");
 /* TCP flags */
 $tcpflags = array("fin", "syn", "rst", "psh", "ack", "urg");
 
@@ -87,7 +90,8 @@ $fwupplatforms = array('net45xx', 'net48xx', 'generic-pc', 'wrap');
 /* IPsec defines */
 $my_identifier_list = array('myaddress' => 'My IP address',
 							'address' => 'IP address',
-							'fqdn' => 'Domain name');
+							'fqdn' => 'Domain name',
+							'user_fqdn' => 'User FQDN');
 
 $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish', 
 					'cast128' => 'CAST128');
@@ -108,7 +112,7 @@ function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors
 
 function print_input_errors($input_errors) {
 	echo "<p><table border=\"0\" cellspacing=\"0\" cellpadding=\"4\" width=\"100%\">\n";
-	echo "<tr><td bgcolor=\"#A12A2A\" width=\"36\" align=\"center\" valign=\"top\"><img src=\"err.gif\" width=\"28\" height=\"32\"></td>\n";
+	echo "<tr><td bgcolor=\"#A12A2A\" width=\"36\" align=\"center\" valign=\"top\"><img src=\"/err.gif\" width=\"28\" height=\"32\"></td>\n";
 	echo "<td bgcolor=\"#FFD9D1\" style=\"padding-left: 8px; padding-top: 6px\">";
 	
 	echo "<span class=\"errmsg\"><p>The following input errors were detected:<ul>\n";
@@ -153,7 +157,7 @@ function verify_gzip_file($fname) {
 
 function print_info_box_np($msg) {
 	echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"4\" width=\"100%\">\n";
-	echo "<tr><td bgcolor=\"#687BA4\" align=\"center\" valign=\"top\" width=\"36\"><img src=\"exclam.gif\" width=\"28\" height=\"32\"></td>\n";
+	echo "<tr><td bgcolor=\"#687BA4\" align=\"center\" valign=\"top\" width=\"36\"><img src=\"/exclam.gif\" width=\"28\" height=\"32\"></td>\n";
 	echo "<td bgcolor=\"#D9DEE8\" style=\"padding-left: 8px\">";
 	echo $msg;
 	echo "</td></tr></table>";
@@ -182,7 +186,7 @@ function get_std_save_message($ok) {
 
 	if ($ok == 0) {
 		if (file_exists($d_sysrebootreqd_path))
-			return "The changes have been saved. You must reboot your firewall for changes to take effect.";
+			return "The changes have been saved. You must <a href=\"/reboot.php\">reboot</a> your firewall for changes to take effect.";
 		else
 			return "The changes have been applied successfully.";
 	} else {
@@ -391,8 +395,34 @@ function proxyarp_sort() {
 	usort($config['proxyarp']['proxyarpnet'], "proxyarpcmp");
 }
 
-function is_numericint($arg) {
-	return (preg_match("/[^0-9]/", $arg) ? false : true);
+function passthrumacs_sort() {
+	global $g, $config;
+
+	function passthrumacscmp($a, $b) {
+		return strcmp($a['mac'], $b['mac']);
+	}
+	
+	usort($config['captiveportal']['passthrumac'],"passthrumacscmp");
+}
+
+function allowedips_sort() {
+	global $g, $config;
+
+	function allowedipscmp($a, $b) {
+		return strcmp($a['ip'], $b['ip']);
+	}
+	
+	usort($config['captiveportal']['allowedip'],"allowedipscmp");
+}
+
+function wol_sort() {
+	global $g, $config;
+
+	function wolcmp($a, $b) {
+		return strcmp($a['descr'], $b['descr']);
+	}
+	
+	usort($config['wol']['wolentry'], "wolcmp");
 }
 
 ?>

@@ -51,7 +51,7 @@ function shaper_configure() {
 		mwexec("/sbin/sysctl net.inet.ip.fw.one_pass=1");
 		
 		/* load shaper rules */
-		mwexec("/sbin/ipfw -f flush");
+		mwexec("/sbin/ipfw -f delete set 4");
 		mwexec("/sbin/ipfw -f pipe flush");
 		
 		/* XXX - seems like ipfw cannot accept rules directly on stdin,
@@ -76,10 +76,16 @@ function shaper_configure() {
 			echo "done\n";
 		
 	} else {
-		/* unload ipfw and dummynet */
 		mwexec("/sbin/sysctl net.link.ether.bridge_ipfw=0");
-		mwexec("/sbin/kldunload dummynet");
-		mwexec("/sbin/kldunload ipfw");
+		if (!isset($config['captiveportal']['enable'])) {
+			/* unload ipfw and dummynet */
+			mwexec("/sbin/kldunload dummynet");
+			mwexec("/sbin/kldunload ipfw");
+		} else {
+			/* captive portal is on - just remove our rules */
+			mwexec("/sbin/ipfw -f delete set 4");
+			mwexec("/sbin/ipfw -f pipe flush");
+		}
 	}
 	
 	return 0;
@@ -122,28 +128,40 @@ function shaper_rules_generate() {
 		$pptpsn = $g['pptp_subnet'];
 	}
 	
+	$rulei = 50000;
+	
 	/* add a rule to pass all traffic from/to the firewall,
 	   so the user cannot lock himself out of the webGUI */
-	$shaperrules = "add pass all from $lanip to any\n";
-	$shaperrules .= "add pass all from any to $lanip\n";
+	$shaperrules = "add $rulei set 4 pass all from $lanip to any\n"; $rulei++;
+	$shaperrules .= "add $rulei set 4 pass all from any to $lanip\n"; $rulei++;
 	
 	/* generate rules */
 	if (isset($config['shaper']['rule']))	
 		foreach ($config['shaper']['rule'] as $rule) {
+			
+		/* don't include disabled rules */
+		if (isset($rule['disabled'])) {
+			$i++;
+			continue;
+		}
 		
 		/* does the rule deal with a PPTP interface? */
 		if ($rule['interface'] == "pptp") {
 		
-			if ($pptpdcfg['mode'] != "server")
+			if ($pptpdcfg['mode'] != "server") {
+				$i++;
 				continue;
+			}
 				
 			$nif = $g['n_pptp_units'];
 			$ispptp = true;
 		} else {
 			
 			if (strstr($rule['interface'], "opt")) {
-				if (!array_key_exists($rule['interface'], $optcfg))
+				if (!array_key_exists($rule['interface'], $optcfg)) {
+					$i++;
 					continue;
+				}
 			}
 		
 			$nif = 1;
@@ -152,34 +170,44 @@ function shaper_rules_generate() {
 		
 		if ($pptpdcfg['mode'] != "server") {
 			if (($rule['source']['network'] == "pptp") ||
-				($rule['destination']['network'] == "pptp"))
+				($rule['destination']['network'] == "pptp")) {
+					$i++;
 					continue;
+				}
 		}
 		
 		if (strstr($rule['source']['network'], "opt")) {
-			if (!array_key_exists($rule['source']['network'], $optcfg))
+			if (!array_key_exists($rule['source']['network'], $optcfg)) {
+				$i++;
 				continue;
+			}
 		}
 		if (strstr($rule['destination']['network'], "opt")) {
-			if (!array_key_exists($rule['destination']['network'], $optcfg))
+			if (!array_key_exists($rule['destination']['network'], $optcfg)) {
+				$i++;
 				continue;
+			}
 		}
 		
 		/* check for unresolvable aliases */
-		if ($rule['source']['address'] && !alias_expand($rule['source']['address']))
+		if ($rule['source']['address'] && !alias_expand($rule['source']['address'])) {
+			$i++;
 			continue;
-		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address']))
+		}
+		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address'])) {
+			$i++;
 			continue;
+		}
 		
 		for ($iif = 0; $iif < $nif; $iif++) {
 			
 			/* pipe or queue? */
 			if (isset($rule['targetpipe']) && isset($config['shaper']['pipe'][$rule['targetpipe']])) {
 				$pipen = $rule['targetpipe'] + 1;
-				$line = "add pipe $pipen ";
+				$line = "add $rulei set 4 pipe $pipen "; $rulei++;
 			} else if (isset($rule['targetqueue']) && isset($config['shaper']['queue'][$rule['targetqueue']])) {
 				$queuen = $rule['targetqueue'] + 1;
-				$line = "add queue $queuen ";
+				$line = "add $rulei set 4 queue $queuen "; $rulei++;
 			} else {
 				printf("Neither existing pipe nor queue found in rule $i\n");
 				break;
@@ -224,7 +252,7 @@ function shaper_rules_generate() {
 				$line .= "from $src ";
 			}
 			
-			if (in_array($rule['protocol'], array("tcp","udp"))) {
+			if (!isset($rule['protocol']) || in_array($rule['protocol'], array("tcp","udp"))) {
 				
 				if ($rule['source']['port']) {
 					$srcport = explode("-", $rule['source']['port']);
@@ -270,7 +298,7 @@ function shaper_rules_generate() {
 				$line .= "to $dst ";
 			}
 			
-			if (in_array($rule['protocol'], array("tcp","udp"))) {
+			if (!isset($rule['protocol']) || in_array($rule['protocol'], array("tcp","udp"))) {
 				
 				if ($rule['destination']['port']) {
 					$dstport = explode("-", $rule['destination']['port']);
@@ -285,6 +313,9 @@ function shaper_rules_generate() {
 			
 			if ($rule['iplen'])
 				$line .= "iplen {$rule['iplen']} ";
+				
+			if ($rule['iptos']) 
+				$line .= "iptos {$rule['iptos']} ";
 			
 			if ($rule['tcpflags'])
 				$line .= "tcpflags {$rule['tcpflags']} ";

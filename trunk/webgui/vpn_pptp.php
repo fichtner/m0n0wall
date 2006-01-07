@@ -171,9 +171,18 @@ function enable_change(enable_over) {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">VPN: PPTP</p>
+<form action="vpn_pptp.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
-            <form action="vpn_pptp.php" method="post" name="iform" id="iform">
+<?php if ($savemsg) print_info_box($savemsg); ?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabact">Configuration</li>
+    <li class="tabinact"><a href="vpn_pptp_users.php">Users</a></li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
@@ -278,6 +287,9 @@ function enable_change(enable_over) {
                     traffic from PPTP clients!</span></td>
                 </tr>
               </table>
+			</td>
+	</tr>
+</table>
 </form>
 <script language="JavaScript">
 <!--

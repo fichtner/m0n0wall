@@ -43,13 +43,14 @@ require("guiconfig.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Diagnostics: IPsec</p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+	<li class="tabinact"><a href="diag_ipsec_sad.php">SAD</a></li>
+	<li class="tabact">SPD</li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="diag_ipsec_sad.php" class="tblnk">SAD</a></td>
-    <td nowrap class="tabact">SPD</td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="3" class="tabcont">
+    <td class="tabcont">
 <?php
 
 /* delete any SP? */
@@ -80,10 +81,13 @@ if ($fd) {
 			$cursp['src'] = substr($linea[0], 0, strpos($linea[0], "["));
 			$cursp['dst'] = substr($linea[1], 0, strpos($linea[1], "["));
 			$i = 0;
-		} else {
+		} else if (is_array($cursp)) {
 			$linea = explode(" ", trim($line));
 			if ($i == 1) {
-				$cursp['dir'] = $linea[0];
+				if ($linea[1] == "none")	/* don't show default anti-lockout rule */
+					unset($cursp);
+				else
+					$cursp['dir'] = $linea[0];
 			} else if ($i == 2) {
 				$upperspec = explode("/", $linea[0]);
 				$cursp['proto'] = $upperspec[0];

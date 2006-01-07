@@ -38,6 +38,7 @@ if (!is_array($config['shaper']['queue'])) {
 	$config['shaper']['queue'] = array();
 }
 $a_queues = &$config['shaper']['queue'];
+$a_pipe = &$config['shaper']['pipe'];
 
 if ($_GET['act'] == "del") {
 	if ($a_queues[$_GET['id']]) {
@@ -84,25 +85,27 @@ if ($_GET['act'] == "del") {
 <p class="pgtitle">Firewall: Traffic shaper</p>
 <form action="firewall_shaper.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="firewall_shaper.php">Rules</a></li>
+    <li class="tabinact"><a href="firewall_shaper_pipes.php">Pipes</a></li>
+    <li class="tabact">Queues</li>
+    <li class="tabinact"><a href="firewall_shaper_magic.php">Magic shaper wizard</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="firewall_shaper.php" class="tblnk">Rules</a></td>
-    <td nowrap class="tabinact"><a href="firewall_shaper_pipes.php" class="tblnk">Pipes</a></a></td>
-    <td nowrap class="tabact">Queues</td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="4" class="tabcont">
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                       <tr> 
                         <td width="10%" class="listhdrr">No.</td>
-                        <td width="15%" class="listhdrr">Pipe</td>
-                        <td width="15%" class="listhdrr">Weight</td>
+                        <td width="25%" class="listhdrr">Pipe</td>
+                        <td width="5%" class="listhdrr">Weight</td>
                         <td width="20%" class="listhdrr">Mask</td>
                         <td width="30%" class="listhdr">Description</td>
                         <td width="10%" class="list"></td>
@@ -112,7 +115,13 @@ if ($_GET['act'] == "del") {
                         <td class="listlr"> 
                           <?=($i+1);?></td>
                         <td class="listr"> 
-                          <a href="firewall_shaper_pipes_edit.php?id=<?=$queue['targetpipe'];?>"><?=$queue['targetpipe']+1;?></a></td>
+							<?php
+							if ($a_pipe[$queue['targetpipe']]['descr'])
+								$desc = htmlspecialchars($a_pipe[$queue['targetpipe']]['descr']);
+							else 
+								$desc = "Pipe " . ($queue['targetpipe']+1);
+							?>	
+                          <a href="firewall_shaper_pipes_edit.php?id=<?=$queue['targetpipe'];?>"><?=$desc;?></a></td>
                         <td class="listr"> 
                           <?=$queue['weight'];?></td>
                         <td class="listr"> 

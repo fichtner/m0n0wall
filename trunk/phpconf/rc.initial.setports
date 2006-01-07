@@ -51,6 +51,32 @@ EOD;
 	
 	echo <<<EOD
 
+Do you want to set up VLANs first?
+If you're not going to use VLANs, or only for optional interfaces, you
+should say no here and use the webGUI to configure VLANs later, if required.
+
+Do you want to set up VLANs now? (y/n) 
+EOD;
+	
+	if (strcasecmp(chop(fgets($fp)), "y") == 0)
+		vlan_setup();
+	
+	if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
+		
+		echo "\n\nVLAN interfaces:\n\n";
+		$i = 0;
+		foreach ($config['vlans']['vlan'] as $vlan) {
+			
+			echo sprintf("% -8s%s\n", "vlan{$i}",
+				"VLAN tag {$vlan['tag']}, interface {$vlan['if']}");
+				
+			$iflist['vlan' . $i] = array();
+			$i++;
+		}
+	}
+	
+	echo <<<EOD
+
 If you don't know the names of your interfaces, you may choose to use
 auto-detection. In that case, disconnect all interfaces before you begin,
 and reconnect each one when prompted to do so.
@@ -227,5 +253,51 @@ EOD;
 		echo "No link-up detected.\n";
 		
 		return null;
+	}
+	
+	function vlan_setup() {
+		global $iflist, $config, $g, $fp;
+		
+		if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
+		
+		echo <<<EOD
+
+WARNING: all existing VLANs will be cleared if you proceed!
+
+Do you want to proceed? (y/n) 
+EOD;
+	
+		if (strcasecmp(chop(fgets($fp)), "y") != 0)
+			return;
+		}
+		
+		$config['vlans']['vlan'] = array();
+		echo "\n";
+		
+		while (1) {
+			$vlan = array();
+			
+			echo "\nEnter the parent interface name for the new VLAN (or nothing if finished): ";
+			$vlan['if'] = chop(fgets($fp));
+			
+			if ($vlan['if']) {
+				if (!array_key_exists($vlan['if'], $iflist)) {
+					echo "\nInvalid interface name '{$vlan['if']}'\n";
+					continue;
+				}
+			} else {
+				break;
+			}
+			
+			echo "Enter the VLAN tag (1-4094): ";
+			$vlan['tag'] = chop(fgets($fp));
+			
+			if (!is_numericint($vlan['tag']) || ($vlan['tag'] < 1) || ($vlan['tag'] > 4094)) {
+				echo "\nInvalid VLAN tag '{$vlan['tag']}'\n";
+				continue;
+			}
+			
+			$config['vlans']['vlan'][] = $vlan;
+		}
 	}
 ?>

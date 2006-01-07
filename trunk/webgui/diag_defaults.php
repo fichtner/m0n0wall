@@ -53,8 +53,8 @@ if ($_POST) {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Diagnostics: Factory defaults</p>
-<?php if ($rebootmsg): echo print_info_box(htmlspecialchars($rebootmsg)); else: ?>
-      <form action="diag_defaults.php" method="post">
+<?php if ($rebootmsg): echo print_info_box($rebootmsg); else: ?>
+<form action="diag_defaults.php" method="post">
               <p><strong>If you click &quot;Yes&quot;, the firewall will be reset 
                 to factory defaults and will reboot immediately. The entire system 
                 configuration will be overwritten. The LAN IP address will be 

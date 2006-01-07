@@ -97,7 +97,6 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: Traffic shaper: Edit pipe</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_shaper_pipes_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 

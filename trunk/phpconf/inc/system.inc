@@ -338,11 +338,11 @@ EOD;
 		fclose($fd);
 	
 		$res = mwexec("/usr/local/sbin/mini_httpd -S -E {$g['varetc_path']}/cert.pem" .
-			" -c \"**.php\" -u root $portarg" .
+			" -c \"**.php|**.cgi\" -u root -maxproc 16 $portarg" .
 			" -i {$g['varrun_path']}/mini_httpd.pid");
 	} else {
-		$res = mwexec("/usr/local/sbin/mini_httpd -c \"**.php\" -u root" .
-			" $portarg -i {$g['varrun_path']}/mini_httpd.pid");
+		$res = mwexec("/usr/local/sbin/mini_httpd -c \"**.php|**.cgi\" -u root" .
+			" -maxproc 16 $portarg -i {$g['varrun_path']}/mini_httpd.pid");
 	}
 	
 	if ($g['booting']) {
@@ -433,13 +433,21 @@ function system_ntp_configure() {
 function system_reboot() {
 	global $g;
 	
+	system_reboot_cleanup();
+	
 	mwexec("nohup /etc/rc.reboot > /dev/null 2>&1 &");
 }
 
 function system_reboot_sync() {
 	global $g;
 	
+	system_reboot_cleanup();
+	
 	mwexec("/etc/rc.reboot > /dev/null 2>&1");
+}
+
+function system_reboot_cleanup() {
+	captiveportal_radius_stop_all();
 }
 
 function system_do_shell_commands() {
@@ -453,6 +461,25 @@ function system_do_shell_commands() {
 	}
 }
 
+function system_do_extensions() {
+	global $config, $g;
+	
+	if (!is_dir("{$g['etc_path']}/inc/ext"))
+		return;
+	
+	$dh = @opendir("{$g['etc_path']}/inc/ext");
+	if ($dh) {
+		while (($extd = readdir($dh)) !== false) {
+			if (($extd === ".") || ($extd === ".."))
+				continue;
+			$rcfile = "{$g['etc_path']}/inc/ext/" . $extd . "/rc";
+			if (file_exists($rcfile))
+				passthru($rcfile);
+		}
+		closedir($dh);
+	}
+}
+
 function system_console_configure() {
 	global $config, $g;
 	
@@ -461,6 +488,33 @@ function system_console_configure() {
 	} else {
 		unlink_if_exists("{$g['varetc_path']}/disableconsole");
 	}
+}
+
+function system_dmesg_save() {
+	global $g;
+	
+	exec("/sbin/dmesg", $dmesg);
+	
+	/* find last copyright line (output from previous boots may be present) */
+	$lastcpline = 0;
+	
+	for ($i = 0; $i < count($dmesg); $i++) {
+		if (strstr($dmesg[$i], "Copyright (c) 1992-"))
+			$lastcpline = $i;
+	}
+	
+	$fd = fopen("{$g['varlog_path']}/dmesg.boot", "w");
+	if (!$fd) {
+		printf("Error: cannot open dmesg.boot in system_dmesg_save().\n");
+		return 1;
+	}
+	
+	for ($i = $lastcpline; $i < count($dmesg); $i++)
+		fwrite($fd, $dmesg[$i] . "\n");
+	
+	fclose($fd);
+	
+	return 0;
 }
 
 ?>

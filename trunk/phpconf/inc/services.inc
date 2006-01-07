@@ -64,17 +64,9 @@ function services_dhcpd_configure() {
 		printf("Error: cannot open dhcpd.conf in services_dhcpd_configure().\n");
 		return 1;
 	}
-
-	$dnscfg = "";
-	if (isset($config['dnsmasq']['enable'])) {
-		$dnscfg = "option domain-name-servers " . $config['interfaces']['lan']['ipaddr'] . ";";
-	} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-		$dnscfg = "option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
-	}
 	
 	$dhcpdconf = <<<EOD
 option domain-name "{$syscfg['domain']}";
-$dnscfg
 default-lease-time 7200;
 max-lease-time 86400;
 authoritative;
@@ -96,10 +88,23 @@ EOD;
 		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
 		
+		$dnscfg = "";
+		if (isset($config['dnsmasq']['enable'])) {
+			$dnscfg = "option domain-name-servers " . $ifcfg['ipaddr'] . ";";
+		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
+			$dnscfg = "option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
+		}
+
+		$dhcpdconf .= "subnet $subnet netmask $subnetmask {\n";
+		$dhcpdconf .= "	pool {\n";
+		if (isset($dhcpifconf['denyunknown'])) 
+		   $dhcpdconf .= "		deny unknown clients;\n";
+		
 		$dhcpdconf .= <<<EOD
-subnet $subnet netmask $subnetmask {
-	range {$dhcpifconf['range']['from']} {$dhcpifconf['range']['to']};
+		range {$dhcpifconf['range']['from']} {$dhcpifconf['range']['to']};
+	}
 	option routers {$ifcfg['ipaddr']};
+	$dnscfg
 
 EOD;
 
@@ -126,10 +131,12 @@ EOD;
 				$dhcpdconf .= <<<EOD
 host s_{$dhcpif}_{$i} {
 	hardware ethernet {$sm['mac']};
-	fixed-address {$sm['ipaddr']};
-}
 
 EOD;
+				if ($sm['ipaddr'])
+					$dhcpdconf .= "	fixed-address {$sm['ipaddr']};\n";
+				
+				$dhcpdconf .= "}\n";
 				$i++;
 			}
 		}
@@ -326,7 +333,8 @@ function services_proxyarp_configure() {
 	
 	if (is_array($config['proxyarp']) && count($config['proxyarp']) &&
 			(is_ipaddr($config['interfaces']['wan']['ipaddr']) ||
-			($config['interfaces']['wan']['ipaddr'] == "dhcp"))) {
+			($config['interfaces']['wan']['ipaddr'] == "dhcp") ||
+			($config['interfaces']['wan']['ipaddr'] == "bigpond"))) {
 	
 		$args = $config['interfaces']['wan']['if'] . " auto";
 	

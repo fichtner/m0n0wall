@@ -34,7 +34,15 @@ require("guiconfig.inc");
 if (!is_array($config['shaper']['rule'])) {
 	$config['shaper']['rule'] = array();
 }
+if (!is_array($config['shaper']['pipe'])) {
+	$config['shaper']['pipe'] = array();
+}
+if (!is_array($config['shaper']['queue'])) {
+	$config['shaper']['queue'] = array();
+}
 $a_shaper = &$config['shaper']['rule'];
+$a_pipe = &$config['shaper']['pipe'];
+$a_queue = &$config['shaper']['queue'];
 
 $pconfig['enable'] = isset($config['shaper']['enable']);
 
@@ -89,6 +97,14 @@ if ($_GET['act'] == "del") {
 		header("Location: firewall_shaper.php");
 		exit;
 	}
+} else if ($_GET['act'] == "toggle") {
+	if ($a_shaper[$_GET['id']]) {
+		$a_shaper[$_GET['id']]['disabled'] = !isset($a_shaper[$_GET['id']]['disabled']);
+		write_config();
+		touch($d_shaperconfdirty_path);
+		header("Location: firewall_shaper.php");
+		exit;
+	}
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -103,20 +119,22 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: Traffic shaper</p>
 <form action="firewall_shaper.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabact">Rules</li>
+    <li class="tabinact"><a href="firewall_shaper_pipes.php">Pipes</a></li>
+    <li class="tabinact"><a href="firewall_shaper_queues.php">Queues</a></li>
+    <li class="tabinact"><a href="firewall_shaper_magic.php">Magic shaper wizard</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabact">Rules</td>
-    <td nowrap class="tabinact"><a href="firewall_shaper_pipes.php" class="tblnk">Pipes</a></td>
-    <td nowrap class="tabinact"><a href="firewall_shaper_queues.php" class="tblnk">Queues</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="4" class="tabcont">
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td class="vtable"><p>
@@ -144,53 +162,73 @@ if ($_GET['act'] == "del") {
                       <tr valign="top"> 
                         <td class="listlr"> 
                           <?php
+				  $dis = "";
+				  if (isset($shaperent['disabled'])) {
+				  	$dis = "_d";
+					$textss = "<span class=\"gray\">";
+					$textse = "</span>";
+				  } else {
+				  	$textss = $textse = "";
+				  }
 				  $iflabels = array('lan' => 'LAN', 'wan' => 'WAN', 'pptp' => 'PPTP');
 				  for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++)
 				  	$iflabels['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
-				  echo htmlspecialchars($iflabels[$shaperent['interface']]);
-				  if ($shaperent['direction'])
-				  	echo "<br><img src=\"{$shaperent['direction']}.gif\" width=\"11\" height=\"11\" style=\"margin-top: 5px\">";
+				  echo $textss . htmlspecialchars($iflabels[$shaperent['interface']]);
+				  echo "<br>";
+				  echo "<a href=\"?act=toggle&id={$i}\">";
+				  if ($shaperent['direction'] != "in")
+				  	echo "<img src=\"out{$dis}.gif\" width=\"11\" height=\"11\" border=\"0\" style=\"margin-top: 5px\" title=\"click to toggle enabled/disabled status\">";
+				  if ($shaperent['direction'] != "out")
+				  	echo "<img src=\"in{$dis}.gif\" width=\"11\" height=\"11\" border=\"0\" style=\"margin-top: 5px\" title=\"click to toggle enabled/disabled status\">";
+				  echo "</a>" . $textse;;
 				  ?>
                         </td>
                         <td class="listr"> 
-                          <?php if (isset($shaperent['protocol'])) echo strtoupper($shaperent['protocol']); else echo "*"; ?>
+                          <?=$textss;?><?php if (isset($shaperent['protocol'])) echo strtoupper($shaperent['protocol']); else echo "*"; ?><?=$textse;?>
                         </td>
-                        <td class="listr"> <?php echo htmlspecialchars(pprint_address($shaperent['source'])); ?>
+                        <td class="listr"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['source'])); ?>
 						<?php if ($shaperent['source']['port']): ?><br>
 						Port: <?=htmlspecialchars(pprint_port($shaperent['source']['port'])); ?> 
-						<?php endif; ?>
+						<?php endif; ?><?=$textse;?>
                         </td>
-                        <td class="listr"> <?php echo htmlspecialchars(pprint_address($shaperent['destination'])); ?>
+                        <td class="listr"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['destination'])); ?>
 						<?php if ($shaperent['destination']['port']): ?><br>
 						Port: <?=htmlspecialchars(pprint_port($shaperent['destination']['port'])); ?>
-						<?php endif; ?>
+						<?php endif; ?><?=$textse;?>
                         </td>
-                        <td class="listr"> 
+                        <td class="listr"><?=$textss;?>
                           <?php 
-						if (isset($shaperent['targetpipe']))
-							echo "<a href=\"firewall_shaper_pipes_edit.php?id={$shaperent['targetpipe']}\">Pipe " . 
-								($shaperent['targetpipe']+1) . "</a>";
-						else if (isset($shaperent['targetqueue']))
-							echo "<a href=\"firewall_shaper_queues_edit.php?id={$shaperent['targetqueue']}\">Queue " . 
-								($shaperent['targetqueue']+1) . "</a>";
-					?>
+							if (isset($shaperent['targetpipe'])) {
+								if ($a_pipe[$shaperent['targetpipe']]['descr'])
+									$desc = htmlspecialchars($a_pipe[$shaperent['targetpipe']]['descr']);
+								else 
+									$desc = "Pipe " . ($shaperent['targetpipe']+1);
+								echo "<a href=\"firewall_shaper_pipes_edit.php?id={$shaperent['targetpipe']}\">{$desc}</a>";
+							} else if (isset($shaperent['targetqueue'])) {
+								if ($a_queue[$shaperent['targetqueue']]['descr'])
+									$desc = htmlspecialchars($a_queue[$shaperent['targetqueue']]['descr']);
+								else 
+									$desc = "Queue " . ($shaperent['targetqueue']+1);
+								echo "<a href=\"firewall_shaper_queues_edit.php?id={$shaperent['targetqueue']}\">{$desc}</a>";
+							}
+						  ?><?=$textse;?>
                         </td>
                         <td class="listbg"> 
-                          <?=htmlspecialchars($shaperent['descr']);?>
+                          <?=$textss;?><?=htmlspecialchars($shaperent['descr']);?><?=$textse;?>
                           &nbsp; </td>
-                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_edit.php?id=<?=$i;?>"><img src="e.gif" alt="edit rule" width="17" height="17" border="0"></a> 
+                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a> 
                           <?php if ($i > 0): ?>
-                          <a href="firewall_shaper.php?act=up&id=<?=$i;?>"><img src="up.gif" alt="move up" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper.php?act=up&id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0"></a> 
                           <?php else: ?>
                           <img src="up_d.gif" width="17" height="17" border="0"> 
                           <?php endif; ?><br>
-						  <a href="firewall_shaper.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" alt="delete rule" width="17" height="17" border="0"></a> 
+						  <a href="firewall_shaper.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0"></a> 
                           <?php if (isset($a_shaper[$i+1])): ?>
-                          <a href="firewall_shaper.php?act=down&id=<?=$i;?>"><img src="down.gif" alt="move down" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper.php?act=down&id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0"></a> 
                           <?php else: ?>
                           <img src="down_d.gif" width="17" height="17" border="0"> 
                           <?php endif; ?>
-                          <a href="firewall_shaper_edit.php?dup=<?=$i;?>"><img src="plus.gif" alt="add a new rule based on this one" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a> 
                         </td>
                       </tr>
                       <?php $i++; endforeach; ?>
@@ -204,19 +242,25 @@ if ($_GET['act'] == "del") {
                       <tr> 
                         <td width="16"><img src="in.gif" width="11" height="11"></td>
                         <td>incoming (as seen by firewall)</td>
+                        <td width="14"></td>
+                        <td width="16"><img src="out.gif" width="11" height="11"></td>
+                        <td>outgoing (as seen by firewall)</td>
                       </tr>
                       <tr> 
                         <td colspan="5" height="4"></td>
                       </tr>
                       <tr> 
-                        <td><img src="out.gif" width="11" height="11"></td>
-                        <td>outgoing (as seen by firewall)</td>
+                        <td><img src="in_d.gif" width="11" height="11"></td>
+                        <td>incoming (disabled)</td>
+                        <td width="14"></td>
+                        <td><img src="out_d.gif" width="11" height="11"></td>
+                        <td>outgoing (disabled)</td>
                       </tr>
                     </table>
 			        <p><span class="red"><strong>Note:</strong></span><strong><br>
                     </strong>the first rule that matches a packet will be executed.<br>
                     The following match patterns are not shown in the list above: 
-                    IP packet length, TCP flags.</td></p>
+                    IP packet length, TCP flags.</td>
 	</tr>
 </table>
             </form>

@@ -56,9 +56,12 @@ function get_interface_info($ifdescr) {
 	if ($ifinfo['if'] != $g['pppoe_interface']) {
 		$ifinfo['macaddr'] = $linkinfo[3];
 		$ifinfo['inpkts'] = $linkinfo[4];
+		$ifinfo['inerrs'] = $linkinfo[5];
 		$ifinfo['inbytes'] = $linkinfo[6];
 		$ifinfo['outpkts'] = $linkinfo[7];
+		$ifinfo['outerrs'] = $linkinfo[8];
 		$ifinfo['outbytes'] = $linkinfo[9];
+		$ifinfo['collisions'] = $linkinfo[10];
 	} else {
 		$ifinfo['inpkts'] = $linkinfo[3];
 		$ifinfo['inbytes'] = $linkinfo[5];
@@ -100,6 +103,8 @@ function get_interface_info($ifdescr) {
 				/* don't list media/speed for wireless cards, as it always
 				   displays 2 Mbps even though clients can connect at 11 Mbps */
 				if (preg_match("/media: .*? \((.*?)\)/", $ici, $matches)) {
+					$ifinfo['media'] = $matches[1];
+				} else if (preg_match("/media: Ethernet (.*)/", $ici, $matches)) {
 					$ifinfo['media'] = $matches[1];
 				}
 			}
@@ -220,7 +225,20 @@ function get_interface_info($ifdescr) {
                   <?=htmlspecialchars($ifinfo['inpkts'] . "/" . $ifinfo['outpkts'] . " (" . 
 				  		format_bytes($ifinfo['inbytes']) . "/" . format_bytes($ifinfo['outbytes']) . ")");?>
                 </td>
+              </tr><?php if (isset($ifinfo['inerrs'])): ?>
+              <tr> 
+                <td width="22%" class="listhdrr">In/out errors</td>
+                <td width="78%" class="listr"> 
+                  <?=htmlspecialchars($ifinfo['inerrs'] . "/" . $ifinfo['outerrs']);?>
+                </td>
+              </tr><?php endif; ?><?php if (isset($ifinfo['collisions'])): ?>
+              <tr> 
+                <td width="22%" class="listhdrr">Collisions</td>
+                <td width="78%" class="listr"> 
+                  <?=htmlspecialchars($ifinfo['collisions']);?>
+                </td>
               </tr><?php endif; ?>
+	      <?php endif; ?>
               <?php $i++; endforeach; ?>
             </table>
 <?php include("fend.inc"); ?>

@@ -87,7 +87,27 @@
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">DHCP lease list page</font></em><br>
               <br>
               Peter Allgeyer (<a href="mailto:allgeyer@web.de">allgeyer@web.de</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules</font></em><br>
+              <br>
+              Thierry Lechat (<a href="mailto:dev@lechat.org">dev@lechat.org</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SVG-based traffic grapher</font></em><br>
+              <br>
+              Steven Honson (<a href="mailto:steven@honson.org">steven@honson.org</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">per-user IP address assignments for PPTP VPN</font></em><br>
+              <br>
+              Kurt Inge Smådal (<a href="mailto:kurt@emsp.no">kurt@emsp.no</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">NAT on optional interfaces</font></em><br>
+              <br>
+              Dinesh Nair (<a href="mailto:dinesh@alphaque.com">dinesh@alphaque.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: pass-through MAC/IP addresses, RADIUS authentication &amp; accounting;<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666"></font></em>HTTP server concurrency limit</font></em><br>
+              <br>
+              Justin Ellison (<a href="mailto:justin@techadvise.com">justin@techadvise.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">traffic shaper TOS matching; magic shaper; DHCP deny unknown clients;<br>
+			  &nbsp;&nbsp;&nbsp;&nbsp;IPsec user FQDNs</font></em><br>
+			  <br>
+              Fred Wright (<a href="mailto:fw@well.com">fw@well.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix </font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -111,8 +131,8 @@
               Copyright &copy; 1993-2002 by Darren Reed.<br>
               <br>
               MPD - Multi-link PPP daemon for FreeBSD (<a href="http://www.dellroad.org/mpd" target="_blank">http://www.dellroad.org/mpd</a>)<br>
-              Copyright &copy; 1995-1999 Whistle Communications, Inc. All rights 
-              reserved. <br>
+              Copyright &copy; 2003-2004, Archie L. Cobbs, Michael Bretterklieber, Alexander Motin<br>
+All rights reserved.<br>
               <br>
               ez-ipupdate (<a href="http://www.gusnet.cx/proj/ez-ipupdate/" target="_blank">http://www.gusnet.cx/proj/ez-ipupdate</a>)<br>
               Copyright &copy; 1998-2001 Angus Mackay. All rights reserved.<br>
@@ -142,7 +162,17 @@
               choparp (<a href="http://choparp.sourceforge.net/" target="_blank">http://choparp.sourceforge.net</a>)<br>
               Copyright &copy; 1997 Takamichi Tateoka (tree@mma.club.uec.ac.jp)<br>
 			  Copyright
-&copy; 2002 Thomas Quinot (thomas@cuivre.fr.eu.org)
-<?php include("fend.inc"); ?>
+&copy; 2002 Thomas Quinot (thomas@cuivre.fr.eu.org)<br>
+              <br>
+              BPALogin (<a href="http://bpalogin.sourceforge.net/" target="_blank">http://bpalogin.sourceforge.net</a>) - lightweight portable BIDS2 login client<br>
+              Copyright &copy; 2001-3 Shane Hyde, and others.<br>
+              <br>
+              php-radius (<a href="http://www.mavetju.org/programming/php.php" target="_blank">http://www.mavetju.org/programming/php.php</a>)<br>
+              Copyright 2000, 2001, 2002 by Edwin Groothuis. All rights reserved.<br>
+			  This product includes software developed by Edwin Groothuis.<br>
+			  <br>
+			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
+			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;
+			  <?php include("fend.inc"); ?>
 </body>
 </html>

@@ -48,6 +48,11 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['localip'] = $a_nat[$id]['target'];
 	$pconfig['localbeginport'] = $a_nat[$id]['local-port'];
 	$pconfig['descr'] = $a_nat[$id]['descr'];
+	$pconfig['interface'] = $a_nat[$id]['interface'];
+	if (!$pconfig['interface'])
+		$pconfig['interface'] = "wan";
+} else {
+	$pconfig['interface'] = "wan";
 }
 
 if ($_POST) {
@@ -66,8 +71,8 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	$reqdfields = explode(" ", "proto beginport localip localbeginport");
-	$reqdfieldsn = explode(",", "Protocol,Start port,NAT IP,Local port");
+	$reqdfields = explode(" ", "interface proto beginport localip localbeginport");
+	$reqdfieldsn = explode(",", "Interface,Protocol,Start port,NAT IP,Local port");
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
@@ -91,9 +96,16 @@ if ($_POST) {
 		$_POST['beginport'] = $tmp;
 	}
 	
+	if (!$input_errors) {
+		if (($_POST['endport'] - $_POST['beginport'] + $_POST['localbeginport']) > 65535)
+			$input_errors[] = "The target port range must lie between 1 and 65535.";
+	}
+	
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
 		if (isset($id) && ($a_nat[$id]) && ($a_nat[$id] === $natent))
+			continue;
+		if ($natent['interface'] != $_POST['interface'])
 			continue;
 		if ($natent['external-address'] != $_POST['extaddr'])
 			continue;
@@ -123,6 +135,7 @@ if ($_POST) {
 		
 		$natent['target'] = $_POST['localip'];
 		$natent['local-port'] = $_POST['localbeginport'];
+		$natent['interface'] = $_POST['interface'];
 		$natent['descr'] = $_POST['descr'];
 		
 		if (isset($id) && $a_nat[$id])
@@ -135,7 +148,7 @@ if ($_POST) {
 		if ($_POST['autoadd']) {
 			/* auto-generate a matching firewall rule */
 			$filterent = array();		
-			$filterent['interface'] = "wan";
+			$filterent['interface'] = $_POST['interface'];
 			$filterent['protocol'] = $_POST['proto'];
 			$filterent['source']['any'] = "";
 			$filterent['destination']['address'] = $_POST['localip'];
@@ -202,21 +215,39 @@ function ext_rep_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: NAT: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_nat_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			  	<tr>
+                  <td width="22%" valign="top" class="vncellreq">Interface</td>
+                  <td width="78%" class="vtable">
+					<select name="interface" class="formfld">
+						<?php
+						$interfaces = array('wan' => 'WAN');
+						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+						}
+						foreach ($interfaces as $iface => $ifacename): ?>
+						<option value="<?=$iface;?>" <?php if ($iface == $pconfig['interface']) echo "selected"; ?>>
+						<?=htmlspecialchars($ifacename);?>
+						</option>
+						<?php endforeach; ?>
+					</select><br>
+                     <span class="vexpl">Choose which interface this rule applies to.<br>
+                     Hint: in most cases, you'll want to use WAN here.</span></td>
+                </tr>
 			    <tr> 
                   <td width="22%" valign="top" class="vncellreq">External address</td>
                   <td width="78%" class="vtable"> 
                     <select name="extaddr" class="formfld">
-					  <option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>WAN</option>
+					  <option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
                       <?php
 					  if (is_array($config['nat']['servernat'])):
 						  foreach ($config['nat']['servernat'] as $sn): ?>
                       <option value="<?=$sn['ipaddr'];?>" <?php if ($sn['ipaddr'] == $pconfig['extaddr']) echo "selected"; ?>><?=htmlspecialchars("{$sn['ipaddr']} ({$sn['descr']})");?></option>
                       <?php endforeach; endif; ?>
-                    </select><br><span class="vexpl">
-					If you want this rule to apply to another IP address than m0n0wall's WAN IP address,
+                    </select><br>
+                    <span class="vexpl">
+					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
 					select it here (you need to define IP addresses on the
 					<a href="firewall_nat_server.php">Server NAT</a> page first).</span></td>
                 </tr>

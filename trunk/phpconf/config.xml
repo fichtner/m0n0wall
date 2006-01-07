@@ -22,6 +22,7 @@
 			-->
 		</webgui>
 		<!-- <disableconsolemenu/> -->
+		<!-- <disablefirmwarecheck/> -->
 		<!-- <shellcmd></shellcmd> -->
 	</system>
 	<interfaces>
@@ -37,8 +38,9 @@
 		</lan>
 		<wan>
 			<if>sis1</if>
+			<mtu></mtu>
 			<ipaddr>dhcp</ipaddr>
-			<!-- *or* ipv4-address *or* 'pppoe' *or* 'pptp' -->
+			<!-- *or* ipv4-address *or* 'pppoe' *or* 'pptp' *or* 'bigpond' -->
 			<subnet></subnet>
 			<gateway></gateway>
 			<blockpriv/>
@@ -72,6 +74,15 @@
 		</opt[n]>
 		-->
 	</interfaces>
+	<!--
+	<vlans>
+		<vlan>
+			<tag></tag>
+			<if></if>
+			<descr></descr>
+		</vlan>
+	</vlans>
+	-->
 	<staticroutes>
 		<!--
 		<route>
@@ -94,6 +105,13 @@
 		<subnet></subnet>
 		<remote></remote>
 	</pptp>
+	<bigpond>
+		<username></username>
+		<password></password>
+		<authserver></authserver>
+		<authdomain></authdomain>
+		<minheartbeatinterval></minheartbeatinterval>
+	</bigpond>
 	<dyndns>
 		<!-- <enable/> -->
 		<type>dyndns</type>
@@ -178,9 +196,25 @@
 		<nologdefaultblock/>
 		-->
 	</syslog>
+	<!--
+	<captiveportal>
+		<enable/>
+		<interface>lan|opt[n]</interface>
+		<idletimeout>minutes</idletimeout>
+		<timeout>minutes</timeout>
+		<page>
+			<htmltext></htmltext>
+			<errtext></errtext>
+		</page>
+		<radiusip></radiusip>
+		<radiusport></radiusport>
+		<radiuskey></radiuskey>
+	</captiveportal>
+	-->
 	<nat>
 		<!--
 		<rule>
+			<interface></interface>
 			<external-address></external-address>
 			<protocol></protocol>
 			<external-port></external-port>
@@ -191,6 +225,7 @@
 		-->
 		<!--
 		<onetoone>
+			<interface></interface>
 			<external>xxx.xxx.xxx.xxx</external>
 			<internal>xxx.xxx.xxx.xxx</internal>
 			<subnet></subnet>
@@ -201,6 +236,7 @@
 		<advancedoutbound>
 			<enable/>
 			<rule>
+				<interface></interface>
 				<source>
 					<network>xxx.xxx.xxx.xxx/xx</network>
 				</source>
@@ -264,6 +300,7 @@
 		<!-- <enable/> -->
 		<!-- rule syntax:
 		<rule>
+			<disabled/>
 			<descr></descr>
 			
 			<targetpipe>number (zero based)</targetpipe>
@@ -289,6 +326,7 @@
 			</destination>
 			
 			<iplen>from[-to]</iplen>
+			<iptos>(!)lowdelay,throughput,reliability,mincost,congestion</iptos>
 			<tcpflags>(!)fin,syn,rst,psh,ack,urg</tcpflags>
 		</rule>
 		<pipe>
@@ -393,4 +431,13 @@
 		</proxyarpnet>
 		-->
 	</proxyarp>
+	<wol>
+		<!--
+		<wolentry>
+			<interface>lan|opt[n]</interface>
+			<mac>xx:xx:xx:xx:xx:xx</mac>
+			<descr></descr>
+		</wolentry>
+		-->
+	</wol>
 </m0n0wall>

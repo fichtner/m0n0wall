@@ -53,12 +53,12 @@ function gen_subnet($ipaddr, $bits) {
 	return long2ip(ip2long($ipaddr) & gen_subnet_mask_long($bits));
 }
 
-/* return the highest address in the subnet given a host address and a subnet bit count */
+/* return the highest (broadcast) address in the subnet given a host address and a subnet bit count */
 function gen_subnet_max($ipaddr, $bits) {
 	if (!is_ipaddr($ipaddr) || !is_numeric($bits))
 		return "";
 	
-	return long2ip(ip2long($ipaddr) | gen_subnet_mask_long($bits));
+	return long2ip(ip2long($ipaddr) | ~gen_subnet_mask_long($bits));
 }
 
 /* returns a subnet mask (long given a bit count) */
@@ -74,6 +74,10 @@ function gen_subnet_mask_long($bits) {
 /* same as above but returns a string */
 function gen_subnet_mask($bits) {
 	return long2ip(gen_subnet_mask_long($bits));
+}
+
+function is_numericint($arg) {
+	return (preg_match("/[^0-9]/", $arg) ? false : true);
 }
 
 /* returns true if $ipaddr is a valid dotted IPv4 address */
@@ -210,7 +214,8 @@ function is_port($port) {
 		return true;
 }
 
-/* returns a list of interfaces with MAC addresses */
+/* returns a list of interfaces with MAC addresses
+   (skips VLAN and other virtual interfaces) */
 function get_interface_list() {
 	
 	global $g;
@@ -228,8 +233,9 @@ function get_interface_list() {
 		if (substr($ifname, -1) == "*")
 			$ifname = substr($ifname, 0, strlen($ifname) - 1);
 		
-		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|tun)/", $ifname)) {
+		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|tun|vlan)/", $ifname)) {
 			$iflist[$ifname] = array();
+			
 			$iflist[$ifname]['mac'] = chop($alink[3]);
 			$iflist[$ifname]['up'] = false;
 			
@@ -387,6 +393,22 @@ function verify_digital_signature($fname) {
 	return mwexec("/usr/local/bin/verifysig " .
 		escapeshellarg("{$g['etc_path']}/pubkey.pem") . " " .
 		escapeshellarg($fname));
+}
+
+/* obtain MAC address given an IP address by looking at the ARP table */
+function arp_get_mac_by_ip($ip) {
+	exec("/usr/sbin/arp -n {$ip}", $arpoutput);
+	
+	if ($arpoutput[0]) {
+		$arpi = explode(" ", $arpoutput[0]);
+		$macaddr = $arpi[3];
+		if (is_macaddr($macaddr))
+			return $macaddr;
+		else
+			return false;
+	}
+	
+	return false;
 }
 
 ?>

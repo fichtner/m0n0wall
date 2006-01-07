@@ -96,7 +96,13 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 				/* verify firmware image(s) */
 				if (!stristr($_FILES['ulfile']['name'], $g['platform']) && !$_POST['sig_override'])
 					$input_errors[] = "The uploaded image file is not for this platfom ({$g['platform']}).";
-				else {
+				else if (!file_exists($_FILES['ulfile']['tmp_name'])) {
+					/* probably out of memory for the MFS */
+					$input_errors[] = "Image upload failed (out of memory?)";
+					exec_rc_script("/etc/rc.firmware disable");
+					if (file_exists($d_fwupenabled_path))
+						unlink($d_fwupenabled_path);
+				} else {
 					/* move the image so PHP won't delete it */
 					rename($_FILES['ulfile']['tmp_name'], "{$g['ftmp_path']}/firmware.img");
 					
@@ -127,7 +133,8 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 		}
 	}
 } else {
-	$fwinfo = check_firmware_version();
+	if (!isset($config['system']['disablefirmwarecheck']))
+		$fwinfo = check_firmware_version();
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -142,7 +149,7 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">System: Firmware</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($fwinfo) echo $fwinfo; ?>
 <?php if (!in_array($g['platform'], $fwupplatforms)): ?>
 <p><strong>Firmware uploading is not supported on this platform.</strong></p>
@@ -150,7 +157,7 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 <form action="system_firmware.php" method="post">
 <?php 
 $sig_warning = "<strong>" . $sig_warning . "</strong><br>This means that the image you uploaded " .
-	"is not an official supported image and may lead to unexpected behavior or security " .
+	"is not an official/supported image and may lead to unexpected behavior or security " .
 	"compromises. Only install images that come from sources that you trust, and make sure ".
 	"that the image has not been tampered with.<br><br>".
 	"Do you want to install this image anyway (on your own risk)?";

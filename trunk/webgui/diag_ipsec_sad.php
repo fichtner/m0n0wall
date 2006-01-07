@@ -43,13 +43,14 @@ require("guiconfig.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Diagnostics: IPsec</p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+	<li class="tabact">SAD</li>
+	<li class="tabinact"><a href="diag_ipsec_spd.php">SPD</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabact">SAD</td>
-    <td nowrap class="tabinact"><a href="diag_ipsec_spd.php" class="tblnk">SPD</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="3" class="tabcont">
+    <td class="tabcont">
 <?php
 
 /* delete any SA? */

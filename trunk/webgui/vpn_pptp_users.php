@@ -78,16 +78,26 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">VPN: PPTP: Users</p>
 <form action="vpn_pptp_users.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (isset($config['pptpd']['radius']['enable']))
-	print_info_box(htmlspecialchars("Warning: RADIUS is enabled. The local user database will not be used.")); ?>
+	print_info_box("Warning: RADIUS is enabled. The local user database will not be used."); ?>
 <?php if (file_exists($d_pptpuserdirty_path)): ?><p>
 <?php print_info_box_np("The PPTP user list has been modified.<br>You must apply the changes in order for them to take effect.<br><b>Warning: this will terminate all current PPTP sessions!</b>");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-              <table width="50%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="vpn_pptp.php">Configuration</a></li>
+    <li class="tabact">Users</li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td colspan="3" class="tabcont">
+              <table width="80%" border="0" cellpadding="0" cellspacing="0">
                 <tr> 
                   <td class="listhdrr">Username</td>
+                  <td class="listhdr">IP address</td>
                   <td class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_secret as $secretent): ?>
@@ -95,16 +105,22 @@ if ($_GET['act'] == "del") {
                   <td class="listlr">
                     <?=htmlspecialchars($secretent['name']);?>
                   </td>
+                  <td class="listr">
+                    <?=htmlspecialchars($secretent['ip']);?>&nbsp;
+                  </td>
                   <td class="list" nowrap> <a href="vpn_pptp_users_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0"></a>
                      &nbsp;<a href="vpn_pptp_users.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list"></td>
+                  <td class="list" colspan="2"></td>
                   <td class="list"> <a href="vpn_pptp_users_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
               </table>
-            </form>
+			</td>
+	</tr>
+</table>
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>

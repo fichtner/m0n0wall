@@ -39,6 +39,48 @@ function interfaces_loopback_configure() {
 	return 0;
 }
 
+function interfaces_vlan_configure() {
+	global $config, $g;
+	
+	if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
+		
+		/* load the VLAN module */
+		mwexec("/sbin/kldload if_vlan");
+		
+		/* devices with native VLAN support */
+		$vlan_native_supp = explode(" ", "bge em gx nge ti txp");
+		
+		/* devices with long frame support */
+		$vlan_long_supp = explode(" ", "dc fxp sis ste tl tx xl");
+		
+		$i = 0;
+		
+		foreach ($config['vlans']['vlan'] as $vlan) {
+			
+			$cmd = "/sbin/ifconfig vlan{$i} create vlan " . 
+				escapeshellarg($vlan['tag']) . " vlandev " . 
+				escapeshellarg($vlan['if']);
+			
+			/* get driver name */
+			for ($j = 0; $j < strlen($vlan['if']); $j++) {
+				if ($vlan['if'][$j] >= '0' && $vlan['if'][$j] <= '9')
+					break;
+			}
+			$drvname = substr($vlan['if'], 0, $j);
+			
+			if (in_array($drvname, $vlan_native_supp))
+				$cmd .= " link0";
+			else if (in_array($drvname, $vlan_long_supp))
+				$cmd .= " mtu 1500";
+			
+			mwexec($cmd);
+			$i++;
+		}
+	}
+	
+	return 0;
+}
+
 function interfaces_lan_configure() {
 	global $config, $g;
 	
@@ -270,6 +312,14 @@ function interfaces_wan_configure() {
 		if (file_exists("{$g['varetc_path']}/mpd.links")) {
 			unlink("{$g['varetc_path']}/mpd.links");
 		}
+		/* remove ipsec.wanip, if it exists */
+		if (file_exists("{$g['vardb_path']}/ipsec.wanip")) {
+			unlink("{$g['vardb_path']}/ipsec.wanip");
+		}
+		/* remove bigpond.wanip, if it exists */
+		if (file_exists("{$g['vardb_path']}/bigpond.wanip")) {
+			unlink("{$g['vardb_path']}/bigpond.wanip");
+		}
 	}
 	
 	/* remove all addresses first */
@@ -296,6 +346,11 @@ function interfaces_wan_configure() {
 			
 		case 'pptp':
 			interfaces_wan_pptp_configure();
+			break;
+			
+		case 'bigpond':
+			/* just configure DHCP for now; fire up bpalogin when we've got the lease */
+			interfaces_wan_dhcp_configure();
 			break;
 			
 		default:
@@ -401,8 +456,10 @@ pppoe:
 	set link mtu 1492
 	set ipcp yes vjcomp
 	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
+	set ipcp enable req-pri-dns
+	set ipcp enable req-sec-dns
 	open iface
-	
+
 EOD;
 
 	fwrite($fd, $mpdconf);
@@ -420,7 +477,9 @@ pppoe:
 	set link type pppoe
 	set pppoe iface {$wancfg['if']}
 	set pppoe service "{$pppoecfg['provider']}"
-	
+	set pppoe enable originate
+	set pppoe disable incoming
+
 EOD;
 
 	fwrite($fd, $mpdconf);
@@ -462,8 +521,10 @@ pptp:
 	set link accept chap
 	set ipcp no vjcomp
 	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
+	set ipcp enable req-pri-dns
+	set ipcp enable req-sec-dns
 	open
-	
+
 EOD;
 
 	fwrite($fd, $mpdconf);
@@ -479,11 +540,11 @@ EOD;
 	$mpdconf = <<<EOD
 pptp:
 	set link type pptp
-	set pptp mode active
 	set pptp enable originate outcall
+	set pptp disable windowing
 	set pptp self {$pptpcfg['local']}
 	set pptp peer {$pptpcfg['remote']}
-	
+
 EOD;
 
 	fwrite($fd, $mpdconf);
@@ -495,6 +556,83 @@ EOD;
 	
 	/* fire up mpd */
 	mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
+	
+	return 0;
+}
+
+function interfaces_wan_bigpond_configure() {
+	global $config, $g;
+	
+	$bpcfg = $config['bigpond'];
+	
+	$curwanip = get_current_wan_address();
+	
+	if (!$curwanip) {
+		/* IP address not configured yet, exit */
+		return 0;
+	}
+	
+	/*	dhclient told us that the IP address has changed;
+		let's see if that's really true to avoid reloading bpalogin
+		when it's not really necessary (dhclient likes to
+		execute its dhclient-exit-hooks also on renewals)
+	*/		
+	if (file_exists("{$g['vardb_path']}/bigpond.wanip")) {
+		$oldwanip = chop(file_get_contents("{$g['vardb_path']}/bigpond.wanip"));
+		
+		if ($curwanip == $oldwanip)
+			return 0;	/* nothing to do */
+	}
+	
+	/* write current WAN IP to file */
+	$fd = fopen("{$g['vardb_path']}/bigpond.wanip", "w");
+	if ($fd) {
+		fwrite($fd, $curwanip);
+		fclose($fd);
+	}
+		
+	/* kill bpalogin */
+	killbyname("bpalogin");
+	
+	/* wait a moment */
+	sleep(1);
+	
+	/* get the default domain */
+	$nfd = @fopen("{$g['varetc_path']}/defaultdomain.conf", "r");
+	if ($nfd) {
+		$defaultdomain = trim(fgets($nfd));
+		fclose($nfd);
+	}
+	
+	/* generate bpalogin.conf */
+	$fd = fopen("{$g['varetc_path']}/bpalogin.conf", "w");
+	if (!$fd) {
+		printf("Error: cannot open bpalogin.conf in interfaces_wan_bigpond_configure().\n");
+		return 1;
+	}
+	
+	if (!$bpcfg['authserver'])
+		$bpcfg['authserver'] = "dce-server";
+	if (!$bpcfg['authdomain'])
+		$bpcfg['authdomain'] = $defaultdomain;
+		
+	$bpconf = <<<EOD
+username {$bpcfg['username']}
+password {$bpcfg['password']}
+authserver {$bpcfg['authserver']}
+authdomain {$bpcfg['authdomain']}
+localport 5050
+
+EOD;
+
+	if ($bpcfg['minheartbeatinterval'])
+		$bpconf .= "minheartbeatinterval {$bpcfg['minheartbeatinterval']}\n";
+
+	fwrite($fd, $bpconf);
+	fclose($fd);
+	
+	/* fire up bpalogin */
+	mwexec("/usr/local/sbin/bpalogin -c {$g['varetc_path']}/bpalogin.conf");
 	
 	return 0;
 }
@@ -517,7 +655,7 @@ function get_current_wan_address() {
 	
 	$wancfg = $config['interfaces']['wan'];
 	
-	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp'))) {
+	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp','bigpond'))) {
 		/* dynamic WAN IP address, find out which one */
 		$wanif = get_real_wan_interface();
 		

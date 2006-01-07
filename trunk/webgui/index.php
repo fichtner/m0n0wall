@@ -32,14 +32,17 @@
 require("guiconfig.inc");
 
 /* find out whether there's hardware encryption (hifn) */
-exec("/sbin/dmesg", $dmesg);
-
 unset($hwcrypto);
-foreach ($dmesg as $dmesgl) {
-	if (preg_match("/^hifn.: (.*?),/", $dmesgl, $matches)) {
-		$hwcrypto = $matches[1];
-		break;
+$fd = @fopen("{$g['varlog_path']}/dmesg.boot", "r");
+if ($fd) {
+	while (!feof($fd)) {
+		$dmesgl = fgets($fd);
+		if (preg_match("/^hifn.: (.*?),/", $dmesgl, $matches)) {
+			$hwcrypto = $matches[1];
+			break;
+		}
 	}
+	fclose($fd);
 }
 
 ?>
@@ -93,9 +96,28 @@ foreach ($dmesg as $dmesgl) {
               <tr> 
                 <td width="25%" class="vncellt">Uptime</td>
                 <td width="75%" class="listr"> 
-                  <?php exec("/usr/bin/uptime", $uptime);
-				  	$uptimea = explode(",", $uptime[0], 3);
-					echo join(",", array($uptimea[0], $uptimea[2])); ?>
+                  <?php
+				  	exec("/sbin/sysctl -n kern.boottime", $boottime);
+					preg_match("/sec = (\d+)/", $boottime[0], $matches);
+					$boottime = $matches[1];
+					$uptime = time() - $boottime;
+					
+					if ($uptime > 60)
+						$uptime += 30;
+					$updays = (int)($uptime / 86400);
+					$uptime %= 86400;
+					$uphours = (int)($uptime / 3600);
+					$uptime %= 3600;
+					$upmins = (int)($uptime / 60);
+					
+					$uptimestr = "";
+					if ($updays > 1)
+						$uptimestr .= "$updays days, ";
+					else if ($updays > 0)
+						$uptimestr .= "1 day, ";
+					$uptimestr .= sprintf("%02d:%02d", $uphours, $upmins);
+					echo htmlspecialchars($uptimestr);
+				  ?>
                 </td>
               </tr>
             </table>

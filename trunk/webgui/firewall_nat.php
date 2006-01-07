@@ -81,33 +81,43 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: NAT</font></p>
 <form action="firewall_nat.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php print_info_box_np("The NAT configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabact">Inbound</li>
+    <li class="tabinact"><a href="firewall_nat_server.php">Server NAT</a></li>
+    <li class="tabinact"><a href="firewall_nat_1to1.php">1:1</a></li>
+    <li class="tabinact"><a href="firewall_nat_out.php">Outbound</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabact">Inbound</td>
-    <td nowrap class="tabinact"><a href="firewall_nat_server.php" class="tblnk">Server NAT</a></td>
-    <td nowrap class="tabinact"><a href="firewall_nat_1to1.php" class="tblnk">1:1</a></td>
-    <td nowrap class="tabinact"><a href="firewall_nat_out.php" class="tblnk">Outbound</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="5" class="tabcont">
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr> 
+                  <td width="5%" class="listhdrr">If</td>
                   <td width="5%" class="listhdrr">Proto</td>
                   <td width="20%" class="listhdrr">Ext. port range</td>
-                  <td width="20%" class="listhdrr">NAT IP<br>(ext. IP)</td>
+                  <td width="20%" class="listhdrr">NAT IP</td>
                   <td width="20%" class="listhdrr">Int. port range</td>
-                  <td width="25%" class="listhdr">Description</td>
-                  <td width="10%" class="list"></td>
+                  <td width="20%" class="listhdr">Description</td>
+                  <td width="5%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_nat as $natent): ?>
                 <tr valign="top"> 
-                  <td class="listlr"> 
+				  <td class="listlr">
+                  <?php
+						if (!$natent['interface'] || ($natent['interface'] == "wan"))
+							echo "WAN";
+						else
+							echo htmlspecialchars($config['interfaces'][$natent['interface']]['descr']);
+				  ?>
+                  </td>
+                  <td class="listr"> 
                     <?=strtoupper($natent['protocol']);?>
                   </td>
                   <td class="listr">
@@ -124,7 +134,7 @@ if ($_GET['act'] == "del") {
                   <td class="listr"> 
                     <?=$natent['target'];?>
 					<?php if ($natent['external-address'])
-						echo "<br>(" . $natent['external-address'] . ")";
+						echo "<br>(ext.: " . $natent['external-address'] . ")";
 					?>
                   </td>
                   <td class="listr"> 
@@ -145,7 +155,7 @@ if ($_GET['act'] == "del") {
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="5"></td>
+                  <td class="list" colspan="6"></td>
                   <td class="list"> <a href="firewall_nat_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
               </table>

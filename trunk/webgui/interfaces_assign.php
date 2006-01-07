@@ -37,7 +37,18 @@ require("guiconfig.inc");
 	while "interface" refers to LAN, WAN, or OPTn.
 */
 
+/* get list without VLAN interfaces */
 $portlist = get_interface_list();
+
+/* add VLAN interfaces */
+if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
+	$i = 0;
+	foreach ($config['vlans']['vlan'] as $vlan) {
+		$portlist['vlan' . $i] = $vlan;
+		$portlist['vlan' . $i]['isvlan'] = true;
+		$i++;
+	}
+}
 
 if ($_POST) {
 
@@ -48,7 +59,7 @@ if ($_POST) {
 	/* Build a list of the port names so we can see how the interfaces map */
 	$portifmap = array();
 	foreach ($portlist as $portname => $portinfo)
-		$portifmap[] = array($portname => array());
+		$portifmap[$portname] = array();
 
 	/* Go through the list of ports selected by the user,
 	   build a list of port-to-interface mappings in portifmap */
@@ -65,7 +76,7 @@ if ($_POST) {
 				" interfaces:";
 				
 			foreach ($portifmap[$portname] as $ifn)
-				$errstr .= "  " . $ifn;
+				$errstr .= " " . $ifn;
 			
 			$input_errors[] = $errstr;
 		}
@@ -101,7 +112,6 @@ if ($_POST) {
 	
 		write_config();
 		touch($d_sysrebootreqd_path);
-		/* message is set up below based on existence of bootreqd file */
 	}
 }
 
@@ -133,34 +143,30 @@ if ($_GET['act'] == "del") {
 }
 
 if ($_GET['act'] == "add") {
-	$i = 0;
+	/* find next free optional interface number */
+	$i = 1;
+	while (is_array($config['interfaces']['opt' . $i]))
+		$i++;
 	
-	while (1) {
-		$newifname = 'opt' . ($i+1);
-		
-		if (!is_array($config['interfaces'][$newifname])) {
-			$config['interfaces'][$newifname] = array();
-			$config['interfaces'][$newifname]['descr'] = "OPT" . ($i+1);
-			
-			/* Find an unused port for this interface */
-			foreach ($portlist as $portname => $portinfo) {
-				$portused = false;
-				foreach ($config['interfaces'] as $ifname => $ifdata) {
-					if ($ifdata['if'] == $portname) {
-						$portused = true;
-						break;
-					}
-				}
-				if (!$portused) {
-					$config['interfaces'][$newifname]['if'] = $portname;
-					if (preg_match("/^(wi|awi|an)/", $portname))
-						$config['interfaces'][$newifname]['wireless'] = array();
-					break;
-				}
+	$newifname = 'opt' . $i;
+	$config['interfaces'][$newifname] = array();
+	$config['interfaces'][$newifname]['descr'] = "OPT" . $i;
+	
+	/* Find an unused port for this interface */
+	foreach ($portlist as $portname => $portinfo) {
+		$portused = false;
+		foreach ($config['interfaces'] as $ifname => $ifdata) {
+			if ($ifdata['if'] == $portname) {
+				$portused = true;
+				break;
 			}
+		}
+		if (!$portused) {
+			$config['interfaces'][$newifname]['if'] = $portname;
+			if (preg_match("/^(wi|awi|an)/", $portname))
+				$config['interfaces'][$newifname]['wireless'] = array();
 			break;
 		}
-		$i++;
 	}
 	
 	write_config();
@@ -184,14 +190,19 @@ if ($_GET['act'] == "add") {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
 <form action="interfaces_assign.php" method="post" name="iform" id="iform">
-              <table border="0" cellpadding="6" cellspacing="0">
-                <tr>
-  <td width="22%" valign="top" class="vncellreq">Interface assignments</td>
-                  <td width="78%" class="vtable"> 
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabact">Interface assignments</li>
+    <li class="tabinact"><a href="interfaces_vlan.php">VLANs</a></li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr> 
 	<td class="listhdrr">Interface</td>
-	<td class="listhdrr">Network port</td>
+	<td class="listhdr">Network port</td>
 	<td class="list">&nbsp;</td>
   </tr>
   <?php foreach ($config['interfaces'] as $ifname => $iface): ?>
@@ -201,14 +212,21 @@ if ($_GET['act'] == "add") {
 		<select name="<?=$ifname;?>" class="formfld" id="<?=$ifname;?>">
 		  <?php foreach ($portlist as $portname => $portinfo): ?>
 		  <option value="<?=$portname;?>" <?php if ($portname == $iface['if']) echo "selected";?>> 
-		  <?=htmlspecialchars($portname . " (" . $portinfo['mac'] . ")");?>
+		  <?php if ($portinfo['isvlan']) {
+		  			$descr = "VLAN {$portinfo['tag']} on {$portinfo['if']}";
+					if ($portinfo['descr'])
+						$descr .= " (" . $portinfo['descr'] . ")";
+					echo htmlspecialchars($descr);
+				  } else
+					echo htmlspecialchars($portname . " (" . $portinfo['mac'] . ")");
+		  ?>
 		  </option>
 		  <?php endforeach; ?>
 		</select>
 		</td>
 		<td valign="middle" class="list"> 
 		  <?php if (($ifname != 'lan') && ($ifname != 'wan')): ?>
-		  <a href="interfaces_assign.php?act=del&id=<?=$ifname;?>"><img src="x.gif" alt="delete interface" width="17" height="17" border="0"></a> 
+		  <a href="interfaces_assign.php?act=del&id=<?=$ifname;?>"><img src="x.gif" title="delete interface" width="17" height="17" border="0"></a> 
 		  <?php endif; ?>
 		</td>
   </tr>
@@ -216,33 +234,20 @@ if ($_GET['act'] == "add") {
   <tr>
 	<td class="list" colspan="2"></td>
 	<td class="list" nowrap><?php if (count($config['interfaces']) < count($portlist)): ?> 
-	<a href="interfaces_assign.php?act=add"><img src="plus.gif" alt="add interface" width="17" height="17" border="0"></a>
+	<a href="interfaces_assign.php?act=add"><img src="plus.gif" title="add interface" width="17" height="17" border="0"></a>
 	<?php endif; ?> </td>
   </tr>
 </table>
-                  </td>
-                </tr>
-                <tr> 
-                  <td width="22%" valign="top">&nbsp;</td>
-                  <td width="78%"> 
                       <input name="Submit" type="submit" class="formbtn" value="Save">
-                  </td>
-                </tr>
-                <tr> 
-                  <td width="22%" valign="top">&nbsp;</td>
-                  <td width="78%"> <span class="vexpl"><span class="red"><strong>Warning:<br>
-                    </strong></span>After you click &quot;Save&quot;, you must 
-                    reboot the firewall to make the changes take effect. You may 
-                    also have to do one or more of the following steps before 
-                    you can access your firewall again: 
+                    <p><span class="vexpl"><strong><span class="red">Warning:</span><br>
+                    </strong>After you click &quot;Save&quot;, you must reboot the firewall to make the changes take effect. You may also have to do one or more of the following steps before you can access your firewall again: </span></p>
                     <ul>
-                      <li>change the IP address of your computer</li>
-                      <li>renew it's DHCP lease</li>
-                      <li>access the webGUI with the new IP address</li>
-                    </ul>
-                    </span></td>
-                </tr>
-              </table>
+                      <li><span class="vexpl">change the IP address of your computer</span></li>
+                      <li><span class="vexpl">renew its DHCP lease</span></li>
+                      <li><span class="vexpl">access the webGUI with the new IP address</span></li>
+                    </ul></td>
+	</tr>
+</table>
 </form>
 <?php include("fend.inc"); ?>
 </body>

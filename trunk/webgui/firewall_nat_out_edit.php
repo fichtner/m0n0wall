@@ -62,11 +62,15 @@ if (isset($id) && $a_out[$id]) {
     network_to_pconfig($a_out[$id]['destination'], $pconfig['destination'],
 	   $pconfig['destination_subnet'], $pconfig['destination_not']);
     $pconfig['target'] = $a_out[$id]['target'];
+    $pconfig['interface'] = $a_out[$id]['interface'];
+	if (!$pconfig['interface'])
+		$pconfig['interface'] = "wan";
     $pconfig['descr'] = $a_out[$id]['descr'];
 } else {
     $pconfig['source_subnet'] = 24;
     $pconfig['destination'] = "any";
     $pconfig['destination_subnet'] = 24;
+	$pconfig['interface'] = "wan";
 }
 
 if ($_POST) {
@@ -80,8 +84,8 @@ if ($_POST) {
     $pconfig = $_POST;
 
     /* input validation */
-    $reqdfields = explode(" ", "source source_subnet destination destination_subnet");
-    $reqdfieldsn = explode(",", "Source,Source bit count,Destination,Destination bit count");
+    $reqdfields = explode(" ", "interface source source_subnet destination destination_subnet");
+    $reqdfieldsn = explode(",", "Interface,Source,Source bit count,Destination,Destination bit count");
     
     do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
@@ -127,15 +131,18 @@ if ($_POST) {
         if (isset($id) && ($a_out[$id]) && ($a_out[$id] === $natent))
             continue;
         
-        if ($natent['source']['network'] == $osn) {
-            if (isset($natent['destination']['not']) == isset($_POST['destination_not'])) {
-                if ((isset($natent['destination']['any']) && ($ext == "any")) ||
-                        ($natent['destination']['network'] == $ext)) {
-                    $input_errors[] = "There is already an outbound NAT rule with the specified settings.";
-                    break;
-                }
-            }
-        }
+		if (!$natent['interface'])
+			$natent['interface'] == "wan";
+		
+		if (($natent['interface'] == $_POST['interface']) && ($natent['source']['network'] == $osn)) {
+			if (isset($natent['destination']['not']) == isset($_POST['destination_not'])) {
+				if ((isset($natent['destination']['any']) && ($ext == "any")) ||
+						($natent['destination']['network'] == $ext)) {
+					$input_errors[] = "There is already an outbound NAT rule with the specified settings.";
+					break;
+				}
+			}
+		}
     }
 
     if (!$input_errors) {
@@ -143,6 +150,7 @@ if ($_POST) {
         $natent['source']['network'] = $osn;
         $natent['descr'] = $_POST['descr'];
         $natent['target'] = $_POST['target'];
+        $natent['interface'] = $_POST['interface'];
         
         if ($ext == "any")
             $natent['destination']['any'] = true;
@@ -196,9 +204,26 @@ function typesel_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: NAT: Edit outbound mapping</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_nat_out_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			      <tr>
+                  <td width="22%" valign="top" class="vncellreq">Interface</td>
+                  <td width="78%" class="vtable">
+					<select name="interface" class="formfld">
+						<?php
+						$interfaces = array('wan' => 'WAN');
+						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+						}
+						foreach ($interfaces as $iface => $ifacename): ?>
+						<option value="<?=$iface;?>" <?php if ($iface == $pconfig['interface']) echo "selected"; ?>> 
+						<?=htmlspecialchars($ifacename);?>
+						</option>
+						<?php endforeach; ?>
+					</select><br>
+                     <span class="vexpl">Choose which interface this rule applies to.<br>
+                     Hint: in most cases, you'll want to use WAN here.</span></td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Source</td>
                   <td width="78%" class="vtable">
@@ -256,7 +281,7 @@ function typesel_change() {
                   <td class="vtable">
 <input name="target" type="text" class="formfld" id="target" size="20" value="<?=htmlspecialchars($pconfig['target']);?>">
                     <br>
-                     <span class="vexpl">Packets matching this rule will be mapped to the IP address given here. Leave blank to use the WAN interface's IP address.</span></td>
+                     <span class="vexpl">Packets matching this rule will be mapped to the IP address given here. Leave blank to use the selected interface's IP address.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>

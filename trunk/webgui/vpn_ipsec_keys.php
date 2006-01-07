@@ -60,20 +60,21 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">VPN: IPsec</p>
 <form action="vpn_ipsec.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_ipsecconfdirty_path)): ?><p>
 <?php print_info_box_np("The IPsec tunnel configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="vpn_ipsec.php">Tunnels</a></li>
+    <li class="tabinact"><a href="vpn_ipsec_mobile.php">Mobile clients</a></li>
+    <li class="tabact">Pre-shared keys</li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="vpn_ipsec.php" class="tblnk">Tunnels</a></td>
-    <td nowrap class="tabinact"><a href="vpn_ipsec_mobile.php" class="tblnk">Mobile clients</a></td>
-    <td nowrap class="tabact">Pre-shared keys</td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="4" class="tabcont">
+    <td class="tabcont">
               <table width="80%" border="0" cellpadding="0" cellspacing="0">
                 <tr> 
                   <td class="listhdrr">Identifier</td>

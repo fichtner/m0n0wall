@@ -422,7 +422,6 @@ function dst_rep_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: Rules: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_rules_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
@@ -468,7 +467,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                   <td width="22%" valign="top" class="vncellreq">Protocol</td>
                   <td width="78%" class="vtable">
 <select name="proto" class="formfld" onchange="proto_change()">
-                      <?php $protocols = explode(" ", "TCP UDP TCP/UDP ICMP ESP AH GRE IPv6 any"); foreach ($protocols as $proto): ?>
+                      <?php $protocols = explode(" ", "TCP UDP TCP/UDP ICMP ESP AH GRE IPv6 IGMP any"); foreach ($protocols as $proto): ?>
                       <option value="<?=strtolower($proto);?>" <?php if (strtolower($proto) == $pconfig['proto']) echo "selected"; ?>>
                       <?=htmlspecialchars($proto);?>
                       </option>

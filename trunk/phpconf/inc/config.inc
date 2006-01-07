@@ -52,12 +52,16 @@ if ($g['booting']) {
 			$cfgdevice = $cfgpartition = "fd0";
 			$cfgfstype = "msdos";
 		} else {
-			/* probe ad0...ad3 until we find the one with config.xml */
-			for ($cfgn = 0; $cfgn <= 3; $cfgn++) {
-				if (mwexec("/sbin/mount -r /dev/ad{$cfgn}a {$g['cf_path']}") == 0) {
+			/* probe kernel known disks until we find one with config.xml */
+			$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
+			foreach ($disks as $mountdisk) {
+				/* skip mfs mounted filesystems */
+				if (strstr($mountdisk, "md"))
+					continue;
+				if (mwexec("/sbin/mount -r /dev/{$mountdisk}a {$g['cf_path']}") == 0) {
 					if (file_exists("{$g['cf_conf_path']}/config.xml")) {
 						/* found it */
-						$cfgdevice = "ad" . $cfgn;
+						$cfgdevice = $mountdisk;
 						$cfgpartition = $cfgdevice . "a";
 						$cfgfstype = "ufs";
 						echo "Found configuration on $cfgdevice.\n";
@@ -77,9 +81,9 @@ if ($g['booting']) {
 
 
 *******************************************************************************
-* FATAL ERROR																  *
-* The device that contains the configuration file (config.xml) could not be	  *
-* found. m0n0wall cannot continue booting.									  *
+* FATAL ERROR                                                                 *
+* The device that contains the configuration file (config.xml) could not be   *
+* found. m0n0wall cannot continue booting.                                    *
 *******************************************************************************
 
 
@@ -151,11 +155,11 @@ if (!$noparseconfig) {
 
 
 *******************************************************************************
-* WARNING!																	  *
+* WARNING!                                                                    *
 * The current configuration has been created with a newer version of m0n0wall *
-* than this one! This can lead to serious misbehavior and even security		  *
-* holes! You are urged to either upgrade to a newer version of m0n0wall or	  *
-* revert to the default configuration immediately!							  *
+* than this one! This can lead to serious misbehavior and even security       *
+* holes! You are urged to either upgrade to a newer version of m0n0wall or    *
+* revert to the default configuration immediately!                            *
 *******************************************************************************
 
 

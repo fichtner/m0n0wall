@@ -57,7 +57,7 @@ function address_to_pconfig($adr, &$padr, &$pmask) {
 		$padr = $adr['network'];
 	else if ($adr['address']) {
 		list($padr, $pmask) = explode("/", $adr['address']);
-		if (!$pmask)
+		if (is_null($pmask))
 			$pmask = 32;
 	}
 }
@@ -100,7 +100,10 @@ if (isset($id) && $a_ipsec[$id]) {
 	} else if (isset($a_ipsec[$id]['p1']['myident']['fqdn'])) {
 		$pconfig['p1myidentt'] = 'fqdn';
 		$pconfig['p1myident'] = $a_ipsec[$id]['p1']['myident']['fqdn'];
-	}
+	} else if (isset($a_ipsec[$id]['p1']['myident']['ufqdn'])) {
+		$pconfig['p1myidentt'] = 'user_fqdn';
+		$pconfig['p1myident'] = $a_ipsec[$id]['p1']['myident']['ufqdn'];
+ 	}
 	
 	$pconfig['p1ealgo'] = $a_ipsec[$id]['p1']['encryption-algorithm'];
 	$pconfig['p1halgo'] = $a_ipsec[$id]['p1']['hash-algorithm'];
@@ -175,6 +178,11 @@ if ($_POST) {
 	if ((($_POST['p1myidentt'] == "fqdn") && !is_domain($_POST['p1myident']))) {
 		$input_errors[] = "A valid domain name for 'My identifier' must be specified.";
 	}
+	if ($_POST['p1myidentt'] == "user_fqdn") {
+		$ufqdn = explode("@",$_POST['p1myident']);
+		if (!is_domain($ufqdn[1])) 
+			$input_errors[] = "A valid User FQDN in the form of user@my.domain.com for 'My identifier' must be specified.";
+	}
 	
 	if ($_POST['p1myidentt'] == "myaddress")
 		$_POST['p1myident'] = "";
@@ -197,6 +205,9 @@ if ($_POST) {
 				break;
 			case 'fqdn':
 				$ipsecent['p1']['myident']['fqdn'] = $_POST['p1myident'];
+				break;
+			case 'user_fqdn':
+				$ipsecent['p1']['myident']['ufqdn'] = $_POST['p1myident'];
 				break;
 		}
 		
@@ -260,7 +271,6 @@ function typesel_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">VPN: IPsec: Edit tunnel</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="vpn_ipsec_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
@@ -311,7 +321,7 @@ function typesel_change() {
                         <td><input name="localnet" type="text" class="formfld" id="localnet" size="20" value="<?php if (!is_specialnet($pconfig['localnet'])) echo htmlspecialchars($pconfig['localnet']);?>">
                           / 
                           <select name="localnetmask" class="formfld" id="localnetmask">
-                            <?php for ($i = 31; $i > 0; $i--): ?>
+                            <?php for ($i = 31; $i >= 0; $i--): ?>
                             <option value="<?=$i;?>" <?php if ($i == $pconfig['localnetmask']) echo "selected"; ?>>
                             <?=$i;?>
                             </option>

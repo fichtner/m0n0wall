@@ -161,7 +161,7 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
       <p class="pgtitle">System: General setup</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="system.php" method="post">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
@@ -187,10 +187,10 @@ if ($_POST) {
                       the DHCP service, DNS forwarder and for PPTP VPN clients<br>
                       <br>
                       <input name="dnsallowoverride" type="checkbox" id="dnsallowoverride" value="yes" <?php if ($pconfig['dnsallowoverride'] == "yes") echo "checked"; ?>>
-                      <strong>Allow DNS server list to be overridden by DHCP 
+                      <strong>Allow DNS server list to be overridden by DHCP/PPP 
                       on WAN</strong><br>
                       If this option is set, m0n0wall will use DNS servers assigned 
-                      by a DHCP server on WAN for its own purposes (including 
+                      by a DHCP/PPP server on WAN for its own purposes (including 
                       the DNS forwarder). They will not be assigned to DHCP and 
                       PPTP VPN clients, though.</span></p></td>
                 </tr>

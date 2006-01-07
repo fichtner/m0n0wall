@@ -37,6 +37,7 @@ $pconfig['ipv6nat_ipaddr'] = $config['diag']['ipv6nat']['ipaddr'];
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
+$pconfig['disablefirmwarecheck'] = isset($config['system']['disablefirmwarecheck']);
 
 if ($_POST) {
 
@@ -65,6 +66,7 @@ if ($_POST) {
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
 		$config['system']['webgui']['private-key'] = base64_encode($_POST['key']);
 		$config['system']['disableconsolemenu'] = $_POST['disableconsolemenu'] ? true : false;
+		$config['system']['disablefirmwarecheck'] = $_POST['disablefirmwarecheck'] ? true : false;
 			
 		write_config();
 		
@@ -107,7 +109,7 @@ function enable_change(enable_over) {
 <?php include("fbegin.inc"); ?>
       <p class="pgtitle">System: Advanced functions</p>
             <?php if ($input_errors) print_input_errors($input_errors); ?>
-            <?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+            <?php if ($savemsg) print_info_box($savemsg); ?>
             <p><span class="vexpl"><span class="red"><strong>Note: </strong></span>the 
               options on this page are intended for use by advanced users only, 
               and there's <strong>NO</strong> support for them.</span></p>
@@ -192,6 +194,13 @@ function enable_change(enable_over) {
                     <input name="disableconsolemenu" type="checkbox" id="disableconsolemenu" value="yes" <?php if ($pconfig['disableconsolemenu']) echo "checked"; ?>>
                     <strong>Disable console menu</strong><span class="vexpl"><br>
                     Changes to this option will take effect after a reboot.</span></td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="disablefirmwarecheck" type="checkbox" id="disablefirmwarecheck" value="yes" <?php if ($pconfig['disablefirmwarecheck']) echo "checked"; ?>>
+                    <strong>Disable firmware version check</strong><span class="vexpl"><br>
+                    This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

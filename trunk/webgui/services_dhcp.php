@@ -54,6 +54,7 @@ $pconfig['deftime'] = $config['dhcpd'][$if]['defaultleasetime'];
 $pconfig['maxtime'] = $config['dhcpd'][$if]['maxleasetime'];
 list($pconfig['wins1'],$pconfig['wins2']) = $config['dhcpd'][$if]['winsserver'];
 $pconfig['enable'] = isset($config['dhcpd'][$if]['enable']);
+$pconfig['denyunknown'] = isset($config['dhcpd'][$if]['denyunknown']);
 
 $ifcfg = $config['interfaces'][$if];
 
@@ -112,6 +113,7 @@ if ($_POST) {
 		$config['dhcpd'][$if]['defaultleasetime'] = $_POST['deftime'];
 		$config['dhcpd'][$if]['maxleasetime'] = $_POST['maxtime'];
 		$config['dhcpd'][$if]['enable'] = $_POST['enable'] ? true : false;
+		$config['dhcpd'][$if]['denyunknown'] = $_POST['denyunknown'] ? true : false;
 		
 		unset($config['dhcpd'][$if]['winsserver']);
 		if ($_POST['wins1'])
@@ -180,24 +182,25 @@ function enable_change(enable_over) {
 <p class="pgtitle">Services: DHCP</p>
 <form action="services_dhcp.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_staticmapsdirty_path)): ?><p>
 <?php print_info_box_np("The static mapping configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr> 
-<?php $i = 1; foreach ($iflist as $ifent => $ifname):
+  <tr><td>
+  <ul id="tabnav">
+<?php foreach ($iflist as $ifent => $ifname):
 	if ($ifent == $if): ?>
-    <td nowrap class="tabact"><?=htmlspecialchars($ifname);?></td>
+    <li class="tabact"><?=htmlspecialchars($ifname);?></li>
 <?php else: ?>
-    <td nowrap class="tabinact"><a href="services_dhcp.php?if=<?=$ifent;?>" class="tblnk"><?=htmlspecialchars($ifname);?></a></td>
+    <li class="tabinact"><a href="services_dhcp.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
 <?php endif; ?>
-<?php $i++; endforeach; ?>
-    <td width="100%">&nbsp;</td>
-  </tr>
+<?php endforeach; ?>
+  </ul>
+  </td></tr>
   <tr> 
-    <td colspan="<?=$i;?>" class="tabcont">			
+    <td class="tabcont">			
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                       <tr> 
                         <td width="22%" valign="top" class="vtable">&nbsp;</td>
@@ -207,6 +210,13 @@ function enable_change(enable_over) {
                           <?=htmlspecialchars($iflist[$if]);?>
                           interface</strong></td>
                       </tr>
+				  <tr>
+	              <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                      <td width="78%" class="vtable">
+<input name="denyunknown" type="checkbox" value="yes" <?php if ($pconfig['denyunknown']) echo "checked"; ?>>
+                      <strong>Deny unknown clients</strong><br>
+                      If this is checked, only the clients defined below will get DHCP leases from this server. </td>
+		      		  </tr>
                       <tr> 
                         <td width="22%" valign="top" class="vncellreq">Subnet</td>
                         <td width="78%" class="vtable"> 
@@ -278,26 +288,24 @@ function enable_change(enable_over) {
                             <br>
                             The DHCP lease table can be viewed on the <a href="diag_dhcp_leases.php">Diagnostics: 
                             DHCP leases</a> page.<br>
-                            <br>
-                            You may enter static mappings between IP and MAC addresses 
-                            below. </span></p></td>
+                            </span></p></td>
                       </tr>
                     </table>
 					&nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="20%" class="listhdrr">IP address</td>
                   <td width="35%" class="listhdrr">MAC address </td>
-                  <td width="35%" class="listhdrr">Description</td>
+                  <td width="20%" class="listhdrr">IP address</td>
+                  <td width="35%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_maps as $mapent): ?>
                 <tr>
                   <td class="listlr">
-                    <?=htmlspecialchars($mapent['ipaddr']);?>
+                    <?=htmlspecialchars($mapent['mac']);?>
                   </td>
                   <td class="listr">
-                    <?=htmlspecialchars($mapent['mac']);?>
+                    <?=htmlspecialchars($mapent['ipaddr']);?>&nbsp;
                   </td>
                   <td class="listbg">
                     <?=htmlspecialchars($mapent['descr']);?>&nbsp;

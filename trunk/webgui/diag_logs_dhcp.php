@@ -73,15 +73,16 @@ function dump_clog($logfile, $tail, $withorig = true) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Diagnostics: System logs</p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="diag_logs.php">System</a></li>
+    <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
+    <li class="tabact">DHCP</li>
+    <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="diag_logs.php" class="tblnk">System</a></td>
-    <td nowrap class="tabinact"><a href="diag_logs_filter.php" class="tblnk">Firewall</a></td>
-    <td nowrap class="tabact">DHCP</td>
-    <td nowrap class="tabinact"><a href="diag_logs_settings.php" class="tblnk">Settings</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="5" class="tabcont">
+    <td class="tabcont">
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tr> 
 			<td colspan="2" class="listtopic"> 

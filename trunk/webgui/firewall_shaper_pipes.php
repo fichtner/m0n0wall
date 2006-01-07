@@ -101,20 +101,22 @@ if ($_GET['act'] == "del") {
 <p class="pgtitle">Firewall: Traffic shaper</p>
 <form action="firewall_shaper.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="firewall_shaper.php">Rules</a></li>
+    <li class="tabact">Pipes</li>
+    <li class="tabinact"><a href="firewall_shaper_queues.php">Queues</a></li>
+    <li class="tabinact"><a href="firewall_shaper_magic.php">Magic shaper wizard</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="firewall_shaper.php" class="tblnk">Rules</a></td>
-    <td nowrap class="tabact">Pipes</a></td>
-    <td nowrap class="tabinact"><a href="firewall_shaper_queues.php" class="tblnk">Queues</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="4" class="tabcont">
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                       <tr> 
                         <td width="10%" class="listhdrr">No.</td>

@@ -89,6 +89,10 @@ if ($_POST) {
 				$input_errors[] = "The specified interface is already bridged to " .
 					"another interface.";
 			}
+			/* captive portal on? */
+			if (isset($config['captiveportal']['enable'])) {
+				$input_errors[] = "Interfaces cannot be bridged while the captive portal is enabled.";
+			}
 		} else {
 			$reqdfields = explode(" ", "descr ipaddr subnet");
 			$reqdfieldsn = explode(",", "Description,IP address,Subnet bit count");
@@ -125,6 +129,12 @@ if ($_POST) {
 		if (!file_exists($d_sysrebootreqd_path)) {
 			config_lock();
 			$retval = interfaces_optional_configure();
+			
+			/* is this the captive portal interface? */
+			if (isset($config['captiveportal']['enable']) && 
+				($config['captiveportal']['interface'] == ('opt' . $index))) {
+				captiveportal_configure();
+			}
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
@@ -177,7 +187,7 @@ function ipaddr_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Interfaces: Optional <?=$index;?> (<?=htmlspecialchars($optcfg['descr']);?>)</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
             <form action="interfaces_opt.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">

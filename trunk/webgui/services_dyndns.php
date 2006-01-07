@@ -118,7 +118,7 @@ function enable_change(enable_change) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Services: Dynamic DNS client</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="services_dyndns.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 

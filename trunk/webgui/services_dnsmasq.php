@@ -85,7 +85,7 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Services: DNS forwarder</p>
 <form action="services_dnsmasq.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_hostsdirty_path)): ?><p>
 <?php print_info_box_np("The DNS forwarder configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
@@ -136,7 +136,7 @@ if ($_GET['act'] == "del") {
                   <td width="20%" class="listhdrr">Host</td>
                   <td width="25%" class="listhdrr">Domain</td>
                   <td width="20%" class="listhdrr">IP</td>
-                  <td width="25%" class="listhdrr">Description</td>
+                  <td width="25%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_hosts as $hostent): ?>

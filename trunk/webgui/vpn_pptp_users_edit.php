@@ -43,6 +43,7 @@ if (isset($_POST['id']))
 
 if (isset($id) && $a_secret[$id]) {
 	$pconfig['username'] = $a_secret[$id]['name'];
+	$pconfig['ip'] = $a_secret[$id]['ip'];
 }
 
 if ($_POST) {
@@ -70,6 +71,9 @@ if ($_POST) {
 	if (($_POST['password']) && ($_POST['password'] != $_POST['password2'])) {
 		$input_errors[] = "The passwords do not match.";
 	}
+	if (($_POST['ip'] && !is_ipaddr($_POST['ip']))) {
+		$input_errors[] = "The IP address entered is not valid.";
+	}
 	
 	if (!$input_errors && !(isset($id) && $a_secret[$id])) {
 		/* make sure there are no dupes */
@@ -87,6 +91,7 @@ if ($_POST) {
 			$secretent = $a_secret[$id];
 	
 		$secretent['name'] = $_POST['username'];
+		$secretent['ip'] = $_POST['ip'];
 		
 		if ($_POST['password'])
 			$secretent['password'] = $_POST['password'];
@@ -116,7 +121,6 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">VPN: PPTP: Users: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="vpn_pptp_users_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
@@ -132,6 +136,12 @@ if ($_POST) {
                     &nbsp;(confirmation)<?php if (isset($id) && $a_secret[$id]): ?><br>
                     <span class="vexpl">If you want to change the users' password, 
                     enter it here twice.</span><?php endif; ?></td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">IP address</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="ip" type="text" class="formfld" id="ip" size="20" value="<?=htmlspecialchars($pconfig['ip']);?>"> 
+                    <br><span class="vexpl">If you want the user to be assigned a specific IP address, enter it here.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

@@ -86,6 +86,14 @@ if ($_GET['act'] == "del") {
 		header("Location: firewall_rules.php");
 		exit;
 	}
+} else if ($_GET['act'] == "toggle") {
+	if ($a_filter[$_GET['id']]) {
+		$a_filter[$_GET['id']]['disabled'] = !isset($a_filter[$_GET['id']]['disabled']);
+		write_config();
+		touch($d_filterconfdirty_path);
+		header("Location: firewall_rules.php");
+		exit;
+	}
 }
 
 ?>
@@ -101,7 +109,7 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: Rules</p>
 <form action="firewall_rules.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_filterconfdirty_path)): ?><p>
 <?php print_info_box_np("The firewall rule configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
@@ -146,56 +154,61 @@ if ($_GET['act'] == "del") {
 								$iconfn = "block";
 						} else
 							$iconfn = "pass";
-						if (isset($filterent['disabled']))
+						if (isset($filterent['disabled'])) {
+							$textss = "<span class=\"gray\">";
+							$textse = "</span>";
 							$iconfn .= "_d";
+						} else {
+							$textss = $textse = "";
+						}
 				  ?>
-				  <img src="<?=$iconfn;?>.gif" width="11" height="11">
+				  <a href="?act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
 				  <?php if (isset($filterent['log'])):
 							$iconfn = "log_s";
 						if (isset($filterent['disabled']))
 							$iconfn .= "_d";
 				  	?>
-				  <br><img src="<?=$iconfn;?>.gif" width="11" height="15">
+				  <br><a href="?act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="15" border="0" title="click to toggle enabled/disabled status"></a>
 				  <?php endif; ?>
 				  </td>
                   <td class="listlr"> 
-                    <?php if (isset($filterent['protocol'])) echo strtoupper($filterent['protocol']); else echo "*"; ?>
+                    <?=$textss;?><?php if (isset($filterent['protocol'])) echo strtoupper($filterent['protocol']); else echo "*"; ?><?=$textse;?>
                   </td>
                   <td class="listr">
-				    <?php echo htmlspecialchars(pprint_address($filterent['source'])); ?>
+				    <?=$textss;?><?php echo htmlspecialchars(pprint_address($filterent['source'])); ?><?=$textse;?>
                   </td>
                   <td class="listr">
-                    <?php echo htmlspecialchars(pprint_port($filterent['source']['port'])); ?>
+                    <?=$textss;?><?php echo htmlspecialchars(pprint_port($filterent['source']['port'])); ?><?=$textse;?>
                   </td>
                   <td class="listr"> 
-				    <?php echo htmlspecialchars(pprint_address($filterent['destination'])); ?>
+				    <?=$textss;?><?php echo htmlspecialchars(pprint_address($filterent['destination'])); ?><?=$textse;?>
                   </td>
                   <td class="listr"> 
-                    <?php echo htmlspecialchars(pprint_port($filterent['destination']['port'])); ?>
+                    <?=$textss;?><?php echo htmlspecialchars(pprint_port($filterent['destination']['port'])); ?><?=$textse;?>
                   </td>
                   <td class="listbg"> 
-                    <?=htmlspecialchars($filterent['descr']);?>&nbsp;
+                    <?=$textss;?><?=htmlspecialchars($filterent['descr']);?>&nbsp;<?=$textse;?>
                   </td>
                   <td valign="middle" nowrap class="list">
-				    <a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" alt="edit rule" width="17" height="17" border="0"></a>
+				    <a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a>
 					<?php if (($i > 0) && ($a_filter[$i-1]['interface'] == $filterent['interface'])): ?>
-					<a href="firewall_rules.php?act=up&id=<?=$i;?>"><img src="up.gif" alt="move up" width="17" height="17" border="0"></a>
+					<a href="firewall_rules.php?act=up&id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0"></a>
 					<?php else: ?>
 					<img src="up_d.gif" width="17" height="17" border="0">
 					<?php endif; ?><br>
-					<a href="firewall_rules.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" alt="delete rule" width="17" height="17" border="0"></a>
+					<a href="firewall_rules.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0"></a>
 					<?php if ($a_filter[$i+1]['interface'] == $filterent['interface']): ?>
-					<a href="firewall_rules.php?act=down&id=<?=$i;?>"><img src="down.gif" alt="move down" width="17" height="17" border="0"></a> 
+					<a href="firewall_rules.php?act=down&id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0"></a> 
                     <?php else: ?>
 					<img src="down_d.gif" width="17" height="17" border="0">
 					<?php endif; ?>
-					<a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" alt="add a new rule based on this one" width="17" height="17" border="0"></a>
+					<a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a>
 				  </td>
 				</tr>
 			  <?php endfor; ?>
                 <tr> 
                   <td class="list" colspan="7"></td>
-                  <td class="list"> <a href="firewall_rules_edit.php"><img src="plus.gif" alt="add new rule" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="firewall_rules_edit.php"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
 				</tr>
               </table>
 			  <table border="0" cellspacing="0" cellpadding="0">

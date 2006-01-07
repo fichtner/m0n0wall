@@ -100,6 +100,10 @@ a {
 	font-size: 11px;
 	color: #FFFFFF;
 }
+.hostname {
+	font-size: 11px;
+	color: #FFFFFF;
+}
 .vnsepcellr {
 	background-color: #BBBBBB;
 	padding-right: 20px;
@@ -229,26 +233,34 @@ a {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
-.tabinact {
-	border-left: 1px solid #999999;
+ul#tabnav {
 	font-size: 11px;
-	background-color: #777777;
-	padding-right: 8px;
-	padding-left: 8px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	color: #FFFFFF;
 	font-weight: bold;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
-.tabact {
-	font-size: 11px;
+ul#tabnav li.tabinact {
+	float: left;
+	border-left: 1px solid #999999;
+	background-color: #777777;
+	color: #FFFFFF;
+	padding: 0;
+	white-space: nowrap;
+}
+ul#tabnav li.tabinact a {
+	float: left;
+	display: block;
+	text-decoration: none;
+	padding: 5px 8px 5px 8px;
+	color: #FFFFFF;
+}
+ul#tabnav li.tabact {
+	float: left;
 	background-color: #EEEEEE;
-	padding-right: 8px;
-	padding-left: 8px;
-	padding-top: 5px;
-	padding-bottom: 5px;
 	color: #000000;
-	font-weight: bold;
+	padding: 5px 8px 5px 8px;
+	white-space: nowrap;
 }
 .tabcont {
 	background-color: #EEEEEE;

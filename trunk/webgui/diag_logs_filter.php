@@ -60,6 +60,61 @@ function dump_clog($logfile, $tail, $withorig = true) {
 	}
 }
 
+function conv_clog($logfile, $tail) {
+	global $g, $config;
+	
+	/* make interface/port table */
+	$iftable = array();
+	$iftable[$config['interfaces']['lan']['if']] = "LAN";
+	$iftable[get_real_wan_interface()] = "WAN";
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+		$iftable[$config['interfaces']['opt' . $i]['if']] = $config['interfaces']['opt' . $i]['descr'];
+
+	$sor = isset($config['syslog']['reverse']) ? "-r" : "";
+
+	exec("/usr/sbin/clog " . $logfile . " | tail {$sor} -n " . $tail, $logarr);
+	
+	$filterlog = array();
+	
+	foreach ($logarr as $logent) {
+		$logent = preg_split("/\s+/", $logent, 6);
+		$ipfa = explode(" ", $logent[5]);
+		
+		$flent = array();
+		$i = 0;
+		$flent['time'] = $ipfa[$i];
+		$i++;
+		if (substr($ipfa[$i], -1) == "x") {
+			$flent['count'] = substr($ipfa[$i], 0, -1);
+			$i++;
+		}
+		if ($iftable[$ipfa[$i]])
+			$flent['interface'] = $iftable[$ipfa[$i]];
+		else
+			$flent['interface'] = $ipfa[$i];
+		$i += 2;
+		$flent['act'] = $ipfa[$i];
+		$i++;
+		$flent['src'] = format_ipf_ip($ipfa[$i]);
+		$i += 2;
+		$flent['dst'] = format_ipf_ip($ipfa[$i]);
+		$i += 2;
+		$flent['proto'] = strtoupper($ipfa[$i]);
+		
+		$filterlog[] = $flent;
+	}
+	
+	return $filterlog;
+}
+
+function format_ipf_ip($ipfip) {
+	list($ip,$port) = explode(",", $ipfip);
+	if (!$port)
+		return $ip;
+	
+	return $ip . ", port " . $port;
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -73,15 +128,48 @@ function dump_clog($logfile, $tail, $withorig = true) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Diagnostics: System logs</p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr> 
-    <td nowrap class="tabinact"><a href="diag_logs.php" class="tblnk">System</a></td>
-    <td nowrap class="tabact">Firewall</td>
-    <td nowrap class="tabinact"><a href="diag_logs_dhcp.php" class="tblnk">DHCP</td>
-    <td nowrap class="tabinact"><a href="diag_logs_settings.php" class="tblnk">Settings</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="5" class="tabcont">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="diag_logs.php">System</a></li>
+    <li class="tabact">Firewall</li>
+    <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
+    <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
+  </ul>
+  </td></tr>
+  <tr>
+    <td class="tabcont">
+<?php if (!isset($config['syslog']['rawfilter'])):
+	$filterlog = conv_clog("/var/log/filter.log", $nentries);
+?>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
+		  <td colspan="6" class="listtopic"> 
+			    Last <?=$nentries;?> firewall log entries</td>
+			</tr>
+			<tr>
+			  <td width="10%" class="listhdrr">Act</td>
+			  <td width="20%" class="listhdrr">Time</td>
+			  <td width="10%" class="listhdrr">If</td>
+			  <td width="20%" class="listhdrr">Source</td>
+			  <td width="20%" class="listhdrr">Destination</td>
+			  <td width="10%" class="listhdrr">Proto</td>
+			</tr><?php foreach ($filterlog as $filterent): ?>
+			<tr>
+			  <td class="listlr" nowrap>
+			  <?php if (strstr(strtolower($filterent['act']), "p"))
+			  			$img = "pass.gif";
+					 else 
+					 	$img = "block.gif";
+			 	?>
+			  <img src="<?=$img;?>" width="11" height="11" align="absmiddle">
+			  <?php if ($filterent['count']) echo $filterent['count'];?></td>
+			  <td class="listr" nowrap><?=htmlspecialchars($filterent['time']);?></td>
+			  <td class="listr" nowrap><?=htmlspecialchars($filterent['interface']);?></td>
+			  <td class="listr" nowrap><?=htmlspecialchars($filterent['src']);?></td>
+			  <td class="listr" nowrap><?=htmlspecialchars($filterent['dst']);?></td>
+			  <td class="listr" nowrap><?=htmlspecialchars($filterent['proto']);?></td>
+			</tr><?php endforeach; ?>
+                    </table>
+<?php else: ?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tr> 
 			<td colspan="2" class="listtopic"> 
@@ -89,6 +177,7 @@ function dump_clog($logfile, $tail, $withorig = true) {
 		  </tr>
 		  <?php dump_clog("/var/log/filter.log", $nentries, false); ?>
 		</table>
+<?php endif; ?>
 		<br><form action="diag_logs_filter.php" method="post">
 <input name="clear" type="submit" class="formbtn" value="Clear log">
 </form>

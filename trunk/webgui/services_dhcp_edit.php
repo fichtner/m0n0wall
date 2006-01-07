@@ -63,8 +63,8 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	$reqdfields = explode(" ", "mac ipaddr");
-	$reqdfieldsn = explode(",", "MAC address,IP address");
+	$reqdfields = explode(" ", "mac");
+	$reqdfieldsn = explode(",", "MAC address");
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
@@ -80,25 +80,27 @@ if ($_POST) {
 		if (isset($id) && ($a_maps[$id]) && ($a_maps[$id] === $mapent))
 			continue;
 
-		if (($mapent['mac'] == $_POST['mac']) || (ip2long($mapent['ipaddr']) == ip2long($_POST['ipaddr']))) {
+		if (($mapent['mac'] == $_POST['mac']) || ($_POST['ipaddr'] && (ip2long($mapent['ipaddr']) == ip2long($_POST['ipaddr'])))) {
 			$input_errors[] = "This IP or MAC address already exists.";
 			break;
 		}
 	}
 		
 	/* make sure it's not within the dynamic subnet */
-	$dynsubnet_start = ip2long($config['dhcpd'][$if]['range']['from']);
-	$dynsubnet_end = ip2long($config['dhcpd'][$if]['range']['to']);
-	$lansubnet_start = (ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet']));
-	$lansubnet_end = (ip2long($ifcfg['ipaddr']) | (~gen_subnet_mask_long($ifcfg['subnet'])));
-	
-	if ((ip2long($_POST['ipaddr']) >= $dynsubnet_start) &&
-			(ip2long($_POST['ipaddr']) <= $dynsubnet_end)) {
-		$input_errors[] = "Static IP addresses may not lie within the dynamic client range.";
-	}
-	if ((ip2long($_POST['ipaddr']) < $lansubnet_start) ||
-		(ip2long($_POST['ipaddr']) > $lansubnet_end)) {
-		$input_errors[] = "The IP address must lie in the {$ifcfg['descr']} subnet.";
+	if ($_POST['ipaddr']) {
+		$dynsubnet_start = ip2long($config['dhcpd'][$if]['range']['from']);
+		$dynsubnet_end = ip2long($config['dhcpd'][$if]['range']['to']);
+		$lansubnet_start = (ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet']));
+		$lansubnet_end = (ip2long($ifcfg['ipaddr']) | (~gen_subnet_mask_long($ifcfg['subnet'])));
+		
+		if ((ip2long($_POST['ipaddr']) >= $dynsubnet_start) &&
+				(ip2long($_POST['ipaddr']) <= $dynsubnet_end)) {
+			$input_errors[] = "Static IP addresses may not lie within the dynamic client range.";
+		}
+		if ((ip2long($_POST['ipaddr']) < $lansubnet_start) ||
+			(ip2long($_POST['ipaddr']) > $lansubnet_end)) {
+			$input_errors[] = "The IP address must lie in the {$ifcfg['descr']} subnet.";
+		}
 	}
 
 	if (!$input_errors) {
@@ -133,15 +135,8 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Services: DHCP: Edit static mapping</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="services_dhcp_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
-                <tr> 
-                  <td width="22%" valign="top" class="vncellreq">IP address</td>
-                  <td width="78%" class="vtable"> 
-                    <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
-                  </td>
-                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">MAC address</td>
                   <td width="78%" class="vtable"> 
@@ -149,6 +144,13 @@ if ($_POST) {
                     <br>
                     <span class="vexpl">Enter a MAC address in the following format: 
                     xx:xx:xx:xx:xx:xx</span></td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">IP address</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
+                    <br>
+                    If no IP address is given, one will be dynamically allocated  from the pool.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>

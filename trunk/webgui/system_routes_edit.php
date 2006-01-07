@@ -115,7 +115,6 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">System: Static routes: Edit route</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="system_routes_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 

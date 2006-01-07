@@ -76,7 +76,7 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Services: Proxy ARP</p>
 <form action="services_proxyarp.php" method="post">
-<?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_proxyarpdirty_path)): ?><p>
 <?php print_info_box_np("The proxy ARP configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
@@ -84,7 +84,7 @@ if ($_GET['act'] == "del") {
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="40%" class="listhdrr">Network</td>
-                  <td width="50%" class="listhdrr">Description</td>
+                  <td width="50%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_proxyarp as $arpent): ?>

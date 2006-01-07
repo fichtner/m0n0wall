@@ -134,9 +134,11 @@ if (isset($id) && $a_shaper[$id]) {
 	}
 	
 	$pconfig['direction'] = $a_shaper[$id]['direction'];
+	$pconfig['iptos'] = $a_shaper[$id]['iptos'];
 	$pconfig['iplen'] = $a_shaper[$id]['iplen'];
 	$pconfig['tcpflags'] = $a_shaper[$id]['tcpflags'];
 	$pconfig['descr'] = $a_shaper[$id]['descr'];
+	$pconfig['disabled'] = isset($a_shaper[$id]['disabled']);
 	
 	if ($pconfig['srcbeginport'] == 0) {
 		$pconfig['srcbeginport'] = "any";
@@ -158,7 +160,7 @@ if (isset($_GET['dup']))
 
 if ($_POST) {
 
-	if (($_POST['proto'] != "tcp") && ($_POST['proto'] != "udp") && ($_POST['proto'] != "tcp/udp")) {
+	if (($_POST['proto'] != "tcp") && ($_POST['proto'] != "udp") && ($_POST['proto'] != "any")) {
 		$_POST['srcbeginport'] = 0;
 		$_POST['srcendport'] = 0;
 		$_POST['dstbeginport'] = 0;
@@ -208,6 +210,15 @@ if ($_POST) {
 	}  else if ($_POST['dsttype'] == "single") {
 		$_POST['dstmask'] = 32;
 	}
+	
+	$intos = array();
+	foreach ($iptos as $tos) {
+		if ($_POST['iptos_' . $tos] == "on")
+			$intos[] = $tos;
+		else if ($_POST['iptos_' . $tos] == "off")
+			$intos[] = "!" . $tos;
+	}
+	$_POST['iptos'] = join(",", $intos);
 	
 	$intcpflags = array();
 	foreach ($tcpflags as $tcpflag) {
@@ -311,8 +322,10 @@ if ($_POST) {
 		
 		$shaperent['direction'] = $_POST['direction'];
 		$shaperent['iplen'] = $_POST['iplen'];
+		$shaperent['iptos'] = $_POST['iptos'];
 		$shaperent['tcpflags'] = $_POST['tcpflags'];
 		$shaperent['descr'] = $_POST['descr'];
+		$shaperent['disabled'] = $_POST['disabled'] ? true : false;
 		
 		list($targettype,$target) = explode(":", $_POST['target']);
 		$shaperent[$targettype] = $target;
@@ -421,7 +434,7 @@ function typesel_change() {
 }
 
 function proto_change() {
-	if (document.iform.proto.selectedIndex < 3) {
+	if (document.iform.proto.selectedIndex < 2 || document.iform.proto.selectedIndex == 8) {
 		portsenabled = 1;
 	} else {
 		portsenabled = 0;
@@ -444,7 +457,6 @@ function dst_rep_change() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: Traffic shaper: Edit rule</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
 <?php if (is_array($config['shaper']['pipe']) && (count($config['shaper']['pipe']) > 0)): ?>
             <form action="firewall_shaper_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -474,6 +486,13 @@ function dst_rep_change() {
                     <span class="vexpl">Choose a pipe or queue where packets that 
                     match this rule should be sent.</span></td>
                 </tr>
+                <tr>
+                  <td valign="top" class="vncellreq">Disabled</td>
+                  <td class="vtable">
+                    <input name="disabled" type="checkbox" id="disabled" value="yes" <?php if ($pconfig['disabled']) echo "checked"; ?>>
+                    <strong>Disable this rule</strong><br>
+                    <span class="vexpl">Set this option to disable this rule without removing it from the list.</span></td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable"> <select name="interface" class="formfld">
@@ -493,7 +512,7 @@ function dst_rep_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Protocol</td>
                   <td width="78%" class="vtable"> <select name="proto" class="formfld" onchange="proto_change()">
-                      <?php $protocols = explode(" ", "TCP UDP ICMP ESP AH GRE IPv6 any"); foreach ($protocols as $proto): ?>
+                      <?php $protocols = explode(" ", "TCP UDP ICMP ESP AH GRE IPv6 IGMP any"); foreach ($protocols as $proto): ?>
                       <option value="<?=strtolower($proto);?>" <?php if (strtolower($proto) == $pconfig['proto']) echo "selected"; ?>> 
                       <?=htmlspecialchars($proto);?>
                       </option>
@@ -672,6 +691,28 @@ function dst_rep_change() {
                     Use this to match only packets travelling in a given direction 
                     on the interface specified above (as seen from the firewall's 
                     perspective). </td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">IP Type of Service (TOS)</td>
+                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0">
+                      <?php 
+				  $iniptos = explode(",", $pconfig['iptos']);
+				  foreach ($iptos as $tos): $dontcare = true; ?>
+                      <tr> 
+                        <td width="80" nowrap><strong> 
+			  <?echo $tos;?>
+                          </strong></td>
+                        <td nowrap> <input type="radio" name="iptos_<?=$tos;?>" value="on" <?php if (array_search($tos, $iniptos) !== false) { echo "checked"; $dontcare = false; }?>>
+                          yes&nbsp;&nbsp;&nbsp;</td>
+                        <td nowrap> <input type="radio" name="iptos_<?=$tos;?>" value="off" <?php if (array_search("!" . $tos, $iniptos) !== false) { echo "checked"; $dontcare = false; }?>>
+                          no&nbsp;&nbsp;&nbsp;</td>
+                        <td nowrap> <input type="radio" name="iptos_<?=$tos;?>" value="" <?php if ($dontcare) echo "checked";?>>
+                          don't care</td>
+                      </tr>
+                      <?php endforeach; ?>
+                    </table>
+                    <span class="vexpl">Use this to match packets according to their IP TOS values.
+                    </span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">IP packet length</td>

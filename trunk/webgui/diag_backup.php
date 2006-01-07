@@ -78,9 +78,9 @@ if ($_POST) {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
       <p class="pgtitle">Diagnostics: Backup/restore</p>
-            <?php if ($input_errors) print_input_errors($input_errors); ?>
-            <?php if ($savemsg) print_info_box(htmlspecialchars($savemsg)); ?>
             <form action="diag_backup.php" method="post" enctype="multipart/form-data">
+            <?php if ($input_errors) print_input_errors($input_errors); ?>
+            <?php if ($savemsg) print_info_box($savemsg); ?>
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr> 
                   <td colspan="2" class="listtopic">Backup configuration</td>

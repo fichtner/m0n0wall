@@ -59,7 +59,10 @@ if (count($a_ipsec) == 0) {
 	} else if (isset($a_ipsec['p1']['myident']['fqdn'])) {
 		$pconfig['p1myidentt'] = 'fqdn';
 		$pconfig['p1myident'] = $a_ipsec['p1']['myident']['fqdn'];
-	}
+	} else if (isset($a_ipsec['p1']['myident']['ufqdn'])) {
+		$pconfig['p1myidentt'] = 'user_fqdn';
+		$pconfig['p1myident'] = $a_ipsec['p1']['myident']['ufqdn'];
+ 	}
 	
 	$pconfig['p1ealgo'] = $a_ipsec['p1']['encryption-algorithm'];
 	$pconfig['p1halgo'] = $a_ipsec['p1']['hash-algorithm'];
@@ -94,6 +97,11 @@ if ($_POST) {
 	if ((($_POST['p1myidentt'] == "fqdn") && !is_domain($_POST['p1myident']))) {
 		$input_errors[] = "A valid domain name for 'My identifier' must be specified.";
 	}
+	if ($_POST['p1myidentt'] == "user_fqdn") {
+		$ufqdn = explode("@",$_POST['p1myident']);
+		if (!is_domain($ufqdn[1])) 
+			$input_errors[] = "A valid User FQDN in the form of user@my.domain.com for 'My identifier' must be specified.";
+	}
 	
 	if ($_POST['p1myidentt'] == "myaddress")
 		$_POST['p1myident'] = "";
@@ -113,6 +121,9 @@ if ($_POST) {
 				break;
 			case 'fqdn':
 				$ipsecent['p1']['myident']['fqdn'] = $_POST['p1myident'];
+				break;
+			case 'user_fqdn':
+				$ipsecent['p1']['myident']['ufqdn'] = $_POST['p1myident'];
 				break;
 		}
 		
@@ -156,14 +167,15 @@ if ($_POST) {
 </form>
 <form action="vpn_ipsec_mobile.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+  <ul id="tabnav">
+    <li class="tabinact"><a href="vpn_ipsec.php">Tunnels</a></li>
+    <li class="tabact">Mobile clients</li>
+    <li class="tabinact"><a href="vpn_ipsec_keys.php">Pre-shared keys</a></li>
+  </ul>
+  </td></tr>
   <tr> 
-    <td nowrap class="tabinact"><a href="vpn_ipsec.php" class="tblnk">Tunnels</a></td>
-    <td nowrap class="tabact">Mobile clients</td>
-    <td nowrap class="tabinact"><a href="vpn_ipsec_keys.php" class="tblnk">Pre-shared keys</a></td>
-    <td width="100%">&nbsp;</td>
-  </tr>
-  <tr> 
-    <td colspan="4" class="tabcont">
+    <td class="tabcont">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
 			  <tr> 
                         <td width="22%" valign="top">&nbsp;</td>

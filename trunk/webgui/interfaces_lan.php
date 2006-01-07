@@ -161,7 +161,7 @@ function ipaddr_change() {
                     access your firewall again: 
                     <ul>
                       <li>change the IP address of your computer</li>
-                      <li>renew it's DHCP lease</li>
+                      <li>renew its DHCP lease</li>
                       <li>access the webGUI with the new IP address</li>
                     </ul>
                     </span></td>

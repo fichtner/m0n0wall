@@ -90,9 +90,14 @@ if ($_POST) {
 		$natent['ipaddr'] = $_POST['ipaddr'];
 		$natent['descr'] = $_POST['descr'];
 		
-		if (isset($id) && $a_snat[$id])
+		if (isset($id) && $a_snat[$id]) {
+			/* modify all inbound NAT rules with this address */
+			for ($i = 0; isset($config['nat']['rule'][$i]); $i++) {
+				if ($config['nat']['rule'][$i]['external-address'] == $a_snat[$id]['ipaddr'])
+					$config['nat']['rule'][$i]['external-address'] = $natent['ipaddr'];
+			}
 			$a_snat[$id] = $natent;
-		else
+		} else
 			$a_snat[] = $natent;
 		
 		touch($d_natconfdirty_path);
@@ -116,11 +121,10 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: NAT: Edit Server NAT</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_nat_server_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
-                  <td width="22%" valign="top" class="vncellreq">External IP</td>
+                  <td width="22%" valign="top" class="vncellreq">External IP address</td>
                   <td width="78%" class="vtable"> 
                     <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
                      

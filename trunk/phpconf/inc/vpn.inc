@@ -53,7 +53,9 @@ function vpn_ipsec_configure($ipchg = false) {
 	$syscfg = $config['system'];
 	$ipseccfg = $config['ipsec'];
 	$lancfg = $config['interfaces']['lan'];
+	$lanip = $lancfg['ipaddr'];
 	$lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
+	$lansn = $lancfg['subnet'];
 	
 	if ($g['booting']) {
 		if (!isset($ipseccfg['enable']))
@@ -97,6 +99,10 @@ function vpn_ipsec_configure($ipchg = false) {
 				}
 					
 				$spdconf = "";
+				
+				$spdconf .= "spdadd {$lansa}/{$lansn} {$lanip}/32 any -P in none;\n";
+				$spdconf .= "spdadd {$lanip}/32 {$lansa}/{$lansn} any -P out none;\n";
+				
 				foreach ($ipseccfg['tunnel'] as $tunnel) {
 				
 					if (isset($tunnel['disabled']))
@@ -156,7 +162,10 @@ function vpn_ipsec_configure($ipchg = false) {
 				} else if (isset($tunnel['p1']['myident']['fqdn'])) {
 					$myidentt = "fqdn";
 					$myident = $tunnel['p1']['myident']['fqdn'];
-				}
+				} else if (isset($tunnel['p1']['myident']['ufqdn'])) {
+					$myidentt = "user_fqdn";
+					$myident = $tunnel['p1']['myident']['ufqdn'];
+ 				}
 			
 				$racoonconf .= <<<EOD
 remote {$tunnel['remote-gateway']} \{
@@ -166,6 +175,7 @@ remote {$tunnel['remote-gateway']} \{
 	initial_contact on;
 	support_proxy on;
 	proposal_check obey;
+
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
 		hash_algorithm {$tunnel['p1']['hash-algorithm']};
@@ -217,7 +227,10 @@ EOD;
 				} else if (isset($tunnel['p1']['myident']['fqdn'])) {
 					$myidentt = "fqdn";
 					$myident = $tunnel['p1']['myident']['fqdn'];
-				}
+				} else if (isset($tunnel['p1']['myident']['ufqdn'])) {
+					$myidentt = "user_fqdn";
+					$myident = $tunnel['p1']['myident']['ufqdn'];
+ 				}
 			
 				$racoonconf .= <<<EOD
 remote anonymous \{
@@ -228,6 +241,7 @@ remote anonymous \{
 	generate_policy on;
 	support_proxy on;
 	proposal_check obey;
+
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
 		hash_algorithm {$tunnel['p1']['hash-algorithm']};
@@ -364,7 +378,7 @@ pptpd:
 EOD;
 
 			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
-				$mpdconf .= "	load pptpc{$i}\n";
+				$mpdconf .= "	load pt{$i}\n";
 			}
 			
 			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
@@ -374,19 +388,20 @@ EOD;
 			
 				$mpdconf .= <<<EOD
 
-pptpc{$i}:	
-	new -i {$ngif} pptpc{$i} pptpc{$i}
+pt{$i}:
+	new -i {$ngif} pt{$i} pt{$i}
 	set ipcp ranges {$pptpdcfg['localip']}/32 {$clientip}/32
-	load pptp_standard
+	load pts
 
 EOD;
 			}
 			
 			$mpdconf .= <<<EOD
 
-pptp_standard:
+pts:
 	set iface disable on-demand
 	set iface enable proxy-arp
+	set iface enable tcpmssfix
 	set iface idle 1800
 	set iface up-script /usr/local/sbin/vpn-linkup
 	set bundle enable multilink
@@ -447,11 +462,12 @@ EOD;
 			
 			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
 				$mpdlinks .= <<<EOD
-			
-pptpc{$i}:
+
+pt{$i}:
 	set link type pptp
 	set pptp enable incoming
 	set pptp disable originate
+	set pptp disable windowing
 	set pptp self 127.0.0.1
 
 EOD;
@@ -471,7 +487,7 @@ EOD;
 			
 			if (is_array($pptpdcfg['user'])) {
 				foreach ($pptpdcfg['user'] as $user)
-					$mpdsecret .= "{$user['name']} \"{$user['password']}\"\n";
+					$mpdsecret .= "{$user['name']} \"{$user['password']}\" {$user['ip']}\n";
 			}
 
 			fwrite($fd, $mpdsecret);
@@ -511,7 +527,7 @@ function vpn_localnet_determine($adr, &$sa, &$sn) {
 			}
 		} else if ($adr['address']) {
 			list($sa,$sn) = explode("/", $adr['address']);
-			if (!$sn)
+			if (is_null($sn))
 				$sn = 32;
 		}
 	} else {

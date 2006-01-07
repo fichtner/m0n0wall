@@ -42,6 +42,9 @@
 	/* convert configuration, if necessary */
 	convert_config();
 	
+	/* save dmesg output to file */
+	system_dmesg_save();
+	
 	/* set up our timezone */
 	system_timezone_configure();
 	
@@ -62,6 +65,9 @@
 	
 	/* configure loopback interface */
 	interfaces_loopback_configure();
+	
+	/* set up VLAN virtual interfaces */
+	interfaces_vlan_configure();
 	
 	/* set up LAN interface */
 	interfaces_lan_configure();
@@ -119,6 +125,12 @@
 	
 	/* start IPsec tunnels */
 	vpn_ipsec_configure();
+	
+	/* start the captive portal */
+	captiveportal_configure();
+	
+	/* execute the rc scripts of extensions */
+	system_do_extensions();
 	
 	/* run any shell commands specified in config.xml */
 	system_do_shell_commands();

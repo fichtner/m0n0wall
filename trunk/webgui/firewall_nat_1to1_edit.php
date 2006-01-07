@@ -44,6 +44,9 @@ if (isset($_POST['id']))
 if (isset($id) && $a_1to1[$id]) {
 	$pconfig['external'] = $a_1to1[$id]['external'];
 	$pconfig['internal'] = $a_1to1[$id]['internal'];
+	$pconfig['interface'] = $a_1to1[$id]['interface'];
+	if (!$pconfig['interface'])
+		$pconfig['interface'] = "wan";
 	if (!$a_1to1[$id]['subnet'])
 		$pconfig['subnet'] = 32;
 	else
@@ -51,6 +54,7 @@ if (isset($id) && $a_1to1[$id]) {
 	$pconfig['descr'] = $a_1to1[$id]['descr'];
 } else {
     $pconfig['subnet'] = 32;
+	$pconfig['interface'] = "wan";
 }
 
 if ($_POST) {
@@ -59,8 +63,8 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	$reqdfields = explode(" ", "external internal");
-	$reqdfieldsn = explode(",", "External subnet,Internal subnet");
+	$reqdfields = explode(" ", "interface external internal");
+	$reqdfieldsn = explode(",", "Interface,External subnet,Internal subnet");
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
@@ -119,6 +123,7 @@ if ($_POST) {
 		$natent['internal'] = $_POST['internal'];
 		$natent['subnet'] = $_POST['subnet'];
 		$natent['descr'] = $_POST['descr'];
+		$natent['interface'] = $_POST['interface'];
 		
 		if (isset($id) && $a_1to1[$id])
 			$a_1to1[$id] = $natent;
@@ -146,9 +151,26 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Firewall: NAT: Edit 1:1</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) echo htmlspecialchars($savemsg); ?>
             <form action="firewall_nat_1to1_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tr>
+				  <td width="22%" valign="top" class="vncellreq">Interface</td>
+				  <td width="78%" class="vtable">
+					<select name="interface" class="formfld">
+						<?php
+						$interfaces = array('wan' => 'WAN');
+						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+						}
+						foreach ($interfaces as $iface => $ifacename): ?>
+						<option value="<?=$iface;?>" <?php if ($iface == $pconfig['interface']) echo "selected"; ?>>
+						<?=htmlspecialchars($ifacename);?>
+						</option>
+						<?php endforeach; ?>
+					</select><br>
+				  <span class="vexpl">Choose which interface this rule applies to.<br>
+				  Hint: in most cases, you'll want to use WAN here.</span></td>
+				</tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">External subnet</td>
                   <td width="78%" class="vtable"> 
