@@ -34,7 +34,7 @@ require("guiconfig.inc");
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Status: Captive portal</title>
+<title><?=gentitle("Status: Captive portal");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -101,7 +101,7 @@ captiveportal_unlock();
 <?php foreach ($cpdb as $cpent): ?>
   <tr>
     <td class="listlr"><?=$cpent[2];?></td>
-    <td class="listr"><?=$cpent[3];?></td>
+    <td class="listr"><?=$cpent[3];?>&nbsp;</td>
     <td class="listr"><?=htmlspecialchars(date("m/d/Y H:i:s", $cpent[0]));?></td>
 	<?php if ($_GET['showact']): ?>
     <td class="listr"><?php if ($cpent[4]) echo htmlspecialchars(date("m/d/Y H:i:s", $cpent[4]));?></td>

@@ -42,6 +42,7 @@ $pconfig['redir'] = $pptpcfg['redir'];
 $pconfig['mode'] = $pptpcfg['mode'];
 $pconfig['req128'] = isset($pptpcfg['req128']);
 $pconfig['radiusenable'] = isset($pptpcfg['radius']['enable']);
+$pconfig['radacct_enable'] = isset($pptpcfg['radius']['accounting']);
 $pconfig['radiusserver'] = $pptpcfg['radius']['server'];
 $pconfig['radiussecret'] = $pptpcfg['radius']['secret'];
 
@@ -104,6 +105,7 @@ if ($_POST) {
 		$pptpcfg['mode'] = $_POST['mode'];
 		$pptpcfg['req128'] = $_POST['req128'] ? true : false;
 		$pptpcfg['radius']['enable'] = $_POST['radiusenable'] ? true : false;
+		$pptpcfg['radius']['accounting'] = $_POST['radacct_enable'] ? true : false;
 		$pptpcfg['radius']['server'] = $_POST['radiusserver'];
 		$pptpcfg['radius']['secret'] = $_POST['radiussecret'];
 			
@@ -120,9 +122,8 @@ if ($_POST) {
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title>m0n0wall webGUI - VPN: PPTP</title>
+<html><head>
+<title><?=gentitle("VPN: PPTP");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -144,9 +145,11 @@ function enable_change(enable_over) {
 		document.iform.radiusenable.disabled = 0;
 		
 		if (document.iform.radiusenable.checked || enable_over) {
+			document.iform.radacct_enable.disabled = 0;
 			document.iform.radiusserver.disabled = 0;
 			document.iform.radiussecret.disabled = 0;
 		} else {
+			document.iform.radacct_enable.disabled = 1;
 			document.iform.radiusserver.disabled = 1;
 			document.iform.radiussecret.disabled = 1;
 		}
@@ -155,6 +158,7 @@ function enable_change(enable_over) {
 		document.iform.localip.disabled = 1;
 		document.iform.req128.disabled = 1;
 		document.iform.radiusenable.disabled = 1;
+		document.iform.radacct_enable.disabled = 1;
 		document.iform.radiusserver.disabled = 1;
 		document.iform.radiussecret.disabled = 1;
 	}
@@ -238,11 +242,15 @@ function enable_change(enable_over) {
                   <td width="22%" valign="top" class="vncell">RADIUS</td>
                   <td width="78%" class="vtable"> 
                     <p> 
-                      <input name="radiusenable" type="checkbox" id="radiusenable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radiusenable'] == "yes") echo "checked"; ?>>
+                      <input name="radiusenable" type="checkbox" id="radiusenable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radiusenable']) echo "checked"; ?>>
                       <strong>Use a RADIUS server for authentication<br>
                       </strong>When set, all users will be authenticated using 
                       the RADIUS server specified below. The local user database 
-                      will not be used.</p></td>
+                      will not be used.<br>
+                      <br>
+                      <input name="radacct_enable" type="checkbox" id="radacct_enable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radacct_enable']) echo "checked"; ?>>
+                      <strong>Enable RADIUS accounting <br>
+                      </strong>Sends accounting packets to the RADIUS server. </p></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS server </td>
@@ -267,7 +275,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="middle">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <input name="req128" type="checkbox" id="req128" value="yes" <?php if ($pconfig['req128'] == "yes") echo "checked"; ?>> 
+                    <input name="req128" type="checkbox" id="req128" value="yes" <?php if ($pconfig['req128']) echo "checked"; ?>> 
                     <strong>Require 128-bit encryption</strong><br>
                     When set, 128-bit encryption will be accepted. Otherwise, 
                     40-bit and 56-bit encryption will be accepted, too. Note that 

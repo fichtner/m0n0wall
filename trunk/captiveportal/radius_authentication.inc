@@ -32,14 +32,6 @@ function RADIUS_AUTHENTICATION($username,$password,$radiusip,$radiusport,$radius
 	$sharedsecret=$radiuskey ;
 	# $debug = 1 ;
 
-	if(!$radiusport)
-		$radiusport=0 ;
-
-	// check your /etc/services. Some radius servers 
-	// listen on port 1812, some on 1645.
-	if ($radiusport==0)
-	    $radiusport=getservbyname("radius","udp");
-
 	exec("/bin/hostname", $nasHostname) ;
 	if(!$nasHostname[0])
 		$nasHostname[0] = "m0n0wall" ;

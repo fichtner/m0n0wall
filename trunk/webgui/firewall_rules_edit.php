@@ -126,6 +126,9 @@ if (isset($id) && $a_filter[$id]) {
 	else
 		$pconfig['proto'] = "any";
 	
+	if ($a_filter[$id]['protocol'] == "icmp")
+		$pconfig['icmptype'] = $a_filter[$id]['icmptype'];
+	
 	address_to_pconfig($a_filter[$id]['source'], $pconfig['src'],
 		$pconfig['srcmask'], $pconfig['srcnot'],
 		$pconfig['srcbeginport'], $pconfig['srcendport']);
@@ -281,6 +284,11 @@ if ($_POST) {
 			$filterent['protocol'] = $_POST['proto'];
 		else
 			unset($filterent['protocol']);
+	
+		if ($_POST['proto'] == "icmp" && $_POST['icmptype'])
+			$filterent['icmptype'] = $_POST['icmptype'];
+		else
+			unset($filterent['icmptype']);
 		
 		pconfig_to_address($filterent['source'], $_POST['src'],
 			$_POST['srcmask'], $_POST['srcnot'],
@@ -315,7 +323,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Firewall: Rules: Edit</title>
+<title><?=gentitle("Firewall: Rules: Edit");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -405,6 +413,12 @@ function proto_change() {
 		portsenabled = 0;
 	}
 	
+	if (document.iform.proto.selectedIndex == 3) {
+		document.iform.icmptype.disabled = 0;
+	} else {
+		document.iform.icmptype.disabled = 1;
+	}
+	
 	ext_change();
 }
 
@@ -476,6 +490,38 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                     <span class="vexpl">Choose which IP protocol this rule should 
                     match.<br>
                     Hint: in most cases, you should specify <em>TCP</em> &nbsp;here.</span></td>
+                </tr>
+                <tr>
+                  <td valign="top" class="vncell">ICMP type</td>
+                  <td class="vtable">
+                    <select name="icmptype" class="formfld">
+                      <?php
+					  
+					  $icmptypes = array(
+					  	"" => "any",
+					  	"unreach" => "Destination unreachable",
+						"echo" => "Echo",
+						"echorep" => "Echo reply",
+						"squench" => "Source quench",
+						"redir" => "Redirect",
+						"timex" => "Time exceeded",
+						"paramprob" => "Parameter problem",
+						"timest" => "Timestamp",
+						"timestrep" => "Timestamp reply",
+						"inforeq" => "Information request",
+						"inforep" => "Information reply",
+						"maskreq" => "Address mask request",
+						"maskrep" => "Address mask reply"
+					  );
+					  
+					  foreach ($icmptypes as $icmptype => $descr): ?>
+                      <option value="<?=$icmptype;?>" <?php if ($icmptype == $pconfig['icmptype']) echo "selected"; ?>>
+                      <?=htmlspecialchars($descr);?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <br>
+                    <span class="vexpl">If you selected ICMP for the protocol above, you may specify an ICMP type here.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Source</td>
@@ -638,6 +684,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                     the destination of the packet for this rule.<br>
                     Hint: you can leave the <em>'to'</em> field empty if you only 
                     want to filter a single port</span></td>
+                
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Fragments</td>
                   <td width="78%" class="vtable"> 

@@ -55,9 +55,11 @@ $pconfig['httpsname'] = $config['captiveportal']['httpsname'];
 $pconfig['cert'] = base64_decode($config['captiveportal']['certificate']);
 $pconfig['key'] = base64_decode($config['captiveportal']['private-key']);
 $pconfig['logoutwin_enable'] = isset($config['captiveportal']['logoutwin_enable']);
+$pconfig['nomacfilter'] = isset($config['captiveportal']['nomacfilter']);
 $pconfig['redirurl'] = $config['captiveportal']['redirurl'];
 $pconfig['radiusip'] = $config['captiveportal']['radiusip'];
 $pconfig['radiusport'] = $config['captiveportal']['radiusport'];
+$pconfig['radiusacctport'] = $config['captiveportal']['radiusacctport'];
 $pconfig['radiuskey'] = $config['captiveportal']['radiuskey'];
 
 if ($_POST) {
@@ -109,6 +111,9 @@ if ($_POST) {
 	if (($_POST['radiusport'] && !is_port($_POST['radiusport']))) {
 		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport']."]";
 	}
+	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
+		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport']."]";
+	}
 
 	if (!$input_errors) {
 		$config['captiveportal']['interface'] = $_POST['cinterface'];
@@ -121,9 +126,11 @@ if ($_POST) {
 		$config['captiveportal']['certificate'] = base64_encode($_POST['cert']);
 		$config['captiveportal']['private-key'] = base64_encode($_POST['key']);
 		$config['captiveportal']['logoutwin_enable'] = $_POST['logoutwin_enable'] ? true : false;
+		$config['captiveportal']['nomacfilter'] = $_POST['nomacfilter'] ? true : false;
 		$config['captiveportal']['redirurl'] = $_POST['redirurl'];
 		$config['captiveportal']['radiusip'] = $_POST['radiusip'];
 		$config['captiveportal']['radiusport'] = $_POST['radiusport'];
+		$config['captiveportal']['radiusacctport'] = $_POST['radiusacctport'];
 		$config['captiveportal']['radiuskey'] = $_POST['radiuskey'];
 		
 		/* file upload? */
@@ -147,7 +154,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Services: Captive portal</title>
+<title><?=gentitle("Services: Captive portal");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -173,6 +180,7 @@ function enable_change(enable_change) {
 		document.iform.cert.disabled = 0;
 		document.iform.key.disabled = 0;
 		document.iform.logoutwin_enable.disabled = 0;
+		document.iform.nomacfilter.disabled = 0;
 		document.iform.htmlfile.disabled = 0;
 		document.iform.errfile.disabled = 0;
 	} else {
@@ -189,6 +197,7 @@ function enable_change(enable_change) {
 		document.iform.cert.disabled = 1;
 		document.iform.key.disabled = 1;
 		document.iform.logoutwin_enable.disabled = 1;
+		document.iform.nomacfilter.disabled = 1;
 		document.iform.htmlfile.disabled = 1;
 		document.iform.errfile.disabled = 1;
 	}
@@ -269,6 +278,13 @@ Clients will be disconnected after this amount of inactivity. They may log in ag
 If you provide a URL here, clients will be redirected to that URL instead of the one they initially tried
 to access after they've authenticated.</td>
 	</tr>
+	<tr>
+      <td valign="top" class="vncell">MAC filtering </td>
+      <td class="vtable">
+        <input name="nomacfilter" type="checkbox" class="formfld" id="nomacfilter" value="yes" <?php if ($pconfig['nomacfilter']) echo "checked"; ?>>
+        <strong>Disable MAC filtering</strong><br>
+    If this option is set, no attempts will be made to ensure that the MAC address of clients stays the same while they're logged in. This is required when the MAC address of cannot be determined (usually because there are routers between m0n0wall and the clients).</td>
+	  </tr>
 	<tr> 
 	  <td width="22%" valign="top" class="vncell">RADIUS server</td>
 	  <td width="78%" class="vtable"> 
@@ -282,12 +298,17 @@ to access after they've authenticated.</td>
 		</tr><tr>
 		<td>Shared secret:&nbsp;&nbsp;</td>
 		<td><input name="radiuskey" type="text" class="formfld" id="radiuskey" size="16" value="<?=htmlspecialchars($pconfig['radiuskey']);?>"> </td>
- 		</tr><tr>
- 		<td>RADIUS accounting:&nbsp;&nbsp;</td>
- 		<td><input name="radacct_enable" type="checkbox" id="radacct_enable" value="yes" <?php if($pconfig['radacct_enable']) echo "checked"; ?> onClick="radacct_change()"></td>
-		</tr></table>
+ 		</tr>
+		<tr>
+          <td>Accounting:&nbsp;&nbsp;</td>
+          <td><input name="radacct_enable" type="checkbox" id="radacct_enable" value="yes" <?php if($pconfig['radacct_enable']) echo "checked"; ?> onClick="radacct_change()"></td>
+		  </tr>
+		<tr>
+          <td>Accounting port:&nbsp;&nbsp;</td>
+          <td><input name="radiusacctport" type="text" class="formfld" id="radiusacctport" size="5" value="<?=htmlspecialchars($pconfig['radiusacctport']);?>"></td>
+		  </tr></table>
  		<br>
- 	Enter the IP address and port of the RADIUS server which users of the captive portal have to authenticate against. Leave blank to disable RADIUS authentication. Leave port number blank to use the default port (1812). Leave the RADIUS shared secret blank to not use a RADIUS shared secret. RADIUS accounting packets will also be sent to port 1813 of the RADIUS server if RADIUS accounting is enabled.
+ 	Enter the IP address and port of the RADIUS server which users of the captive portal have to authenticate against. Leave blank to disable RADIUS authentication. Leave port number blank to use the default port (1812). Leave the RADIUS shared secret blank to not use a RADIUS shared secret. RADIUS accounting packets will also be sent to the RADIUS server if  accounting is enabled (default port is 1813).
 	</tr>
 	<tr>
       <td valign="top" class="vncell">HTTPS login</td>

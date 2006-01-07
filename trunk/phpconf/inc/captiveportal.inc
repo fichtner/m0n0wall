@@ -189,16 +189,22 @@ EOD;
 
 			if($config['captiveportal']['radiusport'])
 				$radiusport = $config['captiveportal']['radiusport'] ;
+			else
+				$radiusport = 1812;
 
-			if($config['captiveportal']['radiuskey'])
-				$radiuskey = $config['captiveportal']['radiuskey'] ;
+			if($config['captiveportal']['radiusacctport'])
+				$radiusacctport = $config['captiveportal']['radiusacctport'] ;
+			else
+				$radiusacctport = 1813;
+
+			$radiuskey = $config['captiveportal']['radiuskey'];
 
 			$fd = @fopen("{$g['vardb_path']}/captiveportal_radius.db", "w");
 			if (!$fd) {
 				printf("Error: cannot open radius DB file in captiveportal_configure().\n");
 				return 1;
 			} else {
-				fwrite($fd,$radiusip . "," . $radiusport . "," . $radiuskey) ;
+				fwrite($fd,$radiusip . "," . $radiusport . "," . $radiusacctport . "," . $radiuskey) ;
 			}
 			fclose($fd) ;
 		}
@@ -308,7 +314,7 @@ EOD;
 }
 
 /* remove clients that have been around for longer than the specified amount of time */
-/* db file structure: timestamp,ipfw_rule_no,clientip,clientmac */
+/* db file structure: timestamp,ipfw_rule_no,clientip,clientmac,username,sessionid */
 function captiveportal_prune_old() {
 	
 	global $g, $config;
@@ -332,6 +338,8 @@ function captiveportal_prune_old() {
 	/* read database */
 	$cpdb = captiveportal_read_db();
 	
+	$radiusservers = captiveportal_get_radius_servers();
+	
 	for ($i = 0; $i < count($cpdb); $i++) {
 		
 		$timedout = false;
@@ -351,14 +359,14 @@ function captiveportal_prune_old() {
 		
 		if ($timedout) {
 			/* this client needs to be deleted - remove ipfw rules */
-			if(isset($config['captiveportal']['radacct_enable']) && 
-			   file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
+			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
 				RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
 									   $cpdb[$i][4], // username
+									   $cpdb[$i][5], // sessionid
 									   $cpdb[$i][0], // start time
-									   $config['captiveportal']['radiusip'],
-									   $config['captiveportal']['radiusport'],
-									   $config['captiveportal']['radiuskey'] ) ;
+									   $radiusservers[0]['ipaddr'],
+									   $radiusservers[0]['acctport'],
+									   $radiusservers[0]['key']);
 			}
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
 			unset($cpdb[$i]);
@@ -380,19 +388,20 @@ function captiveportal_disconnect_client($id) {
 	
 	/* read database */
 	$cpdb = captiveportal_read_db();
+	$radiusservers = captiveportal_get_radius_servers();
 	
 	/* find entry */	
 	for ($i = 0; $i < count($cpdb); $i++) {
 		if ($cpdb[$i][1] == $id) {
 			/* this client needs to be deleted - remove ipfw rules */
-			if(isset($config['captiveportal']['radacct_enable']) && 
-			   file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
+			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
 				RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
 									   $cpdb[$i][4], // username
+									   $cpdb[$i][5], // sessionid
 									   $cpdb[$i][0], // start time
-									   $config['captiveportal']['radiusip'],
-									   $config['captiveportal']['radiusport'],
-									   $config['captiveportal']['radiuskey'] ) ;
+									   $radiusservers[0]['ipaddr'],
+									   $radiusservers[0]['acctport'],
+									   $radiusservers[0]['key']);
 			}
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
 			unset($cpdb[$i]);
@@ -408,22 +417,23 @@ function captiveportal_disconnect_client($id) {
 
 /* send RADIUS acct stop for all current clients */
 function captiveportal_radius_stop_all() {
-	global $g, $config ;
-	
-	if(!isset($config['captiveportal']['radacct_enable']) || 
-	   !file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
-		return ;
-	}
+	global $g, $config;
 
 	captiveportal_lock() ;
 	$cpdb = captiveportal_read_db() ;
-	for ($i = 0; $i < count($cpdb); $i++) {
-		RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
-							   $cpdb[$i][4], // username
-							   $cpdb[$i][0], // start time
-							   $config['captiveportal']['radiusip'],
-							   $config['captiveportal']['radiusport'],
-							   $config['captiveportal']['radiuskey'] ) ;
+	
+	$radiusservers = captiveportal_get_radius_servers();
+	
+	if (isset($radiusservers[0])) {
+		for ($i = 0; $i < count($cpdb); $i++) {
+			RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
+								   $cpdb[$i][4], // username
+								   $cpdb[$i][5], // sessionid
+								   $cpdb[$i][0], // start time
+								   $radiusservers[0]['ipaddr'],
+								   $radiusservers[0]['acctport'],
+								   $radiusservers[0]['key']);
+		}
 	}
 	captiveportal_unlock() ;
 }
@@ -567,6 +577,32 @@ function captiveportal_write_db($cpdb) {
 		}
 		fclose($fd);
 	}
+}
+
+/* read RADIUS servers into array */
+function captiveportal_get_radius_servers() {
+	
+	global $g;
+	
+	if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
+	   	$fd = @fopen("{$g['vardb_path']}/captiveportal_radius.db","r");
+		if ($fd) {
+			$radiusservers = array();
+			while (!feof($fd)) {
+				$line = trim(fgets($fd));
+				if ($line) {
+					$radsrv = array();
+					list($radsrv['ipaddr'],$radsrv['port'],$radsrv['acctport'],$radsrv['key']) = explode(",",$line);
+					$radiusservers[] = $radsrv;
+				}
+			}
+			fclose($fd);
+			
+			return $radiusservers;
+		}
+	}
+	
+	return false;
 }
 
 /* lock captive portal information, decide that the lock file is stale after

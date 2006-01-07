@@ -178,7 +178,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Firewall: NAT: Edit</title>
+<title><?=gentitle("Firewall: NAT: Edit");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">

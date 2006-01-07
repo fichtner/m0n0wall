@@ -76,7 +76,7 @@ if ($_GET['act'] == "del") {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Services: DNS forwarder</title>
+<title><?=gentitle("Services: DNS forwarder");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -93,13 +93,13 @@ if ($_GET['act'] == "del") {
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td class="vtable"><p> 
-                      <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable'] == "yes") echo "checked";?>>
+                      <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
                       <strong>Enable DNS forwarder<br>
                       </strong></p></td>
                 </tr>
                 <tr> 
                   <td class="vtable"><p> 
-                      <input name="regdhcp" type="checkbox" id="regdhcp" value="yes" <?php if ($pconfig['regdhcp'] == "yes") echo "checked";?>>
+                      <input name="regdhcp" type="checkbox" id="regdhcp" value="yes" <?php if ($pconfig['regdhcp']) echo "checked";?>>
                       <strong>Register DHCP leases in DNS forwarder<br>
                       </strong>If this option is set, then machines that specify 
                       their hostname when requesting a DHCP lease will be registered 

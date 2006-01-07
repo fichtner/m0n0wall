@@ -49,6 +49,13 @@ function filter_configure() {
 	if ($g['booting'])
 		echo "Configuring firewall... ";
 	
+	/* set TCP timeouts */
+	$tcpidletimeout = 9000;
+	if ($config['filter']['tcpidletimeout'])
+		$tcpidletimeout = $config['filter']['tcpidletimeout'];
+	mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
+	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=480");
+	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
 	
@@ -780,6 +787,10 @@ EOD;
 						$line .= "port {$dstport[0]} >< {$dstport[1]} ";
 					}
 				}
+			}
+			
+			if (($rule['protocol'] == "icmp") && $rule['icmptype']) {
+				$line .= "icmp-type {$rule['icmptype']} ";
 			}
 			
 			if ($type == "pass") {

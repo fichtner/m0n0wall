@@ -61,7 +61,8 @@
 	system_resolvconf_generate();
 	
 	/* start pccardd */
-	system_pccard_start();
+	if (!in_array($g['platform'], $g['nopccard_platforms']))
+		system_pccard_start();
 	
 	/* establish ipfilter ruleset */
 	filter_configure();
@@ -80,6 +81,9 @@
 	
 	/* set up Optional interfaces */
 	interfaces_optional_configure();
+		
+	/* start OpenVPN server & clients */
+	ovpn_configure();
 	
 	/* resync ipfilter */
 	filter_resync();

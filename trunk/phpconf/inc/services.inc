@@ -94,7 +94,9 @@ EOD;
 			$dnscfg .= "	option domain-name \"{$dhcpifconf['domain']}\";\n";
 		}
 		
-		if (isset($config['dnsmasq']['enable'])) {
+		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
+			$dnscfg .= "	option domain-name-servers " . join(",", $dhcpifconf['dnsserver']) . ";";
+		} else if (isset($config['dnsmasq']['enable'])) {
 			$dnscfg .= "	option domain-name-servers " . $ifcfg['ipaddr'] . ";";
 		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
 			$dnscfg .= "	option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
@@ -168,6 +170,76 @@ EOD;
 	/* fire up dhcpd */
 	mwexec("/usr/local/sbin/dhcpd -cf {$g['varetc_path']}/dhcpd.conf " . 
 		join(" ", $dhcpdifs));
+		
+	if (!$g['booting']) {
+		filter_configure();
+	} else
+		echo "done\n";
+	
+	return 0;
+}
+
+function services_dhcrelay_configure() {
+	global $config, $g;
+	
+	/* kill any running dhcrelay */
+	killbypid("{$g['varrun_path']}/dhcrelay.pid");
+	
+	$dhcrelaycfg = $config['dhcrelay'];
+	
+	/* DHCPRelay enabled on any interfaces? */
+	$dhcrelayenable = false;
+	foreach ($dhcrelaycfg as $dhcrelayif => $dhcrelayifconf) {
+		if (isset($dhcrelayifconf['enable']) &&
+			(($dhcrelayif == "lan") ||
+			(isset($config['interfaces'][$dhcrelayif]['enable']) &&
+			$config['interfaces'][$dhcrelayif]['if'] && (!$config['interfaces'][$dhcrelayif]['bridge']))))
+			$dhcrelayenable = true;
+	}
+	
+	if (!$dhcrelayenable)
+		return 0;
+	
+	if ($g['booting'])
+		echo "Starting DHCP relay service... ";
+	else
+		sleep(1);
+	
+	$dhcrelayifs = array();
+	foreach ($dhcrelaycfg as $dhcrelayif => $dhcrelayifconf) {
+		
+		$ifcfg = $config['interfaces'][$dhcrelayif];
+		
+		if (!isset($dhcrelayifconf['enable']) ||
+			(($dhcrelayif != "lan") &&
+			(!isset($ifcfg['enable']) || !$ifcfg['if'] || $ifcfg['bridge'])))
+			continue;
+			
+		$dhcrelayifs[] = $ifcfg['if'];
+	}
+
+	/* In order for the relay to work, it needs to be active on the 
+	   interface in which the destination server sits */
+	foreach ($config['interfaces'] as $ifname) {
+		$subnet = $ifname['ipaddr'] . "/" . $ifname['subnet'];
+		if (ip_in_subnet($dhcrelaycfg['server'],$subnet)) 
+			$destif = $ifname['if'];	
+	}
+	
+	if (!isset($destif)) 
+		$destif = $config['interfaces']['wan']['if'];
+	
+	$dhcrelayifs[] = $destif;
+	$dhcrelayifs = array_unique($dhcrelayifs);
+
+	/* fire up dhcrelay */
+	$cmd = "/usr/local/sbin/dhcrelay -i " .  join(" -i ", $dhcrelayifs);
+
+	if (isset($dhcrelaycfg['agentoption']))	
+		$cmd .=  " -a -m replace";
+
+	$cmd .= " {$dhcrelaycfg['server']}";
+	mwexec($cmd);
 		
 	if (!$g['booting']) {
 		filter_configure();

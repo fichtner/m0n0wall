@@ -88,7 +88,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Services: Dynamic DNS client</title>
+<title><?=gentitle("Services: Dynamic DNS client");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -157,7 +157,7 @@ function enable_change(enable_change) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Wildcards</td>
                   <td width="78%" class="vtable"> 
-                    <input name="wildcard" type="checkbox" id="wildcard" value="yes" <?php if ($pconfig['wildcard'] == "yes") echo "checked"; ?>>
+                    <input name="wildcard" type="checkbox" id="wildcard" value="yes" <?php if ($pconfig['wildcard']) echo "checked"; ?>>
                     Enable Wildcard</td>
 				</tr>
                 <tr> 

@@ -53,7 +53,7 @@ function get_interface_info($ifdescr) {
 		$ifinfo['status'] = "up";
 	}
 	
-	if ($ifinfo['if'] != $g['pppoe_interface']) {
+	if (($ifinfo['if'] != $g['pppoe_interface']) && (!strstr($ifinfo['if'],'tun'))) {
 		$ifinfo['macaddr'] = $linkinfo[3];
 		$ifinfo['inpkts'] = $linkinfo[4];
 		$ifinfo['inerrs'] = $linkinfo[5];
@@ -132,6 +132,31 @@ function get_interface_info($ifdescr) {
 					$ifinfo['macaddr'] = $matches[1];
 				}
 			}
+
+			/* get pppoe link status for dial on demand */
+			unset($ifconfiginfo);
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+
+			$ifinfo['pppoelink'] = "up";
+
+			foreach ($ifconfiginfo as $ici) {
+				if (strpos($ici, 'LINK0') !== false)
+					$ifinfo['pppoelink'] = "down";
+			}
+		}
+
+		/* get ppptp link status for dial on demand */
+		if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "pptp")) {
+			
+			unset($ifconfiginfo);
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+
+			$ifinfo['pptplink'] = "up";
+
+			foreach ($ifconfiginfo as $ici) {
+				if (strpos($ici, 'LINK0') !== false)
+					$ifinfo['pptplink'] = "down";
+			}
 		}
 	}
 	
@@ -142,7 +167,7 @@ function get_interface_info($ifdescr) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Status: Interfaces</title>
+<title><?=gentitle("Status: Interfaces");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -175,7 +200,19 @@ function get_interface_info($ifdescr) {
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['status']);?>
                 </td>
-              </tr><?php if ($ifinfo['macaddr']): ?>
+              </tr><?php if ($ifinfo['pppoelink']): ?>
+              <tr> 
+                <td width="22%" class="listhdrr">PPPoE</td>
+                <td width="78%" class="listr"> 
+                  <?=htmlspecialchars($ifinfo['pppoelink']);?>
+                </td>
+              </tr><?php  endif; if ($ifinfo['pptplink']): ?>
+              <tr> 
+                <td width="22%" class="listhdrr">PPTP</td>
+                <td width="78%" class="listr"> 
+                  <?=htmlspecialchars($ifinfo['pptplink']);?>
+                </td>
+              </tr><?php  endif; if ($ifinfo['macaddr']): ?>
               <tr> 
                 <td width="22%" class="listhdrr">MAC address</td>
                 <td width="78%" class="listr"> 

@@ -37,12 +37,16 @@ $optcfg = &$config['interfaces']['wan'];
 $pconfig['username'] = $config['pppoe']['username'];
 $pconfig['password'] = $config['pppoe']['password'];
 $pconfig['provider'] = $config['pppoe']['provider'];
+$pconfig['pppoe_dialondemand'] = isset($config['pppoe']['ondemand']);
+$pconfig['pppoe_idletimeout'] = $config['pppoe']['timeout'];
 
 $pconfig['pptp_username'] = $config['pptp']['username'];
 $pconfig['pptp_password'] = $config['pptp']['password'];
 $pconfig['pptp_local'] = $config['pptp']['local'];
 $pconfig['pptp_subnet'] = $config['pptp']['subnet'];
 $pconfig['pptp_remote'] = $config['pptp']['remote'];
+$pconfig['pptp_dialondemand'] = isset($config['pptp']['ondemand']);
+$pconfig['pptp_idletimeout'] = $config['pptp']['timeout'];
 
 $pconfig['bigpond_username'] = $config['bigpond']['username'];
 $pconfig['bigpond_password'] = $config['bigpond']['password'];
@@ -88,12 +92,22 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "IP address,Subnet bit count,Gateway");
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	} else if ($_POST['type'] == "PPPoE") {
-		$reqdfields = explode(" ", "username password");
-		$reqdfieldsn = explode(",", "PPPoE username,PPPoE password");
+		if ($_POST['pppoe_dialondemand']) {
+			$reqdfields = explode(" ", "username password pppoe_dialondemand pppoe_idletimeout");
+			$reqdfieldsn = explode(",", "PPPoE username,PPPoE password,Dial on demand,Idle timeout value");
+		} else {
+			$reqdfields = explode(" ", "username password");
+			$reqdfieldsn = explode(",", "PPPoE username,PPPoE password");
+		}
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	} else if ($_POST['type'] == "PPTP") {
-		$reqdfields = explode(" ", "pptp_username pptp_password pptp_local pptp_subnet pptp_remote");
-		$reqdfieldsn = explode(",", "PPTP username,PPTP password,PPTP local IP address,PPTP subnet,PPTP remote IP address");
+		if ($_POST['pptp_dialondemand']) {
+			$reqdfields = explode(" ", "pptp_username pptp_password pptp_local pptp_subnet pptp_remote pptp_dialondemand pptp_idletimeout");
+			$reqdfieldsn = explode(",", "PPTP username,PPTP password,PPTP local IP address,PPTP subnet,PPTP remote IP address,Dial on demand,Idle timeout value");
+		} else {
+			$reqdfields = explode(" ", "pptp_username pptp_password pptp_local pptp_subnet pptp_remote");
+			$reqdfieldsn = explode(",", "PPTP username,PPTP password,PPTP local IP address,PPTP subnet,PPTP remote IP address");
+		}
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	} else if ($_POST['type'] == "BigPond") {
 		$reqdfields = explode(" ", "bigpond_username bigpond_password");
@@ -113,6 +127,9 @@ if ($_POST) {
 	if (($_POST['provider'] && !is_domain($_POST['provider']))) {
 		$input_errors[] = "The service name contains invalid characters.";
 	}
+	if ($_POST['pppoe_idletimeout'] && !is_numericint($_POST['pppoe_idletimeout'])) {
+		$input_errors[] = "The idle timeout value must be an integer.";
+	}
 	if (($_POST['pptp_local'] && !is_ipaddr($_POST['pptp_local']))) {
 		$input_errors[] = "A valid PPTP local IP address must be specified.";
 	}
@@ -121,6 +138,9 @@ if ($_POST) {
 	}
 	if (($_POST['pptp_remote'] && !is_ipaddr($_POST['pptp_remote']))) {
 		$input_errors[] = "A valid PPTP remote IP address must be specified.";
+	}
+	if ($_POST['pptp_idletimeout'] && !is_numericint($_POST['pptp_idletimeout'])) {
+		$input_errors[] = "The idle timeout value must be an integer.";
 	}
 	if (($_POST['bigpond_authserver'] && !is_domain($_POST['bigpond_authserver']))) {
 		$input_errors[] = "The authentication server name contains invalid characters.";
@@ -155,11 +175,15 @@ if ($_POST) {
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
 		unset($config['pppoe']['provider']);
+		unset($config['pppoe']['ondemand']);
+		unset($config['pppoe']['timeout']);
 		unset($config['pptp']['username']);
 		unset($config['pptp']['password']);
 		unset($config['pptp']['local']);
 		unset($config['pptp']['subnet']);
 		unset($config['pptp']['remote']);
+		unset($config['pptp']['ondemand']);
+		unset($config['pptp']['timeout']);
 		unset($config['bigpond']['username']);
 		unset($config['bigpond']['password']);
 		unset($config['bigpond']['authserver']);
@@ -178,6 +202,8 @@ if ($_POST) {
 			$config['pppoe']['username'] = $_POST['username'];
 			$config['pppoe']['password'] = $_POST['password'];
 			$config['pppoe']['provider'] = $_POST['provider'];
+			$config['pppoe']['ondemand'] = $_POST['pppoe_dialondemand'] ? true : false;
+			$config['pppoe']['timeout'] = $_POST['pppoe_idletimeout'];
 		} else if ($_POST['type'] == "PPTP") {
 			$wancfg['ipaddr'] = "pptp";
 			$config['pptp']['username'] = $_POST['pptp_username'];
@@ -185,6 +211,8 @@ if ($_POST) {
 			$config['pptp']['local'] = $_POST['pptp_local'];
 			$config['pptp']['subnet'] = $_POST['pptp_subnet'];
 			$config['pptp']['remote'] = $_POST['pptp_remote'];
+			$config['pptp']['ondemand'] = $_POST['pptp_dialondemand'] ? true : false;
+			$config['pptp']['timeout'] = $_POST['pptp_idletimeout'];
 		} else if ($_POST['type'] == "BigPond") {
 			$wancfg['ipaddr'] = "bigpond";
 			$config['bigpond']['username'] = $_POST['bigpond_username'];
@@ -213,17 +241,37 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Interfaces: WAN</title>
+<title><?=gentitle("Interfaces: WAN");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
 <!--
-function type_change() {
+function enable_change(enable_change) {
+	if (document.iform.pppoe_dialondemand.checked || enable_change) {
+		document.iform.pppoe_idletimeout.disabled = 0;
+	} else {
+		document.iform.pppoe_idletimeout.disabled = 1;
+	}
+}
+
+function enable_change_pptp(enable_change_pptp) {
+	if (document.iform.pptp_dialondemand.checked || enable_change_pptp) {
+		document.iform.pptp_idletimeout.disabled = 0;
+		document.iform.pptp_local.disabled = 0;
+		document.iform.pptp_remote.disabled = 0;
+	} else {
+		document.iform.pptp_idletimeout.disabled = 1;
+	}
+}
+
+function type_change(enable_change,enable_change_pptp) {
 	switch (document.iform.type.selectedIndex) {
 		case 0:
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoe_dialondemand.disabled = 1;
+			document.iform.pppoe_idletimeout.disabled = 1;
 			document.iform.ipaddr.disabled = 0;
 			document.iform.subnet.disabled = 0;
 			document.iform.gateway.disabled = 0;
@@ -232,6 +280,8 @@ function type_change() {
 			document.iform.pptp_local.disabled = 1;
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
+			document.iform.pptp_dialondemand.disabled = 1;
+			document.iform.pptp_idletimeout.disabled = 1;
 			document.iform.bigpond_username.disabled = 1;
 			document.iform.bigpond_password.disabled = 1;
 			document.iform.bigpond_authserver.disabled = 1;
@@ -243,6 +293,8 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoe_dialondemand.disabled = 1;
+			document.iform.pppoe_idletimeout.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -251,6 +303,8 @@ function type_change() {
 			document.iform.pptp_local.disabled = 1;
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
+			document.iform.pptp_dialondemand.disabled = 1;
+			document.iform.pptp_idletimeout.disabled = 1;
 			document.iform.bigpond_username.disabled = 1;
 			document.iform.bigpond_password.disabled = 1;
 			document.iform.bigpond_authserver.disabled = 1;
@@ -262,6 +316,12 @@ function type_change() {
 			document.iform.username.disabled = 0;
 			document.iform.password.disabled = 0;
 			document.iform.provider.disabled = 0;
+			document.iform.pppoe_dialondemand.disabled = 0;
+			if (document.iform.pppoe_dialondemand.checked || enable_change) {
+				document.iform.pppoe_idletimeout.disabled = 0;
+			} else {
+				document.iform.pppoe_idletimeout.disabled = 1;
+			}
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -270,6 +330,8 @@ function type_change() {
 			document.iform.pptp_local.disabled = 1;
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
+			document.iform.pptp_dialondemand.disabled = 1;
+			document.iform.pptp_idletimeout.disabled = 1;
 			document.iform.bigpond_username.disabled = 1;
 			document.iform.bigpond_password.disabled = 1;
 			document.iform.bigpond_authserver.disabled = 1;
@@ -281,6 +343,8 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoe_dialondemand.disabled = 1;
+			document.iform.pppoe_idletimeout.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -289,6 +353,12 @@ function type_change() {
 			document.iform.pptp_local.disabled = 0;
 			document.iform.pptp_subnet.disabled = 0;
 			document.iform.pptp_remote.disabled = 0;
+			document.iform.pptp_dialondemand.disabled = 0;
+			if (document.iform.pptp_dialondemand.checked || enable_change_pptp) {
+				document.iform.pptp_idletimeout.disabled = 0;
+			} else {
+				document.iform.pptp_idletimeout.disabled = 1;
+			}
 			document.iform.bigpond_username.disabled = 1;
 			document.iform.bigpond_password.disabled = 1;
 			document.iform.bigpond_authserver.disabled = 1;
@@ -300,6 +370,8 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoe_dialondemand.disabled = 1;
+			document.iform.pppoe_idletimeout.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -308,6 +380,8 @@ function type_change() {
 			document.iform.pptp_local.disabled = 1;
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
+			document.iform.pptp_dialondemand.disabled = 1;
+			document.iform.pptp_idletimeout.disabled = 1;
 			document.iform.bigpond_username.disabled = 0;
 			document.iform.bigpond_password.disabled = 0;
 			document.iform.bigpond_authserver.disabled = 0;
@@ -425,6 +499,19 @@ function type_change() {
                     empty</span></td>
                 </tr>
                 <tr> 
+                  <td valign="top" class="vncell">Dial on demand</td>
+                  <td class="vtable"><input name="pppoe_dialondemand" type="checkbox" id="pppoe_dialondemand" value="enable" <?php if ($pconfig['pppoe_dialondemand']) echo "checked"; ?> onClick="enable_change(false)" > 
+                    <strong>Enable Dial-On-Demand mode</strong><br>
+		    This option causes the interface to operate in dial-on-demand mode, allowing you to have a <i>virtual full time</i> connection. The interface is configured, but the actual connection of the link is delayed until qualifying outgoing traffic is detected.</td>
+                </tr>
+                <tr>
+                  <td valign="top" class="vncell">Idle timeout</td>
+                  <td class="vtable">
+                    <input name="pppoe_idletimeout" type="text" class="formfld" id="pppoe_idletimeout" size="8" value="<?=htmlspecialchars($pconfig['pppoe_idletimeout']);?>">
+                    seconds<br>
+    If no qualifying outgoing packets are transmitted for the specified number of seconds, the connection is brought down. An idle timeout of zero disables this feature.</td>
+                </tr>
+                <tr> 
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
@@ -457,7 +544,20 @@ function type_change() {
                   <td class="vtable"> <input name="pptp_remote" type="text" class="formfld" id="pptp_remote" size="20" value="<?=htmlspecialchars($pconfig['pptp_remote']);?>"> 
                   </td>
                 </tr>
-				<tr> 
+                <tr> 
+                  <td valign="top" class="vncell">Dial on demand</td>
+                  <td class="vtable"><input name="pptp_dialondemand" type="checkbox" id="pptp_dialondemand" value="enable" <?php if ($pconfig['pptp_dialondemand']) echo "checked"; ?> onClick="enable_change_pptp(false)" > 
+                    <strong>Enable Dial-On-Demand mode</strong><br>
+		    This option causes the interface to operate in dial-on-demand mode, allowing you to have a <i>virtual full time</i> connection. The interface is configured, but the actual connection of the link is delayed until qualifying outgoing traffic is detected.</td>
+                </tr>
+                <tr>
+                  <td valign="top" class="vncell">Idle timeout</td>
+                  <td class="vtable">
+                    <input name="pptp_idletimeout" type="text" class="formfld" id="pptp_idletimeout" size="8" value="<?=htmlspecialchars($pconfig['pptp_idletimeout']);?>">
+                    seconds<br>
+    If no qualifying outgoing packets are transmitted for the specified number of seconds, the connection is brought down. An idle timeout of zero disables this feature.</td>
+                </tr>
+                <tr> 
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
@@ -503,7 +603,7 @@ function type_change() {
                 </tr>
                 <tr> 
                   <td valign="middle">&nbsp;</td>
-                  <td class="vtable"> <input name="blockpriv" type="checkbox" id="blockpriv" value="yes" <?php if ($pconfig['blockpriv'] == "yes") echo "checked"; ?>> 
+                  <td class="vtable"> <input name="blockpriv" type="checkbox" id="blockpriv" value="yes" <?php if ($pconfig['blockpriv']) echo "checked"; ?>> 
                     <strong>Block private networks</strong><br>
                     When set, this option blocks traffic from IP addresses that 
                     are reserved for private<br>
@@ -515,7 +615,7 @@ function type_change() {
                 </tr>
                 <tr> 
                   <td width="100" valign="top">&nbsp;</td>
-                  <td> &nbsp;<br> <input name="Submit" type="submit" class="formbtn" value="Save"> 
+                  <td> &nbsp;<br> <input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change_pptp(true)&&enable_change(true)"> 
                   </td>
                 </tr>
               </table>

@@ -29,11 +29,9 @@
 */
 
 
-function RADIUS_ACCOUNTING_START($username,$radiusip,$radiusport,$radiuskey) {
+function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$radiuskey) {
 	$sharedsecret=$radiuskey ;
 	# $debug = 1 ;
-
-	$radiusport=getservbyname("radacct","udp");
 
 	exec("/bin/hostname", $nasHostname) ;
 	if(!$nasHostname[0])
@@ -50,7 +48,6 @@ function RADIUS_ACCOUNTING_START($username,$radiusip,$radiusport,$radiuskey) {
 	    echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
 
 	$thisidentifier=rand()%256;
-	$sessionid = $username."-".$nasHostname[0] ;
 
 	$length=4+				// header
 		16+				// auth code
@@ -122,11 +119,9 @@ function RADIUS_ACCOUNTING_START($username,$radiusip,$radiusport,$radiuskey) {
 	// See RFC2866 for this.
 }
 
-function RADIUS_ACCOUNTING_STOP($ruleno,$username,$start_time,$radiusip,$radiusport,$radiuskey) {
+function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey) {
 	$sharedsecret=$radiuskey ;
 	# $debug = 1 ;
-
-	$radiusport=getservbyname("radacct","udp");
 
 	exec("/bin/hostname", $nasHostname) ;
 	if(!$nasHostname[0])
@@ -155,7 +150,6 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$start_time,$radiusip,$radiusp
 	    echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
 
 	$thisidentifier=rand()%256;
-	$sessionid = $username."-".$nasHostname[0] ;
 
 	$length=4+				// header
 		16+				// auth code

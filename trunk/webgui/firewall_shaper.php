@@ -110,7 +110,7 @@ if ($_GET['act'] == "del") {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Firewall: Traffic shaper</title>
+<title><?=gentitle("Firewall: Traffic shaper");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -138,7 +138,7 @@ if ($_GET['act'] == "del") {
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td class="vtable"><p>
-                      <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable'] == "yes") echo "checked";?>>
+                      <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
                       <strong>Enable traffic shaper<br>
                       </strong></p></td>
                 </tr>

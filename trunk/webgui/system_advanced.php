@@ -42,16 +42,20 @@ $pconfig['expanddiags'] = isset($config['system']['webgui']['expanddiags']);
 if ($g['platform'] == "generic-pc")
 	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
 $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
+$pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 
 if ($_POST) {
 
 	unset($input_errors);
 	$pconfig = $_POST;
 
-	/* input validation */	
+	/* input validation */
 	if ($_POST['ipv6nat_enable'] && !is_ipaddr($_POST['ipv6nat_ipaddr'])) {
 		$input_errors[] = "You must specify an IP address to NAT IPv6 packets.";
-	}	
+	}
+	if ($_POST['tcpidletimeout'] && !is_numericint($_POST['tcpidletimeout'])) {
+		$input_errors[] = "The TCP idle timeout must be an integer.";
+	}
 	if (($_POST['cert'] && !$_POST['key']) || ($_POST['key'] && !$_POST['cert'])) {
 		$input_errors[] = "Certificate and key must always be specified together.";
 	} else if ($_POST['cert'] && $_POST['key']) {
@@ -77,6 +81,7 @@ if ($_POST) {
 			$config['system']['harddiskstandby'] = $_POST['harddiskstandby'];
 		}
 		$config['system']['webgui']['noantilockout'] = $_POST['noantilockout'] ? true : false;
+		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
 			
 		write_config();
 		
@@ -98,7 +103,7 @@ if ($_POST) {
 		if (!file_exists($d_sysrebootreqd_path)) {
 			config_lock();
 			$retval = filter_configure();
-			$retval = interfaces_optional_configure();
+			$retval |= interfaces_optional_configure();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
@@ -108,7 +113,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - System: Advanced functions</title>
+<title><?=gentitle("System: Advanced functions");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -138,7 +143,7 @@ function enable_change(enable_over) {
                   <td colspan="2" valign="top" class="listtopic">IPv6 tunneling</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
                     <input name="ipv6nat_enable" type="checkbox" id="ipv6nat_enable" value="yes" <?php if ($pconfig['ipv6nat_enable']) echo "checked"; ?> onclick="enable_change(false)"> 
                     <strong>NAT encapsulated IPv6 packets (IP protocol 41/RFC2893) 
@@ -159,7 +164,7 @@ function enable_change(enable_over) {
                   <td colspan="2" valign="top" class="listtopic">Filtering bridge</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
                     <input name="filteringbridge_enable" type="checkbox" id="filteringbridge_enable" value="yes" <?php if ($pconfig['filteringbridge_enable']) echo "checked"; ?>>
                     <strong>Enable filtering bridge</strong><span class="vexpl"><br>
@@ -208,24 +213,30 @@ function enable_change(enable_over) {
                   <td colspan="2" valign="top" class="listtopic">Miscellaneous</td>
                 </tr>
 				<tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">Console menu </td>
                   <td width="78%" class="vtable"> 
                     <input name="disableconsolemenu" type="checkbox" id="disableconsolemenu" value="yes" <?php if ($pconfig['disableconsolemenu']) echo "checked"; ?>>
                     <strong>Disable console menu</strong><span class="vexpl"><br>
                     Changes to this option will take effect after a reboot.</span></td>
                 </tr>
 				<tr>
-                  <td valign="top" class="vtable">&nbsp;</td>
+                  <td valign="top" class="vncell">Firmware version check </td>
                   <td class="vtable">
                     <input name="disablefirmwarecheck" type="checkbox" id="disablefirmwarecheck" value="yes" <?php if ($pconfig['disablefirmwarecheck']) echo "checked"; ?>>
                     <strong>Disable firmware version check</strong><span class="vexpl"><br>
     This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
 			    </tr>
+				<tr>
+                  <td valign="top" class="vncell">TCP idle timeout </td>
+                  <td class="vtable">                    <span class="vexpl">
+                    <input name="tcpidletimeout" type="text" class="formfld" id="tcpidletimeout" size="8" value="<?=htmlspecialchars($pconfig['tcpidletimeout']);?>">
+                    seconds<br>
+    Idle TCP connections will be removed from the state table after no packets have been received for the specified number of seconds. Don't set this too high or your state table could become full of connections that have been improperly shut down. The default is 2.5 hours.</span></td>
+			    </tr>
 <?php if ($g['platform'] == "generic-pc"): ?>
 				<tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">Hard disk standby time </td>
                   <td width="78%" class="vtable"> 
-				  <strong>Hard disk standby time: </strong>
                     <select name="harddiskstandby" class="formfld">
 					<?php
                         /* Values from ATA-2
@@ -246,13 +257,13 @@ function enable_change(enable_over) {
 				</tr>
 <?php endif; ?>
 				<tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">Navigation</td>
                   <td width="78%" class="vtable"> 
                     <input name="expanddiags" type="checkbox" id="expanddiags" value="yes" <?php if ($pconfig['expanddiags']) echo "checked"; ?>>
                     <strong>Keep diagnostics in navigation expanded </strong></td>
                 </tr>
 				<tr> 
-                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="22%" valign="top" class="vncell">webGUI anti-lockout</td>
                   <td width="78%" class="vtable"> 
                     <input name="noantilockout" type="checkbox" id="noantilockout" value="yes" <?php if ($pconfig['noantilockout']) echo "checked"; ?>>
                     <strong>Disable webGUI anti-lockout rule</strong><br>

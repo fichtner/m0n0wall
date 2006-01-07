@@ -36,20 +36,6 @@ function vpn_ipsec_configure($ipchg = false) {
 	
 	$curwanip = get_current_wan_address();
 	
-	if ($ipchg) {
-		/*	dhclient or MPD told us that the IP address has changed;
-			let's see if that's really true to avoid reloading the whole
-			IPsec stuff when it's not really necessary (dhclient likes to
-			execute its dhclient-exit-hooks also on renewals)
-		*/		
-		if (file_exists("{$g['vardb_path']}/ipsec.wanip")) {
-			$oldwanip = chop(file_get_contents("{$g['vardb_path']}/ipsec.wanip"));
-			
-			if ($curwanip == $oldwanip)
-				return 0;	/* nothing to do */
-		}
-	}
-	
 	$syscfg = $config['system'];
 	$ipseccfg = $config['ipsec'];
 	$lancfg = $config['interfaces']['lan'];
@@ -177,7 +163,7 @@ remote {$tunnel['remote-gateway']} \{
 	peers_identifier address {$tunnel['remote-gateway']};
 	initial_contact on;
 	support_proxy on;
-	proposal_check claim;
+	proposal_check obey;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
@@ -243,7 +229,7 @@ remote anonymous \{
 	passive on;
 	generate_policy on;
 	support_proxy on;
-	proposal_check claim;
+	proposal_check obey;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
@@ -325,13 +311,6 @@ EOD;
 				}
 			}
 		}
-	}
-	
-	/* write current WAN IP to file */
-	$fd = fopen("{$g['vardb_path']}/ipsec.wanip", "w");
-	if ($fd) {
-		fwrite($fd, $curwanip);
-		fclose($fd);
 	}
 	
 	if (!$g['booting']) {
@@ -416,6 +395,7 @@ pts:
 	set iface enable tcpmssfix
 	set iface idle 1800
 	set iface up-script /usr/local/sbin/vpn-linkup
+	set iface down-script /usr/local/sbin/vpn-linkdown
 	set bundle enable multilink
 	set bundle enable crypt-reqd
 	set link yes acfcomp protocomp
@@ -457,6 +437,13 @@ EOD;
 	set bundle disable radius-fallback
 
 EOD;
+
+				if (isset($pptpdcfg['radius']['accounting'])) {
+					$mpdconf .= <<<EOD
+	set bundle enable radius-acct
+
+EOD;
+				}
 			}
 
 			fwrite($fd, $mpdconf);

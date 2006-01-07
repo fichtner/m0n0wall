@@ -51,24 +51,24 @@ function wipe_magic () {
 function populate_p2p(&$rulei) {
   global $config;
   
-  /* To add p2p clients, push Descr,Protocol,Start,End onto p2plist */
+  /* To add p2p clients, push Descr,Protocol,Start,End,src/dest/both onto p2plist */
   $p2plist[] = array('BitTorrent','tcp','6881','6999','both');
-  $p2plist[] = array('DirectConnect','','412','412','source');
-  $p2plist[] = array('DirectFileExpress','','1044','1045','source');
-  $p2plist[] = array('FastTrack','','1214','1214','source');
-  $p2plist[] = array('CuteMX','','2340','2340','source');
-  $p2plist[] = array('iMest','','4329','4329','source');
-  $p2plist[] = array('EDonkey2000','','4661','4665','source');
-  $p2plist[] = array('SongSpy','','5190','5190','source');
-  $p2plist[] = array('HotlineConnect','','5500','5503','source');
-  $p2plist[] = array('Gnutella','','6346','6346','source');
-  $p2plist[] = array('dcc','','6666','6668','source');
-  $p2plist[] = array('Napster','','6699','6701','source');
-  $p2plist[] = array('Aimster','','7668','7668','source');
-  $p2plist[] = array('BuddyShare','','7788','7788','source');
-  $p2plist[] = array('Scour','','8311','8311','source');
-  $p2plist[] = array('OpenNap','','8888','8889','source');
-  $p2plist[] = array('hotComm','','28864','28865','source');
+  $p2plist[] = array('DirectConnect','','412','412','both');
+  $p2plist[] = array('DirectFileExpress','','1044','1045','both');
+  $p2plist[] = array('FastTrack','','1214','1214','both');
+  $p2plist[] = array('CuteMX','','2340','2340','both');
+  $p2plist[] = array('iMest','','4329','4329','both');
+  $p2plist[] = array('EDonkey2000','','4661','4665','both');
+  $p2plist[] = array('SongSpy','','5190','5190','both');
+  $p2plist[] = array('HotlineConnect','','5500','5503','both');
+  $p2plist[] = array('Gnutella','','6346','6346','both');
+  $p2plist[] = array('dcc','','6666','6668','both');
+  $p2plist[] = array('Napster','','6699','6701','both');
+  $p2plist[] = array('Aimster','','7668','7668','both');
+  $p2plist[] = array('BuddyShare','','7788','7788','both');
+  $p2plist[] = array('Scour','','8311','8311','both');
+  $p2plist[] = array('OpenNap','','8888','8889','both');
+  $p2plist[] = array('hotComm','','28864','28865','both');
 
   /* Set up/down p2p as lowest weight */
   $direction = array("in","out");
@@ -347,7 +347,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Firewall: Traffic shaper</title>
+<title><?=gentitle("Firewall: Traffic shaper");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -376,14 +376,14 @@ if ($_POST) {
 		<tr> 
 		  <td width="22%" valign="top" class="vtable">&nbsp;</td>
 		  <td width="78%" class="vtable"><p>
-			  <input name="p2plow" type="checkbox" id="p2plow" value="yes" <?php if ($pconfig['p2plow'] == "yes") echo "checked";?>>
+			  <input name="p2plow" type="checkbox" id="p2plow" value="yes" <?php if ($pconfig['p2plow']) echo "checked";?>>
 			  Set P2P traffic to lowest priority<br>
 			  </p></td>
 		</tr>
 		<tr> 
 		  <td width="22%" valign="top" class="vtable">&nbsp;</td>
 		  <td width="78%" class="vtable"><p>
-			  <input name="maskq" type="checkbox" id="maskq" value="yes" <?php if ($pconfig['maskq'] == "yes") echo "checked";?>>
+			  <input name="maskq" type="checkbox" id="maskq" value="yes" <?php if ($pconfig['maskq']) echo "checked";?>>
 			  Share bandwidth evenly on LAN<br>
 			  </p></td>
 		</tr>

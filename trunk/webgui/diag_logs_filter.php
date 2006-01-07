@@ -119,7 +119,7 @@ function format_ipf_ip($ipfip) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Diagnostics: System logs</title>
+<title><?=gentitle("Diagnostics: System logs");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -133,6 +133,7 @@ function format_ipf_ip($ipfip) {
     <li class="tabinact"><a href="diag_logs.php">System</a></li>
     <li class="tabact">Firewall</li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
+    <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
   </ul>
   </td></tr>

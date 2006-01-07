@@ -40,8 +40,25 @@
 		sleep(1);
 	}
 	
+	$curwanip = get_current_wan_address();
+	
+	/*	dhclient or MPD told us that the IP address has changed;
+		let's see if that's really true to avoid reloading things
+		when it's not really necessary (dhclient likes to
+		execute its dhclient-exit-hooks also on renewals)
+	*/		
+	if (file_exists("{$g['vardb_path']}/wanip")) {
+		$oldwanip = chop(file_get_contents("{$g['vardb_path']}/wanip"));
+		
+		if ($curwanip == $oldwanip)
+			return 0;	/* nothing to do */
+	}
+	
 	/* resync ipfilter */
 	filter_resync();
+	
+	/* flush NAT table */
+	filter_flush_nat_table();
 	
 	/* reconfigure IPsec tunnels */
 	vpn_ipsec_configure(true);
@@ -54,5 +71,12 @@
 	
 	/* fire up the BigPond client, if necessary */
 	if ($config['interfaces']['wan']['ipaddr'] == "bigpond")
-		interfaces_wan_bigpond_configure();
+		interfaces_wan_bigpond_configure($curwanip);
+	
+	/* write current WAN IP to file */
+	$fd = @fopen("{$g['vardb_path']}/wanip", "w");
+	if ($fd) {
+		fwrite($fd, $curwanip);
+		fclose($fd);
+	}
 ?>

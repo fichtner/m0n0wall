@@ -233,7 +233,7 @@ function get_interface_list() {
 		if (substr($ifname, -1) == "*")
 			$ifname = substr($ifname, 0, strlen($ifname) - 1);
 		
-		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|tun|vlan)/", $ifname)) {
+		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|vlan)/", $ifname)) {
 			$iflist[$ifname] = array();
 			
 			$iflist[$ifname]['mac'] = chop($alink[3]);
@@ -383,6 +383,13 @@ function ipcmp($a, $b) {
 		return 1;
 	else
 		return 0;
+}
+
+/* return true if $addr is in $subnet, false if not */
+function ip_in_subnet($addr,$subnet) {
+	list($ip, $mask) = explode('/', $subnet);
+	$mask = 0xffffffff << (32 - $mask);
+	return ((ip2long($addr) & $mask) == (ip2long($ip) & $mask));
 }
 
 /* verify (and remove) the digital signature on a file - returns 0 if OK */

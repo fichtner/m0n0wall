@@ -104,6 +104,10 @@ if ($_POST) {
 			
 			if (ip2long($_POST['range_from']) > ip2long($_POST['range_to']))
 				$input_errors[] = "The range is invalid (first element higher than second element).";
+			
+			/* make sure that the DHCP Relay isn't enabled on this interface */
+			if (isset($config['dhcrelay'][$if]['enable']))
+				$input_errors[] = "You must disable the DHCP relay on the {$iflist[$if]} interface before enabling the DHCP server.";
 		}
 	}
 
@@ -151,7 +155,7 @@ if ($_GET['act'] == "del") {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Services: DHCP</title>
+<title><?=gentitle("Services: DHCP server");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 <script language="JavaScript">
@@ -179,7 +183,7 @@ function enable_change(enable_over) {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: DHCP</p>
+<p class="pgtitle">Services: DHCP server</p>
 <form action="services_dhcp.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>

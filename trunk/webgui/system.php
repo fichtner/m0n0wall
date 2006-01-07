@@ -152,7 +152,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - System: General setup</title>
+<title><?=gentitle("System: General setup");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>
@@ -186,7 +186,7 @@ if ($_POST) {
                       <span class="vexpl">IP addresses; these are also used for 
                       the DHCP service, DNS forwarder and for PPTP VPN clients<br>
                       <br>
-                      <input name="dnsallowoverride" type="checkbox" id="dnsallowoverride" value="yes" <?php if ($pconfig['dnsallowoverride'] == "yes") echo "checked"; ?>>
+                      <input name="dnsallowoverride" type="checkbox" id="dnsallowoverride" value="yes" <?php if ($pconfig['dnsallowoverride']) echo "checked"; ?>>
                       <strong>Allow DNS server list to be overridden by DHCP/PPP 
                       on WAN</strong><br>
                       If this option is set, m0n0wall will use DNS servers assigned 

@@ -143,7 +143,7 @@ function wireless_config_print() {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">WEP</td>
-                  <td class="vtable"> <input name="wep_enable" type="checkbox" id="wep_enable" value="yes" <?php if ($pconfig['wep_enable'] == "yes") echo "checked"; ?>> 
+                  <td class="vtable"> <input name="wep_enable" type="checkbox" id="wep_enable" value="yes" <?php if ($pconfig['wep_enable']) echo "checked"; ?>> 
                     <strong>Enable WEP</strong><br>
                     &nbsp; <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 

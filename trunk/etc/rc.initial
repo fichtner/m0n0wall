@@ -3,7 +3,7 @@
 # /etc/rc.initial
 # part of m0n0wall (http://neon1.net/m0n0wall)
 #
-# Copyright (C) 2003 Manuel Kasper <mk@neon1.net>.
+# Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
 # All rights reserved.
 
 # make sure the user can't kill us by pressing Ctrl-C
@@ -41,6 +41,7 @@ echo "2) Set up LAN IP address"
 echo "3) Reset webGUI password"
 echo "4) Reset to factory defaults"
 echo "5) Reboot system"
+echo "6) Ping host"
 echo
 
 read -p "Enter a number: " opmode
@@ -61,6 +62,9 @@ case ${opmode} in
 	;;
 5)
 	/etc/rc.initial.reboot
+	;;
+6)
+	/etc/rc.initial.ping
 	;;
 esac
 

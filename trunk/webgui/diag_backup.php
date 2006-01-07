@@ -45,9 +45,13 @@ if ($_POST) {
 	if ($mode) {
 		if ($mode == "download") {
 			config_lock();
+			
+			$fn = "config-" . $config['system']['hostname'] . "." . 
+				$config['system']['domain'] . "-" . date("YmdHis") . ".xml";
+			
 			$fs = filesize($g['conf_path'] . "/config.xml");
 			header("Content-Type: application/octet-stream"); 
-			header("Content-Disposition: attachment; filename=config.xml");
+			header("Content-Disposition: attachment; filename=$fn");
 			header("Content-Length: $fs");
 			readfile($g['conf_path'] . "/config.xml");
 			config_unlock();
@@ -70,7 +74,7 @@ if ($_POST) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>m0n0wall webGUI - Diagnostics: Backup/restore</title>
+<title><?=gentitle("Diagnostics: Backup/restore");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="gui.css" rel="stylesheet" type="text/css">
 </head>

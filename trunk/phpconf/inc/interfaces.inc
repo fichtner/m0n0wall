@@ -102,6 +102,16 @@ function interfaces_lan_configure() {
 		mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . 
 			" link " . escapeshellarg($lancfg['spoofmac']));
 	
+	/* media */
+	if ($lancfg['media'] || $lancfg['mediaopt']) {
+		$cmd = "/sbin/ifconfig " . escapeshellarg($lancfg['if']);
+		if ($lancfg['media'])
+			$cmd .= " media " . escapeshellarg($lancfg['media']);
+		if ($lancfg['mediaopt'])
+			$cmd .= " mediaopt " . escapeshellarg($lancfg['mediaopt']);
+		mwexec($cmd);
+	}
+	
 	mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " " . 
 		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']));
 	
@@ -129,6 +139,9 @@ function interfaces_lan_configure() {
 		
 		/* reload webgui */
 		system_webgui_start();
+		
+		/* reload captive portal */
+		captiveportal_configure();
 	}
 	
 	if ($g['booting'])
@@ -206,6 +219,22 @@ function interfaces_optional_configure_if($opti) {
 		if ($optcfg['spoofmac'])
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
 				" link " . escapeshellarg($optcfg['spoofmac']));
+		
+		/* media */
+		if ($optcfg['media'] || $optcfg['mediaopt']) {
+			$cmd = "/sbin/ifconfig " . escapeshellarg($optcfg['if']);
+			if ($optcfg['media'])
+				$cmd .= " media " . escapeshellarg($optcfg['media']);
+			if ($optcfg['mediaopt'])
+				$cmd .= " mediaopt " . escapeshellarg($optcfg['mediaopt']);
+			mwexec($cmd);
+		}
+		
+		/* OpenVPN configuration? */
+ 		if (isset($optcfg['ovpn'])) {
+ 			if (strstr($if, "tap"))
+ 				ovpn_link_tap();
+ 		}
 		
 		/* bridged? */
 		if ($optcfg['bridge']) {
@@ -316,13 +345,9 @@ function interfaces_wan_configure() {
 		if (file_exists("{$g['varetc_path']}/mpd.links")) {
 			unlink("{$g['varetc_path']}/mpd.links");
 		}
-		/* remove ipsec.wanip, if it exists */
-		if (file_exists("{$g['vardb_path']}/ipsec.wanip")) {
-			unlink("{$g['vardb_path']}/ipsec.wanip");
-		}
-		/* remove bigpond.wanip, if it exists */
-		if (file_exists("{$g['vardb_path']}/bigpond.wanip")) {
-			unlink("{$g['vardb_path']}/bigpond.wanip");
+		/* remove wanip, if it exists */
+		if (file_exists("{$g['vardb_path']}/wanip")) {
+			unlink("{$g['vardb_path']}/wanip");
 		}
 	}
 	
@@ -337,6 +362,16 @@ function interfaces_wan_configure() {
 	if ($wancfg['spoofmac'])
 		mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . 
 			" link " . escapeshellarg($wancfg['spoofmac']));
+		
+	/* media */
+	if ($wancfg['media'] || $wancfg['mediaopt']) {
+		$cmd = "/sbin/ifconfig " . escapeshellarg($wancfg['if']);
+		if ($wancfg['media'])
+			$cmd .= " media " . escapeshellarg($wancfg['media']);
+		if ($wancfg['mediaopt'])
+			$cmd .= " mediaopt " . escapeshellarg($wancfg['mediaopt']);
+		mwexec($cmd);
+	}
 	
 	switch ($wancfg['ipaddr']) {
 	
@@ -441,14 +476,35 @@ function interfaces_wan_pppoe_configure() {
 		printf("Error: cannot open mpd.conf in interfaces_wan_pppoe_configure().\n");
 		return 1;
 	}
-		
+	
+	$idle = 0;
+	
+	if (isset($pppoecfg['ondemand'])) {
+		$ondemand = "enable";
+		if ($pppoecfg['timeout'])
+			$idle = $pppoecfg['timeout'];
+	} else {
+		$ondemand = "disable";
+	}
+	
 	$mpdconf = <<<EOD
 pppoe:
 	new -i ng0 pppoe pppoe
 	set iface route default
-	set iface disable on-demand
-	set iface idle 0
+	set iface {$ondemand} on-demand
+	set iface idle {$idle}
 	set iface up-script /usr/local/sbin/ppp-linkup
+
+EOD;
+	
+	if (isset($pppoecfg['ondemand'])) {
+		$mpdconf .= <<<EOD
+	set iface addrs 10.0.0.1 10.0.0.2
+
+EOD;
+	}
+	
+	$mpdconf .= <<<EOD
 	set bundle disable multilink
 	set bundle authname "{$pppoecfg['username']}"
 	set bundle password "{$pppoecfg['password']}"
@@ -507,14 +563,35 @@ function interfaces_wan_pptp_configure() {
 		printf("Error: cannot open mpd.conf in interfaces_wan_pptp_configure().\n");
 		return 1;
 	}
+	
+	$idle = 0;
+	
+	if (isset($pptpcfg['ondemand'])) {
+		$ondemand = "enable";
+		if ($pptpcfg['timeout'])
+			$idle = $pptpcfg['timeout'];
+	} else {
+		$ondemand = "disable";
+	}
 		
 	$mpdconf = <<<EOD
 pptp:
 	new -i ng0 pptp pptp
 	set iface route default
-	set iface disable on-demand
-	set iface idle 0
+	set iface {$ondemand} on-demand
+	set iface idle {$idle}
 	set iface up-script /usr/local/sbin/ppp-linkup
+
+EOD;
+	
+	if (isset($pptpcfg['ondemand'])) {
+		$mpdconf .= <<<EOD
+	set iface addrs {$pptpcfg['local']} {$pptpcfg['remote']}
+
+EOD;
+	}
+	
+	$mpdconf .= <<<EOD
 	set bundle disable multilink
 	set bundle authname "{$pptpcfg['username']}"
 	set bundle password "{$pptpcfg['password']}"
@@ -564,35 +641,14 @@ EOD;
 	return 0;
 }
 
-function interfaces_wan_bigpond_configure() {
+function interfaces_wan_bigpond_configure($curwanip) {
 	global $config, $g;
 	
 	$bpcfg = $config['bigpond'];
 	
-	$curwanip = get_current_wan_address();
-	
 	if (!$curwanip) {
 		/* IP address not configured yet, exit */
 		return 0;
-	}
-	
-	/*	dhclient told us that the IP address has changed;
-		let's see if that's really true to avoid reloading bpalogin
-		when it's not really necessary (dhclient likes to
-		execute its dhclient-exit-hooks also on renewals)
-	*/		
-	if (file_exists("{$g['vardb_path']}/bigpond.wanip")) {
-		$oldwanip = chop(file_get_contents("{$g['vardb_path']}/bigpond.wanip"));
-		
-		if ($curwanip == $oldwanip)
-			return 0;	/* nothing to do */
-	}
-	
-	/* write current WAN IP to file */
-	$fd = fopen("{$g['vardb_path']}/bigpond.wanip", "w");
-	if ($fd) {
-		fwrite($fd, $curwanip);
-		fclose($fd);
 	}
 		
 	/* kill bpalogin */
