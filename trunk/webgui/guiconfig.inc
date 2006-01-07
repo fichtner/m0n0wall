@@ -97,12 +97,20 @@ $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
 					'cast128' => 'CAST128');
 $p2_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
 					'cast128' => 'CAST128', 'rijndael' => 'Rijndael (AES)');
-$p1_halgos = array('md5' => 'MD5', 'sha1' => 'SHA1');
-$p2_halgos = array('hmac_md5' => 'MD5', 'hmac_sha1' => 'SHA1');
+$p1_halgos = array('sha1' => 'SHA1', 'md5' => 'MD5');
+$p2_halgos = array('hmac_sha1' => 'SHA1', 'hmac_md5' => 'MD5');
 $p2_protos = array('esp' => 'ESP', 'ah' => 'AH');
 $p2_pfskeygroups = array('0' => 'off', '1' => '1', '2' => '2', '5' => '5');
 
 function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors) {
+	
+	/* check for bad control characters */	
+	foreach ($postdata as $pn => $pd) {
+		if (is_string($pd) && preg_match("/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f]/", $pd)) {
+			$input_errors[] = "The field '" . $pn . "' contains invalid characters.";
+		}
+	}
+	
 	for ($i = 0; $i < count($reqdfields); $i++) {
 		if (!$_POST[$reqdfields[$i]]) {
 			$input_errors[] = "The field '" . $reqdfieldsn[$i] . "' is required.";

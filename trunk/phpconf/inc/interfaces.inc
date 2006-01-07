@@ -74,6 +74,10 @@ function interfaces_vlan_configure() {
 				$cmd .= " mtu 1500";
 			
 			mwexec($cmd);
+			
+			/* make sure the parent interface is up */
+			mwexec("/sbin/ifconfig " . escapeshellarg($vlan['if']) . " up");
+			
 			$i++;
 		}
 	}

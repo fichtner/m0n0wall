@@ -119,7 +119,7 @@ function get_wireless_info($ifdescr) {
               <?php endif; ?>
               <tr> 
                 <td colspan="2" class="listtopic"> 
-                  <?=htmlspecialchars($ifname);?> interface</td>
+                  <?=htmlspecialchars($ifname);?> interface (SSID &quot;<?=htmlspecialchars($config['interfaces'][$ifdescr]['wireless']['ssid']);?>&quot;)</td>
               </tr>
               <tr> 
                 <td width="22%" valign="top" class="listhdrr">Signal strength 

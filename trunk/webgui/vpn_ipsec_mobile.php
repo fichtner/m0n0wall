@@ -41,11 +41,11 @@ if (count($a_ipsec) == 0) {
 	$pconfig['p1mode'] = "aggressive";
 	$pconfig['p1myidentt'] = "myaddress";
 	$pconfig['p1ealgo'] = "3des";
-	$pconfig['p1halgo'] = "md5";
+	$pconfig['p1halgo'] = "sha1";
 	$pconfig['p1dhgroup'] = "2";
 	$pconfig['p2proto'] = "esp";
 	$pconfig['p2ealgos'] = explode(",", "3des,blowfish,cast128,rijndael");
-	$pconfig['p2halgos'] = explode(",", "hmac_md5,hmac_sha1");
+	$pconfig['p2halgos'] = explode(",", "hmac_sha1,hmac_md5");
 	$pconfig['p2pfsgroup'] = "0";
 } else {
 	$pconfig['enable'] = isset($a_ipsec['enable']);
@@ -294,8 +294,7 @@ if ($_POST) {
                     <?=htmlspecialchars($algoname);?>
                     <br> 
                     <?php endforeach; ?>
-                    <br>
-                    Hint: MD5 is slightly faster than SHA1.</td>
+                  </td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">PFS key group</td>

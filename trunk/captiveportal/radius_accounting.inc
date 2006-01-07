@@ -37,7 +37,7 @@ function RADIUS_ACCOUNTING_START($username,$radiusip,$radiusport,$radiuskey) {
 
 	exec("/bin/hostname", $nasHostname) ;
 	if(!$nasHostname[0])
-		$nasHostname[0] = "quewall" ;
+		$nasHostname[0] = "m0n0wall" ;
 
 	$fd = @fsockopen("udp://$radiusip",$radiusport,$errno,$errstr,3) ;
 	if(!$fd) 

@@ -116,7 +116,7 @@ This can be either an IP address, fully qualified domain name or an e-mail addre
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Pre-shared key</td>
                   <td width="78%" class="vtable"> 
-                    <input name="psk" type="text" class="formfld" id="psk" size="40" value="<?=$pconfig['psk'];?>">
+                    <input name="psk" type="text" class="formfld" id="psk" size="40" value="<?=htmlspecialchars($pconfig['psk']);?>">
                   </td>
                 </tr>
                 <tr> 

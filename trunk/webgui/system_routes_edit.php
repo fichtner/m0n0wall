@@ -121,7 +121,7 @@ if ($_POST) {
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
 <select name="interface" class="formfld">
-                      <?php $interfaces = array('lan' => 'LAN', 'pptp' => 'PPTP');
+                      <?php $interfaces = array('lan' => 'LAN', 'wan' => 'WAN', 'pptp' => 'PPTP');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 					  }

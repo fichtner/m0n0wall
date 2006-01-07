@@ -38,6 +38,10 @@ $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
 $pconfig['disablefirmwarecheck'] = isset($config['system']['disablefirmwarecheck']);
+$pconfig['expanddiags'] = isset($config['system']['webgui']['expanddiags']);
+if ($g['platform'] == "generic-pc")
+	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
+$pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
 
 if ($_POST) {
 
@@ -67,12 +71,27 @@ if ($_POST) {
 		$config['system']['webgui']['private-key'] = base64_encode($_POST['key']);
 		$config['system']['disableconsolemenu'] = $_POST['disableconsolemenu'] ? true : false;
 		$config['system']['disablefirmwarecheck'] = $_POST['disablefirmwarecheck'] ? true : false;
+		$config['system']['webgui']['expanddiags'] = $_POST['expanddiags'] ? true : false;
+		if ($g['platform'] == "generic-pc") {
+			$oldharddiskstandby = $config['system']['harddiskstandby'];
+			$config['system']['harddiskstandby'] = $_POST['harddiskstandby'];
+		}
+		$config['system']['webgui']['noantilockout'] = $_POST['noantilockout'] ? true : false;
 			
 		write_config();
 		
 		if (($config['system']['webgui']['certificate'] != $oldcert)
 				|| ($config['system']['webgui']['private-key'] != $oldkey)) {
 			touch($d_sysrebootreqd_path);
+		} else if (($g['platform'] == "generic-pc") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
+			if (!$config['system']['harddiskstandby']) {
+				// Reboot needed to deactivate standby due to a stupid ATA-protocol
+				touch($d_sysrebootreqd_path);
+				unset($config['system']['harddiskstandby']);
+			} else {
+				// No need to set the standby-time if a reboot is needed anyway
+				system_set_harddisk_standby();
+			}
 		}
 		
 		$retval = 0;
@@ -195,12 +214,51 @@ function enable_change(enable_over) {
                     <strong>Disable console menu</strong><span class="vexpl"><br>
                     Changes to this option will take effect after a reboot.</span></td>
                 </tr>
+				<tr>
+                  <td valign="top" class="vtable">&nbsp;</td>
+                  <td class="vtable">
+                    <input name="disablefirmwarecheck" type="checkbox" id="disablefirmwarecheck" value="yes" <?php if ($pconfig['disablefirmwarecheck']) echo "checked"; ?>>
+                    <strong>Disable firmware version check</strong><span class="vexpl"><br>
+    This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
+			    </tr>
+<?php if ($g['platform'] == "generic-pc"): ?>
 				<tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <input name="disablefirmwarecheck" type="checkbox" id="disablefirmwarecheck" value="yes" <?php if ($pconfig['disablefirmwarecheck']) echo "checked"; ?>>
-                    <strong>Disable firmware version check</strong><span class="vexpl"><br>
-                    This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
+				  <strong>Hard disk standby time: </strong>
+                    <select name="harddiskstandby" class="formfld">
+					<?php
+                        /* Values from ATA-2
+                           http://www.t13.org/project/d0948r3-ATA-2.pdf
+                           Page 66 */
+						$sbvals = explode(" ", "0.5,6 1,12 2,24 3,36 4,48 5,60 7.5,90 10,120 15,180 20,240 30,241 60,242");
+					?>
+                      <option value="" <?php if(!$pconfig['harddiskstandby']) echo('selected');?>>Always on</option>
+					<?php
+					foreach ($sbvals as $sbval):
+						list($min,$val) = explode(",", $sbval); ?>
+                      <option value="<?=$val;?>" <?php if($pconfig['harddiskstandby'] == $val) echo('selected');?>><?=$min;?> minutes</option>
+					<?php endforeach; ?>
+                    </select>
+                    <br>
+                    Puts the hard disk into standby mode when the selected amount of time after the last
+                    access has elapsed. <em>Do not set this for CF cards.</em></td>
+				</tr>
+<?php endif; ?>
+				<tr> 
+                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="expanddiags" type="checkbox" id="expanddiags" value="yes" <?php if ($pconfig['expanddiags']) echo "checked"; ?>>
+                    <strong>Keep diagnostics in navigation expanded </strong></td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vtable">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="noantilockout" type="checkbox" id="noantilockout" value="yes" <?php if ($pconfig['noantilockout']) echo "checked"; ?>>
+                    <strong>Disable webGUI anti-lockout rule</strong><br>
+					By default, access to the webGUI on the LAN interface is always permitted, regardless of the user-defined filter rule set. Enable this feature to control webGUI access (make sure to have a filter rule in place that allows you in, or you will lock yourself out!).<br>
+					Hint: 
+					the &quot;set LAN IP address&quot; option in the console menu  resets this setting as well.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

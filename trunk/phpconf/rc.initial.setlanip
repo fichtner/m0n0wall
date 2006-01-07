@@ -93,6 +93,11 @@
 			$config['system']['webgui']['protocol'] = "http";
 	}
 	
+	if (isset($config['system']['webgui']['noantilockout'])) {
+		echo "\nNote: the anti-lockout rule on LAN has been re-enabled.\n";
+		unset($config['system']['webgui']['noantilockout']);
+	}
+	
 	write_config();
 	interfaces_lan_configure();
 	

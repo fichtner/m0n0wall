@@ -50,7 +50,12 @@ $pconfig['timeout'] = $config['captiveportal']['timeout'];
 $pconfig['idletimeout'] = $config['captiveportal']['idletimeout'];
 $pconfig['enable'] = isset($config['captiveportal']['enable']);
 $pconfig['radacct_enable'] = isset($config['captiveportal']['radacct_enable']);
+$pconfig['httpslogin_enable'] = isset($config['captiveportal']['httpslogin']);
+$pconfig['httpsname'] = $config['captiveportal']['httpsname'];
+$pconfig['cert'] = base64_decode($config['captiveportal']['certificate']);
+$pconfig['key'] = base64_decode($config['captiveportal']['private-key']);
 $pconfig['logoutwin_enable'] = isset($config['captiveportal']['logoutwin_enable']);
+$pconfig['redirurl'] = $config['captiveportal']['redirurl'];
 $pconfig['radiusip'] = $config['captiveportal']['radiusip'];
 $pconfig['radiusport'] = $config['captiveportal']['radiusport'];
 $pconfig['radiuskey'] = $config['captiveportal']['radiuskey'];
@@ -75,6 +80,21 @@ if ($_POST) {
 				break;
 			}
 		}
+		
+		if ($_POST['httpslogin_enable']) {
+		 	if (!$_POST['cert'] || !$_POST['key']) {
+				$input_errors[] = "Certificate and key must be specified for HTTPS login.";
+			} else {
+				if (!strstr($_POST['cert'], "BEGIN CERTIFICATE") || !strstr($_POST['cert'], "END CERTIFICATE"))
+					$input_errors[] = "This certificate does not appear to be valid.";
+				if (!strstr($_POST['key'], "BEGIN RSA PRIVATE KEY") || !strstr($_POST['key'], "END RSA PRIVATE KEY"))
+					$input_errors[] = "This key does not appear to be valid.";
+			}
+			
+			if (!$_POST['httpsname'] || !is_domain($_POST['httpsname'])) {
+				$input_errors[] = "The HTTPS server name must be specified for HTTPS login.";
+			}
+		}
 	}
 	
 	if ($_POST['timeout'] && (!is_numeric($_POST['timeout']) || ($_POST['timeout'] < 1))) {
@@ -96,7 +116,12 @@ if ($_POST) {
 		$config['captiveportal']['idletimeout'] = $_POST['idletimeout'];
 		$config['captiveportal']['enable'] = $_POST['enable'] ? true : false;
 		$config['captiveportal']['radacct_enable'] = $_POST['radacct_enable'] ? true : false;
+		$config['captiveportal']['httpslogin'] = $_POST['httpslogin_enable'] ? true : false;
+		$config['captiveportal']['httpsname'] = $_POST['httpsname'];
+		$config['captiveportal']['certificate'] = base64_encode($_POST['cert']);
+		$config['captiveportal']['private-key'] = base64_encode($_POST['key']);
 		$config['captiveportal']['logoutwin_enable'] = $_POST['logoutwin_enable'] ? true : false;
+		$config['captiveportal']['redirurl'] = $_POST['redirurl'];
 		$config['captiveportal']['radiusip'] = $_POST['radiusip'];
 		$config['captiveportal']['radiusport'] = $_POST['radiusport'];
 		$config['captiveportal']['radiuskey'] = $_POST['radiuskey'];
@@ -138,10 +163,15 @@ function enable_change(enable_change) {
 		document.iform.cinterface.disabled = 0;
 		document.iform.idletimeout.disabled = 0;
 		document.iform.timeout.disabled = 0;
+		document.iform.redirurl.disabled = 0;
 		document.iform.radiusip.disabled = 0;
 		document.iform.radiusport.disabled = 0;
 		document.iform.radiuskey.disabled = 0;
 		document.iform.radacct_enable.disabled = 0;
+		document.iform.httpslogin_enable.disabled = 0;
+		document.iform.httpsname.disabled = 0;
+		document.iform.cert.disabled = 0;
+		document.iform.key.disabled = 0;
 		document.iform.logoutwin_enable.disabled = 0;
 		document.iform.htmlfile.disabled = 0;
 		document.iform.errfile.disabled = 0;
@@ -149,10 +179,15 @@ function enable_change(enable_change) {
 		document.iform.cinterface.disabled = 1;
 		document.iform.idletimeout.disabled = 1;
 		document.iform.timeout.disabled = 1;
+		document.iform.redirurl.disabled = 1;
 		document.iform.radiusip.disabled = 1;
 		document.iform.radiusport.disabled = 1;
 		document.iform.radiuskey.disabled = 1;
 		document.iform.radacct_enable.disabled = 1;
+		document.iform.httpslogin_enable.disabled = 1;
+		document.iform.httpsname.disabled = 1;
+		document.iform.cert.disabled = 1;
+		document.iform.key.disabled = 1;
 		document.iform.logoutwin_enable.disabled = 1;
 		document.iform.htmlfile.disabled = 1;
 		document.iform.errfile.disabled = 1;
@@ -223,8 +258,16 @@ Clients will be disconnected after this amount of inactivity. They may log in ag
 	  <td width="22%" valign="top" class="vncell">Logout popup window</td>
 	  <td width="78%" class="vtable"> 
 		<input name="logoutwin_enable" type="checkbox" class="formfld" id="logoutwin_enable" value="yes" <?php if($pconfig['logoutwin_enable']) echo "checked"; ?>>
-		<br>
+		<strong>Enable logout popup window</strong><br>
 	  If enabled, a popup window will appear when clients are allowed through the captive portal. This allows clients to explicitly disconnect themselves before the idle or hard timeout occurs. When RADIUS accounting is  enabled, this option is implied.</td>
+	</tr>
+	<tr>
+	  <td valign="top" class="vncell">Redirection URL</td>
+	  <td class="vtable">
+		<input name="redirurl" type="text" class="formfld" id="redirurl" size="60" value="<?=htmlspecialchars($pconfig['redirurl']);?>">
+		<br>
+If you provide a URL here, clients will be redirected to that URL instead of the one they initially tried
+to access after they've authenticated.</td>
 	</tr>
 	<tr> 
 	  <td width="22%" valign="top" class="vncell">RADIUS server</td>
@@ -246,6 +289,33 @@ Clients will be disconnected after this amount of inactivity. They may log in ag
  		<br>
  	Enter the IP address and port of the RADIUS server which users of the captive portal have to authenticate against. Leave blank to disable RADIUS authentication. Leave port number blank to use the default port (1812). Leave the RADIUS shared secret blank to not use a RADIUS shared secret. RADIUS accounting packets will also be sent to port 1813 of the RADIUS server if RADIUS accounting is enabled.
 	</tr>
+	<tr>
+      <td valign="top" class="vncell">HTTPS login</td>
+      <td class="vtable">
+        <input name="httpslogin_enable" type="checkbox" class="formfld" id="httpslogin_enable" value="yes" <?php if($pconfig['httpslogin_enable']) echo "checked"; ?>>
+        <strong>Enable HTTPS login</strong><br>
+    If enabled, the username and password will be transmitted over an HTTPS connection to protect against eavesdroppers. This option only applies when RADIUS authentication is used. A server name, certificate and matching private key must also be specified below.</td>
+	  </tr>
+	<tr>
+      <td valign="top" class="vncell">HTTPS server name </td>
+      <td class="vtable">
+        <input name="httpsname" type="text" class="formfld" id="httpsname" size="30" value="<?=htmlspecialchars($pconfig['httpsname']);?>"><br>
+    This name will be used in the form action for the HTTPS POST and should match the Common Name (CN) in your certificate (otherwise, the client browser will most likely display a security warning). Make sure captive portal clients can resolve this name in DNS. </td>
+	  </tr>
+	<tr>
+      <td valign="top" class="vncell">HTTPS certificate</td>
+      <td class="vtable">
+        <textarea name="cert" cols="65" rows="7" id="cert" class="formpre"><?=htmlspecialchars($pconfig['cert']);?></textarea>
+        <br>
+    Paste a signed certificate in X.509 PEM format here.</td>
+	  </tr>
+	<tr>
+      <td valign="top" class="vncell">HTTPS private key</td>
+      <td class="vtable">
+        <textarea name="key" cols="65" rows="7" id="key" class="formpre"><?=htmlspecialchars($pconfig['key']);?></textarea>
+        <br>
+    Paste an RSA private key in PEM format here.</td>
+	  </tr>
 	<tr> 
 	  <td width="22%" valign="top" class="vncellreq">Portal page contents</td>
 	  <td width="78%" class="vtable">    
@@ -255,14 +325,16 @@ Clients will be disconnected after this amount of inactivity. They may log in ag
 		  <br>
 		  <br>
 		<?php endif; ?>
-		  Upload an HTML file for the portal page here (leave blank to keep the current one). Make sure to include a form (POST to the page itself)
+		  Upload an HTML file for the portal page here (leave blank to keep the current one). Make sure to include a form (POST to &quot;$PORTAL_ACTION$&quot;)
 with a submit button (name=&quot;accept&quot;). Include the &quot;auth_user&quot; and &quot;auth_pass&quot; input elements if RADIUS authentication is enabled. If RADIUS is enabled and no &quot;auth_user&quot; is present, authentication will always fail. If RADIUS is not enabled, you can omit both these input elements.
-Example code for the button:<br>
-		  <br><tt>&lt;form method=&quot;post&quot; action=&quot;&quot;&gt;<br>  
-		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;accept&quot; type=&quot;submit&quot; value=&quot;Continue&quot;&gt;<br>
+When using HTTPS login, a hidden field with name=&quot;redirurl&quot; and value=&quot;$PORTAL_REDIRURL$&quot; has to be included as well. Example code for the form:<br>
+		  <br>
+		  <tt>&lt;form method=&quot;post&quot; action=&quot;$PORTAL_ACTION$&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_user&quot; type=&quot;text&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_pass&quot; type=&quot;password&quot;&gt;<br>
-		  &lt;/form&gt;</tt>					</td>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;redirurl&quot; type=&quot;hidden&quot; value=&quot;$PORTAL_REDIRURL$&quot;&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;input name=&quot;accept&quot; type=&quot;submit&quot; value=&quot;Continue&quot;&gt;<br>
+		  &lt;/form&gt;</tt></td>
 	</tr>
 	<tr>
 	  <td width="22%" valign="top" class="vncell">Authentication<br>

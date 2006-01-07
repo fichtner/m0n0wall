@@ -107,7 +107,13 @@
 			  &nbsp;&nbsp;&nbsp;&nbsp;IPsec user FQDNs</font></em><br>
 			  <br>
               Fred Wright (<a href="mailto:fw@well.com">fw@well.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix </font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix; IPsec dead SA fixes</font></em><br>
+			  <br>
+              Michael Hanselmann (<a href="mailto:public@hansmi.ch">public@hansmi.ch</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby</font></em><br>
+			  <br>
+              Audun Larsen (<a href="mailto:larsen@xqus.com">larsen@xqus.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CPU/memory usage display</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

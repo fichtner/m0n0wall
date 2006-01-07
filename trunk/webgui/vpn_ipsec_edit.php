@@ -77,6 +77,7 @@ function pconfig_to_address(&$adr, $padr, $pmask) {
 
 if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['disabled'] = isset($a_ipsec[$id]['disabled']);
+	$pconfig['auto'] = isset($a_ipsec[$id]['auto']);
 
 	if (!isset($a_ipsec[$id]['local-subnet']))
 		$pconfig['localnet'] = "lan";
@@ -124,11 +125,11 @@ if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['p1mode'] = "aggressive";
 	$pconfig['p1myidentt'] = "myaddress";
 	$pconfig['p1ealgo'] = "3des";
-	$pconfig['p1halgo'] = "md5";
+	$pconfig['p1halgo'] = "sha1";
 	$pconfig['p1dhgroup'] = "2";
 	$pconfig['p2proto'] = "esp";
 	$pconfig['p2ealgos'] = explode(",", "3des,blowfish,cast128,rijndael");
-	$pconfig['p2halgos'] = explode(",", "hmac_md5,hmac_sha1");
+	$pconfig['p2halgos'] = explode(",", "hmac_sha1,hmac_md5");
 	$pconfig['p2pfsgroup'] = "0";
 }
 
@@ -189,6 +190,7 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$ipsecent['disabled'] = $_POST['disabled'] ? true : false;
+		$ipsecent['auto'] = $_POST['auto'] ? true : false;
 		$ipsecent['interface'] = $pconfig['interface'];
 		pconfig_to_address($ipsecent['local-subnet'], $_POST['localnet'], $_POST['localnetmask']);
 		$ipsecent['remote-subnet'] = $_POST['remotenet'] . "/" . $_POST['remotebits'];
@@ -285,6 +287,13 @@ function typesel_change() {
                     <span class="vexpl">Set this option to disable this tunnel without
 					removing it from the list.</span></td>
                 </tr>
+				<tr> 
+				  <td width="22%" valign="top" class="vncellreq">Auto-establish</td>
+				  <td width="78%" class="vtable"> 
+					<input name="auto" type="checkbox" id="auto" value="yes" <?php if ($pconfig['auto']) echo "checked"; ?>>
+					<strong>Automatically establish this tunnel</strong><br>
+					<span class="vexpl">Set this option to automatically re-establish this tunnel after reboots/reconfigures. If this is not set, the tunnel is established on demand.</span></td>
+				</tr>
 				<tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable"> <select name="interface" class="formfld">
@@ -434,7 +443,7 @@ function typesel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Pre-Shared Key</td>
                   <td width="78%" class="vtable"> 
-                    <input name="p1pskey" type="text" class="formfld" id="p1pskey" size="40" value="<?=$pconfig['p1pskey'];?>"> 
+                    <input name="p1pskey" type="text" class="formfld" id="p1pskey" size="40" value="<?=htmlspecialchars($pconfig['p1pskey']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -477,8 +486,7 @@ function typesel_change() {
                     <?=htmlspecialchars($algoname);?>
                     <br> 
                     <?php endforeach; ?>
-                    <br>
-                    Hint: MD5 is slightly faster than SHA1.</td>
+				  </td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">PFS key group</td>

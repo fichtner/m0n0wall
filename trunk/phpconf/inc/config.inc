@@ -435,6 +435,9 @@ function write_config() {
 
 	conf_mount_rw();
 	
+	if (time() > mktime(0, 0, 0, 9, 1, 2004))	/* make sure the clock settings is plausible */
+		$config['lastchange'] = time();
+	
 	/* generate configuration XML */
 	$xmlconfig = dump_xml_config($config, $g['xml_rootobj']);
 	

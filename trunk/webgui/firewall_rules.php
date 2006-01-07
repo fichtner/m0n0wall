@@ -168,7 +168,7 @@ if ($_GET['act'] == "del") {
 						if (isset($filterent['disabled']))
 							$iconfn .= "_d";
 				  	?>
-				  <br><a href="?act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="15" border="0" title="click to toggle enabled/disabled status"></a>
+				  <br><img src="<?=$iconfn;?>.gif" width="11" height="15" border="0">
 				  <?php endif; ?>
 				  </td>
                   <td class="listlr"> 

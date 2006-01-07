@@ -109,9 +109,26 @@ setTimeout('window.close();',5000) ;
 </HTML>
 
 EOD;
+} else if (($_ENV['SERVER_PORT'] != 8001) && isset($config['captiveportal']['httpslogin'])) {
+	/* redirect to HTTPS login page */
+	header("Location: https://{$config['captiveportal']['httpsname']}:8001/?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
 } else {
 	/* display captive portal page */
-	readfile("{$g['varetc_path']}/captiveportal.html");
+	$htmltext = file_get_contents("{$g['varetc_path']}/captiveportal.html");
+	
+	/* substitute variables */
+	if (isset($config['captiveportal']['httpslogin']))
+		$htmltext = str_replace("\$PORTAL_ACTION\$", "https://{$config['captiveportal']['httpsname']}:8001/", $htmltext);
+	else
+		$htmltext = str_replace("\$PORTAL_ACTION\$", "", $htmltext);
+	
+	if (preg_match("/redirurl=(.*)/", $orig_request, $matches))
+		$redirurl = urldecode($matches[1]);
+	else
+		$redirurl = "http://{$orig_host}{$orig_request}";
+	$htmltext = str_replace("\$PORTAL_REDIRURL\$", htmlspecialchars($redirurl), $htmltext);
+	
+	echo $htmltext;
 }
 
 exit;
@@ -219,13 +236,26 @@ function portal_allow($clientip,$clientmac,$clientuser) {
 	portal_unlock();
 	
 	/* redirect user to desired destination */
+	if ($config['captiveportal']['redirurl'])
+		$redirurl = $config['captiveportal']['redirurl'];
+	else if ($_POST['redirurl'])
+		$redirurl = $_POST['redirurl'];
+	else
+		$redirurl = "http://{$orig_host}{$orig_request}";
+	
 	if(isset($config['captiveportal']['logoutwin_enable'])) {
+		
+		if (isset($config['captiveportal']['httpslogin']))
+			$logouturl = "https://{$config['captiveportal']['httpsname']}:8001/";
+		else
+			$logouturl = "http://{$config['interfaces'][$config['captiveportal']['interface']]['ipaddr']}:8000/";
+		
 		echo <<<EOD
 <HTML>
 <HEAD><TITLE>Redirecting...</TITLE></HEAD>
 <BODY>
 <SPAN STYLE="font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">
-<B>Redirecting to <A HREF="http://{$orig_host}{$orig_request}">http://{$orig_host}{$orig_request}</A>...</B>
+<B>Redirecting to <A HREF="{$redirurl}">{$redirurl}</A>...</B>
 </SPAN>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
@@ -236,7 +266,7 @@ if (LogoutWin) {
 	LogoutWin.document.write('<BODY BGCOLOR="#435370">');
 	LogoutWin.document.write('<DIV ALIGN="center" STYLE="color: #ffffff; font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">') ;
 	LogoutWin.document.write('<B>Click the button below to disconnect</B><P>');
-	LogoutWin.document.write('<FORM METHOD="POST" ACTION="http://{$config['interfaces']['lan']['ipaddr']}:8000/index.php">');
+	LogoutWin.document.write('<FORM METHOD="POST" ACTION="{$logouturl}">');
 	LogoutWin.document.write('<INPUT NAME="logout_id" TYPE="hidden" VALUE="{$clientmac}">');
 	LogoutWin.document.write('<INPUT NAME="logout" TYPE="submit" VALUE="Logout">');
 	LogoutWin.document.write('</FORM>');
@@ -245,7 +275,7 @@ if (LogoutWin) {
 	LogoutWin.document.close();
 }
 
-document.location.href="http://{$orig_host}{$orig_request}";
+document.location.href="{$redirurl}";
 -->
 </SCRIPT>
 </BODY>
@@ -253,7 +283,7 @@ document.location.href="http://{$orig_host}{$orig_request}";
 
 EOD;
 	} else {
-		header("Location: http://" . $orig_host . $orig_request); 
+		header("Location: " . $redirurl); 
 	}
 }
 

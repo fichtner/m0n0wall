@@ -119,6 +119,60 @@ if ($fd) {
 					echo htmlspecialchars($uptimestr);
 				  ?>
                 </td>
+              </tr><?php if ($config['lastchange']): ?>
+              <tr> 
+                <td width="25%" class="vncellt">Last config change</td>
+                <td width="75%" class="listr"> 
+                  <?=htmlspecialchars(date("D M j G:i:s T Y", $config['lastchange']));?>
+                </td>
+              </tr><?php endif; ?>
+			  <tr> 
+                <td width="25%" class="vncellt">CPU usage</td>
+                <td width="75%" class="listr">
+<?php
+$cpuTicks = explode(" ", `/sbin/sysctl -n kern.cp_time`);
+sleep(1);
+$cpuTicks2 = explode(" ", `/sbin/sysctl -n kern.cp_time`);
+
+$diff = array();
+$diff['user'] = $cpuTicks2[0] - $cpuTicks[0];
+$diff['nice'] = $cpuTicks2[1] - $cpuTicks[1];
+$diff['sys'] = $cpuTicks2[2] - $cpuTicks[2];
+$diff['intr'] = $cpuTicks2[3] - $cpuTicks[3];
+$diff['idle'] = $cpuTicks2[4] - $cpuTicks[4];
+
+$totalDiff = $diff['user'] + $diff['nice'] + $diff['sys'] + $diff['intr'] + $diff['idle'];
+
+$cpuUsage = round(100 * (1 - $diff['idle'] / $totalDiff), 0);
+									
+echo "<img src='bar_left.gif' height='15' width='4' border='0' align='absmiddle'>";
+echo "<img src='bar_blue.gif' height='15' width='" . $cpuUsage . "' border='0' align='absmiddle'>";
+echo "<img src='bar_gray.gif' height='15' width='" . (100 - $cpuUsage) . "' border='0' align='absmiddle'>";
+echo "<img src='bar_right.gif' height='15' width='5' border='0' align='absmiddle'> ";
+echo $cpuUsage . "%";
+?>
+                </td>
+              </tr>
+			  <tr> 
+                <td width="25%" class="vncellt">Memory usage</td>
+                <td width="75%" class="listr">
+<?php
+
+exec("/sbin/sysctl -n vm.stats.vm.v_active_count vm.stats.vm.v_inactive_count " .
+	"vm.stats.vm.v_wire_count vm.stats.vm.v_cache_count vm.stats.vm.v_free_count", $memory);
+
+$totalMem = $memory[0] + $memory[1] + $memory[2] + $memory[3] + $memory[4];
+$freeMem = $memory[4];
+$usedMem = $totalMem - $freeMem;
+$memUsage = round(($usedMem * 100) / $totalMem, 0);
+		  
+echo " <img src='bar_left.gif' height='15' width='4' border='0' align='absmiddle'>";
+echo "<img src='bar_blue.gif' height='15' width='" . $memUsage . "' border='0' align='absmiddle'>";
+echo "<img src='bar_gray.gif' height='15' width='" . (100 - $memUsage) . "' border='0' align='absmiddle'>";
+echo "<img src='bar_right.gif' height='15' width='5' border='0' align='absmiddle'> ";
+echo $memUsage . "%";
+?>
+                </td>
               </tr>
             </table>
             <?php include("fend.inc"); ?>

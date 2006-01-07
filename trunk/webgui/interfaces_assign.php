@@ -205,9 +205,14 @@ if ($_GET['act'] == "add") {
 	<td class="listhdr">Network port</td>
 	<td class="list">&nbsp;</td>
   </tr>
-  <?php foreach ($config['interfaces'] as $ifname => $iface): ?>
+  <?php foreach ($config['interfaces'] as $ifname => $iface):
+  	if ($iface['descr'])
+		$ifdescr = $iface['descr'];
+	else
+		$ifdescr = strtoupper($ifname);
+	?>
   <tr> 
-	<td class="listlr" valign="middle"><strong><?=strtoupper($ifname);?></strong></td>
+	<td class="listlr" valign="middle"><strong><?=$ifdescr;?></strong></td>
 	  <td valign="middle" class="listr">
 		<select name="<?=$ifname;?>" class="formfld" id="<?=$ifname;?>">
 		  <?php foreach ($portlist as $portname => $portinfo): ?>
@@ -231,12 +236,18 @@ if ($_GET['act'] == "add") {
 		</td>
   </tr>
   <?php endforeach; ?>
+  <?php if (count($config['interfaces']) < count($portlist)): ?>
   <tr>
 	<td class="list" colspan="2"></td>
-	<td class="list" nowrap><?php if (count($config['interfaces']) < count($portlist)): ?> 
+	<td class="list" nowrap>
 	<a href="interfaces_assign.php?act=add"><img src="plus.gif" title="add interface" width="17" height="17" border="0"></a>
-	<?php endif; ?> </td>
+	</td>
   </tr>
+  <?php else: ?>
+  <tr>
+	<td class="list" colspan="3" height="10"></td>
+  </tr>
+  <?php endif; ?>
 </table>
                       <input name="Submit" type="submit" class="formbtn" value="Save">
                     <p><span class="vexpl"><strong><span class="red">Warning:</span><br>

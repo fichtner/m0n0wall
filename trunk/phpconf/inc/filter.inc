@@ -203,8 +203,9 @@ function filter_nat_rules_generate() {
 		/* static routes */
 		if (is_array($config['staticroutes']['route'])) {
 			foreach ($config['staticroutes']['route'] as $route) {
-				$natrules .= filter_nat_rules_generate_if($wanif,
-					$route['network'], "", null);
+				if ($route['interface'] != "wan")
+					$natrules .= filter_nat_rules_generate_if($wanif,
+						$route['network'], "", null);
 			}
 		}
 	}
@@ -249,12 +250,14 @@ function filter_nat_rules_generate() {
 		}
 	}
 	
-	if ($pptpdcfg['mode']) {
+	if ($pptpdcfg['mode'] && $pptpdcfg['mode'] != "off") {
 	
 		if ($pptpdcfg['mode'] == "server")
 			$pptpdtarget = "127.0.0.1";
-		else
+		else if ($pptpdcfg['mode'] == "redir")
 			$pptpdtarget = $pptpdcfg['redir'];
+	
+		if ($pptpdtarget) {
 	
 		$natrules .= <<<EOD
 
@@ -263,6 +266,7 @@ rdr $wanif 0/0 port 0 -> $pptpdtarget port 0 gre
 rdr $wanif 0/0 port 1723 -> $pptpdtarget port 1723 tcp
 
 EOD;
+		}
 	}
 	
 	return $natrules;
@@ -519,12 +523,15 @@ EOD;
 	
 	}
 	
+	if (!isset($config['system']['webgui']['noantilockout'])) {
+	
 	$ipfrules .= <<<EOD
 
 # make sure the user cannot lock himself out of the webGUI
 pass in quick from $lansa/$lansn to $lanip keep state group 100
 
 EOD;
+	}
 	
 	/* PPTPd enabled? */
 	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off")) {

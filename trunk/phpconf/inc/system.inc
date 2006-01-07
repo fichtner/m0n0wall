@@ -450,12 +450,17 @@ function system_reboot_cleanup() {
 	captiveportal_radius_stop_all();
 }
 
-function system_do_shell_commands() {
+function system_do_shell_commands($early = 0) {
 	global $config, $g;
 	
-	if (is_array($config['system']['shellcmd'])) {
+	if ($early)
+		$cmdn = "earlyshellcmd";
+	else
+		$cmdn = "shellcmd";
+	
+	if (is_array($config['system'][$cmdn])) {
 		
-		foreach ($config['system']['shellcmd'] as $cmd) {
+		foreach ($config['system'][$cmdn] as $cmd) {
 			exec($cmd);
 		}
 	}
@@ -515,6 +520,37 @@ function system_dmesg_save() {
 	fclose($fd);
 	
 	return 0;
+}
+
+function system_set_harddisk_standby() {
+	global $g, $config;
+
+	if ($g['platform'] != "generic-pc")
+		return;
+
+	if (isset($config['system']['harddiskstandby'])) {
+		if ($g['booting']) {
+			echo 'Setting harddisk standby time... ';
+		}
+
+		$standby = $config['system']['harddiskstandby'];
+		// Check for a numeric value
+		if (is_numeric($standby)) {
+			// Sync the disk(s)
+			mwexec('/bin/sync');
+			if (!mwexec('/sbin/sysctl hw.ata.standby=' . ((int)$standby))) {
+				// Reinitialize ATA-drives
+				mwexec('/usr/local/sbin/atareinit');
+				if ($g['booting']) {
+					echo "done\n";
+				}
+			} else if ($g['booting']) {
+				echo "failed\n";
+			}
+		} else if ($g['booting']) {
+			echo "failed\n";
+		}
+	}
 }
 
 ?>

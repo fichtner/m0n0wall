@@ -44,6 +44,7 @@ function captiveportal_configure() {
 		
 		/* kill any running mini_httpd */
 		killbypid("{$g['varrun_path']}/mini_httpd.cp.pid");
+		killbypid("{$g['varrun_path']}/mini_httpd.cps.pid");
 		
 		/* kill any running minicron */
 		killbypid("{$g['varrun_path']}/minicron.pid");
@@ -149,6 +150,29 @@ EOD;
 		/* start web server */
 		mwexec("/usr/local/sbin/mini_httpd -a -M 0 -u root -maxproc 16" .
 			" -p 8000 -i {$g['varrun_path']}/mini_httpd.cp.pid");
+		
+		/* fire up another one for HTTPS if requested */
+		if (isset($config['captiveportal']['httpslogin']) &&
+			$config['captiveportal']['certificate'] && $config['captiveportal']['private-key']) {
+			
+			$cert = base64_decode($config['captiveportal']['certificate']);
+			$key = base64_decode($config['captiveportal']['private-key']);
+			
+			$fd = fopen("{$g['varetc_path']}/cert-portal.pem", "w");
+			if (!$fd) {
+				printf("Error: cannot open cert-portal.pem in system_webgui_start().\n");
+				return 1;
+			}
+			chmod("{$g['varetc_path']}/cert-portal.pem", 0600);
+			fwrite($fd, $cert);
+			fwrite($fd, "\n");
+			fwrite($fd, $key);
+			fclose($fd);
+			
+			mwexec("/usr/local/sbin/mini_httpd -S -a -M 0 -E {$g['varetc_path']}/cert-portal.pem" .
+				" -u root -maxproc 16 -p 8001" .
+				" -i {$g['varrun_path']}/mini_httpd.cps.pid");
+		}
 			
 		/* start pruning process (interval = 60 seconds) */
 		mwexec("/usr/local/bin/minicron 60 {$g['varrun_path']}/minicron.pid " .
@@ -247,6 +271,22 @@ add 1204 set 1 pass icmp from any to $cpip in icmptype 0
 # allow access to our DNS forwarder
 add 1300 set 1 pass udp from any to $cpip 53 in
 add 1301 set 1 pass udp from $cpip 53 to any out
+
+# allow access to our web server
+add 1302 set 1 pass tcp from any to $cpip 8000 in
+add 1303 set 1 pass tcp from $cpip 8000 to any out
+
+EOD;
+
+	if (isset($config['captiveportal']['httpslogin'])) {
+		$cprules .= <<<EOD
+add 1304 set 1 pass tcp from any to $cpip 8001 in
+add 1305 set 1 pass tcp from $cpip 8001 to any out
+
+EOD;
+	}
+	
+	$cprules .= <<<EOD
 
 # ... 10000-19899: rules per authenticated client go here...
 

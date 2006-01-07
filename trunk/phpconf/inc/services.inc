@@ -89,10 +89,15 @@ EOD;
 		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
 		
 		$dnscfg = "";
+		
+		if ($dhcpifconf['domain']) {
+			$dnscfg .= "	option domain-name \"{$dhcpifconf['domain']}\";\n";
+		}
+		
 		if (isset($config['dnsmasq']['enable'])) {
-			$dnscfg = "option domain-name-servers " . $ifcfg['ipaddr'] . ";";
+			$dnscfg .= "	option domain-name-servers " . $ifcfg['ipaddr'] . ";";
 		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-			$dnscfg = "option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
+			$dnscfg .= "	option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
 		}
 
 		$dhcpdconf .= "subnet $subnet netmask $subnetmask {\n";
@@ -100,11 +105,16 @@ EOD;
 		if (isset($dhcpifconf['denyunknown'])) 
 		   $dhcpdconf .= "		deny unknown clients;\n";
 		
+		if ($dhcpifconf['gateway'])
+			$routers = $dhcpifconf['gateway'];
+		else
+			$routers = $ifcfg['ipaddr'];
+		
 		$dhcpdconf .= <<<EOD
 		range {$dhcpifconf['range']['from']} {$dhcpifconf['range']['to']};
 	}
-	option routers {$ifcfg['ipaddr']};
-	$dnscfg
+	option routers {$routers};
+$dnscfg
 
 EOD;
 
@@ -117,6 +127,11 @@ EOD;
 			$dhcpdconf .= "	option netbios-name-servers " . join(",", $dhcpifconf['winsserver']) . ";\n";
 			$dhcpdconf .= "	option netbios-node-type 8;\n";
 		}
+		
+		if ($dhcpifconf['next-server'])
+			$dhcpdconf .= "	next-server {$dhcpifconf['next-server']};\n";
+		if ($dhcpifconf['filename'])
+			$dhcpdconf .= "	filename \"{$dhcpifconf['filename']}\";\n";
 			
 		$dhcpdconf .= <<<EOD
 }

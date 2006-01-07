@@ -32,8 +32,8 @@
 /* tags that are always to be handled as lists */
 $listtags = explode(" ", "rule user key dnsserver winsserver " .
 	"encryption-algorithm-option hash-algorithm-option hosts tunnel onetoone " .
-	"staticmap route alias pipe queue shellcmd mobilekey servernat " .
-	"proxyarpnet passthrumac allowedip wolentry vlan");
+	"staticmap route alias pipe queue shellcmd earlyshellcmd mobilekey " .
+	"servernat proxyarpnet passthrumac allowedip wolentry vlan");
 
 function startElement($parser, $name, $attrs) {
 	global $depth, $curpath, $config, $havedata, $listtags;
