@@ -167,6 +167,7 @@ EOD;
 		portal_reply_page($redirurl, "error");
 	}
 } else if ($_POST['accept'] && $clientip) {
+	captiveportal_logportalauth("unauthenticated",$clientmac,$clientip,"ACCEPT");
 	portal_allow($clientip, $clientmac, "unauthenticated");
 } else {
 	/* display captive portal page */
