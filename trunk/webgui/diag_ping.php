@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "Ping");
+$pgtitle = array("Diagnostics", "Ping/Traceroute");
 require("guiconfig.inc");
 
 define('MAX_COUNT', 10);
@@ -85,6 +85,15 @@ function get_interface_addr($ifdescr) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+  <ul id="tabnav">
+	<li class="tabact">Ping</li>
+	<li class="tabinact"><a href="diag_traceroute.php">Traceroute</a></li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 			<form action="diag_ping.php" method="post" name="iform" id="iform">
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -144,4 +153,5 @@ function get_interface_addr($ifdescr) {
 				</tr>
 			</table>
 </form>
+</td></tr></table>
 <?php include("fend.inc"); ?>

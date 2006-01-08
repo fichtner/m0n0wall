@@ -375,7 +375,7 @@ function services_dnsmasq_configure() {
 		
 		if (isset($config['dnsmasq']['domainoverrides']) && is_array($config['dnsmasq']['domainoverrides'])) {
 			foreach($config['dnsmasq']['domainoverrides'] as $override) {
-				$args .= escapeshellarg(' --server=/' . $override['domain'] . '/' . $override['ip']);
+				$args .= " " . escapeshellarg('--server=/' . $override['domain'] . '/' . $override['ip']);
 			}
 		}
 

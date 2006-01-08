@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "Traceroute");
+$pgtitle = array("Diagnostics", "Ping/Traceroute");
 require("guiconfig.inc");
 
 
@@ -53,16 +53,26 @@ if ($_POST) {
 		$do_traceroute = true;
 		$host = $_POST['host'];
 		$ttl = $_POST['ttl'];
-
+		$resolve = $_POST['resolve'];
 	}
 }
 if (!isset($do_traceroute)) {
 	$do_traceroute = false;
 	$host = '';
 	$ttl = DEFAULT_TTL;
+	$resolve = false;
 }
 ?>
 <?php include("fbegin.inc"); ?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+  <ul id="tabnav">
+	<li class="tabinact"><a href="diag_ping.php">Ping</a></li>
+	<li class="tabact">Traceroute</li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 			<form action="diag_traceroute.php" method="post" name="iform" id="iform">
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -80,6 +90,12 @@ if (!isset($do_traceroute)) {
 					<?php endfor; ?>
 					</select></td>
 				</tr>
+				  <tr> 
+					<td valign="top" class="vtable">&nbsp;</td>
+					<td class="vtable"> <input name="resolve" type="checkbox" id="resolve" value="yes" <?php if ($resolve) echo "checked"; ?>>
+					  <strong>Resolve IP addresses to hostnames</strong><br>
+					</td>
+				  </tr>
 				<tr>
 				  <td width="22%" valign="top">&nbsp;</td>
 				  <td width="78%"> 
@@ -93,7 +109,7 @@ if (!isset($do_traceroute)) {
 					echo("<br><strong>Traceroute output:</strong><br>");
 					echo('<pre>');
 					ob_end_flush();
-					system("/usr/sbin/traceroute -w 2 -m " . escapeshellarg($ttl) . " " . escapeshellarg($host));
+					system("/usr/sbin/traceroute " . ($resolve ? "" : "-n ") . "-w 2 -m " . escapeshellarg($ttl) . " " . escapeshellarg($host));
 					echo('</pre>');
 				}
 				?>
@@ -101,4 +117,5 @@ if (!isset($do_traceroute)) {
 				</tr>
 			</table>
 </form>
+</td></tr></table>
 <?php include("fend.inc"); ?>

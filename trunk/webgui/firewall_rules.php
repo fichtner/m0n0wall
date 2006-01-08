@@ -161,10 +161,15 @@ function fr_bgcolor(id) {
 }
 function fr_insline(id, on) {
 	var row = document.getElementById('fr' + id);
+	var prevrow;
 	if (id != 0) {
-		var prevrow = document.getElementById('fr' + (id-1));
+		prevrow = document.getElementById('fr' + (id-1));
 	} else {
-		var prevrow = document.getElementById('frheader');
+		if (<?php if (($if == "wan") && isset($config['interfaces']['wan']['blockpriv'])) echo "true"; else echo "false"; ?>) {
+			prevrow = document.getElementById('frrfc1918');
+		} else {
+			prevrow = document.getElementById('frheader');
+		}
 	}
 	
 	var cells = row.getElementsByTagName("td");
@@ -224,6 +229,30 @@ function fr_insline(id, on) {
                   <td width="22%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
+<?php if (($if == "wan") && isset($config['interfaces']['wan']['blockpriv'])): ?>
+                <tr valign="top" id="frrfc1918">
+                  <td class="listt"></td>
+                  <td class="listt" align="center"><img src="block.gif" width="11" height="11" border="0"></td>
+                  <td class="listlr" style="background-color: #e0e0e0">*</td>
+                  <td class="listr" style="background-color: #e0e0e0">RFC 1918 networks</td>
+                  <td class="listr" style="background-color: #e0e0e0">*</td>
+                  <td class="listr" style="background-color: #e0e0e0">*</td>
+                  <td class="listr" style="background-color: #e0e0e0">*</td>
+                  <td class="listbg" style="background-color: #e0e0e0">Block private networks</td>
+                  <td valign="middle" nowrap class="list">
+				    <table border="0" cellspacing="0" cellpadding="1">
+					<tr>
+					  <td><img src="left_d.gif" width="17" height="17" title="move selected rules before this rule"></td>
+					  <td><a href="interfaces_wan.php#rfc1918"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+					</tr>
+					<tr>
+					  <td align="center" valign="middle"></td>
+					  <td><img src="plus_d.gif" title="add a new rule based on this one" width="17" height="17" border="0"></td>
+					</tr>
+					</table>
+				  </td>
+				</tr>
+<?php endif; ?>
 				<?php $nrules = 0; for ($i = 0; isset($a_filter[$i]); $i++):
 					$filterent = $a_filter[$i];
 					if ($filterent['interface'] != $if)

@@ -62,9 +62,6 @@
 	
 	/* reconfigure IPsec tunnels */
 	vpn_ipsec_configure(true);
- 	
-	/* reconfigure OpenVPN tunnels */
-	ovpn_configure(true);
 	
 	/* regenerate resolv.conf if DNS overrides are allowed or the BigPond
 	   client is enabled */

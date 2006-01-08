@@ -104,13 +104,9 @@ function showhide(tspan, tri) {
               <strong>VPN</strong><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_ipsec.php" class="navlnk">IPsec</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_pptp.php" class="navlnk">PPTP</a><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_openvpn_srv.php" class="navlnk">OpenVPN</a><br>
               <strong>Status</strong><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/index.php" class="navlnk">System</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_interfaces.php" class="navlnk">Interfaces</a><br>
-			  <?php if (is_array($config['ovpn']['server']['tunnel'])): ?>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_ovpn.php" class="navlnk">OpenVPN</a><br>
-	      	  <?php endif; ?>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_graph.php" class="navlnk">Traffic graph</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_wireless.php" class="navlnk">Wireless</a><br>
 			  <?php if (isset($config['captiveportal']['enable'])): ?>
@@ -143,8 +139,7 @@ endif;
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_logs.php" class="navlnk">Logs</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_dhcp_leases.php" class="navlnk">DHCP leases</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ipsec_sad.php" class="navlnk">IPsec</a><br>
-				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ping.php" class="navlnk">Ping</a><br>
-				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_traceroute.php" class="navlnk">Traceroute</a><br>
+				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ping.php" class="navlnk">Ping/Traceroute</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_arp.php" class="navlnk">ARP table</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ipfstat.php" class="navlnk">Firewall states</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_resetstate.php" class="navlnk">Reset state</a><br>

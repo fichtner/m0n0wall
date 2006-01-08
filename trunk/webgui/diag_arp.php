@@ -32,7 +32,31 @@
 $pgtitle = array("Diagnostics", "ARP table");
 require("guiconfig.inc");
 
+$id = $_GET['id'];
+if (isset($_POST['id']))
+        $id = $_POST['id'];
+
+if ($_GET['act'] == "del") {
+	if (isset($id)) {
+		/* remove arp entry from arp table */
+		mwexec("/usr/sbin/arp -d " . escapeshellarg($id));
+
+		/* redirect to avoid reposting form data on refresh */
+		header("Location: diag_arp.php");
+		exit;
+	} else {
+		/* remove all entries from arp table */
+		mwexec("/usr/sbin/arp -d -a");
+
+		/* redirect to avoid reposting form data on refresh */
+		header("Location: diag_arp.php");
+		exit;
+	}
+}
+
+$resolve = isset($config['syslog']['resolve']);
 ?>
+
 <?php include("fbegin.inc"); ?>
 
 <?php
@@ -166,14 +190,16 @@ foreach ($rawdata as $line) {
 
 function getHostName($mac,$ip)
 {
-	global $dhcpmac, $dhcpip;
+	global $dhcpmac, $dhcpip, $resolve;
 	
 	if ($dhcpmac[$mac])
 		return $dhcpmac[$mac];
 	else if ($dhcpip[$ip])
 		return $dhcpip[$ip];
-	else 
-		return "&nbsp;";	
+	else if ($resolve) 
+		return gethostbyaddr($ip);
+	else
+		return "&nbsp;";
 }
 
 ?>
@@ -186,14 +212,31 @@ function getHostName($mac,$ip)
     <td class="listhdr">Interface</td>
     <td class="list"></td>
   </tr>
-<?php foreach ($data as $entry): ?>
+<?php $i = 0; foreach ($data as $entry): ?>
   <tr>
     <td class="listlr"><?=$entry['ip'];?></td>
     <td class="listr"><?=$entry['mac'];?></td>
     <td class="listr"><?=getHostName($entry['mac'], $entry['ip']);?></td>
     <td class="listr"><?=$hwif[$entry['interface']];?></td>
+    <td valign="middle" nowrap class="list"><a href="diag_arp.php?act=del&id=<?=$entry['ip'];?>"><img src="x.gif" title="delete arp entry" width="17" height="17" border="0"></a></td>
   </tr>
-<?php endforeach; ?>
+<?php $i++; endforeach; ?>
+  <tr> 
+    <td></td>
+  </tr> 
+  <tr> 
+    <td class="list" colspan="4"></td>
+    <td class="list"><a href="diag_arp.php?act=del"><img src="x.gif" title="remove all entries from arp table" width="17" height="17" border="0"></a></td>
+  </tr>
+  <tr>
+    <td colspan="4">
+      <span class="vexpl"><span class="red"><strong>Hint:<br>
+      </strong></span>IP addresses are resolved to hostnames if
+      &quot;Resolve IP addresses to hostnames&quot; 
+      is checked on the <a href="diag_logs_settings.php">
+      Diagnostics: Logs</a> page.</span>
+    </td>
+  </tr>
 </table>
 
 <?php include("fend.inc"); ?>

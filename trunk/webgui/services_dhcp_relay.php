@@ -62,7 +62,7 @@ $iflist = array("lan" => "LAN");
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 	$oc = $config['interfaces']['opt' . $i];
 	
-	if (isset($oc['enable']) && $oc['if'] && (!$oc['bridge']) && (!$oc['ovpn'])) {
+	if (isset($oc['enable']) && $oc['if'] && (!$oc['bridge'])) {
 		$iflist['opt' . $i] = $oc['descr'];
 	}
 }

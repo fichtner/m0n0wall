@@ -235,12 +235,6 @@ function interfaces_optional_configure_if($opti) {
 				$cmd .= " mediaopt " . escapeshellarg($optcfg['mediaopt']);
 			mwexec($cmd);
 		}
-		
-		/* OpenVPN configuration? */
- 		if (isset($optcfg['ovpn'])) {
- 			if (strstr($if, "tap"))
- 				ovpn_link_tap();
- 		}
 	
 		$addflags = "";
 		if (strpos($optcfg['if'], "fxp") !== false)
@@ -533,10 +527,17 @@ pppoe:
 EOD;
 	
 	if (isset($pppoecfg['ondemand'])) {
-		$mpdconf .= <<<EOD
-	set iface addrs 10.0.0.1 10.0.0.2
+		if (isset($pppoecfg['local-ip']) && isset($pppoecfg['remote-ip'])) {
+			$mpdconf .= <<<EOD
+	set iface addrs {$pppoecfg['local-ip']} {$pppoecfg['remote-ip']}
 
 EOD;
+		} else {
+			$mpdconf .= <<<EOD
+	set iface addrs 192.0.2.112 192.0.2.113
+
+EOD;
+		}
 	}
 	
 	$mpdconf .= <<<EOD
@@ -557,9 +558,14 @@ EOD;
 	if (isset($config['system']['dnsallowoverride'])) {
 		$mpdconf .= <<<EOD
 	set ipcp enable req-pri-dns
+
+EOD;
+		if (!isset($config['pppoe']['dnsnosec'])) {
+			$mpdconf .= <<<EOD
 	set ipcp enable req-sec-dns
 
 EOD;
+		}
 	}
 	
 	$mpdconf .= <<<EOD

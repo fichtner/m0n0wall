@@ -87,9 +87,6 @@
 	
 	/* set up Optional interfaces */
 	interfaces_optional_configure();
-		
-	/* start OpenVPN server & clients */
-	ovpn_configure(false);
 	
 	/* resync ipfilter */
 	filter_resync();

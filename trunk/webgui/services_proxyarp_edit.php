@@ -168,7 +168,6 @@ function typesel_change() {
 					<select name="interface" class="formfld">
                       <?php $interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-					  	if (!isset($config['interfaces']['opt' . $i]['ovpn']))
 							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 					  }
 					  foreach ($interfaces as $iface => $ifacename): ?>

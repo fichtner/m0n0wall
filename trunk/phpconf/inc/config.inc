@@ -519,6 +519,38 @@ function convert_config() {
 		$config['version'] = "1.5";
 	}
 	
+	/* convert 1.5 -> 1.6 */
+	if ($config['version'] == "1.5") {
+	
+		/* Remove OpenVPN configuration */
+		unset($config['ovpn']);
+		
+		/* Remove OpenVPN interfaces */
+		for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+			if (isset($config['interfaces']['opt' . $i]['ovpn'])) {
+			
+				unset($config['interfaces']['opt' . $i]);
+
+				/* shift down other OPTn interfaces to get rid of holes */
+				$j = $i + 1;
+				
+				/* look at the following OPTn ports */
+				while (is_array($config['interfaces']['opt' . $j])) {
+					$config['interfaces']['opt' . ($j - 1)] =
+						$config['interfaces']['opt' . $j];
+					
+					if ($config['interfaces']['opt' . ($j - 1)]['descr'] == "OPT" . $j)
+						$config['interfaces']['opt' . ($j - 1)]['descr'] = "OPT" . ($j - 1);
+					
+					unset($config['interfaces']['opt' . $j]);
+					$j++;
+				}
+			}
+		}
+
+		$config['version'] = "1.6";
+	}
+	
 	write_config();
 	
 	if ($g['booting'])

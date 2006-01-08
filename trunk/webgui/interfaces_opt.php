@@ -47,8 +47,6 @@ $pconfig['ipaddr'] = $optcfg['ipaddr'];
 $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
 
-$pgtitle = array("Interfaces", "Optional $index (" . htmlspecialchars($optcfg['descr']) . ")");
-
 /* Wireless interface? */
 if (isset($optcfg['wireless'])) {
 	require("interfaces_wlan.inc");
@@ -124,7 +122,7 @@ if ($_POST) {
 		$optcfg['subnet'] = $_POST['subnet'];
 		$optcfg['bridge'] = $_POST['bridge'];
 		$optcfg['enable'] = $_POST['enable'] ? true : false;
-			
+
 		write_config();
 		
 		$retval = 0;
@@ -142,13 +140,42 @@ if ($_POST) {
 		$savemsg = get_std_save_message($retval);
 	}
 }
+
+$pgtitle = array("Interfaces", "Optional $index (" . htmlspecialchars($optcfg['descr']) . ")");
 ?>
+
 <?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
 	var endis;
-	endis = !((document.iform.bridge.selectedIndex == 0) || enable_over);
+	endis = !(document.iform.enable.checked || enable_over);
+	document.iform.descr.disabled = endis;
+	document.iform.ipaddr.disabled = endis;
+	document.iform.subnet.disabled = endis;
+	document.iform.bridge.disabled = endis;
+
+	if (document.iform.mode) {
+		 document.iform.mode.disabled = endis;
+		 document.iform.ssid.disabled = endis;
+		 document.iform.channel.disabled = endis;
+		 document.iform.stationname.disabled = endis;
+		 document.iform.wep_enable.disabled = endis;
+		 document.iform.key1.disabled = endis;
+		 document.iform.key2.disabled = endis;
+		 document.iform.key3.disabled = endis;
+		 document.iform.key4.disabled = endis;
+	}
+}
+function bridge_change(enable_over) {
+	var endis;
+
+	if (document.iform.enable.checked || enable_over) {
+		endis = !((document.iform.bridge.selectedIndex == 0) || enable_over);
+	} else {
+		endis = true;
+	}
+
 	document.iform.ipaddr.disabled = endis;
 	document.iform.subnet.disabled = endis;
 }
@@ -183,7 +210,7 @@ function ipaddr_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
-<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)">
+<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false);bridge_change(false)">
                     <strong>Enable Optional <?=$index;?> interface</strong></td>
 				</tr>
                 <tr> 
@@ -202,7 +229,7 @@ function ipaddr_change() {
 				<tr> 
                   <td width="22%" valign="top" class="vncellreq">Bridge with</td>
                   <td width="78%" class="vtable">
-					<select name="bridge" class="formfld" id="bridge" onChange="enable_change(false)">
+					<select name="bridge" class="formfld" id="bridge" onChange="bridge_change(false)">
 				  	<option <?php if (!$pconfig['bridge']) echo "selected";?> value="">none</option>
                       <?php $opts = array('lan' => "LAN", 'wan' => "WAN");
 					  	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
@@ -237,7 +264,7 @@ function ipaddr_change() {
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
                     <input name="index" type="hidden" value="<?=$index;?>"> 
-				  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
+				  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true);bridge_change(true)"> 
                   </td>
                 </tr>
                 <tr> 
@@ -255,6 +282,7 @@ function ipaddr_change() {
 <script language="JavaScript">
 <!--
 enable_change(false);
+bridge_change(false);
 //-->
 </script>
 <?php else: ?>

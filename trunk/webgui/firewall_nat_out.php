@@ -106,7 +106,10 @@ if ($_GET['act'] == "del") {
                       rules will be automatically generated anymore. Instead, only the mappings
                       you specify below will be used. With advanced outbound NAT disabled,
                       a mapping is automatically created for each interface's subnet
-                      (except WAN).</span> If you use target addresses other than the WAN interface's IP address, then depending on<span class="vexpl"> the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span><br>
+                      (except WAN) and any mappings specified below will be ignored.</span>
+                      If you use target addresses other than the WAN interface's IP address,
+                      then depending on<span class="vexpl"> the way your WAN connection is setup,
+                      you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span><br>
                       <br>
                       You may enter your own mappings below.</p>
                     </td>

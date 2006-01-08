@@ -80,7 +80,7 @@ require("guiconfig.inc");
               <br>
               Peter Allgeyer (<a href="mailto:allgeyer@web.de">allgeyer@web.de</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules; dial-on-demand; WAN connect/disconnect; auto-add proxy ARP </font></em><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">firewall log filtering; DynDNS server/port; OpenVPN improvements</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">firewall log filtering; DynDNS server/port; Diag: ARP improvements</font></em><br>
               <br>
               Thierry Lechat (<a href="mailto:dev@lechat.org">dev@lechat.org</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SVG-based traffic grapher</font></em><br>
@@ -110,9 +110,6 @@ require("guiconfig.inc");
               Audun Larsen (<a href="mailto:larsen@xqus.com">larsen@xqus.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CPU/memory usage display</font></em><br>
 			  <br>
-              Peter Curran (<a href="mailto:peter@closeconsultants.com">peter@closeconsultants.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">OpenVPN support</font></em><br>
-			  <br>
               Pavel A. Grodek (<a href="mailto:pg@abletools.com">pg@abletools.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Traffic shaper packet loss rate/queue size</font></em><br>
 			  <br>
@@ -134,8 +131,11 @@ require("guiconfig.inc");
               Joe Suhre (<a href="mailto:jsuhre@nullconcepts.com">jsuhre@nullconcepts.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">DNS forwarder domain overriding</font></em><br>
 			  <br>
-              Paul Taylor (<a href="mailto:paultaylor@winndixie.com">paultaylor@winndixie.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ARP table, Traceroute and Filter state pages</font></em></p>
+              Paul Taylor (<a href="mailto:paultaylor@winn-dixie.com">paultaylor@winn-dixie.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ARP table, Traceroute and Filter state pages</font></em><br>
+			  <br>
+              Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal RADIUS accounting gigawords</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

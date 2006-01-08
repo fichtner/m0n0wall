@@ -554,7 +554,7 @@ function system_set_harddisk_standby() {
 		if (is_numeric($standby)) {
 			// Sync the disk(s)
 			mwexec('/bin/sync');
-			if (!mwexec('/sbin/sysctl hw.ata.suspend=' . ((int)$standby))) {
+			if (!mwexec('/sbin/sysctl hw.ata.suspend=' . ((int)$standby*60))) {
 				// Reinitialize ATA-drives
 				mwexec('/usr/local/sbin/atareinit');
 				if ($g['booting']) {

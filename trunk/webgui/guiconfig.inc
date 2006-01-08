@@ -56,8 +56,6 @@ $d_firmwarelock_path = $g['varrun_path'] . "/firmware.lock";
 $d_sysrebootreqd_path = $g['varrun_path'] . "/sysreboot.reqd";
 $d_passthrumacsdirty_path = $g['varrun_path'] . "/passthrumacs.dirty";
 $d_allowedipsdirty_path = $g['varrun_path'] . "/allowedips.dirty";
-$d_ovpnclidirty_path = $g['varrun_path'] . "/ovpnclient.dirty";
-$d_ovpnsrvdirty_path = $g['varrun_path'] . "/ovpnserver.dirty";
 
 if (file_exists($d_firmwarelock_path)) {
 	if (!$d_isfwfile) {

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- m0n0wall default system configuration -->
 <m0n0wall>
-	<version>1.5</version>
+	<version>1.6</version>
 	<lastchange></lastchange>
 	<system>
 		<hostname>m0n0wall</hostname>
@@ -114,6 +114,7 @@
 		<!--
 		<ondemand/>
 		<timeout></timeout>
+		<dnsnosec/>
 		-->
 	</pppoe>
 	<pptp>
@@ -124,6 +125,8 @@
 		<remote></remote>
 		<!--
 		<ondemand/>
+		<local-ip></local-ip>
+		<remote-ip></remote-ip>
 		<timeout></timeout>
 		-->
 	</pptp>
@@ -198,51 +201,6 @@
 		</user>
 		-->
 	</pptpd>
-	<ovpn>
-		<!--
-		<server>
-			<enable/>
-			<ca_cert></ca_cert>
-			<srv_cert></srv_cert>
-			<srv_key></srv_key>
-			<dh_param></dh_param>
-			<verb></verb>
-			<tun_iface></tun_iface>
-			<port></port>
-			<bind_iface></bind_iface>
-			<cli2cli/>
-			<maxcli></maxcli>
-			<prefix></prefix>
-			<ipblock></ipblock>
-			<crypto></crypto>
-			<dupcn/>
-			<psh_options>
-				<redir></redir>
-				<redir_loc></redir_loc>
-				<rte_delay></rte_delay>
-				<ping></ping>
-				<pingrst></pingrst>
-				<pingexit></pingexit>
-				<inact></inact>
-			</psh_options>
-		</server>
-		<client>
-			<tunnel></tunnel>
-			<ca_cert></ca_cert>
-			<cli_cert></cli_cert>
-			<cli_key></cli_key>
-			<type></type>
-			<tunnel>
-				<if></if>
-				<proto></proto>
-				<cport></cport>
-				<saddr></saddr>
-				<sport></sport>
-				<crypto></crypto>
-			</tunnel>
-		</client>
-		-->
-	</ovpn>
 	<dnsmasq>
 		<enable/>
 		<!--

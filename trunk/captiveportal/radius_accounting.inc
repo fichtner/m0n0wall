@@ -32,6 +32,13 @@
 	// * now sends Framed-IP-Address (client IP)
 	// * now sends Called-Station-ID (NAS IP)
 	// * now sends Calling-Station-ID (client IP)
+
+	// This version of radius_accounting.inc has been modified by
+	// Jonathan De Graeve <jonathan@imelda.be>. Changes made include:
+	// - RFC2869 (Radius Extensions)
+	// * now sends Acct-Input-Gigawords
+	// * now sends Acct-Output-Gigawords
+
 */
 
 function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$radiuskey,$clientip) {
@@ -59,6 +66,9 @@ function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$rad
 
 	if ($debug)
 	    echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
+
+	/* Initialise rand function, make it more random */
+	srand((double)microtime() * 1000000);
 
 	$thisidentifier=rand()%256;
 
@@ -135,7 +145,7 @@ function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$rad
 	// See RFC2866 for this.
 }
 
-function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$interimupdate=false) {
+function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$interimupdate=false, $radius_term_cause = 1) {
 	$sharedsecret=$radiuskey ;
 	# $debug = 1 ;
 
@@ -143,17 +153,19 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	if(!$nasHostname[0])
 		$nasHostname[0] = "quewall" ;
 
-	$input_pkts = $input_bytes = $output_pkts = $output_bytes = 0 ;
+	$input_pkts = $input_bytes = $input_gigawords = $output_pkts = $output_bytes = $output_gigawords = 0 ;
 
 	exec("/sbin/ipfw show {$ruleno}", $ipfw) ;	
 	preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[0], $matches) ;
 	$input_pkts = $matches[2] ;
-	$input_bytes = $matches[3] ;
+	$input_bytes = remainder($matches[3]) ;
+	$input_gigawords = gigawords($matches[3]) ;
 
 	unset($matches) ;
 	preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[1], $matches) ;
 	$output_pkts = $matches[2] ;
-	$output_bytes = $matches[3] ;
+	$output_bytes = remainder($matches[3]) ;
+	$output_gigawords = gigawords($matches[3]) ;
 
 	$fd = @fsockopen("udp://$radiusip",$radiusport,$errno,$errstr,3) ;
 	if(!$fd) 
@@ -173,6 +185,9 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	if ($debug)
 	    echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
 
+	/* Initialise rand function, make it more random */
+	srand((double)microtime() * 1000000);
+
 	$thisidentifier=rand()%256;
 
 	$length=4+				// header
@@ -189,8 +204,10 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		6+				// Session time
 		6+				// input bytes
 		6+				// input packets
+		6+				// input gigawords
 		6+				// output bytes
 		6+				// output packets
+		6+				// output gigawords
 		2+strlen($nas_ip_address)+		//Called-Station-ID
 		2+strlen($clientip)+	//Calling-Station-ID
 
@@ -201,9 +218,9 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	else
 		$acctstatustype = 2;
 
-	//          v   v   v     v   v   v     v     v     v     1   1  1  1  1  1  1  v
-	// Line #   1   2   3     4   5   6     7     8     9     0   1  2  3  4  5  6  E
-	$data=pack("CCCCNNNNCCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
+	//          v   v   v     v   v   v     v     v     v     1   1  1  1  1  1  1  1  1  v
+	// Line #   1   2   3     4   5   6     7     8     9     0   1  2  3  4  5  6  7  8  E
+	$data=pack("CCCCNNNNCCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
 	    4,$thisidentifier,$length/256,$length%256,		// header
 	    0,0,0,0,						// authcode
 	    6,6,0,0,0,1,					// service type
@@ -214,12 +231,14 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
-		49,6,1,		// Acct Terminate = User Request
+		49,6,$radius_term_cause,		// Acct Terminate = User Request
 		46,6,time() - $start_time,			// Session Time
 		42,6,$input_bytes,	// Input Octets
 		47,6,$input_pkts,	// Input Packets
+		52,6,$input_gigawords,	// Input Gigawords
 		43,6,$output_bytes, // Output Octets
 		48,6,$output_pkts,	// Output Packets
+		53,6,$output_gigawords,	// Output Gigawords
 		30,2+strlen($nas_ip_address),$nas_ip_address,	//Called-Station-ID
 		31,2+strlen($clientip),$clientip,				//Calling-Station-ID
 
@@ -229,9 +248,9 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	/* Generate Accounting Request Authenticator */
 	$RA = md5($data.$radiuskey) ;
 
-	//          v   v v     v   v   v     v     v     v     1   1  1  1  1  1  1  v
-	// Line #   1   2 3     4   5   6     7     8     9     0   1  2  3  4  5  6  E
-	$data=pack("CCCCH*CCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
+	//          v   v v     v   v   v     v     v     v     1   1  1  1  1  1  1  1  1  v
+	// Line #   1   2 3     4   5   6     7     8     9     0   1  2  3  4  5  6  7  8  E
+	$data=pack("CCCCH*CCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
 	    4,$thisidentifier,$length/256,$length%256,		// header
 	    $RA,						// authcode
 	    6,6,0,0,0,1,					// service type
@@ -242,12 +261,14 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
-		49,6,1,		// Acct Terminate = User Request
+		49,6,$radius_term_cause,		// Acct Terminate = User Request
 		46,6,time() - $start_time,			// Session Time
 		42,6,$input_bytes,	// Input Octets
 		47,6,$input_pkts,	// Input Packets
+		52,6,$input_gigawords,	// Input Gigawords
 		43,6,$output_bytes, // Output Octets
 		48,6,$output_pkts,	// Output Packets
+		53,6,$output_gigawords,	// Output Gigawords
 		30,2+strlen($nas_ip_address),$nas_ip_address,	//Called-Station-ID
 		31,2+strlen($clientip),$clientip,				//Calling-Station-ID
 
@@ -286,5 +307,22 @@ function get_nas_ip() {
 	/* static WAN IP address */
 	return $config['interfaces']['wan']['ipaddr'];
 }
+
+function gigawords($bytes) {
+
+	/* We use BCMath functions since normal integers don't work with so large numbers */
+	$gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 2147483647) ;
+
+	return $gigawords;
+}
+
+function remainder($bytes) {
+
+	/* Calculate the bytes we are going to send to the radius. */
+	$bytes = bcmod($bytes, 2147483647);
+
+	return $bytes;
+}
+
 
 ?>
