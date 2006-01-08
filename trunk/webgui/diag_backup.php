@@ -4,7 +4,7 @@
 	diag_backup.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,10 @@ if ($_POST) {
 					system_reboot();
 					$savemsg = "The configuration has been restored. The firewall is now rebooting.";
 				} else {
-					$input_errors[] = "The configuration could not be restored.";
+					$errstr = "The configuration could not be restored.";
+					if ($xmlerr)
+						$errstr .= " (XML error: $xmlerr)";
+					$input_errors[] = $errstr;
 				}
 			} else {
 				$input_errors[] = "The configuration could not be restored (file upload error).";

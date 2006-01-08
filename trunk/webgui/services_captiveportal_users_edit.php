@@ -4,7 +4,7 @@
 	services_captiveportal_users_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	Copyright (C) 2005 Pascal Suter <d-monodev@psuter.ch>.
 	All rights reserved. 

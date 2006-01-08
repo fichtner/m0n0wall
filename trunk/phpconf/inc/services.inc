@@ -3,7 +3,7 @@
 	services.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -417,6 +417,10 @@ syscontact "{$config['snmpd']['syscontact']}"
 rocommunity "{$config['snmpd']['rocommunity']}"
 
 EOD;
+
+		if (isset($config['snmpd']['bindlan'])) {
+			$snmpdconf .= "agentaddress udp:161@{$config['interfaces']['lan']['ipaddr']}\n";
+		}
 
 		fwrite($fd, $snmpdconf);
 		fclose($fd);

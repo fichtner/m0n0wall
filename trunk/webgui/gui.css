@@ -44,6 +44,15 @@ p {
 	font-size: 10px;
 	font-weight: bold;
 }
+.formbtns {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	font-weight: bold;
+}
+textarea.notes {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
 .vvcell {
 	background-color: #FFFFC6;
 }
@@ -253,6 +262,17 @@ a {
 	padding-left: 6px;
 	padding-top: 2px;
 	padding-bottom: 2px;
+}
+.optsect_t2 {
+	border-right: 1px solid #999999;
+	background-color: #435370;
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	font-size: 11px;
+	color: #FFFFFF;
+	font-weight: bold;
 }
 .optsect_s {
 	font-size: 11px;

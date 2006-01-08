@@ -3,7 +3,7 @@
 	interfaces.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -824,6 +824,16 @@ function get_current_wan_address() {
 		/* static WAN IP address */
 		return $wancfg['ipaddr'];
 	}
+}
+
+function get_interface_mac($interface) {
+  
+        /* build interface list with netstat */
+        exec("/usr/bin/netstat -I $interface -nW -f link", $linkinfo);
+        array_shift($linkinfo);
+        $alink = preg_split("/\s+/", $linkinfo[0]);
+        $mac = chop($alink[3]);
+        return $mac;
 }
 
 ?>

@@ -4,7 +4,7 @@
 	functions to parse/dump configuration files in XML format
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 $listtags = explode(" ", "rule user key dnsserver winsserver " .
 	"encryption-algorithm-option hash-algorithm-option hosts tunnel onetoone " .
 	"staticmap route alias pipe queue shellcmd cacert earlyshellcmd mobilekey " .
-	"servernat proxyarpnet passthrumac allowedip wolentry vlan domainoverrides");
+	"servernat proxyarpnet passthrumac allowedip wolentry vlan domainoverrides element");
 
 function startElement($parser, $name, $attrs) {
 	global $depth, $curpath, $config, $havedata, $listtags;
@@ -138,6 +138,8 @@ function parse_xml_config($cffile, $rootobj) {
 	if (!$config[$rootobj]) {
 		die("XML error: no $rootobj object found!\n");
 	}
+	
+	fclose($fp);
 	
 	return $config[$rootobj];
 }

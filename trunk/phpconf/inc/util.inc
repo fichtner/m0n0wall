@@ -3,7 +3,7 @@
 	util.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,11 @@ function sigkillbypid($pidfile, $sig) {
 /* kill a process by name */
 function killbyname($procname) {
 	return mwexec("/usr/bin/killall " . escapeshellarg($procname));
+}
+
+/* kill a process by name */
+function sigkillbyname($procname, $sig) {
+	return mwexec("/usr/bin/killall -{$sig} " . escapeshellarg($procname));
 }
 
 /* return the subnet address given a host address and a subnet bit count */

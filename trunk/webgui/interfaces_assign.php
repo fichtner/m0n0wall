@@ -5,7 +5,7 @@
 	part of m0n0wall (http://m0n0.ch/wall)
 	Written by Jim McBeath based on existing m0n0wall files
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without

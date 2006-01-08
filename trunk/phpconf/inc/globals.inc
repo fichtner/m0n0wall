@@ -3,7 +3,7 @@
     globals.inc
     part of m0n0wall (http://m0n0.ch/wall)
     
-    Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,8 @@ $g = array(
     "cf_conf_path" => "/cf/conf",
     "www_path" => "/usr/local/www",
     "captiveportal_path" => "/usr/local/captiveportal",
+    "captiveportal_element_path" => "/var/db/cpelements",
+    "captiveportal_element_sizelimit" => 262144,
     "xml_rootobj" => "m0n0wall",
     "pppoe_interface" => "ng0",
     "n_pptp_units" => 16,

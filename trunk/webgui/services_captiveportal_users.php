@@ -4,7 +4,7 @@
 	services_captiveportal_users.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	Copyright (C) 2005 Pascal Suter <d-monodev@psuter.ch>.
 	All rights reserved. 
@@ -72,6 +72,7 @@ if ($changed) {
 	<li class="tabinact"><a href="services_captiveportal_mac.php">Pass-through MAC</a></li>
 	<li class="tabinact"><a href="services_captiveportal_ip.php">Allowed IP addresses</a></li>
 	<li class="tabact">Users</li>
+	<li class="tabinact"><a href="services_captiveportal_filemanager.php">File manager</a></li>
   </ul>
   </td></tr>
   <tr>

@@ -30,6 +30,7 @@
 		<!-- <earlyshellcmd></earlyshellcmd> -->
 		<!-- <harddiskstandby></harddiskstandby> -->
 		<!-- <polling/> -->
+		<!-- <notes></notes> -->
 	</system>
 	<interfaces>
 		<lan>
@@ -222,6 +223,7 @@
 		<syslocation></syslocation>
 		<syscontact></syscontact>
 		<rocommunity>public</rocommunity>
+		<!-- <bindlan/> -->
 	</snmpd>
 	<diag>
 		<ipv6nat>
@@ -264,11 +266,18 @@
 		<redirurl></redirurl>
 		<auth_method>none|radius|local</auth_method>
 		<radiusip></radiusip>
+		<radiusip2></radiusip2>
 		<radiusport></radiusport>
+		<radiusport2></radiusport2>
 		<radiuskey></radiuskey>
+		<radiuskey2></radiuskey2>
+		<radiussession_timeout></radiussession_timeout>
 		<nomacfilter/>
 		<reauthenticate/>
 		<reauthenticateacct>stopstart|interimupdate</reauthenticateacct>
+		<maxproc></maxproc>
+		<maxprocperip></maxprocperip>
+		<croninterval></croninterval>
 		
 		<user>
 			<name></name>
@@ -276,6 +285,12 @@
 			<password></password>
 			<expirationdate></expirationdate>
 		</user>
+		
+		<element>
+			<name></name>
+			<size></size>
+			<content></content>
+		</element>
 	</captiveportal>
 	-->
 	<nat>

@@ -4,7 +4,7 @@ $pgtitle = array("License");
 require("guiconfig.inc"); 
 ?>
 <?php include("fbegin.inc"); ?>
-            <p><strong>m0n0wall is Copyright &copy; 2002-2005 by Manuel Kasper 
+            <p><strong>m0n0wall is Copyright &copy; 2002-2006 by Manuel Kasper 
               (<a href="mailto:mk@neon1.net">mk@neon1.net</a>).<br>
               All rights reserved.</strong></p>
             <p> Redistribution and use in source and binary forms, with or without<br>
@@ -133,9 +133,10 @@ require("guiconfig.inc");
 			  <br>
               Paul Taylor (<a href="mailto:paultaylor@winn-dixie.com">paultaylor@winn-dixie.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ARP table, Traceroute and Filter state pages</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: disable concurrent logins, file manager</font></em><br>
 			  <br>
               Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal RADIUS accounting gigawords</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">complete captive portal RADIUS overhaul; file manager</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -200,5 +201,8 @@ All rights reserved.<br>
 			  This product includes software developed by Edwin Groothuis.<br>
 			  <br>
 			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
-			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;
+			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;<br>
+              <br>
+              PHP RADIUS PECL package<br>
+              Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.
 <?php include("fend.inc"); ?>

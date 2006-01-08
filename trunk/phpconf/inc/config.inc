@@ -3,7 +3,7 @@
 	config.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -634,6 +634,9 @@ function config_install($conffile) {
 	if (!file_exists($conffile))
 		return 1;
 
+	if (!config_validate($conffile))
+		return 1;
+
 	config_lock();
 	conf_mount_rw();
 	
@@ -643,6 +646,32 @@ function config_install($conffile) {
 	config_unlock();
 	
 	return 0;
+}
+
+function config_validate($conffile) {
+
+	global $g, $xmlerr;
+
+	$xml_parser = xml_parser_create();
+	
+	if (!($fp = fopen($conffile, "r"))) {
+		$xmlerr = "XML error: unable to open file";
+		return false;
+	}
+	
+	while ($data = fread($fp, 4096)) {
+		if (!xml_parse($xml_parser, $data, feof($fp))) {
+			$xmlerr = sprintf("%s at line %d",
+						xml_error_string(xml_get_error_code($xml_parser)),
+						xml_get_current_line_number($xml_parser));
+			return false;
+		}
+	}
+	xml_parser_free($xml_parser);
+	
+	fclose($fp);
+	
+	return true;
 }
 
 /* lock configuration file, decide that the lock file is stale after

@@ -4,7 +4,7 @@
 	status_captiveportal.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ require("guiconfig.inc");
 <?php
 
 if ($_GET['act'] == "del") {
-	captiveportal_disconnect_client($_GET['id']);
+	captiveportal_disconnect_client($_GET['id'],6);
 }
 
 flush();

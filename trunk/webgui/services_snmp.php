@@ -4,7 +4,7 @@
 	services_snmp.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ $pconfig['syslocation'] = $config['snmpd']['syslocation'];
 $pconfig['syscontact'] = $config['snmpd']['syscontact'];
 $pconfig['rocommunity'] = $config['snmpd']['rocommunity'];
 $pconfig['enable'] = isset($config['snmpd']['enable']);
+$pconfig['bindlan'] = isset($config['snmpd']['bindlan']);
 
 if ($_POST) {
 
@@ -60,6 +61,7 @@ if ($_POST) {
 		$config['snmpd']['syscontact'] = $_POST['syscontact'];
 		$config['snmpd']['rocommunity'] = $_POST['rocommunity'];
 		$config['snmpd']['enable'] = $_POST['enable'] ? true : false;
+		$config['snmpd']['bindlan'] = $_POST['bindlan'] ? true : false;
 			
 		write_config();
 		
@@ -82,6 +84,7 @@ function enable_change(enable_change) {
 	document.iform.syslocation.disabled = endis;
 	document.iform.syscontact.disabled = endis;
 	document.iform.rocommunity.disabled = endis;
+	document.iform.bindlan.disabled = endis;
 }
 //-->
 </script>
@@ -113,6 +116,14 @@ function enable_change(enable_change) {
                     <?=$mandfldhtml;?><input name="rocommunity" type="text" class="formfld" id="rocommunity" size="40" value="<?=htmlspecialchars($pconfig['rocommunity']);?>"> 
                     <br>
                     In most cases, &quot;public&quot; is used here</td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vtable"></td>
+                  <td width="78%" class="vtable"> 
+                    <input name="bindlan" type="checkbox" value="yes" <?php if ($pconfig['bindlan']) echo "checked"; ?>> <strong>Bind to LAN interface only</strong>
+                    <br>
+                    This option can be useful when trying to access the SNMP agent
+                    by the LAN interface's IP address through a VPN tunnel terminated on the WAN interface.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

@@ -3,7 +3,7 @@
 	guiconfig.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -445,6 +445,16 @@ function allowedips_sort() {
 	}
 	
 	usort($config['captiveportal']['allowedip'],"allowedipscmp");
+}
+
+function cpelements_sort() {
+	global $g, $config;
+
+	function cpelementscmp($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
+	usort($config['captiveportal']['element'],"cpelementscmp");
 }
 
 function wol_sort() {

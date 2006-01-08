@@ -4,7 +4,7 @@
 	index.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,16 @@ if ($fd) {
 	fclose($fd);
 }
 
+if ($_POST) {
+	$config['system']['notes'] = base64_encode($_POST['notes']);
+	write_config();
+	header("Location: index.php");
+	exit;
+}
+
 ?>
 <?php include("fbegin.inc"); ?>
+<form action="" method="POST">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr align="center" valign="top"> 
                 <td height="10" colspan="2">&nbsp;</td>
@@ -145,5 +153,13 @@ echo $memUsage . "%";
 ?>
                 </td>
               </tr>
+              <tr> 
+                <td width="25%" class="vncellt" valign="top">Notes</td>
+                <td width="75%" class="listr">
+                  <textarea name="notes" cols="75" rows="7" id="notes" class="notes"><?=htmlspecialchars(base64_decode($config['system']['notes']));?></textarea><br>
+                  <input name="Submit" type="submit" class="formbtns" value="Save">
+                </td>
+              </tr>
             </table>
+</form>
             <?php include("fend.inc"); ?>
