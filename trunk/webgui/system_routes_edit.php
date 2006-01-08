@@ -4,7 +4,7 @@
 	system_routes_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("System", "Static routes", "Edit");
 require("guiconfig.inc");
 
 if (!is_array($config['staticroutes']['route']))
@@ -103,24 +104,14 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("System: Static routes: Edit route");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">System: Static routes: Edit route</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="system_routes_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
-<select name="interface" class="formfld">
+					<select name="interface" class="formfld">
                       <?php $interfaces = array('lan' => 'LAN', 'wan' => 'WAN', 'pptp' => 'PPTP');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
@@ -136,7 +127,7 @@ if ($_POST) {
                 <tr>
                   <td width="22%" valign="top" class="vncellreq">Destination network</td>
                   <td width="78%" class="vtable"> 
-                    <input name="network" type="text" class="formfld" id="network" size="20" value="<?=htmlspecialchars($pconfig['network']);?>"> 
+                    <?=$mandfldhtml;?><input name="network" type="text" class="formfld" id="network" size="20" value="<?=htmlspecialchars($pconfig['network']);?>"> 
 				  / 
                     <select name="network_subnet" class="formfld" id="network_subnet">
                       <?php for ($i = 32; $i >= 1; $i--): ?>
@@ -150,7 +141,7 @@ if ($_POST) {
 				<tr>
                   <td width="22%" valign="top" class="vncellreq">Gateway</td>
                   <td width="78%" class="vtable"> 
-                    <input name="gateway" type="text" class="formfld" id="gateway" size="40" value="<?=htmlspecialchars($pconfig['gateway']);?>">
+                    <?=$mandfldhtml;?><input name="gateway" type="text" class="formfld" id="gateway" size="40" value="<?=htmlspecialchars($pconfig['gateway']);?>">
                     <br> <span class="vexpl">Gateway to be used to reach the destination network</span></td>
                 </tr>
 				<tr>
@@ -172,5 +163,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

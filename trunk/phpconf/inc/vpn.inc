@@ -3,7 +3,7 @@
 	vpn.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,10 @@ function vpn_ipsec_configure($ipchg = false) {
 	mwexec("/usr/sbin/setkey -F");
 	
 	/* prefer old SAs only for 30 seconds, then use the new one */
-	mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");
+	if (!isset($config['ipsec']['preferoldsa']))
+		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");
+	else
+		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=1");
 	
 	if (isset($ipseccfg['enable'])) {
 		
@@ -302,12 +305,14 @@ EOD;
 			/* start racoon */
 			mwexec("/usr/local/sbin/racoon -d -f {$g['varetc_path']}/racoon.conf");
 			
-			foreach ($ipseccfg['tunnel'] as $tunnel) {
-				if (isset($tunnel['auto'])) {
-					$remotehost = substr($tunnel['remote-subnet'],0,strpos($tunnel['remote-subnet'],"/"));
-					$srchost = vpn_endpoint_determine($tunnel, $curwanip);
-					if ($srchost)
-						mwexec_bg("/sbin/ping -c 1 -S {$srchost} {$remotehost}");
+			if (is_array($ipseccfg['tunnel'])) {
+				foreach ($ipseccfg['tunnel'] as $tunnel) {
+					if (isset($tunnel['auto'])) {
+						$remotehost = substr($tunnel['remote-subnet'],0,strpos($tunnel['remote-subnet'],"/"));
+						$srchost = vpn_endpoint_determine($tunnel, $curwanip);
+						if ($srchost)
+							mwexec_bg("/sbin/ping -c 1 -S {$srchost} {$remotehost}");
+					}
 				}
 			}
 		}
@@ -419,7 +424,9 @@ EOD;
 EOD;
 			}
 			
-			if (isset($config['dnsmasq']['enable'])) {
+			if (is_array($pptpdcfg['dnsserver']) && ($pptpdcfg['dnsserver'][0])) {
+				$mpdconf .= "	set ipcp dns " . join(" ", $pptpdcfg['dnsserver']) . "\n";
+			} else if (isset($config['dnsmasq']['enable'])) {
 				$mpdconf .= "	set ipcp dns " . $config['interfaces']['lan']['ipaddr'];
 				if ($syscfg['dnsserver'][0])
 					$mpdconf .= " " . $syscfg['dnsserver'][0];

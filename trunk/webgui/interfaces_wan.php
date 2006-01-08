@@ -4,7 +4,7 @@
 	interfaces_wan.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Interfaces", "WAN");
 require("guiconfig.inc");
 
 $wancfg = &$config['interfaces']['wan'];
@@ -115,6 +116,8 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "BigPond username,BigPond password");
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	}
+	
+	$_POST['spoofmac'] = str_replace("-", ":", $_POST['spoofmac']);
 	
 	if (($_POST['ipaddr'] && !is_ipaddr($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";
@@ -245,12 +248,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Interfaces: WAN");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_change) {
@@ -400,18 +398,13 @@ function type_change(enable_change,enable_change_pptp) {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Interfaces: WAN</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_wan.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td valign="middle"><strong>Type</strong></td>
-                  <td> <select name="type" class="formfld" id="type" onchange="type_change()">
+                  <td><select name="type" class="formfld" id="type" onchange="type_change()">
                       <?php $opts = split(" ", "Static DHCP PPPoE PPTP BigPond");
 				foreach ($opts as $opt): ?>
                       <option <?php if ($opt == $pconfig['type']) echo "selected";?>> 
@@ -454,7 +447,7 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td width="100" valign="top" class="vncellreq">IP address</td>
-                  <td class="vtable"> <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
+                  <td class="vtable"><?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
                     <?php
@@ -472,12 +465,12 @@ function type_change(enable_change,enable_change_pptp) {
                 <tr>
                   <td valign="top" class="vncellreq">Point-to-point IP address </td>
                   <td class="vtable">
-                    <input name="pointtopoint" type="text" class="formfld" id="pointtopoint" size="20" value="<?=htmlspecialchars($pconfig['pointtopoint']);?>">
+                    <?=$mandfldhtml;?><input name="pointtopoint" type="text" class="formfld" id="pointtopoint" size="20" value="<?=htmlspecialchars($pconfig['pointtopoint']);?>">
                   </td>
                 </tr><?php endif; ?>
                 <tr> 
                   <td valign="top" class="vncellreq">Gateway</td>
-                  <td class="vtable"> <input name="gateway" type="text" class="formfld" id="gateway" size="20" value="<?=htmlspecialchars($pconfig['gateway']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="gateway" type="text" class="formfld" id="gateway" size="20" value="<?=htmlspecialchars($pconfig['gateway']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -502,12 +495,12 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>
-                  <td class="vtable"><input name="username" type="text" class="formfld" id="username" size="20" value="<?=htmlspecialchars($pconfig['username']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="username" type="text" class="formfld" id="username" size="20" value="<?=htmlspecialchars($pconfig['username']);?>"> 
                   </td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Password</td>
-                  <td class="vtable"><input name="password" type="text" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="password" type="text" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -537,17 +530,17 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>
-                  <td class="vtable"><input name="pptp_username" type="text" class="formfld" id="pptp_username" size="20" value="<?=htmlspecialchars($pconfig['pptp_username']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_username" type="text" class="formfld" id="pptp_username" size="20" value="<?=htmlspecialchars($pconfig['pptp_username']);?>"> 
                   </td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Password</td>
-                  <td class="vtable"><input name="pptp_password" type="text" class="formfld" id="pptp_password" size="20" value="<?=htmlspecialchars($pconfig['pptp_password']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_password" type="text" class="formfld" id="pptp_password" size="20" value="<?=htmlspecialchars($pconfig['pptp_password']);?>"> 
                   </td>
                 </tr>
                 <tr> 
                   <td width="100" valign="top" class="vncellreq">Local IP address</td>
-                  <td class="vtable"> <input name="pptp_local" type="text" class="formfld" id="pptp_local" size="20" value="<?=htmlspecialchars($pconfig['pptp_local']);?>">
+                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_local" type="text" class="formfld" id="pptp_local" size="20" value="<?=htmlspecialchars($pconfig['pptp_local']);?>">
                     / 
                     <select name="pptp_subnet" class="formfld" id="pptp_subnet">
                       <?php for ($i = 31; $i > 0; $i--): ?>
@@ -559,7 +552,7 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td width="100" valign="top" class="vncellreq">Remote IP address</td>
-                  <td class="vtable"> <input name="pptp_remote" type="text" class="formfld" id="pptp_remote" size="20" value="<?=htmlspecialchars($pconfig['pptp_remote']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_remote" type="text" class="formfld" id="pptp_remote" size="20" value="<?=htmlspecialchars($pconfig['pptp_remote']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -583,12 +576,12 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Username</td>
-                  <td class="vtable"><input name="bigpond_username" type="text" class="formfld" id="bigpond_username" size="20" value="<?=htmlspecialchars($pconfig['bigpond_username']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="bigpond_username" type="text" class="formfld" id="bigpond_username" size="20" value="<?=htmlspecialchars($pconfig['bigpond_username']);?>"> 
                   </td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Password</td>
-                  <td class="vtable"><input name="bigpond_password" type="text" class="formfld" id="bigpond_password" size="20" value="<?=htmlspecialchars($pconfig['bigpond_password']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="bigpond_password" type="text" class="formfld" id="bigpond_password" size="20" value="<?=htmlspecialchars($pconfig['bigpond_password']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -644,5 +637,3 @@ type_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

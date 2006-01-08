@@ -4,7 +4,7 @@
 	services_dhcp_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "DHCP server", "Edit static mapping");
 require("guiconfig.inc");
 
 $if = $_GET['if'];
@@ -55,6 +56,8 @@ if (isset($id) && $a_maps[$id]) {
 	$pconfig['mac'] = $a_maps[$id]['mac'];
 	$pconfig['ipaddr'] = $a_maps[$id]['ipaddr'];
 	$pconfig['descr'] = $a_maps[$id]['descr'];
+} else {
+	$pconfig['mac'] = $_GET['mac'];
 }
 
 if ($_POST) {
@@ -67,6 +70,8 @@ if ($_POST) {
 	$reqdfieldsn = explode(",", "MAC address");
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	
+	$_POST['mac'] = str_replace("-", ":", $_POST['mac']);
 	
 	if (($_POST['ipaddr'] && !is_ipaddr($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";
@@ -123,24 +128,14 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: DHCP: Edit static mapping");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: DHCP: Edit static mapping</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="services_dhcp_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">MAC address</td>
                   <td width="78%" class="vtable"> 
-                    <input name="mac" type="text" class="formfld" id="mac" size="30" value="<?=htmlspecialchars($pconfig['mac']);?>"> 
+                    <?=$mandfldhtml;?><input name="mac" type="text" class="formfld" id="mac" size="30" value="<?=htmlspecialchars($pconfig['mac']);?>"> 
                     <br>
                     <span class="vexpl">Enter a MAC address in the following format: 
                     xx:xx:xx:xx:xx:xx</span></td>
@@ -172,5 +167,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

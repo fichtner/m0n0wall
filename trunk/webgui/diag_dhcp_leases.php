@@ -4,7 +4,7 @@
 	diag_dhcp_leases.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Björn Pålsson <bjorn@networksab.com> and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Björn Pålsson <bjorn@networksab.com> and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,25 +29,22 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Diagnostics", "DHCP leases");
+
 require("guiconfig.inc");
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Diagnostics: DHCP leases");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Diagnostics: DHCP leases</p>
 <?php
 
 flush();
 
 function leasecmp($a, $b) {
 	return strcmp($a[$_GET['order']], $b[$_GET['order']]);
+}
+
+function adjust_gmt($dt) {
+	$ts = strtotime($dt . " GMT");
+	return strftime("%Y/%m/%d %H:%M:%S", $ts);
 }
 
 $fp = @fopen("{$g['vardb_path']}/dhcpd.leases","r");
@@ -149,6 +146,7 @@ if ($_GET['order'])
     <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=hostname">Hostname</a></td>
     <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=start">Start</a></td>
     <td class="listhdr"><a href="?all=<?=$_GET['all'];?>&order=end">End</a></td>
+    <td class="list"></td>
 	</tr>
 <?php
 foreach ($leases as $data) {
@@ -159,18 +157,26 @@ foreach ($leases as $data) {
 		} else {
 			$fspans = $fspane = "";
 		}
+		$lip = ip2long($data['ip']);
+		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf) {
+			if (($lip >= ip2long($dhcpifconf['range']['from'])) && ($lip <= ip2long($dhcpifconf['range']['to']))) {
+				$data['if'] = $dhcpif;
+				break;
+			}
+		}
 		echo "<tr>\n";
 		echo "<td class=\"listlr\">{$fspans}{$data['ip']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['mac']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['hostname']}{$fspane}&nbsp;</td>\n";
-		echo "<td class=\"listr\">{$fspans}{$data['start']}{$fspane}&nbsp;</td>\n";
-		echo "<td class=\"listr\">{$fspans}{$data['end']}{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['start']) . "{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['end']) . "{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"list\" valign=\"middle\"><a href=\"services_dhcp_edit.php?if={$data['if']}&mac={$data['mac']}\"><img src=\"plus.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"add a static mapping for this MAC address\"></a></td>\n";
 		echo "</tr>\n";
 	}
 }
 ?>
 </table>
-<p>
+<br>
 <form action="diag_dhcp_leases.php" method="GET">
 <input type="hidden" name="order" value="<?=$_GET['order'];?>">
 <?php if ($_GET['all']): ?>
@@ -182,8 +188,6 @@ foreach ($leases as $data) {
 <?php endif; ?>
 </form>
 <?php else: ?>
-<p><strong>No leases file found. Is the DHCP server active?</strong></p>
+<strong>No leases file found. Is the DHCP server active?</strong>
 <?php endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

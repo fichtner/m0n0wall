@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # /etc/rc
-# part of m0n0wall (http://neon1.net/m0n0wall)
+# part of m0n0wall (http://m0n0.ch/wall)
 #
-# Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+# Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 # All rights reserved.
 
 stty status '^T'
@@ -25,6 +25,7 @@ mkdir /var/run /var/log /var/etc /var/db
 clog -i -s 262144 /var/log/system.log
 clog -i -s 262144 /var/log/filter.log
 clog -i -s 65536 /var/log/vpn.log
+clog -i -s 32768 /var/log/portalauth.log
 clog -i -s 32768 /var/log/dhcpd.log
 chmod 0600 /var/log/*.log
 
@@ -37,7 +38,7 @@ cd /var/run && cp /dev/null utmp && chmod 644 utmp
 dev_mkdb
 
 # Run ldconfig
-/sbin/ldconfig -elf /usr/lib
+/sbin/ldconfig -elf /usr/lib /usr/local/lib
 
 # let the PHP-based configuration subsystem set up the system now
 /etc/rc.bootup

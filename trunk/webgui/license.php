@@ -1,18 +1,10 @@
 #!/usr/local/bin/php
-<?php require("guiconfig.inc"); 
+<?php 
+$pgtitle = array("License");
+require("guiconfig.inc"); 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("License");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">License</p>
-            <p><strong>m0n0wall is Copyright &copy; 2002-2004 by Manuel Kasper 
+            <p><strong>m0n0wall is Copyright &copy; 2002-2005 by Manuel Kasper 
               (<a href="mailto:mk@neon1.net">mk@neon1.net</a>).<br>
               All rights reserved.</strong></p>
             <p> Redistribution and use in source and binary forms, with or without<br>
@@ -73,8 +65,8 @@
               <br>
               Jim McBeath (<a href="mailto:monowall@j.jimmc.org">monowall@j.jimmc.org</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Filter rule patches 
-              (ordering, block/pass, disabled); better status page;<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;webGUI assign network ports page </font></em><br>
+              (ordering, block/pass, disabled); better status page;</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">webGUI assign network ports page</font></em><br>
               <br>
               Chris Olive (<a href="mailto:chris@technologEase.com">chris@technologEase.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">enhanced &quot;execute 
@@ -87,7 +79,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">DHCP lease list page</font></em><br>
               <br>
               Peter Allgeyer (<a href="mailto:allgeyer@web.de">allgeyer@web.de</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules; dial-on-demand; WAN connect/disconnect</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules; dial-on-demand; WAN connect/disconnect; auto-add proxy ARP </font></em><br>
               <br>
               Thierry Lechat (<a href="mailto:dev@lechat.org">dev@lechat.org</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SVG-based traffic grapher</font></em><br>
@@ -99,34 +91,48 @@
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">NAT on optional interfaces</font></em><br>
               <br>
               Dinesh Nair (<a href="mailto:dinesh@alphaque.com">dinesh@alphaque.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: pass-through MAC/IP addresses, RADIUS authentication &amp; accounting;<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666"></font></em>HTTP server concurrency limit</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: pass-through MAC/IP addresses, RADIUS authentication &amp; accounting;</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">HTTP server concurrency limit</font></em><br>
               <br>
               Justin Ellison (<a href="mailto:justin@techadvise.com">justin@techadvise.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">traffic shaper TOS matching; magic shaper; DHCP deny unknown clients;<br>
 			  &nbsp;&nbsp;&nbsp;&nbsp;IPsec user FQDNs; DHCP relay</font></em><br>
 			  <br>
               Fred Wright (<a href="mailto:fw@well.com">fw@well.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix; IPsec dead SA fixes</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix; IPsec dead SA fixes;</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">netgraph PPP PFC fixes; kernel build improvements;</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">updated DP83815 short cable bug workaround</font></em><br>
 			  <br>
               Michael Hanselmann (<a href="mailto:m0n0@hansmi.ch">m0n0@hansmi.ch</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby; exec.php arrow keys</font></em><br>
 			  <br>
               Audun Larsen (<a href="mailto:larsen@xqus.com">larsen@xqus.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CPU/memory usage display</font></em><br>
 			  <br>
               Peter Curran (<a href="mailto:peter@closeconsultants.com">peter@closeconsultants.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">OpenVPN support</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">OpenVPN support</font></em><br>
+			  <br>
+              Pavel A. Grodek (<a href="mailto:pg@abletools.com">pg@abletools.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Traffic shaper packet loss rate/queue size</font></em><br>
+			  <br>
+              Rob Parker, Keycom PLC (<a href="mailto:rob.parker@keycom.co.uk">rob.parker@keycom.co.uk</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal per-user bandwidth restrictions</font></em><br>
+			  <br>
+              Pascal Suter (<a href="mailto:d-monodev@psuter.ch">d-monodev@psuter.ch</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal local user database</font></em><br>
+			  <br>
+              Matt Juszczak (<a href="mailto:matt@atopia.net">matt@atopia.net</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal logging</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
               The author of m0n0wall would like to thank the authors of these 
               software packages for their efforts.</p>
             <p>FreeBSD (<a href="http://www.freebsd.org" target="_blank">http://www.freebsd.org</a>)<br>
-              Copyright &copy; 1994-2003 FreeBSD, Inc. All rights reserved.<br>
+              Copyright &copy; 1994-2005 FreeBSD, Inc. All rights reserved.<br>
               <br>
               This product includes PHP, freely available from <a href="http://www.php.net/" target="_blank">http://www.php.net</a>.<br>
-              Copyright &copy; 1999 - 2003 The PHP Group. All rights reserved.<br>
+              Copyright &copy; 1999 - 2005 The PHP Group. All rights reserved.<br>
               <br>
               mini_httpd (<a href="http://www.acme.com/software/mini_httpd" target="_blank">http://www.acme.com/software/mini_httpd)</a><br>
               Copyright &copy; 1999, 2000 by Jef Poskanzer &lt;jef@acme.com&gt;. 
@@ -136,7 +142,7 @@
               Copyright &copy; 1996-2003 Internet Software Consortium. All rights 
               reserved.<br>
               <br>
-              ipfilter (<a href="http://www.ipfilter.org" target="_blank">http://www.ipfilter.org</a>)<br>
+              ipfilter (<a href="http://coombs.anu.edu.au/ipfilter" target="_blank">http://coombs.anu.edu.au/ipfilter</a>)<br>
               Copyright &copy; 1993-2002 by Darren Reed.<br>
               <br>
               MPD - Multi-link PPP daemon for FreeBSD (<a href="http://www.dellroad.org/mpd" target="_blank">http://www.dellroad.org/mpd</a>)<br>
@@ -182,6 +188,4 @@ All rights reserved.<br>
 			  <br>
 			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
 			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;
-			  <?php include("fend.inc"); ?>
-</body>
-</html>
+<?php include("fend.inc"); ?>

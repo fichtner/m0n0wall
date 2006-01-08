@@ -4,7 +4,7 @@
 	services_wol.php
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "Wake on LAN");
 require("guiconfig.inc");
 
 if (!is_array($config['wol']['wolentry'])) {
@@ -47,6 +48,8 @@ if ($_POST || $_GET['mac']) {
 		$mac = $_POST['mac_input'];
 		$if = $_POST['interface'];
 	}
+	
+	$mac = str_replace("-", ":", $mac);
 
 	/* input validation */
 	if (!$mac || !is_macaddr($mac))
@@ -73,17 +76,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: Wake on LAN");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: Wake on LAN</font></p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 			<form action="services_wol.php" method="post" name="iform" id="iform">
@@ -91,7 +84,7 @@ if ($_GET['act'] == "del") {
 			  <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
-<select name="interface" class="formfld">
+					<select name="interface" class="formfld">
                       <?php $interfaces = array('lan' => 'LAN');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					    if (isset($config['interfaces']['opt' . $i]['enable']) &&
@@ -109,7 +102,7 @@ if ($_GET['act'] == "del") {
                 <tr>
 				  <td width="22%" valign="top" class="vncellreq">MAC address</td>
 				  <td width="78%" class="vtable">
-                      <input name="mac_input" type="text" class="formfld" id="mac_input" size="20" value="<?=htmlspecialchars($mac);?>">
+                      <?=$mandfldhtml;?><input name="mac_input" type="text" class="formfld" id="mac_input" size="20" value="<?=htmlspecialchars($mac);?>">
                       <br>
                       Enter a MAC address <span class="vexpl"> in the following format: xx:xx:xx:xx:xx:xx</span></td></tr>
 				<tr>
@@ -158,5 +151,3 @@ Click the MAC address to wake up a computer. <br>
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

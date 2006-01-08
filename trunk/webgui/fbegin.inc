@@ -1,3 +1,27 @@
+<?php
+$navlevelsep = ": ";	/* navigation level separator string */
+$mandfldhtml = "";		/* display this before mandatory input fields */
+$mandfldhtmlspc = "";	/* same as above, but with spacing */
+
+function gentitle($title) {
+	global $navlevelsep;
+	return join($navlevelsep, $title);
+}
+
+function genhtmltitle($title) {
+	global $config;
+	return $config['system']['hostname'] . "." . $config['system']['domain'] . " - " . gentitle($title);
+}
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title><?=genhtmltitle($pgtitle);?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="gui.css" rel="stylesheet" type="text/css">
+</head>
+
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script language="javascript">
 <!--
 var tri_open = "";
@@ -129,3 +153,6 @@ endif;
         </tr></table></td>
     <td width="600"><table width="100%" border="0" cellpadding="10" cellspacing="0">
         <tr><td>
+<?php if (!$pgtitle_omit): ?>
+      <p class="pgtitle"><?=gentitle($pgtitle);?></p>
+<?php endif; ?>

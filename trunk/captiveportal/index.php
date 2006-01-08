@@ -4,7 +4,7 @@
 	index.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@
 require("globals.inc");
 require("util.inc");
 require("config.inc");
-require("radius_authentication.inc") ;
-require("radius_accounting.inc") ;
+require("radius_authentication.inc");
+require("radius_accounting.inc");
 
 header("Expires: 0");
 header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -73,21 +73,41 @@ if ($clientmac && portal_mac_fixed($clientmac)) {
 							  			  $radiusservers[0]['port'],
 							  			  $radiusservers[0]['key']);
 		if ($auth_val == 2) {
+			captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"LOGIN");
 			$sessionid = portal_allow($clientip, $clientmac, $_POST['auth_user']);
 			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
 				$auth_val = RADIUS_ACCOUNTING_START($_POST['auth_user'],
 													$sessionid,
 													$radiusservers[0]['ipaddr'],
 													$radiusservers[0]['acctport'],
-													$radiusservers[0]['key']);
+													$radiusservers[0]['key'],
+													$clientip);
 			}
 		} else {
+			captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"FAILURE");
 			readfile("{$g['varetc_path']}/captiveportal-error.html");
 		}
 	} else {
 		readfile("{$g['varetc_path']}/captiveportal-error.html");
 	}
+	
+} else if ($_POST['accept'] && $config['captiveportal']['auth_method'] == "local") {
 
+	//check against local usermanager
+
+	//erase expired accounts
+	if(trim($config['users'][$_POST['auth_user']]['expirationdate'])!="" && strtotime("-1 day")>strtotime($config['users'][$_POST['auth_user']]['expirationdate'])){
+		unset($config['users'][$_POST['auth_user']]);
+		write_config();
+	}
+
+	if($config['users'][$_POST['auth_user']]['password']==md5($_POST['auth_pass'])){
+		captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"LOGIN");
+		portal_allow($clientip, $clientmac,$_POST['auth_user'],0,0);
+	} else {
+		captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"FAILURE");
+		readfile("{$g['varetc_path']}/captiveportal-error.html");
+	}
 } else if ($_POST['accept'] && $clientip) {
 	portal_allow($clientip, $clientmac, "unauthenticated");
 } else if ($_POST['logout_id']) {
@@ -209,7 +229,8 @@ function portal_allow($clientip,$clientmac,$clientuser) {
 									   $cpdb[$i][0], // start time
 									   $radiusservers[0]['ipaddr'],
 									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
+									   $radiusservers[0]['key'],
+									   $clientip);
 			}
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
 			unset($cpdb[$i]);
@@ -385,9 +406,11 @@ function disconnect_client($sessionid) {
 									   $cpdb[$i][0], // start time
 									   $radiusservers[0]['ipaddr'],
 									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
+									   $radiusservers[0]['key'],
+									   $cpdb[$i][2]);
 			}
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+			captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"LOGOUT");
 			unset($cpdb[$i]);
 			break;
 		}
@@ -404,4 +427,15 @@ function disconnect_client($sessionid) {
 	
 	portal_unlock();
 }
+
+/* log successful captive portal authentication to syslog */
+/* part of this code from php.net */
+function captiveportal_logportalauth($user,$mac,$ip,$status) {
+	define_syslog_variables();
+	openlog("logportalauth", LOG_PID, LOG_LOCAL4);
+	// Log it
+	syslog(LOG_INFO, "$status: $user, $mac, $ip");
+	closelog();
+}
+
 ?>

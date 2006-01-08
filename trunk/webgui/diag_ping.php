@@ -4,7 +4,7 @@
 	diag_ping.php
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2003-2004 Bob Zoller (bob@kludgebox.com) and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Bob Zoller (bob@kludgebox.com) and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Diagnostics", "Ping");
 require("guiconfig.inc");
 
 define('MAX_COUNT', 10);
@@ -49,7 +50,7 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$do_ping = true;
-		$host = preg_replace ("/[^A-Za-z0-9.]/","",$_POST['host']);
+		$host = $_POST['host'];
 		$count = $_POST['count'];
 
 	}
@@ -60,29 +61,19 @@ if (!isset($do_ping)) {
 	$count = DEFAULT_COUNT;
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Diagnostics: Ping");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Diagnostics: Ping</font></p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 			<form action="diag_ping.php" method="post" name="iform" id="iform">
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr>
 				  <td width="22%" valign="top" class="vncellreq">Host</td>
 				  <td width="78%" class="vtable"> 
-                    <input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>"></td>
+                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>"></td>
 				</tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncellreq">Count</td>
 				  <td width="78%" class="vtable">
-<select name="count" class="formfld" id="count">
+					<select name="count" class="formfld" id="count">
 					<?php for ($i = 1; $i <= MAX_COUNT; $i++): ?>
 					<option value="<?=$i;?>" <?php if ($i == $count) echo "selected"; ?>><?=$i;?></option>
 					<?php endfor; ?>
@@ -109,5 +100,3 @@ if (!isset($do_ping)) {
 			</table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

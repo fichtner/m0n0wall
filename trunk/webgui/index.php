@@ -4,7 +4,7 @@
 	index.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("m0n0wall webGUI");
+$pgtitle_omit = true;
 require("guiconfig.inc");
 
 /* find out whether there's hardware encryption (hifn) */
@@ -46,15 +48,6 @@ if ($fd) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("m0n0wall webGUI");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr align="center" valign="top"> 
@@ -84,7 +77,7 @@ if ($fd) {
               <tr> 
                 <td width="25%" class="vncellt">Platform</td>
                 <td width="75%" class="listr"> 
-                  <?=htmlspecialchars($g['platform']);?>
+                  <?=htmlspecialchars($g['fullplatform']);?>
                 </td>
               </tr><?php if ($hwcrypto): ?>
               <tr> 
@@ -129,29 +122,7 @@ if ($fd) {
 			  <tr> 
                 <td width="25%" class="vncellt">CPU usage</td>
                 <td width="75%" class="listr">
-<?php
-$cpuTicks = explode(" ", `/sbin/sysctl -n kern.cp_time`);
-sleep(1);
-$cpuTicks2 = explode(" ", `/sbin/sysctl -n kern.cp_time`);
-
-$diff = array();
-$diff['user'] = $cpuTicks2[0] - $cpuTicks[0];
-$diff['nice'] = $cpuTicks2[1] - $cpuTicks[1];
-$diff['sys'] = $cpuTicks2[2] - $cpuTicks[2];
-$diff['intr'] = $cpuTicks2[3] - $cpuTicks[3];
-$diff['idle'] = $cpuTicks2[4] - $cpuTicks[4];
-
-$totalDiff = $diff['user'] + $diff['nice'] + $diff['sys'] + $diff['intr'] + $diff['idle'];
-
-$cpuUsage = round(100 * (1 - $diff['idle'] / $totalDiff), 0);
-									
-echo "<img src='bar_left.gif' height='15' width='4' border='0' align='absmiddle'>";
-echo "<img src='bar_blue.gif' height='15' width='" . $cpuUsage . "' border='0' align='absmiddle'>";
-echo "<img src='bar_gray.gif' height='15' width='" . (100 - $cpuUsage) . "' border='0' align='absmiddle'>";
-echo "<img src='bar_right.gif' height='15' width='5' border='0' align='absmiddle'> ";
-echo $cpuUsage . "%";
-?>
-                </td>
+				<a href="status_graph_cpu.php">view graph</a></td>
               </tr>
 			  <tr> 
                 <td width="25%" class="vncellt">Memory usage</td>
@@ -176,5 +147,3 @@ echo $memUsage . "%";
               </tr>
             </table>
             <?php include("fend.inc"); ?>
-</body>
-</html>

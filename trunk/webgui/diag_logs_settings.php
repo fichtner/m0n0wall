@@ -4,7 +4,7 @@
 	diag_logs_settings.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Diagnostics", "Logs");
 require("guiconfig.inc");
 
 $pconfig['reverse'] = isset($config['syslog']['reverse']);
@@ -36,6 +37,7 @@ $pconfig['nentries'] = $config['syslog']['nentries'];
 $pconfig['remoteserver'] = $config['syslog']['remoteserver'];
 $pconfig['filter'] = isset($config['syslog']['filter']);
 $pconfig['dhcp'] = isset($config['syslog']['dhcp']);
+$pconfig['portalauth'] = isset($config['syslog']['portalauth']);
 $pconfig['vpn'] = isset($config['syslog']['vpn']);
 $pconfig['system'] = isset($config['syslog']['system']);
 $pconfig['enable'] = isset($config['syslog']['enable']);
@@ -64,6 +66,7 @@ if ($_POST) {
 		$config['syslog']['remoteserver'] = $_POST['remoteserver'];
 		$config['syslog']['filter'] = $_POST['filter'] ? true : false;
 		$config['syslog']['dhcp'] = $_POST['dhcp'] ? true : false;
+		$config['syslog']['portalauth'] = $_POST['portalauth'] ? true : false;
 		$config['syslog']['vpn'] = $_POST['vpn'] ? true : false;
 		$config['syslog']['system'] = $_POST['system'] ? true : false;
 		$config['syslog']['enable'] = $_POST['enable'] ? true : false;
@@ -86,12 +89,7 @@ if ($_POST) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Diagnostics: Logs");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
@@ -99,32 +97,30 @@ function enable_change(enable_over) {
 		document.iform.remoteserver.disabled = 0;
 		document.iform.filter.disabled = 0;
 		document.iform.dhcp.disabled = 0;
+		document.iform.portalauth.disabled = 0;
 		document.iform.vpn.disabled = 0;
 		document.iform.system.disabled = 0;
 	} else {
 		document.iform.remoteserver.disabled = 1;
 		document.iform.filter.disabled = 1;
 		document.iform.dhcp.disabled = 1;
+		document.iform.portalauth.disabled = 1;
 		document.iform.vpn.disabled = 1;
 		document.iform.system.disabled = 1;
 	}
 }
 // -->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Diagnostics: Logs</p>
 <form action="diag_logs_settings.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact"><a href="diag_logs.php">System</a></li>
+    <li class="tabinact1"><a href="diag_logs.php">System</a></li>
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
+    <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
     <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabact">Settings</li>
   </ul>
@@ -168,10 +164,16 @@ function enable_change(enable_over) {
                           server</td>
                         <td width="78%" class="vtable"> <input name="remoteserver" id="remoteserver" type="text" class="formfld" size="20" value="<?=htmlspecialchars($pconfig['remoteserver']);?>"> 
                           <br>
-                          IP address of remote syslog server<br> <br> <input name="system" id="system" type="checkbox" value="yes" onclick="enable_change(false)" <?php if ($pconfig['system']) echo "checked"; ?>>
-                          system events <br> <input name="filter" id="filter" type="checkbox" value="yes" <?php if ($pconfig['filter']) echo "checked"; ?>>
-                          firewall events<br> <input name="dhcp" id="dhcp" type="checkbox" value="yes" <?php if ($pconfig['dhcp']) echo "checked"; ?>>
-                          DHCP service events<br> <input name="vpn" id="vpn" type="checkbox" value="yes" <?php if ($pconfig['vpn']) echo "checked"; ?>>
+                          IP address of remote syslog server<br> <br>
+						  <input name="system" id="system" type="checkbox" value="yes" onclick="enable_change(false)" <?php if ($pconfig['system']) echo "checked"; ?>>
+                          system events <br>
+						  <input name="filter" id="filter" type="checkbox" value="yes" <?php if ($pconfig['filter']) echo "checked"; ?>>
+                          firewall events<br>
+						  <input name="dhcp" id="dhcp" type="checkbox" value="yes" <?php if ($pconfig['dhcp']) echo "checked"; ?>>
+                          DHCP service events<br>
+						  <input name="portalauth" id="portalauth" type="checkbox" value="yes" <?php if ($pconfig['portalauth']) echo "checked"; ?>>
+                          Captive portal<br> 
+						  <input name="vpn" id="vpn" type="checkbox" value="yes" <?php if ($pconfig['vpn']) echo "checked"; ?>>
                           PPTP VPN events</td>
                       </tr>
                       <tr> 
@@ -180,7 +182,7 @@ function enable_change(enable_over) {
                         </td>
                       </tr>
                       <tr> 
-                        <td width="22%" height="53" valign="top">&nbsp;</td>
+                        <td width="22%" valign="top">&nbsp;</td>
                         <td width="78%"><strong><span class="red">Note:</span></strong><br>
                           syslog sends UDP datagrams to port 514 on the specified 
                           remote syslog server. Be sure to set syslogd on the 
@@ -198,5 +200,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -28,6 +28,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("VPN", "OpenVPN");
 require("guiconfig.inc");
 require_once("openvpn.inc");
 
@@ -67,17 +68,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("VPN: OpenVPN");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">VPN: OpenVPN</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path) && !file_exists($d_ovpnclidirty_path)) print_info_box(get_std_save_message(0)); ?>
 <form action="vpn_openvpn_cli.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
@@ -89,7 +80,7 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
   <ul id="tabnav">	        
-	<li class="tabinact"><a href="vpn_openvpn.php">Server</a></li>
+	<li class="tabinact1"><a href="vpn_openvpn.php">Server</a></li>
 	<li class="tabact">Client</li>
   </ul>
   </td></tr>
@@ -144,5 +135,3 @@ if ($_GET['act'] == "del") {
 </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

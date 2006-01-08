@@ -4,7 +4,7 @@
 	firewall_nat_1to1_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "NAT", "Edit 1:1");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['onetoone'])) {
@@ -75,12 +76,26 @@ if ($_POST) {
 		$input_errors[] = "A valid internal subnet must be specified.";
 	}
 	
+	/*  return the subnet address given a host address and a subnet bit count */
+	if ($extsubnetip = gen_subnet($_POST['external'], $_POST['subnet'])) {
+		$_POST['external'] = $extsubnetip;
+	} else {
+		$input_errors[] = "Can't convert external ip to valid subnet address.";
+	}
+
+	if ($intsubnetip = gen_subnet($_POST['internal'], $_POST['subnet'])) {
+		$_POST['internal'] = $intsubnetip;
+	} else {
+		$input_errors[] = "Can't convert internal ip to valid subnet address.";
+	}
+
 	if (is_ipaddr($config['interfaces']['wan']['ipaddr'])) {
 		if (check_subnets_overlap($_POST['external'], $_POST['subnet'], 
 				$config['interfaces']['wan']['ipaddr'], 32))
 			$input_errors[] = "The WAN IP address may not be used in a 1:1 rule.";
 	}
 	
+
 	/* check for overlaps with other 1:1 */
 	foreach ($a_1to1 as $natent) {
 		if (isset($id) && ($a_1to1[$id]) && ($a_1to1[$id] === $natent))
@@ -131,6 +146,18 @@ if ($_POST) {
 			$a_1to1[] = $natent;
 		
 		touch($d_natconfdirty_path);
+
+                if ($_POST['autoaddproxy']) {
+                        /* auto-generate a matching proxy arp entry */
+                        $arpent = array();           
+                        $arpent['interface'] = $_POST['interface'];
+                        $arpent['network'] = $_POST['external'] . "/" . $_POST['subnet'];
+                        $arpent['descr'] = "NAT " . $_POST['descr'];
+                        
+                        $config['proxyarp']['proxyarpnet'][] = $arpent;
+                        
+                        touch($d_proxyarpdirty_path);
+                }
 		
 		write_config();
 		
@@ -139,17 +166,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: NAT: Edit 1:1");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: NAT: Edit 1:1</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_nat_1to1_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -174,7 +191,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">External subnet</td>
                   <td width="78%" class="vtable"> 
-                    <input name="external" type="text" class="formfld" id="external" size="20" value="<?=htmlspecialchars($pconfig['external']);?>">
+                    <?=$mandfldhtml;?><input name="external" type="text" class="formfld" id="external" size="20" value="<?=htmlspecialchars($pconfig['external']);?>">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
                       <?php for ($i = 32; $i >= 0; $i--): ?>
@@ -189,7 +206,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Internal subnet</td>
                   <td width="78%" class="vtable"> 
-                    <input name="internal" type="text" class="formfld" id="internal" size="20" value="<?=htmlspecialchars($pconfig['internal']);?>"> 
+                    <?=$mandfldhtml;?><input name="internal" type="text" class="formfld" id="internal" size="20" value="<?=htmlspecialchars($pconfig['internal']);?>"> 
                     <br>
                      <span class="vexpl">Enter the internal (LAN) subnet for the 1:1 mapping. The subnet size specified for the external subnet also applies to the internal subnet (they  have to be the same).</span></td>
                 </tr>
@@ -199,7 +216,14 @@ if ($_POST) {
                     <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>"> 
                     <br> <span class="vexpl">You may enter a description here 
                     for your reference (not parsed).</span></td>
-                </tr>
+                </tr><?php if (!(isset($id) && $a_1to1[$id])): ?>
+		<tr> 
+		  <td width="22%" valign="top">&nbsp;</td>
+		  <td width="78%"> 
+		    <input name="autoaddproxy" type="checkbox" id="autoaddproxy" value="yes" checked="checked">
+		    <strong>Auto-add a <a href="services_proxyarp.php">proxy ARP</a> entry to this interface
+		    </strong></td>
+		</tr><?php endif; ?>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
@@ -212,5 +236,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

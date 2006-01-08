@@ -3,7 +3,7 @@
 	filter.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -50,12 +50,12 @@ function filter_configure() {
 		echo "Configuring firewall... ";
 	
 	/* set TCP timeouts */
-	$tcpidletimeout = 9000;
+	$tcpidletimeout = 9000*2;
 	if ($config['filter']['tcpidletimeout'])
-		$tcpidletimeout = $config['filter']['tcpidletimeout'];
+		$tcpidletimeout = $config['filter']['tcpidletimeout']*2;
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=480");
-	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=240");	/* SIP... */
+	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=480");	/* SIP... */
 	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
@@ -258,23 +258,15 @@ function filter_nat_rules_generate() {
 		}
 	}
 	
-	if ($pptpdcfg['mode'] && $pptpdcfg['mode'] != "off") {
-	
-		if ($pptpdcfg['mode'] == "server")
-			$pptpdtarget = "127.0.0.1";
-		else if ($pptpdcfg['mode'] == "redir")
-			$pptpdtarget = $pptpdcfg['redir'];
-	
-		if ($pptpdtarget) {
+	if ($pptpdcfg['mode'] == "redir" && $pptpdcfg['redir']) {
 	
 		$natrules .= <<<EOD
 
 # PPTP
-rdr $wanif 0/0 port 0 -> $pptpdtarget port 0 gre
-rdr $wanif 0/0 port 1723 -> $pptpdtarget port 1723 tcp
+rdr $wanif 0/0 port 0 -> {$pptpdcfg['redir']} port 0 gre
+rdr $wanif 0/0 port 1723 -> {$pptpdcfg['redir']} port 1723 tcp
 
 EOD;
-		}
 	}
 	
 	return $natrules;
@@ -289,6 +281,8 @@ function filter_rules_generate() {
 	
 	$lanif = $lancfg['if'];
 	$wanif = get_real_wan_interface();
+	
+	$curwanip = get_current_wan_address();
 	
 	/* rule groups (optional interfaces: see below) */
 	$ifgroups = array("lan" => 100, "wan" => 200);
@@ -317,6 +311,7 @@ function filter_rules_generate() {
 					}
 				}
 				$oic['bridge'] = 1;
+				$oic['bridge_if'] = $oc['bridge'];
 			} else {
 				$oic['ip'] = $oc['ipaddr'];
 				$oic['sn'] = $oc['subnet'];
@@ -375,7 +370,7 @@ EOD;
 	/* pass traffic between statically routed subnets and the subnet on the
 	   interface in question to avoid problems with complicated routing
 	   topologies */
-	if (is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
+	if (isset($config['filter']['bypassstaticroutes']) && is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
 		foreach ($config['staticroutes']['route'] as $route) {
 			unset($sa);
 			
@@ -445,12 +440,22 @@ pass in quick on $wanif proto udp from any port = 67 to any port = 68
 
 EOD;
 
-	/* LAN spoof check */	
-	$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log);
+	/* LAN spoof check */
+	/* omit if any interface is bridged to LAN and the filtering bridge is on */
+	$lanbridge = false;
+	foreach ($optcfg as $on => $oc) {
+		if ($oc['bridge'] && $oc['bridge_if'] == "lan") {
+			$lanbridge = true;
+			break;
+		}
+	}
+	if (!$lanbridge || !isset($config['bridge']['filteringbridge']))
+		$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log);
 
 	/* OPT spoof check */
 	foreach ($optcfg as $on => $oc) {
-		if ($oc['ip'])
+		/* omit for bridged interfaces when the filtering bridge is on */
+		if ($oc['ip'] && (!$oc['bridge'] || !isset($config['bridge']['filteringbridge'])))
 			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
 	}
 	
@@ -472,8 +477,6 @@ EOD;
 		((is_array($config['ipsec']['tunnel']) &&
 		count($config['ipsec']['tunnel'])) ||
 			isset($config['ipsec']['mobileclients']['enable']))) {
-		
-		$curwanip = get_current_wan_address();
 		
 		if ($curwanip)
 			$ipfrules .= filter_rules_ipsec_generate($wanif, $curwanip);
@@ -548,17 +551,19 @@ EOD;
 	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off")) {
 	
 		if ($pptpdcfg['mode'] == "server")
-			$pptpdtarget = "127.0.0.1";
+			$pptpdtarget = $curwanip;
 		else
 			$pptpdtarget = $pptpdcfg['redir'];
-			
-		$ipfrules .= <<<EOD
+		
+		if ($pptpdtarget) {
+			$ipfrules .= <<<EOD
 
 # PPTP rules
 pass in quick proto gre from any to $pptpdtarget keep state group 200
 pass in quick proto tcp from any to $pptpdtarget port = 1723 keep state group 200
 
 EOD;
+		}
 	}
 	
 	/* BigPond client enabled? */
@@ -662,7 +667,7 @@ EOD;
 				if ($rule['protocol'] == "tcp") {
 					$line = "block return-rst";
 				} else if ($rule['protocol'] == "udp") {
-					$line = "block return-icmp";
+					$line = "block return-icmp(port-unr)";
 				} else {
 					$line = "block";
 				}
@@ -673,7 +678,7 @@ EOD;
 			$line .= " in ";
 
 			if (isset($rule['log']))
-				$line .= "log ";
+				$line .= "log first ";
 
 			$line .= "quick ";
 			
@@ -695,6 +700,9 @@ EOD;
 						$optcfg[$rule['source']['network']]['sn'];
 				} else {
 					switch ($rule['source']['network']) {
+						case 'wanip':
+							$src = $curwanip;
+							break;
 						case 'lan':
 							$src = "$lansa/$lansn";
 							break;
@@ -749,6 +757,9 @@ EOD;
 						$optcfg[$rule['destination']['network']]['sn'];
 				} else {
 					switch ($rule['destination']['network']) {
+						case 'wanip':
+							$dst = $curwanip;
+							break;
 						case 'lan':
 							$dst = "$lansa/$lansn";
 							break;

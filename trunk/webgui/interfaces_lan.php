@@ -4,7 +4,7 @@
 	interfaces_lan.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Interfaces", "LAN");
 require("guiconfig.inc");
 
 $lancfg = &$config['interfaces']['lan'];
@@ -89,12 +90,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Interfaces: LAN");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function gen_bits(ipaddr) {
@@ -120,11 +116,6 @@ function ipaddr_change() {
 }
 // -->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Interfaces: LAN</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_lan.php" method="post" name="iform" id="iform">
@@ -132,7 +123,7 @@ function ipaddr_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
-                    <input name="ipaddr" type="text" class="formfld" id="hostname" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
+                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="hostname" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
                       <?php for ($i = 31; $i > 0; $i--): ?>
@@ -169,5 +160,3 @@ function ipaddr_change() {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

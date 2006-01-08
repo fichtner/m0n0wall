@@ -4,7 +4,7 @@
 	system.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("System", "General setup");
 require("guiconfig.inc");
 
 $pconfig['hostname'] = $config['system']['hostname'];
@@ -154,36 +155,26 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("System: General setup");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-      <p class="pgtitle">System: General setup</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<form action="system.php" method="post">
+		<form action="system.php" method="post">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Hostname</td>
-                  <td width="78%" class="vtable"> <input name="hostname" type="text" class="formfld" id="hostname" size="40" value="<?=htmlspecialchars($pconfig['hostname']);?>"> 
+                  <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="hostname" type="text" class="formfld" id="hostname" size="40" value="<?=htmlspecialchars($pconfig['hostname']);?>"> 
                     <br> <span class="vexpl">name of the firewall host, without 
                     domain part<br>
                     e.g. <em>firewall</em></span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Domain</td>
-                  <td width="78%" class="vtable"> <input name="domain" type="text" class="formfld" id="domain" size="40" value="<?=htmlspecialchars($pconfig['domain']);?>"> 
+                  <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="domain" type="text" class="formfld" id="domain" size="40" value="<?=htmlspecialchars($pconfig['domain']);?>"> 
                     <br> <span class="vexpl">e.g. <em>mycorp.com</em> </span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">DNS servers</td>
-                  <td width="78%" class="vtable"> <p> 
+                  <td width="78%" class="vtable">
                       <input name="dns1" type="text" class="formfld" id="dns1" size="20" value="<?=htmlspecialchars($pconfig['dns1']);?>">
                       <br>
                       <input name="dns2" type="text" class="formfld" id="dns22" size="20" value="<?=htmlspecialchars($pconfig['dns2']);?>">
@@ -197,7 +188,7 @@ if ($_POST) {
                       If this option is set, m0n0wall will use DNS servers assigned 
                       by a DHCP/PPP server on WAN for its own purposes (including 
                       the DNS forwarder). They will not be assigned to DHCP and 
-                      PPTP VPN clients, though.</span></p></td>
+                      PPTP VPN clients, though.</span></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">Username</td>
@@ -261,5 +252,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -4,7 +4,7 @@
 	services_dnsmasq_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Bob Zoller <bob@kludgebox.com> and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Bob Zoller <bob@kludgebox.com> and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "DNS forwarder", "Edit host");
 require("guiconfig.inc");
 
 if (!is_array($config['dnsmasq']['hosts'])) {
@@ -101,17 +102,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: DNS forwarder: Edit host");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: DNS forwarder: Edit host</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="services_dnsmasq_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -126,14 +117,14 @@ if ($_POST) {
 				<tr>
                   <td width="22%" valign="top" class="vncellreq">Domain</td>
                   <td width="78%" class="vtable"> 
-                    <input name="domain" type="text" class="formfld" id="domain" size="40" value="<?=htmlspecialchars($pconfig['domain']);?>">
+                    <?=$mandfldhtml;?><input name="domain" type="text" class="formfld" id="domain" size="40" value="<?=htmlspecialchars($pconfig['domain']);?>">
                     <br> <span class="vexpl">Domain of the host<br>
                     e.g. <em>blah.com</em></span></td>
                 </tr>
 				<tr>
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
-                    <input name="ip" type="text" class="formfld" id="ip" size="40" value="<?=htmlspecialchars($pconfig['ip']);?>">
+                    <?=$mandfldhtml;?><input name="ip" type="text" class="formfld" id="ip" size="40" value="<?=htmlspecialchars($pconfig['ip']);?>">
                     <br> <span class="vexpl">IP address of the host<br>
                     e.g. <em>192.168.100.100</em></span></td>
                 </tr>
@@ -156,5 +147,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

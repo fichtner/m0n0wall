@@ -4,7 +4,7 @@
 	graph.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2004 T. Lechat <dev@lechat.org> and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2004-2005 T. Lechat <dev@lechat.org> and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ $time_interval=1;		//Refresh time Interval
 $first_stage_time_interval=2;	//First stage time Intervall
 
 $urldata=@$_SERVER["SCRIPT_NAME"];
-$fetch_link = "ifstats.cgi?$ifnum";
+$fetch_link = "stats.cgi?$ifnum";
 
 //Style
 $style['bg']="fill:white;stroke:none;stroke-width:0;opacity:1;";

@@ -4,7 +4,7 @@
 	services_dyndns.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "Dynamic DNS");
 require("guiconfig.inc");
 
 if (!is_array($config['dnsupdate'])) {
@@ -50,9 +51,6 @@ if (!$pconfig['dnsupdate_ttl'])
 	$pconfig['dnsupdate_ttl'] = 60;
 $pconfig['dnsupdate_keydata'] = $config['dnsupdate']['keydata'];
 $pconfig['dnsupdate_keyname'] = $config['dnsupdate']['keyname'];
-$pconfig['dnsupdate_keytype'] = $config['dnsupdate']['keytype'];
-if (!$pconfig['dnsupdate_keytype'])
-	$pconfig['dnsupdate_keytype'] = "zone";
 $pconfig['dnsupdate_usetcp'] = isset($config['dnsupdate']['usetcp']);
 
 if ($_POST) {
@@ -106,7 +104,6 @@ if ($_POST) {
 		$config['dnsupdate']['host'] = $_POST['dnsupdate_host'];
 		$config['dnsupdate']['ttl'] = $_POST['dnsupdate_ttl'];
 		$config['dnsupdate']['keyname'] = $_POST['dnsupdate_keyname'];
-		$config['dnsupdate']['keytype'] = $_POST['dnsupdate_keytype'];
 		$config['dnsupdate']['keydata'] = $_POST['dnsupdate_keydata'];
 		$config['dnsupdate']['usetcp'] = $_POST['dnsupdate_usetcp'] ? true : false;
 			
@@ -125,12 +122,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: Dynamic DNS client");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_change) {
@@ -148,19 +140,11 @@ function enable_change(enable_change) {
 	document.iform.dnsupdate_host.disabled = endis;
 	document.iform.dnsupdate_ttl.disabled = endis;
 	document.iform.dnsupdate_keyname.disabled = endis;
-	document.iform.dnsupdate_keytype[0].disabled = endis;
-	document.iform.dnsupdate_keytype[1].disabled = endis;
-	document.iform.dnsupdate_keytype[2].disabled = endis;
 	document.iform.dnsupdate_keydata.disabled = endis;
 	document.iform.dnsupdate_usetcp.disabled = endis;
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: Dynamic DNS client</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="services_dyndns.php" method="post" name="iform" id="iform">
@@ -175,7 +159,7 @@ function enable_change(enable_change) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Service type</td>
                   <td width="78%" class="vtable">
-<select name="type" class="formfld" id="type">
+					<select name="type" class="formfld" id="type">
                       <?php $types = explode(",", "DynDNS,DHS,ODS,DyNS,HN.ORG,ZoneEdit,GNUDip,DynDNS (static),DynDNS (custom),easyDNS,EZ-IP,TZO");
 					        $vals = explode(" ", "dyndns dhs ods dyns hn zoneedit gnudip dyndns-static dyndns-custom easydns ezip tzo");
 					  $j = 0; for ($j = 0; $j < count($vals); $j++): ?>
@@ -188,7 +172,7 @@ function enable_change(enable_change) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Hostname</td>
                   <td width="78%" class="vtable"> 
-                    <input name="host" type="text" class="formfld" id="host" size="30" value="<?=htmlspecialchars($pconfig['host']);?>"> 
+                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="30" value="<?=htmlspecialchars($pconfig['host']);?>"> 
                   </td>
 				</tr>
                 <tr> 
@@ -208,13 +192,13 @@ function enable_change(enable_change) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Username</td>
                   <td width="78%" class="vtable"> 
-                    <input name="username" type="text" class="formfld" id="username" size="20" value="<?=htmlspecialchars($pconfig['username']);?>"> 
+                    <?=$mandfldhtml;?><input name="username" type="text" class="formfld" id="username" size="20" value="<?=htmlspecialchars($pconfig['username']);?>"> 
                   </td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Password</td>
                   <td width="78%" class="vtable"> 
-                    <input name="password" type="password" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
+                    <?=$mandfldhtml;?><input name="password" type="password" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -223,40 +207,34 @@ function enable_change(enable_change) {
                 <tr> 
                   <td colspan="2" valign="top" class="optsect_t">
 				  <table border="0" cellspacing="0" cellpadding="0" width="100%">
-				  <tr><td class="optsect_s"><strong>RFC 2163 Dynamic DNS updates</strong></td>
-				  <td align="right" class="optsect_s"><input name="dnsupdate_enable" type="checkbox" value="yes" <?php if ($pconfig['dnsupdate_enable']) echo "checked"; ?> onClick="enable_change(false)"> <strong>Enable</strong></td></tr>
+				  <tr>
+				    <td class="optsect_s"><strong>RFC 2136 Dynamic DNS updates</strong></td>
+				    <td align="right" class="optsect_s"><input name="dnsupdate_enable" type="checkbox" value="yes" <?php if ($pconfig['dnsupdate_enable']) echo "checked"; ?> onClick="enable_change(false)"> <strong>Enable</strong></td></tr>
 				  </table></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Hostname</td>
                   <td width="78%" class="vtable"> 
-                    <input name="dnsupdate_host" type="text" class="formfld" id="dnsupdate_host" size="30" value="<?=htmlspecialchars($pconfig['dnsupdate_host']);?>"> 
+                    <?=$mandfldhtml;?><input name="dnsupdate_host" type="text" class="formfld" id="dnsupdate_host" size="30" value="<?=htmlspecialchars($pconfig['dnsupdate_host']);?>"> 
                   </td>
 				</tr>
                 <tr>
                   <td valign="top" class="vncellreq">TTL</td>
                   <td class="vtable">
-                    <input name="dnsupdate_ttl" type="text" class="formfld" id="dnsupdate_ttl" size="6" value="<?=htmlspecialchars($pconfig['dnsupdate_ttl']);?>"> 
+                    <?=$mandfldhtml;?><input name="dnsupdate_ttl" type="text" class="formfld" id="dnsupdate_ttl" size="6" value="<?=htmlspecialchars($pconfig['dnsupdate_ttl']);?>"> 
                   seconds</td>
                 </tr>
                 <tr>
                   <td valign="top" class="vncellreq">Key name</td>
                   <td class="vtable">
-                    <input name="dnsupdate_keyname" type="text" class="formfld" id="dnsupdate_keyname" size="30" value="<?=htmlspecialchars($pconfig['dnsupdate_keyname']);?>">
+                    <?=$mandfldhtml;?><input name="dnsupdate_keyname" type="text" class="formfld" id="dnsupdate_keyname" size="30" value="<?=htmlspecialchars($pconfig['dnsupdate_keyname']);?>">
                     <br> 
                     This must match the setting on the DNS server.</td>
                 </tr>
                 <tr>
-                  <td valign="top" class="vncellreq">Key type </td>
-                  <td class="vtable">
-				  <input name="dnsupdate_keytype" type="radio" value="zone" <?php if ($pconfig['dnsupdate_keytype'] == "zone") echo "checked"; ?>> Zone &nbsp;
-                  <input name="dnsupdate_keytype" type="radio" value="host" <?php if ($pconfig['dnsupdate_keytype'] == "host") echo "checked"; ?>> Host &nbsp;
-                  <input name="dnsupdate_keytype" type="radio" value="user" <?php if ($pconfig['dnsupdate_keytype'] == "user") echo "checked"; ?>> User
-				</tr>
-                <tr>
                   <td valign="top" class="vncellreq">Key</td>
                   <td class="vtable">
-                    <input name="dnsupdate_keydata" type="text" class="formfld" id="dnsupdate_keydata" size="70" value="<?=htmlspecialchars($pconfig['dnsupdate_keydata']);?>">
+                    <?=$mandfldhtml;?><input name="dnsupdate_keydata" type="text" class="formfld" id="dnsupdate_keydata" size="70" value="<?=htmlspecialchars($pconfig['dnsupdate_keydata']);?>">
                     <br> 
                     Paste an HMAC-MD5 key here.</td>
                 </tr>
@@ -287,5 +265,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

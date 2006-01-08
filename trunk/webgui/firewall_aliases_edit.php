@@ -4,7 +4,7 @@
 	firewall_aliases_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Aliases", "Edit alias");
 require("guiconfig.inc");
 
 if (!is_array($config['aliases']['alias']))
@@ -112,12 +113,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("System: Firewall: Aliases: Edit alias");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function typesel_change() {
@@ -133,17 +129,12 @@ function typesel_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Aliases: Edit alias</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_aliases_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td valign="top" class="vncellreq">Name</td>
-                  <td class="vtable"> <input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>"> 
                     <br> <span class="vexpl">The name of the alias may only consist 
                     of the characters a-z, A-Z and 0-9.</span></td>
                 </tr>
@@ -158,7 +149,7 @@ function typesel_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Address</td>
-                  <td width="78%" class="vtable"> <input name="address" type="text" class="formfld" id="address" size="20" value="<?=htmlspecialchars($pconfig['address']);?>">
+                  <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="address" type="text" class="formfld" id="address" size="20" value="<?=htmlspecialchars($pconfig['address']);?>">
                     / 
                     <select name="address_subnet" class="formfld" id="address_subnet">
                       <?php for ($i = 32; $i >= 1; $i--): ?>
@@ -191,5 +182,3 @@ typesel_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

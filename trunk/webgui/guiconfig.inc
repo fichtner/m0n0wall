@@ -3,7 +3,7 @@
 	guiconfig.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ $iptos = array("lowdelay", "throughput", "reliability", "mincost", "congestion")
 /* TCP flags */
 $tcpflags = array("fin", "syn", "rst", "psh", "ack", "urg");
 
-$specialnets = array("lan" => "LAN net", "pptp" => "PPTP clients");
+$specialnets = array("wanip" => "WAN address", "lan" => "LAN net", "pptp" => "PPTP clients");
 
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 	$specialnets['opt' . $i] = $config['interfaces']['opt' . $i]['descr'] . " net";
@@ -113,7 +113,7 @@ function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors
 	}
 	
 	for ($i = 0; $i < count($reqdfields); $i++) {
-		if (!$_POST[$reqdfields[$i]]) {
+		if (!isset($_POST[$reqdfields[$i]]) || ($_POST[$reqdfields[$i]] === "")) {
 			$input_errors[] = "The field '" . $reqdfieldsn[$i] . "' is required.";
 		}
 	}	
@@ -432,11 +432,6 @@ function wol_sort() {
 	}
 	
 	usort($config['wol']['wolentry'], "wolcmp");
-}
-
-function gentitle($pgname) {
-	global $config;
-	return $config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pgname;
 }
 
 ?>

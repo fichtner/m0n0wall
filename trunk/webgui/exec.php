@@ -74,7 +74,7 @@ if (isBlank( $_POST['txtRecallBuffer'] )) {
 ?>
 
    // Set pointer to end of recall buffer.
-   var intRecallPtr = arrRecallBuffer.length-1;
+   var intRecallPtr = arrRecallBuffer.length;
 
    // Functions to extend String class.
    function str_encode() { return escape( this ) }
@@ -142,6 +142,23 @@ if (isBlank( $_POST['txtRecallBuffer'] )) {
 
       return true;
    }
+
+   // hansmi, 2005-01-13
+   function txtCommand_onKey(e) {
+       if(!e) var e = window.event; // IE-Fix
+       var code = (e.keyCode?e.keyCode:(e.which?e.which:0));
+       if(!code) return;
+       var f = document.getElementsByName('frmExecPlus')[0];
+       if(!f) return;
+       switch(code) {
+       case 38: // up
+           btnRecall_onClick(f, -1);
+           break;
+       case 40: // down
+           btnRecall_onClick(f, 1);
+           break;
+       }
+   }
 //-->
 </script>
 <link href="gui.css" rel="stylesheet" type="text/css">
@@ -179,7 +196,11 @@ pre {
 -->
 </style>
 </head>
-<body>
+<body<?php
+if(!isBlank($_POST['txtCommand'])) {
+    echo ' onload="document.forms[\'frmExecPlus\'].txtCommand.focus();"';
+}
+?>>
 <p><span class="pgtitle"><?=$Title ?></span>
 <?php if (isBlank($_POST['txtCommand'])): ?>
 <p class="red"><strong>Note: this function is unsupported. Use it
@@ -205,10 +226,10 @@ if (!isBlank($_POST['txtCommand'])) {
   <table>
     <tr>
       <td class="label" align="right">Command:</td>
-      <td class="type"><input name="txtCommand" type="text" size="80" value="<?=htmlspecialchars($_POST['txtCommand']);?>"></td>
+      <td class="type"><input name="txtCommand" type="text" size="80" value="" onkeypress="txtCommand_onKey(event);"></td>
     </tr>
     <tr>
-      <td valign="top">&nbsp;&nbsp;&nbsp;</td>
+      <td valign="top">&nbsp;</td>
       <td valign="top" class="label">
          <input type="hidden" name="txtRecallBuffer" value="<?=$_POST['txtRecallBuffer'] ?>">
          <input type="button" class="button" name="btnRecallPrev" value="<" onClick="btnRecall_onClick( this.form, -1 );">

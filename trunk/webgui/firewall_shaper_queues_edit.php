@@ -4,7 +4,7 @@
 	firewall_shaper_queues_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Traffic shaper", "Edit queue");
 require("guiconfig.inc");
 
 $a_queues = &$config['shaper']['queue'];
@@ -82,24 +83,14 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Traffic shaper: Edit queue");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Traffic shaper: Edit queue</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (is_array($config['shaper']['pipe']) && (count($config['shaper']['pipe']) > 0)): ?>
             <form action="firewall_shaper_queues_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td valign="top" class="vncellreq">Pipe</td>
-                  <td class="vtable"> <select name="targetpipe" class="formfld">
+                  <td class="vtable"><select name="targetpipe" class="formfld">
                       <?php 
 					  foreach ($config['shaper']['pipe'] as $pipei => $pipe): ?>
                       <option value="<?=$pipei;?>" <?php if ($pipei == $pconfig['targetpipe']) echo "selected"; ?>> 
@@ -116,7 +107,7 @@ if ($_POST) {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Weight</td>
-                  <td width="78%" class="vtable"> <input name="weight" type="text" id="weight" size="5" value="<?=htmlspecialchars($pconfig['weight']);?>"> 
+                  <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="weight" type="text" id="weight" size="5" value="<?=htmlspecialchars($pconfig['weight']);?>"> 
                     <br> <span class="vexpl">Valid range: 1..100.<br>
                     All backlogged (i.e., with packets queued) queues linked to 
                     the same pipe share the pipe's bandwidth proportionally to 
@@ -157,5 +148,3 @@ if ($_POST) {
 <p><strong>You need to create a pipe before you can add a new queue.</strong></p>
 <?php endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

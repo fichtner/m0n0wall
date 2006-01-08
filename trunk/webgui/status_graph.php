@@ -4,7 +4,7 @@
 	status_graph.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Status", "Traffic graph");
 require("guiconfig.inc");
 
 $curif = "wan";
@@ -40,17 +41,7 @@ if ($curif == "wan")
 else
 	$ifnum = $config['interfaces'][$curif]['if'];
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Status: Traffic graph");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Status: Traffic graph</p>
 <?php
 $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
 	
@@ -74,7 +65,5 @@ foreach ($ifdescrs as $ifn => $ifd) {
 <embed src="graph.php?ifnum=<?=$ifnum;?>&ifname=<?=rawurlencode($ifdescrs[$curif]);?>" type="image/svg+xml"
 		width="550" height="275" pluginspage="http://www.adobe.com/svg/viewer/install/auto" />
 </div>
-<p><span class="red"><strong>Note:</strong></span> the <a href="http://www.adobe.com/svg/viewer/install/" target="_blank">Adobe SVG viewer</a> is required to view the graph.
+<br><span class="red"><strong>Note:</strong></span> the <a href="http://www.adobe.com/svg/viewer/install/" target="_blank">Adobe SVG viewer</a> is required to view the graph.
 <?php include("fend.inc"); ?>
-</body>
-</html>

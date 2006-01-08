@@ -4,7 +4,7 @@
 	firewall_rules_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,10 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Rules", "Edit");
 require("guiconfig.inc");
 
-$specialsrcdst = explode(" ", "any lan pptp");
+$specialsrcdst = explode(" ", "any wanip lan pptp");
 
 if (!is_array($config['filter']['rule'])) {
 	$config['filter']['rule'] = array();
@@ -234,6 +235,10 @@ if ($_POST) {
 		$_POST['dstendport'] = 0;
 	}
 	
+	if (($_POST['type'] == "reject") && ($_POST['proto'] != "tcp") && ($_POST['proto'] != "udp")) {
+		$input_errors[] = "Reject only works when the protocol is set to either TCP or UDP.";
+	}
+	
 	if (($_POST['srcbeginport'] && !is_port($_POST['srcbeginport']))) {
 		$input_errors[] = "The start source port must be an integer between 1 and 65535.";
 	}
@@ -322,12 +327,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Rules: Edit");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 var portsenabled = 1;
@@ -432,18 +432,13 @@ function dst_rep_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Rules: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_rules_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Action</td>
                   <td width="78%" class="vtable">
-<select name="type" class="formfld">
+					<select name="type" class="formfld">
                       <?php $types = explode(" ", "Pass Block Reject"); foreach ($types as $type): ?>
                       <option value="<?=strtolower($type);?>" <?php if (strtolower($type) == strtolower($pconfig['type'])) echo "selected"; ?>>
                       <?=htmlspecialchars($type);?>
@@ -465,7 +460,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
-<select name="interface" class="formfld">
+					<select name="interface" class="formfld">
                       <?php $interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
@@ -482,7 +477,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Protocol</td>
                   <td width="78%" class="vtable">
-<select name="proto" class="formfld" onchange="proto_change()">
+					<select name="proto" class="formfld" onchange="proto_change()">
                       <?php $protocols = explode(" ", "TCP UDP TCP/UDP ICMP ESP AH GRE IPv6 IGMP any"); foreach ($protocols as $proto): ?>
                       <option value="<?=strtolower($proto);?>" <?php if (strtolower($proto) == $pconfig['proto']) echo "selected"; ?>>
                       <?=htmlspecialchars($proto);?>
@@ -535,6 +530,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="srctype" class="formfld" onChange="typesel_change()">
 							<?php $sel = is_specialnet($pconfig['src']); ?>
                             <option value="any" <?php if ($pconfig['src'] == "any") { echo "selected"; } ?>>
@@ -543,6 +539,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             Single host or alias</option>
                             <option value="network" <?php if (!$sel) echo "selected"; ?>>
                             Network</option>
+                            <option value="wanip" <?php if ($pconfig['src'] == "wanip") { echo "selected"; } ?>>
+                            WAN address</option>
                             <option value="lan" <?php if ($pconfig['src'] == "lan") { echo "selected"; } ?>>
                             LAN subnet</option>
                             <option value="pptp" <?php if ($pconfig['src'] == "pptp") { echo "selected"; } ?>>
@@ -555,6 +553,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="src" type="text" class="formfldalias" id="src" size="20" value="<?php if (!is_specialnet($pconfig['src'])) echo htmlspecialchars($pconfig['src']);?>">
                         /
 						<select name="srcmask" class="formfld" id="srcmask">
@@ -617,6 +616,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="dsttype" class="formfld" onChange="typesel_change()">
                             <?php $sel = is_specialnet($pconfig['dst']); ?>
                             <option value="any" <?php if ($pconfig['dst'] == "any") { echo "selected"; } ?>>
@@ -625,6 +625,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             Single host or alias</option>
                             <option value="network" <?php if (!$sel) echo "selected"; ?>>
                             Network</option>
+                            <option value="wanip" <?php if ($pconfig['dst'] == "wanip") { echo "selected"; } ?>>
+                            WAN address</option>
                             <option value="lan" <?php if ($pconfig['dst'] == "lan") { echo "selected"; } ?>>
                             LAN subnet</option>
                             <option value="pptp" <?php if ($pconfig['dst'] == "pptp") { echo "selected"; } ?>>
@@ -637,6 +639,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="dst" type="text" class="formfldalias" id="dst" size="20" value="<?php if (!is_specialnet($pconfig['dst'])) echo htmlspecialchars($pconfig['dst']);?>">
                           / 
                           <select name="dstmask" class="formfld" id="dstmask">
@@ -736,5 +739,3 @@ proto_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

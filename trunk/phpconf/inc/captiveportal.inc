@@ -3,7 +3,7 @@
 	captiveportal.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,12 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
+
+	This version of captiveportal.inc has been modified by Rob Parker
+	<rob.parker@keycom.co.uk> to include changes for per-user bandwidth management
+	via returned RADIUS attributes. This page has been modified to delete any
+	added rules which may have been created by other per-user code (index.php, etc).
+	These changes are (c) 2004 Keycom PLC.
 */
 	
 /* include all configuration functions */
@@ -56,7 +62,7 @@ function captiveportal_configure() {
 		mwexec("/sbin/kldload ipfw");
 		
 		/* stop accounting on all clients */
-		captiveportal_radius_stop_all() ;
+		captiveportal_radius_stop_all();
 
 		/* remove old information */
 		unlink_if_exists("{$g['vardb_path']}/captiveportal.nextrule");
@@ -180,21 +186,22 @@ EOD;
 			"/etc/rc.prunecaptiveportal");
 		
 		/* generate passthru mac database */
-		captiveportal_passthrumac_configure() ;
+		captiveportal_passthrumac_configure();
 		/* create allowed ip database and insert ipfw rules to make it so */
-		captiveportal_allowedip_configure() ;
+		captiveportal_allowedip_configure();
 
 		/* generate radius server database */
-		if($config['captiveportal']['radiusip']) {
-			$radiusip = $config['captiveportal']['radiusip'] ;
+		if ($config['captiveportal']['radiusip'] && (!isset($config['captiveportal']['auth_method']) ||
+				($config['captiveportal']['auth_method'] == "radius"))) {
+			$radiusip = $config['captiveportal']['radiusip'];
 
-			if($config['captiveportal']['radiusport'])
-				$radiusport = $config['captiveportal']['radiusport'] ;
+			if ($config['captiveportal']['radiusport'])
+				$radiusport = $config['captiveportal']['radiusport'];
 			else
 				$radiusport = 1812;
 
-			if($config['captiveportal']['radiusacctport'])
-				$radiusacctport = $config['captiveportal']['radiusacctport'] ;
+			if ($config['captiveportal']['radiusacctport'])
+				$radiusacctport = $config['captiveportal']['radiusacctport'];
 			else
 				$radiusacctport = 1813;
 
@@ -205,11 +212,10 @@ EOD;
 				printf("Error: cannot open radius DB file in captiveportal_configure().\n");
 				return 1;
 			} else {
-				fwrite($fd,$radiusip . "," . $radiusport . "," . $radiusacctport . "," . $radiuskey) ;
+				fwrite($fd,$radiusip . "," . $radiusport . "," . $radiusacctport . "," . $radiuskey);
 			}
-			fclose($fd) ;
+			fclose($fd);
 		}
-
 
 		if ($g['booting'])
 			echo "done\n";
@@ -217,8 +223,11 @@ EOD;
 	} else {
 		killbypid("{$g['varrun_path']}/mini_httpd.cp.pid");
 		killbypid("{$g['varrun_path']}/minicron.pid");
-		captiveportal_radius_stop_all() ;
+
+		captiveportal_radius_stop_all();
+
 		mwexec("/sbin/sysctl net.link.ether.ipfw=0");
+
 		if (!isset($config['shaper']['enable'])) {
 			/* unload ipfw */
 			mwexec("/sbin/kldunload ipfw");
@@ -359,17 +368,8 @@ function captiveportal_prune_old() {
 		}
 		
 		if ($timedout) {
-			/* this client needs to be deleted - remove ipfw rules */
-			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
-				RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
-									   $cpdb[$i][4], // username
-									   $cpdb[$i][5], // sessionid
-									   $cpdb[$i][0], // start time
-									   $radiusservers[0]['ipaddr'],
-									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
-			}
-			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+			captiveportal_disconnect($cpdb[$i], $radiusservers);
+			captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "TIMEOUT");
 			unset($cpdb[$i]);
 		}
 	}
@@ -378,6 +378,34 @@ function captiveportal_prune_old() {
 	captiveportal_write_db($cpdb);
 	
 	captiveportal_unlock();
+}
+
+/* remove a single client according to the DB entry */
+function captiveportal_disconnect($dbent, $radiusservers) {
+	
+	global $g, $config;
+	
+	/* this client needs to be deleted - remove ipfw rules */
+	if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
+		RADIUS_ACCOUNTING_STOP($dbent[1], // ruleno
+							   $dbent[4], // username
+							   $dbent[5], // sessionid
+							   $dbent[0], // start time
+							   $radiusservers[0]['ipaddr'],
+							   $radiusservers[0]['acctport'],
+							   $radiusservers[0]['key'],
+							   $dbent[2]); //clientip
+	}
+	
+	mwexec("/sbin/ipfw delete " . $dbent[1] . " " . ($dbent[1]+10000));
+	
+	//KEYCOM: we need to delete +40500 and +45500 as well...
+	//these are the rule numbers we use to control traffic shaping for each logged in user via captive portal
+	//we only need to remove our rules if peruserbw is turned on.
+	if (isset($config['captiveportal']['peruserbw'])) {
+		mwexec("/sbin/ipfw delete " . ($dbent[1]+40500));
+		mwexec("/sbin/ipfw delete " . ($dbent[1]+45500));
+	}
 }
 
 /* remove a single client by ipfw rule number */
@@ -394,17 +422,8 @@ function captiveportal_disconnect_client($id) {
 	/* find entry */	
 	for ($i = 0; $i < count($cpdb); $i++) {
 		if ($cpdb[$i][1] == $id) {
-			/* this client needs to be deleted - remove ipfw rules */
-			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
-				RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
-									   $cpdb[$i][4], // username
-									   $cpdb[$i][5], // sessionid
-									   $cpdb[$i][0], // start time
-									   $radiusservers[0]['ipaddr'],
-									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
-			}
-			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+			captiveportal_disconnect($cpdb[$i], $radiusservers);
+			captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "DISCONNECT");
 			unset($cpdb[$i]);
 			break;
 		}
@@ -420,8 +439,8 @@ function captiveportal_disconnect_client($id) {
 function captiveportal_radius_stop_all() {
 	global $g, $config;
 
-	captiveportal_lock() ;
-	$cpdb = captiveportal_read_db() ;
+	captiveportal_lock();
+	$cpdb = captiveportal_read_db();
 	
 	$radiusservers = captiveportal_get_radius_servers();
 	
@@ -433,25 +452,27 @@ function captiveportal_radius_stop_all() {
 								   $cpdb[$i][0], // start time
 								   $radiusservers[0]['ipaddr'],
 								   $radiusservers[0]['acctport'],
-								   $radiusservers[0]['key']);
+								   $radiusservers[0]['key'],
+								   $cpdb[$i][2]); //clientip
 		}
 	}
-	captiveportal_unlock() ;
+	captiveportal_unlock();
 }
 
 function captiveportal_passthrumac_configure() {
 	global $config, $g;
 	
+	captiveportal_lock();
+	
 	/* clear out passthru macs, if necessary */
-	if (file_exists("{$g['vardb_path']}/captiveportal_mac.db")) {
-		unlink("{$g['vardb_path']}/captiveportal_mac.db");
-	}
+	unlink_if_exists("{$g['vardb_path']}/captiveportal_mac.db");
 	
 	if (is_array($config['captiveportal']['passthrumac'])) {
 		
 		$fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db", "w");
 		if (!$fd) {
 			printf("Error: cannot open passthru mac DB file in captiveportal_passthrumac_configure().\n");
+			captiveportal_unlock();
 			return 1;		
 		}
 		
@@ -463,13 +484,15 @@ function captiveportal_passthrumac_configure() {
 		fclose($fd); 
 	}
 	
+	captiveportal_unlock();
+	
 	return 0;
 }
 
 function captiveportal_allowedip_configure() {
 	global $config, $g;
 	
-	captiveportal_lock() ;
+	captiveportal_lock();
 
 	/* clear out existing allowed ips, if necessary */
 	if (file_exists("{$g['vardb_path']}/captiveportal_ip.db")) {
@@ -477,13 +500,13 @@ function captiveportal_allowedip_configure() {
 		if ($fd) {
 			while (!feof($fd)) {
 				$line = trim(fgets($fd));
-				if($line) {
+				if ($line) {
 					list($ip,$rule) = explode(",",$line);
-					mwexec("/sbin/ipfw delete $rule") ;
+					mwexec("/sbin/ipfw delete $rule");
 				}	
 			}
 		}
-		fclose($fd) ;
+		fclose($fd);
 		unlink("{$g['vardb_path']}/captiveportal_ip.db");
 	}
 
@@ -498,22 +521,25 @@ function captiveportal_allowedip_configure() {
 		$fd = @fopen("{$g['vardb_path']}/captiveportal_ip.db", "w");
 		if (!$fd) {
 			printf("Error: cannot open allowed ip DB file in captiveportal_allowedip_configure().\n");
-			captiveportal_unlock() ;
+			captiveportal_unlock();
 			return 1;		
 		}
 		
 		foreach ($config['captiveportal']['allowedip'] as $ipent) {
+		
 			/* record allowed ip so it can be recognized and removed later */
 			fwrite($fd, $ipent['ip'] . "," . $ruleno ."\n");
+			
 			/* insert ipfw rule to allow ip thru */
-			if($ipent['dir'] == "from") {
-				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from ".$ipent['ip']." to any in") ;
-				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to ".$ipent['ip']." out") ;
+			if ($ipent['dir'] == "from") {
+				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from " . $ipent['ip'] . " to any in");
+				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to " . $ipent['ip'] . " out");
 			} else {
-				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to ".$ipent['ip']." in") ;
-				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from ".$ipent['ip']." to any out") ;
+				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to " . $ipent['ip'] . " in");
+				mwexec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from " . $ipent['ip'] . " to any out");
 			}
-			$ruleno++ ;
+			
+			$ruleno++;
 			if ($ruleno > 19899)
 				$ruleno = 10000;
 		}
@@ -528,7 +554,7 @@ function captiveportal_allowedip_configure() {
 		}
 	}
 	
-	captiveportal_unlock() ;
+	captiveportal_unlock();
 	return 0;
 }
 
@@ -638,6 +664,16 @@ function captiveportal_unlock() {
 	
 	if (file_exists($lockfile))
 		unlink($lockfile);
+}
+
+/* log successful captive portal authentication to syslog */
+/* part of this code from php.net */
+function captiveportal_logportalauth($user,$mac,$ip,$status) {
+	define_syslog_variables();
+	openlog("logportalauth", LOG_PID, LOG_LOCAL4);
+	// Log it
+	syslog(LOG_INFO, "$status: $user, $mac, $ip");
+	closelog();
 }
 
 ?>

@@ -4,7 +4,7 @@
 	system_firmware.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,15 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$d_isfwfile = 1; require("guiconfig.inc"); 
+$d_isfwfile = 1;
+$pgtitle = array("System", "Firmware");
+require("guiconfig.inc"); 
 
 /* checks with m0n0.ch to see if a newer firmware version is available;
    returns any HTML message it gets from the server */
 function check_firmware_version() {
 	global $g;
-	$post = "platform=" . rawurlencode($g['platform']) . 
+	$post = "platform=" . rawurlencode($g['fullplatform']) . 
 		"&version=" . rawurlencode(trim(file_get_contents("/etc/version")));
 		
 	$rfd = @fsockopen("m0n0.ch", 80, $errno, $errstr, 3);
@@ -94,8 +96,8 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 		} else if ($mode == "upgrade") {
 			if (is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
 				/* verify firmware image(s) */
-				if (!stristr($_FILES['ulfile']['name'], $g['platform']) && !$_POST['sig_override'])
-					$input_errors[] = "The uploaded image file is not for this platfom ({$g['platform']}).";
+				if (!stristr($_FILES['ulfile']['name'], $g['fullplatform']) && !$_POST['sig_override'])
+					$input_errors[] = "The uploaded image file is not for this platform ({$g['fullplatform']}).";
 				else if (!file_exists($_FILES['ulfile']['tmp_name'])) {
 					/* probably out of memory for the MFS */
 					$input_errors[] = "Image upload failed (out of memory?)";
@@ -137,17 +139,7 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 		$fwinfo = check_firmware_version();
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("System: Firmware");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">System: Firmware</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($fwinfo) echo $fwinfo; ?>
@@ -169,7 +161,7 @@ print_info_box($sig_warning);
 <?php else: ?>
             <?php if (!file_exists($d_firmwarelock_path)): ?>
             <p>Click &quot;Enable firmware 
-              upload&quot; below, then choose the image file (<?=$g['platform'];?>-*.img)
+              upload&quot; below, then choose the image file (<?=$g['fullplatform'];?>-*.img)
 			  to be uploaded.<br>Click &quot;Upgrade firmware&quot; 
               to start the upgrade process.</p>
             <form action="system_firmware.php" method="post" enctype="multipart/form-data">
@@ -202,5 +194,3 @@ print_info_box($sig_warning);
 </form>
 <?php endif; endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

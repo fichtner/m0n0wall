@@ -4,7 +4,7 @@
     firewall_nat_out_edit.php
     part of m0n0wall (http://m0n0.ch/wall)
     
-    Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "NAT", "Edit outbound mapping");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['advancedoutbound']['rule']))
@@ -174,12 +175,7 @@ if ($_POST) {
     }
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: NAT: Edit outbound mapping");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function typesel_change() {
@@ -198,11 +194,6 @@ function typesel_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: NAT: Edit outbound mapping</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_nat_out_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -227,7 +218,7 @@ function typesel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Source</td>
                   <td width="78%" class="vtable">
-<input name="source" type="text" class="formfld" id="source" size="20" value="<?=htmlspecialchars($pconfig['source']);?>">
+					<?=$mandfldhtml;?><input name="source" type="text" class="formfld" id="source" size="20" value="<?=htmlspecialchars($pconfig['source']);?>">
                      
                   / 
                     <select name="source_subnet" class="formfld" id="source_subnet">
@@ -243,13 +234,14 @@ function typesel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Destination</td>
                   <td width="78%" class="vtable">
-<input name="destination_not" type="checkbox" id="destination_not" value="yes" <?php if ($pconfig['destination_not']) echo "checked"; ?>>
+				<input name="destination_not" type="checkbox" id="destination_not" value="yes" <?php if ($pconfig['destination_not']) echo "checked"; ?>>
                     <strong>not</strong><br>
                     Use this option to invert the sense of the match.<br>
                     <br>
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="destination_type" class="formfld" onChange="typesel_change()">
                             <option value="any" <?php if ($pconfig['destination'] == "any") echo "selected"; ?>> 
                             any</option>
@@ -259,6 +251,7 @@ function typesel_change() {
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="destination" type="text" class="formfld" id="destination" size="20" value="<?=htmlspecialchars($pconfig['destination']);?>">
                           / 
                           <select name="destination_subnet" class="formfld" id="destination_subnet">
@@ -271,6 +264,7 @@ function typesel_change() {
                       </tr>
                       <tr>
                         <td>&nbsp;</td>
+						<td></td>
                         <td><span class="vexpl">Enter the destination network for 
                           the outbound NAT mapping.</span></td>
                       </tr>
@@ -307,5 +301,3 @@ typesel_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

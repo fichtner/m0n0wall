@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	diag_logs_vpn.php
+	diag_logs_portal.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
@@ -37,7 +37,7 @@ if (!$nentries)
 	$nentries = 50;
 
 if ($_POST['clear']) {
-	exec("/usr/sbin/clog -i -s 65536 /var/log/vpn.log");
+	exec("/usr/sbin/clog -i -s 32768 /var/log/portalauth.log");
 }
 
 function dump_clog($logfile, $tail) {
@@ -49,18 +49,9 @@ function dump_clog($logfile, $tail) {
 	
 	foreach ($logarr as $logent) {
 		$logent = preg_split("/\s+/", $logent, 6);
-		$llent = explode(",", $logent[5]);
-		
-		echo "<tr>\n";
+		echo "<tr valign=\"top\">\n";
 		echo "<td class=\"listlr\" nowrap>" . htmlspecialchars(join(" ", array_slice($logent, 0, 3))) . "</td>\n";
-		
-		if ($llent[0] == "login")
-			echo "<td class=\"listr\"><img src=\"in.gif\" width=\"11\" height=\"11\" title=\"login\"></td>\n";
-		else
-			echo "<td class=\"listr\"><img src=\"out.gif\" width=\"11\" height=\"11\" title=\"logout\"></td>\n";
-		
-		echo "<td class=\"listr\">" . htmlspecialchars($llent[3]) . "</td>\n";
-		echo "<td class=\"listr\">" . htmlspecialchars($llent[2]) . "&nbsp;</td>\n";
+		echo "<td class=\"listr\">" . htmlspecialchars($logent[5]) . "</td>\n";
 		echo "</tr>\n";
 	}
 }
@@ -73,26 +64,21 @@ function dump_clog($logfile, $tail) {
     <li class="tabinact1"><a href="diag_logs.php">System</a></li>
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
-    <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
-    <li class="tabact">PPTP VPN</li>
+    <li class="tabact">Captive portal</li>
+    <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
   </ul>
   </td></tr>
-  <tr>
+  <tr> 
     <td class="tabcont">
-		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
-		  <td colspan="4" class="listtopic"> 
-			    Last <?=$nentries;?> PPTP VPN log entries</td>
-			</tr>
-			<tr>
-			  <td class="listhdrr">Time</td>
-			  <td class="listhdrr">Action</td>
-			  <td class="listhdrr">User</td>
-			  <td class="listhdrr">IP address</td>
-			</tr>
-			<?php dump_clog("/var/log/vpn.log", $nentries); ?>
-          </table>
-		<br><form action="diag_logs_vpn.php" method="post">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		  <tr> 
+			<td colspan="2" class="listtopic"> 
+			  Last <?=$nentries;?> captive portal log entries</td>
+		  </tr>
+		  <?php dump_clog("/var/log/portalauth.log", $nentries); ?>
+		</table>
+		<br><form action="diag_logs_portal.php" method="post">
 <input name="clear" type="submit" class="formbtn" value="Clear log">
 </form>
 	</td>

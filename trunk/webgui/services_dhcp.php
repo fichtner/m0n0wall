@@ -4,7 +4,7 @@
 	services_dhcp.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "DHCP server");
 require("guiconfig.inc");
 
 $if = $_GET['if'];
@@ -85,11 +86,11 @@ if ($_POST) {
 		if (($_POST['wins1'] && !is_ipaddr($_POST['wins1'])) || ($_POST['wins2'] && !is_ipaddr($_POST['wins2']))) {
 			$input_errors[] = "A valid IP address must be specified for the primary/secondary WINS server.";
 		}
-		if ($_POST['deftime'] && (!is_numeric($_POST['deftime']) || ($_POST['deftime'] < 60))) {
-			$input_errors[] = "The default lease time must be at least 60 seconds.";
+		if ($_POST['deftime'] && (!is_numericint($_POST['deftime']))) {
+			$input_errors[] = "The default lease time must be an integer.";
 		}
-		if ($_POST['maxtime'] && (!is_numeric($_POST['maxtime']) || ($_POST['maxtime'] < 60) || ($_POST['maxtime'] <= $_POST['deftime']))) {
-			$input_errors[] = "The maximum lease time must be at least 60 seconds and higher than the default lease time.";
+		if ($_POST['maxtime'] && (!is_numericint($_POST['maxtime']) || ($_POST['maxtime'] <= $_POST['deftime']))) {
+			$input_errors[] = "The maximum lease time must be higher than the default lease time.";
 		}
 		
 		if (!$input_errors) {
@@ -152,12 +153,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: DHCP server");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
@@ -173,11 +169,6 @@ function enable_change(enable_over) {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: DHCP server</p>
 <form action="services_dhcp.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -186,15 +177,15 @@ function enable_change(enable_over) {
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-<?php foreach ($iflist as $ifent => $ifname):
+<?php $i = 0; foreach ($iflist as $ifent => $ifname):
 	if ($ifent == $if): ?>
     <li class="tabact"><?=htmlspecialchars($ifname);?></li>
 <?php else: ?>
-    <li class="tabinact"><a href="services_dhcp.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
+    <li class="<?php if ($i == 0) echo "tabinact1"; else echo "tabinact";?>"><a href="services_dhcp.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
 <?php endif; ?>
-<?php endforeach; ?>
+<?php $i++; endforeach; ?>
   </ul>
   </td></tr>
   <tr> 
@@ -240,8 +231,8 @@ function enable_change(enable_over) {
                       <tr> 
                         <td width="22%" valign="top" class="vncellreq">Range</td>
                         <td width="78%" class="vtable"> 
-                          <input name="range_from" type="text" class="formfld" id="range_from" size="20" value="<?=htmlspecialchars($pconfig['range_from']);?>"> 
-                          &nbsp;to&nbsp; <input name="range_to" type="text" class="formfld" id="range_to" size="20" value="<?=htmlspecialchars($pconfig['range_to']);?>"></td>
+                          <?=$mandfldhtml;?><input name="range_from" type="text" class="formfld" id="range_from" size="20" value="<?=htmlspecialchars($pconfig['range_from']);?>"> 
+                          &nbsp;to&nbsp; <?=$mandfldhtmlspc;?><input name="range_to" type="text" class="formfld" id="range_to" size="20" value="<?=htmlspecialchars($pconfig['range_to']);?>"></td>
                       </tr>
                       <tr> 
                         <td width="22%" valign="top" class="vncell">WINS servers</td>
@@ -289,7 +280,6 @@ function enable_change(enable_over) {
                             </span></p></td>
                       </tr>
                     </table>
-					&nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="35%" class="listhdrr">MAC address </td>
@@ -327,5 +317,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -4,7 +4,7 @@
 	vpn_pptp.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("VPN", "PPTP");
 require("guiconfig.inc");
 
 if (!is_array($config['pptpd']['radius'])) {
@@ -121,11 +122,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-<title><?=gentitle("VPN: PPTP");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function get_radio_value(obj)
@@ -170,16 +167,11 @@ function enable_change(enable_over) {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">VPN: PPTP</p>
 <form action="vpn_pptp.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabact">Configuration</li>
     <li class="tabinact"><a href="vpn_pptp_users.php">Users</a></li>
@@ -202,7 +194,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">PPTP redirection</td>
                   <td width="78%" class="vtable"> 
-                    <input name="redir" type="text" class="formfld" id="redir" size="20" value="<?=htmlspecialchars($pconfig['redir']);?>"> 
+                    <?=$mandfldhtml;?><input name="redir" type="text" class="formfld" id="redir" size="20" value="<?=htmlspecialchars($pconfig['redir']);?>"> 
                     <br>
                     Enter the IP address of a host which will accept incoming 
                     PPTP connections.</td>
@@ -220,7 +212,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Server address</td>
                   <td width="78%" class="vtable"> 
-                    <input name="localip" type="text" class="formfld" id="localip" size="20" value="<?=htmlspecialchars($pconfig['localip']);?>"> 
+                    <?=$mandfldhtml;?><input name="localip" type="text" class="formfld" id="localip" size="20" value="<?=htmlspecialchars($pconfig['localip']);?>"> 
                     <br>
                     Enter the IP address the PPTP server should use on its side 
                     for all clients.</td>
@@ -229,7 +221,7 @@ function enable_change(enable_over) {
                   <td width="22%" valign="top" class="vncellreq">Remote address 
                     range</td>
                   <td width="78%" class="vtable"> 
-                    <input name="remoteip" type="text" class="formfld" id="remoteip" size="20" value="<?=htmlspecialchars($pconfig['remoteip']);?>">
+                    <?=$mandfldhtml;?><input name="remoteip" type="text" class="formfld" id="remoteip" size="20" value="<?=htmlspecialchars($pconfig['remoteip']);?>">
                     / 
                     <?=$g['pptp_subnet'];?>
                     <br>
@@ -241,7 +233,6 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS</td>
                   <td width="78%" class="vtable"> 
-                    <p> 
                       <input name="radiusenable" type="checkbox" id="radiusenable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radiusenable']) echo "checked"; ?>>
                       <strong>Use a RADIUS server for authentication<br>
                       </strong>When set, all users will be authenticated using 
@@ -250,24 +241,22 @@ function enable_change(enable_over) {
                       <br>
                       <input name="radacct_enable" type="checkbox" id="radacct_enable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radacct_enable']) echo "checked"; ?>>
                       <strong>Enable RADIUS accounting <br>
-                      </strong>Sends accounting packets to the RADIUS server. </p></td>
+                      </strong>Sends accounting packets to the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS server </td>
-                  <td width="78%" class="vtable"> 
-                    <p> 
+                  <td width="78%" class="vtable">
                       <input name="radiusserver" type="text" class="formfld" id="radiusserver" size="20" value="<?=htmlspecialchars($pconfig['radiusserver']);?>">
                       <br>
-                      Enter the IP address of the RADIUS server.</p></td>
+                      Enter the IP address of the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS shared secret</td>
-                  <td width="78%" valign="top" class="vtable"> 
-                    <p> 
+                  <td width="78%" valign="top" class="vtable">
                       <input name="radiussecret" type="password" class="formfld" id="radiussecret" size="20" value="<?=htmlspecialchars($pconfig['radiussecret']);?>">
                       <br>
                       Enter the shared secret that will be used to authenticate 
-                      to the RADIUS server.</p></td>
+                      to the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td height="16" colspan="2" valign="top"></td>
@@ -305,5 +294,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

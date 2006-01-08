@@ -4,7 +4,7 @@
 	firewall_nat_server.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "NAT");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['servernat'])) {
@@ -81,17 +82,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: NAT");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: NAT</p>
 <form action="firewall_nat_server.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -99,9 +90,10 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The NAT configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact"><a href="firewall_nat.php">Inbound</a></li>
+    <li class="tabinact1"><a href="firewall_nat.php">Inbound</a></li>
     <li class="tabact">Server NAT</li>
     <li class="tabinact"><a href="firewall_nat_1to1.php">1:1</a></li>
     <li class="tabinact"><a href="firewall_nat_out.php">Outbound</a></li>
@@ -131,13 +123,11 @@ if ($_GET['act'] == "del") {
                   <td class="list" colspan="2"></td>
                   <td class="list"> <a href="firewall_nat_server_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
-              </table>
-			        <p><span class="vexpl"><span class="red"><strong>Note:<br>
-                      </strong></span>The external IP addresses defined on this page may be used in <a href="firewall_nat.php">inbound NAT</a> mappings. Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span></p>
+              </table><br>
+			        <span class="vexpl"><span class="red"><strong>Note:<br>
+                      </strong></span>The external IP addresses defined on this page may be used in <a href="firewall_nat.php">inbound NAT</a> mappings. Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span>
 </td>
   </tr>
 </table>
             </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -4,7 +4,7 @@
 	diag_backup.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,8 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+
+$pgtitle = array("Diagnostics", "Backup/restore");
 
 /* omit no-cache headers because it confuses IE with file downloads */
 $omit_nocacheheaders = true;
@@ -71,17 +73,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Diagnostics: Backup/restore");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-      <p class="pgtitle">Diagnostics: Backup/restore</p>
             <form action="diag_backup.php" method="post" enctype="multipart/form-data">
             <?php if ($input_errors) print_input_errors($input_errors); ?>
             <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -92,7 +84,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="baseline" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <p> Click this button to download the system configuration 
+                    Click this button to download the system configuration 
                       in XML format.<br>
                       <br>
                       <input name="Submit" type="submit" class="formbtn" id="download" value="Download configuration"></td>
@@ -121,5 +113,3 @@ if ($_POST) {
               </table>
             </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

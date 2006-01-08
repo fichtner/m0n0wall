@@ -1,7 +1,7 @@
-#!/usr/local/bin/php -f
-<?php
+#!/usr/local/bin/php
+<?php 
 /*
-	rc.prunecaptiveportal
+	status_graph_cpu.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
@@ -29,9 +29,13 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-	/* parse the configuration and include all functions used below */
-	require_once("config.inc");
-	require_once("functions.inc");
-	
-	captiveportal_prune_old();
+$pgtitle = array("Status", "CPU load");
+require("guiconfig.inc");
 ?>
+<?php include("fbegin.inc"); ?>
+<div align="center">
+<embed src="graph_cpu.php" type="image/svg+xml"
+		width="550" height="275" pluginspage="http://www.adobe.com/svg/viewer/install/auto" />
+</div>
+<br><span class="red"><strong>Note:</strong></span> the <a href="http://www.adobe.com/svg/viewer/install/" target="_blank">Adobe SVG viewer</a> is required to view the graph.
+<?php include("fend.inc"); ?>

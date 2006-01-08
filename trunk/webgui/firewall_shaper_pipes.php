@@ -4,7 +4,7 @@
 	firewall_shaper_pipes.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Traffic shaper");
 require("guiconfig.inc");
 
 if (!is_array($config['shaper']['pipe'])) {
@@ -88,17 +89,7 @@ if ($_GET['act'] == "del") {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Traffic shaper");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Traffic shaper</p>
 <form action="firewall_shaper.php" method="post">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -107,9 +98,9 @@ if ($_GET['act'] == "del") {
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact"><a href="firewall_shaper.php">Rules</a></li>
+    <li class="tabinact1"><a href="firewall_shaper.php">Rules</a></li>
     <li class="tabact">Pipes</li>
     <li class="tabinact"><a href="firewall_shaper_queues.php">Queues</a></li>
     <li class="tabinact"><a href="firewall_shaper_magic.php">Magic shaper wizard</a></li>
@@ -120,10 +111,12 @@ if ($_GET['act'] == "del") {
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                       <tr> 
                         <td width="10%" class="listhdrr">No.</td>
-                        <td width="20%" class="listhdrr">Bandwidth</td>
-                        <td width="15%" class="listhdrr">Delay</td>
+                        <td width="15%" class="listhdrr">Bandwidth</td>
+                        <td width="10%" class="listhdrr">Delay</td>
+                        <td width="10%" class="listhdrr">PLR</td>
+                        <td width="10%" class="listhdrr">Queue</td>
                         <td width="15%" class="listhdrr">Mask</td>
-                        <td width="30%" class="listhdr">Description</td>
+                        <td width="20%" class="listhdr">Description</td>
                         <td width="10%" class="list"></td>
                       </tr>
                       <?php $i = 0; foreach ($a_pipes as $pipe): ?>
@@ -140,6 +133,16 @@ if ($_GET['act'] == "del") {
                           <?php endif; ?>
                           &nbsp; </td>
                         <td class="listr"> 
+                          <?php if ($pipe['plr']): ?>
+                          <?=$pipe['plr'];?>
+                          <?php endif; ?>
+                          &nbsp; </td>
+                        <td class="listr"> 
+                          <?php if ($pipe['qsize']): ?>
+                          <?=htmlspecialchars($pipe['qsize']);?>
+                          <?php endif; ?>
+                          &nbsp; </td>
+                        <td class="listr"> 
                           <?php if ($pipe['mask']): ?>
                           <?=$pipe['mask'];?>
                           <?php endif; ?>
@@ -152,16 +155,13 @@ if ($_GET['act'] == "del") {
                       </tr>
                       <?php $i++; endforeach; ?>
                       <tr> 
-                        <td class="list" colspan="5"></td>
+                        <td class="list" colspan="7"></td>
                         <td class="list"> <a href="firewall_shaper_pipes_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
-                    </table>
-			        <p>
+                    </table><br>
                     <strong><span class="red">Note:</span></strong> a pipe can 
-                    only be deleted if it is not referenced by any rules or queues.</td></p>
+                    only be deleted if it is not referenced by any rules or queues.</td>
 	</tr>
 </table>
             </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -4,7 +4,7 @@
 	system_advanced.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
 
 $pconfig['filteringbridge_enable'] = isset($config['bridge']['filteringbridge']);
@@ -41,8 +42,10 @@ $pconfig['disablefirmwarecheck'] = isset($config['system']['disablefirmwarecheck
 $pconfig['expanddiags'] = isset($config['system']['webgui']['expanddiags']);
 if ($g['platform'] == "generic-pc")
 	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
+$pconfig['bypassstaticroutes'] = isset($config['filter']['bypassstaticroutes']);
 $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
 $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
+$pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 
 if ($_POST) {
 
@@ -81,7 +84,10 @@ if ($_POST) {
 			$config['system']['harddiskstandby'] = $_POST['harddiskstandby'];
 		}
 		$config['system']['webgui']['noantilockout'] = $_POST['noantilockout'] ? true : false;
+		$config['filter']['bypassstaticroutes'] = $_POST['bypassstaticroutes'] ? true : false;
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
+		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
+		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
 			
 		write_config();
 		
@@ -104,18 +110,15 @@ if ($_POST) {
 			config_lock();
 			$retval = filter_configure();
 			$retval |= interfaces_optional_configure();
+			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa)
+				$retval |= vpn_ipsec_configure();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("System: Advanced functions");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
@@ -127,11 +130,6 @@ function enable_change(enable_over) {
 }
 // -->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-      <p class="pgtitle">System: Advanced functions</p>
             <?php if ($input_errors) print_input_errors($input_errors); ?>
             <?php if ($savemsg) print_info_box($savemsg); ?>
             <p><span class="vexpl"><span class="red"><strong>Note: </strong></span>the 
@@ -238,17 +236,10 @@ function enable_change(enable_over) {
                   <td width="22%" valign="top" class="vncell">Hard disk standby time </td>
                   <td width="78%" class="vtable"> 
                     <select name="harddiskstandby" class="formfld">
-					<?php
-                        /* Values from ATA-2
-                           http://www.t13.org/project/d0948r3-ATA-2.pdf
-                           Page 66 */
-						$sbvals = explode(" ", "0.5,6 1,12 2,24 3,36 4,48 5,60 7.5,90 10,120 15,180 20,240 30,241 60,242");
-					?>
+					<?php $sbvals = array(1,2,3,4,5,10,15,20,30,60); ?>
                       <option value="" <?php if(!$pconfig['harddiskstandby']) echo('selected');?>>Always on</option>
-					<?php
-					foreach ($sbvals as $sbval):
-						list($min,$val) = explode(",", $sbval); ?>
-                      <option value="<?=$val;?>" <?php if($pconfig['harddiskstandby'] == $val) echo('selected');?>><?=$min;?> minutes</option>
+					<?php foreach ($sbvals as $sbval): ?>
+                      <option value="<?=$sbval;?>" <?php if($pconfig['harddiskstandby'] == $sbval) echo 'selected';?>><?=$sbval;?> minutes</option>
 					<?php endforeach; ?>
                     </select>
                     <br>
@@ -263,6 +254,13 @@ function enable_change(enable_over) {
                     <strong>Keep diagnostics in navigation expanded </strong></td>
                 </tr>
 				<tr> 
+                  <td width="22%" valign="top" class="vncell">Static route filtering</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="bypassstaticroutes" type="checkbox" id="bypassstaticroutes" value="yes" <?php if ($pconfig['bypassstaticroutes']) echo "checked"; ?>>
+                    <strong>Bypass firewall rules for traffic on the same interface</strong><br>
+					This option only applies if you have defined one or more static routes. If it is enabled, traffic that enters and leaves through the same interface will not be checked by the firewall. This may be desirable in some situations where multiple subnets are connected to the same interface. </td>
+                </tr>
+				<tr> 
                   <td width="22%" valign="top" class="vncell">webGUI anti-lockout</td>
                   <td width="78%" class="vtable"> 
                     <input name="noantilockout" type="checkbox" id="noantilockout" value="yes" <?php if ($pconfig['noantilockout']) echo "checked"; ?>>
@@ -270,6 +268,15 @@ function enable_change(enable_over) {
 					By default, access to the webGUI on the LAN interface is always permitted, regardless of the user-defined filter rule set. Enable this feature to control webGUI access (make sure to have a filter rule in place that allows you in, or you will lock yourself out!).<br>
 					Hint: 
 					the &quot;set LAN IP address&quot; option in the console menu  resets this setting as well.</td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">IPsec SA preferral</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="preferoldsa_enable" type="checkbox" id="preferoldsa_enable" value="yes" <?php if ($pconfig['preferoldsa_enable']) echo "checked"; ?>>
+                    <strong>Prefer old IPsec SAs</strong><br>
+					By default, if several SAs match, the newest one is preferred if it's at least 30 seconds old.
+					Select this option to always prefer old SAs over new ones.
+					</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
@@ -285,5 +292,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>
