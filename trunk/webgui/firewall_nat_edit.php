@@ -110,7 +110,7 @@ if ($_POST) {
 			continue;
 		if ($natent['external-address'] != $_POST['extaddr'])
 			continue;
-		if (($natent['proto'] != $_POST['proto']) && ($natent['proto'] != "tcp/udp") && ($_POST['proto'] != "tcp/udp"))
+		if (($natent['protocol'] != $_POST['proto']) && ($natent['protocol'] != "tcp/udp") && ($_POST['proto'] != "tcp/udp"))
 			continue;
 		
 		list($begp,$endp) = explode("-", $natent['external-port']);
