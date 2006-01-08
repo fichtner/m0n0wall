@@ -1,0 +1,55 @@
+--- crypto_openssl.c.orig2	Sat Jun 18 20:46:38 2005
++++ crypto_openssl.c	Sat Jun 18 20:48:08 2005
+@@ -32,6 +32,10 @@
+ #include <sys/types.h>
+ #include <sys/param.h>
+ 
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <limits.h>
+@@ -494,12 +498,36 @@
+ 		goto end;
+ 	}
+ 
+-	len = gen->d.ia5->length + 1;
+-	*altname = racoon_malloc(len);
+-	if (!*altname)
+-		goto end;
++	if (gen->type == GEN_IPADD && gen->d.ia5->length == 4 /* IPv4 */) {
++	  char *ipv4_string = inet_ntoa(*((struct in_addr *)gen->d.iPAddress->data));
++	  *altname = NULL;
++	  if (ipv4_string) {
++	    len = strlen(ipv4_string)+1;
++	    *altname = racoon_malloc(len);
++	  }
++	  if (!*altname) {
++#ifndef EAYDEBUG
++	    plog(LLV_ERROR, LOCATION, NULL, "failed to extract ipv4 alt name from certificate\n");
++#else
++	    printf("failed to extract ipv4 alt name from certificate\n");
++#endif
++	    goto end;
++	  }
++	  strcpy(*altname, ipv4_string);
++#ifndef EAYDEBUG
++	  plog(LLV_DEBUG2, LOCATION, NULL, "extracted ipv4 alt name from certificate: %s\n", *altname);
++#else
++	  printf("extracted ipv4 alt name from certificate: %s\n", *altname);
++#endif
++	}
++	else {
++	  len = gen->d.ia5->length + 1;
++	  *altname = racoon_malloc(len);
++	  if (!*altname)
++	    goto end;
+ 
+-	strlcpy(*altname, gen->d.ia5->data, len);
++	  strlcpy(*altname, gen->d.ia5->data, len);
++	}
+ 	*type = gen->type;
+ 
+ 	error = 0;
