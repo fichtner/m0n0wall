@@ -3,7 +3,7 @@
 	interfaces_wlan.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 function wireless_config_init() {
 	global $optcfg, $pconfig;
 	
+	$pconfig['standard'] = $optcfg['wireless']['standard'];
 	$pconfig['mode'] = $optcfg['wireless']['mode'];
 	$pconfig['ssid'] = $optcfg['wireless']['ssid'];
 	$pconfig['stationname'] = $optcfg['wireless']['stationname'];
@@ -70,6 +71,7 @@ function wireless_config_post() {
 
 	if (!$input_errors) {
 	
+		$optcfg['wireless']['standard'] = $_POST['standard'];
 		$optcfg['wireless']['mode'] = $_POST['mode'];
 		$optcfg['wireless']['ssid'] = $_POST['ssid'];
 		$optcfg['wireless']['stationname'] = $_POST['stationname'];
@@ -100,12 +102,26 @@ function wireless_config_print() {
                 <tr> 
                   <td colspan="2" valign="top" class="listtopic">Wireless configuration</td>
 				</tr>
+				<?php if (strstr($optcfg['if'], "ath")): ?>
+                <tr> 
+                  <td valign="top" class="vncellreq">Standard</td>
+                  <td class="vtable"><select name="standard" class="formfld" id="standard">
+                      <?php
+					  $standards = array("11b" => "802.11b", "11g" => "802.11g", "11a" => "802.11a");
+					  foreach ($standards as $sn => $sv): ?>
+                      <option value="<?=$sn;?>" <?php if ($sn == $pconfig['standard']) echo "selected";?>>
+                      <?=$sv;?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select></td>
+                </tr>
+				<?php endif; ?>
                 <tr> 
                   <td valign="top" class="vncellreq">Mode</td>
-                  <td class="vtable"> <select name="mode" class="formfld" id="mode">
+                  <td class="vtable"><select name="mode" class="formfld" id="mode">
                       <?php 
 						$opts = array();
-						if (strstr($optcfg['if'], "wi"))
+						if (strstr($optcfg['if'], "wi") || strstr($optcfg['if'], "ath"))
 							$opts[] = "hostap";
 						$opts[] = "BSS";
 						$opts[] = "IBSS";
@@ -121,7 +137,7 @@ function wireless_config_print() {
 				</tr>
                 <tr> 
                   <td valign="top" class="vncellreq">SSID</td>
-                  <td class="vtable"><input name="ssid" type="text" class="formfld" id="ssid" size="20" value="<?=htmlspecialchars($pconfig['ssid']);?>">
+                  <td class="vtable"><?=$mandfldhtml;?><input name="ssid" type="text" class="formfld" id="ssid" size="20" value="<?=htmlspecialchars($pconfig['ssid']);?>">
                   </td>
                 </tr>
                 <tr> 

@@ -4,7 +4,7 @@
 	interfaces_vlan.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Interfaces", "Assign network ports");
 require("guiconfig.inc");
 
 if (!is_array($config['vlans']['vlan']))
@@ -84,23 +85,13 @@ if ($_GET['act'] == "del") {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Interfaces: Assign network ports: VLANs");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Interfaces: Assign network ports: VLANs</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact"><a href="interfaces_assign.php">Interface assignments</a></li>
+    <li class="tabinact1"><a href="interfaces_assign.php">Interface assignments</a></li>
     <li class="tabact">VLANs</li>
   </ul>
   </td></tr>
@@ -145,5 +136,3 @@ if ($_GET['act'] == "del") {
 	</tr>
 </table>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -4,7 +4,7 @@
 	interfaces_opt.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,8 @@ $pconfig['bridge'] = $optcfg['bridge'];
 $pconfig['ipaddr'] = $optcfg['ipaddr'];
 $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
+
+$pgtitle = array("Interfaces", "Optional $index (" . htmlspecialchars($optcfg['descr']) . ")");
 
 /* Wireless interface? */
 if (isset($optcfg['wireless'])) {
@@ -141,12 +143,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Interfaces: Optional $index (" . htmlspecialchars($optcfg['descr']) . ")");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
@@ -178,11 +175,6 @@ function ipaddr_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Interfaces: Optional <?=$index;?> (<?=htmlspecialchars($optcfg['descr']);?>)</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
@@ -210,7 +202,7 @@ function ipaddr_change() {
 				<tr> 
                   <td width="22%" valign="top" class="vncellreq">Bridge with</td>
                   <td width="78%" class="vtable">
-<select name="bridge" class="formfld" id="bridge" onChange="enable_change(false)">
+					<select name="bridge" class="formfld" id="bridge" onChange="enable_change(false)">
 				  	<option <?php if (!$pconfig['bridge']) echo "selected";?> value="">none</option>
                       <?php $opts = array('lan' => "LAN", 'wan' => "WAN");
 					  	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
@@ -228,7 +220,7 @@ function ipaddr_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
-                    <input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
+                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
                     /
                 	<select name="subnet" class="formfld" id="subnet">
 					<?php for ($i = 31; $i > 0; $i--): ?>
@@ -269,5 +261,3 @@ enable_change(false);
 <p><strong>Optional <?=$index;?> has been disabled because there is no OPT<?=$index;?> interface.</strong></p>
 <?php endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

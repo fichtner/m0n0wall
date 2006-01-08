@@ -4,7 +4,7 @@
 	rc.initial.setlanip
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -85,12 +85,15 @@
 		unset($config['dhcpd']['lan']['enable']);
 	}
 	
+	$proto = "http";
 	if ($config['system']['webgui']['protocol'] == "https") {
 	
 		echo "\nDo you want to revert to HTTP as the webGUI protocol? (y/n) ";
 		
 		if (strcasecmp(chop(fgets($fp)), "y") == 0)
 			$config['system']['webgui']['protocol'] = "http";
+		else
+			$proto = "https";
 	}
 	
 	if (isset($config['system']['webgui']['noantilockout'])) {
@@ -107,7 +110,7 @@ The LAN IP address has been set to $lanip/$lanbits.
 You can now access the webGUI by opening the following URL
 in your browser:
 
-http://$lanip/
+$proto://$lanip/
 
 Press ENTER to continue.
 

@@ -3,7 +3,7 @@
 	filter.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -50,12 +50,12 @@ function filter_configure() {
 		echo "Configuring firewall... ";
 	
 	/* set TCP timeouts */
-	$tcpidletimeout = 9000;
+	$tcpidletimeout = 9000*2;
 	if ($config['filter']['tcpidletimeout'])
-		$tcpidletimeout = $config['filter']['tcpidletimeout'];
+		$tcpidletimeout = $config['filter']['tcpidletimeout']*2;
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
 	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=480");
-	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=240");	/* SIP... */
+	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=480");	/* SIP... */
 	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
@@ -317,6 +317,7 @@ function filter_rules_generate() {
 					}
 				}
 				$oic['bridge'] = 1;
+				$oic['bridge_if'] = $oc['bridge'];
 			} else {
 				$oic['ip'] = $oc['ipaddr'];
 				$oic['sn'] = $oc['subnet'];
@@ -375,7 +376,7 @@ EOD;
 	/* pass traffic between statically routed subnets and the subnet on the
 	   interface in question to avoid problems with complicated routing
 	   topologies */
-	if (is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
+	if (isset($config['filter']['bypassstaticroutes']) && is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
 		foreach ($config['staticroutes']['route'] as $route) {
 			unset($sa);
 			
@@ -445,12 +446,22 @@ pass in quick on $wanif proto udp from any port = 67 to any port = 68
 
 EOD;
 
-	/* LAN spoof check */	
-	$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log);
+	/* LAN spoof check */
+	/* omit if any interface is bridged to LAN and the filtering bridge is on */
+	$lanbridge = false;
+	foreach ($optcfg as $on => $oc) {
+		if ($oc['bridge'] && $oc['bridge_if'] == "lan") {
+			$lanbridge = true;
+			break;
+		}
+	}
+	if (!$lanbridge || !isset($config['bridge']['filteringbridge']))
+		$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log);
 
 	/* OPT spoof check */
 	foreach ($optcfg as $on => $oc) {
-		if ($oc['ip'])
+		/* omit for bridged interfaces when the filtering bridge is on */
+		if ($oc['ip'] && (!$oc['bridge'] || !isset($config['bridge']['filteringbridge'])))
 			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
 	}
 	

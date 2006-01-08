@@ -3,7 +3,7 @@
 	interfaces.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -163,15 +163,18 @@ function interfaces_optional_configure() {
 	
 	if ($bridgeconfig) {
 		/* Set the system bridge configuration and enable bridging. */
-		mwexec("/sbin/sysctl net.link.ether.bridge_cfg=" . $bridgeconfig);
+		mwexec("/sbin/sysctl net.link.ether.bridge.config=" . $bridgeconfig);
 		
-		if (isset($config['bridge']['filteringbridge']))
-			mwexec("/sbin/sysctl net.link.ether.bridge_ipf=1");
+		if (isset($config['bridge']['filteringbridge'])) {
+			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=1");
+			mwexec("/sbin/sysctl net.link.ether.bridge.ipfw=1");
+		}
 		
-		mwexec("/sbin/sysctl net.link.ether.bridge=1");
+		mwexec("/sbin/sysctl net.link.ether.bridge.enable=1");
 	} else {
-		mwexec("/sbin/sysctl net.link.ether.bridge_ipf=0");
-		mwexec("/sbin/sysctl net.link.ether.bridge=0");
+		mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
+		mwexec("/sbin/sysctl net.link.ether.bridge.ipfw=0");
+		mwexec("/sbin/sysctl net.link.ether.bridge.enable=0");
 	}
 	
 	if (!$g['booting']) {
@@ -288,21 +291,32 @@ function interfaces_wireless_configure($if, $wlcfg) {
 		$ifcargs .= "wepmode off ";
 	}
 	
+	if (strstr($if, "ath")) {
+		if ($wlcfg['standard'])
+			$ifcargs .= "mode {$wlcfg['standard']} ";
+	}
+	
 	switch ($wlcfg['mode']) {
 		case 'hostap':
-			if (strstr($if, "wi"))
+			if (strstr($if, "ath"))
+				$ifcargs .= "-mediaopt adhoc mediaopt hostap ";
+			else if (strstr($if, "wi"))
 				$ifcargs .= "-mediaopt ibss mediaopt hostap ";
 			break;
 		case 'ibss':
 		case 'IBSS':
-			if (strstr($if, "wi"))
+			if (strstr($if, "ath"))
+				$ifcargs .= "-mediaopt hostap mediaopt adhoc ";
+			else if (strstr($if, "wi"))
 				$ifcargs .= "-mediaopt hostap mediaopt ibss ";
 			else if (strstr($if, "an"))
 				$ifcargs .= "mediaopt adhoc ";
 			break;
 		case 'bss':
 		case 'BSS':
-			if (strstr($if, "wi"))
+			if (strstr($if, "ath"))
+				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
+			else if (strstr($if, "wi"))
 				$ifcargs .= "-mediaopt hostap -mediaopt ibss ";
 			else if (strstr($if, "an"))
 				$ifcargs .= "-mediaopt adhoc ";

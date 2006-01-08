@@ -1,22 +1,19 @@
 #!/bin/sh
 
 # /etc/rc
-# part of m0n0wall (http://neon1.net/m0n0wall)
+# part of m0n0wall (http://m0n0.ch/wall)
 #
-# Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+# Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 # All rights reserved.
 
 stty status '^T'
 
 trap : 2
-trap : 3
+trap "echo 'Boot interrupted'; exit 1" 3
 
 HOME=/
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 export HOME PATH
-
-set -T
-trap "echo 'Reboot interrupted'; exit 1" 3
 
 # make some directories in /var
 mkdir /var/run /var/log /var/etc /var/db
@@ -33,11 +30,8 @@ adjkerntz -i
 # Create an initial utmp file
 cd /var/run && cp /dev/null utmp && chmod 644 utmp
 
-# Build devices database
-dev_mkdb
-
 # Run ldconfig
-/sbin/ldconfig -elf /usr/lib
+/sbin/ldconfig -elf /lib /usr/lib
 
 # let the PHP-based configuration subsystem set up the system now
 /etc/rc.bootup

@@ -4,7 +4,7 @@
 	status_wireless.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Status", "Wireless");
 require("guiconfig.inc");
 
 function get_wireless_info($ifdescr) {
@@ -78,35 +79,25 @@ function get_wireless_info($ifdescr) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Status: Wireless");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-      <p class="pgtitle">Status: Wireless</p>
-              <?php $i = 0; $ifdescrs = array();
-			  
-			  		if (is_array($config['interfaces']['wan']['wireless']) &&
-							strstr($config['interfaces']['wan']['if'], "wi"))
-							$ifdescrs['wan'] = 'WAN';
-							
-			  		if (is_array($config['interfaces']['lan']['wireless']) &&
-							strstr($config['interfaces']['lan']['if'], "wi"))
-							$ifdescrs['lan'] = 'LAN';
-					
-			  		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-						if (is_array($config['interfaces']['opt' . $j]['wireless']) &&
-							isset($config['interfaces']['opt' . $j]['enable']) &&
-							strstr($config['interfaces']['opt' . $j]['if'], "wi"))
-							$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
-					}
-						
-					if (count($ifdescrs) > 0): ?>
+<?php $i = 0; $ifdescrs = array();
+
+	if (is_array($config['interfaces']['wan']['wireless']) &&
+			strstr($config['interfaces']['wan']['if'], "wi"))
+			$ifdescrs['wan'] = 'WAN';
+			
+	if (is_array($config['interfaces']['lan']['wireless']) &&
+			strstr($config['interfaces']['lan']['if'], "wi"))
+			$ifdescrs['lan'] = 'LAN';
+	
+	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+		if (is_array($config['interfaces']['opt' . $j]['wireless']) &&
+			isset($config['interfaces']['opt' . $j]['enable']) &&
+			strstr($config['interfaces']['opt' . $j]['if'], "wi"))
+			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
+	}
+		
+	if (count($ifdescrs) > 0): ?>
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <?php
 			      foreach ($ifdescrs as $ifdescr => $ifname): 
@@ -122,7 +113,7 @@ function get_wireless_info($ifdescr) {
                   <?=htmlspecialchars($ifname);?> interface (SSID &quot;<?=htmlspecialchars($config['interfaces'][$ifdescr]['wireless']['ssid']);?>&quot;)</td>
               </tr>
               <tr> 
-                <td width="22%" valign="top" class="listhdrr">Signal strength 
+                <td width="22%" valign="top" class="vncellt">Signal strength 
                   cache</td>
                 <td width="78%" class="listrpad"> 
                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -155,7 +146,7 @@ function get_wireless_info($ifdescr) {
                   </table></td>
               </tr><?php if ($ifinfo['aslist']): ?>
               <tr> 
-                <td width="22%" valign="top" class="listhdrr">Associated stations 
+                <td width="22%" valign="top" class="vncellt">Associated stations 
                 </td>
                 <td width="78%" class="listrpad"> 
                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -185,5 +176,3 @@ function get_wireless_info($ifdescr) {
 <p><strong>No supported wireless interfaces were found for status display.</strong></p>
 <?php endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

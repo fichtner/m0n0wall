@@ -4,7 +4,7 @@
 	interfaces_vlan_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Interfaces", "Assign network ports", "Edit VLAN");
 require("guiconfig.inc");
 
 if (!is_array($config['vlans']['vlan']))
@@ -91,16 +92,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-<title><?=gentitle("Interfaces: Assign network ports: VLANs: Edit");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Interfaces: Assign network ports: VLANs: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="interfaces_vlan_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -119,7 +111,7 @@ if ($_POST) {
 				<tr>
                   <td valign="top" class="vncellreq">VLAN tag </td>
                   <td class="vtable">
-                    <input name="tag" type="text" class="formfld" id="tag" size="6" value="<?=htmlspecialchars($pconfig['tag']);?>">
+                    <?=$mandfldhtml;?><input name="tag" type="text" class="formfld" id="tag" size="6" value="<?=htmlspecialchars($pconfig['tag']);?>">
                     <br>
                     <span class="vexpl">802.1Q VLAN tag (between 1 and 4094) </span></td>
 			    </tr>
@@ -142,5 +134,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

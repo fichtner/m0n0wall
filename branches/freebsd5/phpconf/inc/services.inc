@@ -3,7 +3,7 @@
 	services.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -189,12 +189,18 @@ function services_dhcrelay_configure() {
 	
 	/* DHCPRelay enabled on any interfaces? */
 	$dhcrelayenable = false;
-	foreach ($dhcrelaycfg as $dhcrelayif => $dhcrelayifconf) {
-		if (isset($dhcrelayifconf['enable']) &&
-			(($dhcrelayif == "lan") ||
-			(isset($config['interfaces'][$dhcrelayif]['enable']) &&
-			$config['interfaces'][$dhcrelayif]['if'] && (!$config['interfaces'][$dhcrelayif]['bridge']))))
-			$dhcrelayenable = true;
+	
+	if (is_array($dhcrelaycfg)) {
+		foreach ($dhcrelaycfg as $dhcrelayif => $dhcrelayifconf) {
+			if (isset($dhcrelayifconf['enable']) &&
+				(($dhcrelayif == "lan") ||
+				(isset($config['interfaces'][$dhcrelayif]['enable']) &&
+				$config['interfaces'][$dhcrelayif]['if'] && (!$config['interfaces'][$dhcrelayif]['bridge'])))) {
+				
+				$dhcrelayenable = true;
+				break;
+			}
+		}
 	}
 	
 	if (!$dhcrelayenable)
@@ -463,8 +469,9 @@ function services_dnsupdate_process() {
 	if (isset($config['dnsupdate']['enable'])) {
 		
 		$wanip = get_current_wan_address();
+		
 		if ($wanip) {
-			
+				
 			$keyname = $config['dnsupdate']['keyname'];
 			/* trailing dot */
 			if (substr($keyname, -1) != ".")
@@ -475,46 +482,18 @@ function services_dnsupdate_process() {
 			if (substr($hostname, -1) != ".")
 				$hostname .= ".";
 			
-			/* write private key file
-			   this is dumb - public and private keys are the same for HMAC-MD5,
-			   but nsupdate insists on having both */
-			$fd = fopen("{$g['varetc_path']}/K{$keyname}+157+00000.private", "w");
-			$privkey .= <<<EOD
-Private-key-format: v1.2
-Algorithm: 157 (HMAC)
-Key: {$config['dnsupdate']['keydata']}
-
-EOD;
-			fwrite($fd, $privkey);
-			fclose($fd);
-			
-			/* write public key file */
-			if ($config['dnsupdate']['keytype'] == "zone") {
-				$flags = 257;
-				$proto = 3;
-			} else if ($config['dnsupdate']['keytype'] == "host") {
-				$flags = 513;
-				$proto = 3;
-			} else if ($config['dnsupdate']['keytype'] == "user") {
-				$flags = 0;
-				$proto = 2;
-			}
-			
-			$fd = fopen("{$g['varetc_path']}/K{$keyname}+157+00000.key", "w");
-			fwrite($fd, "{$keyname} IN KEY {$flags} {$proto} 157 {$config['dnsupdate']['keydata']}\n");
-			fclose($fd);
-			
 			/* generate update instructions */
-			$upinst =  "update delete {$config['dnsupdate']['host']} A\n";
-			$upinst .= "update add {$config['dnsupdate']['host']} {$config['dnsupdate']['ttl']} A {$wanip}\n";
-			$upinst .= "\n";	/* mind that trailing newline! */
+			$upinst =  "key {$keyname} {$config['dnsupdate']['keydata']}\n";
+			$upinst .= "update delete {$hostname} A\n";
+			$upinst .= "update add {$hostname} {$config['dnsupdate']['ttl']} A {$wanip}\n";
+			$upinst .= "send\n";
 			
 			$fd = fopen("{$g['varetc_path']}/nsupdatecmds", "w");
 			fwrite($fd, $upinst);
 			fclose($fd);
 			
 			/* invoke nsupdate */
-			$cmd = "/usr/sbin/nsupdate -k {$g['varetc_path']}:{$keyname}";
+			$cmd = "/usr/bin/nsupdate";
 			if (isset($config['dnsupdate']['usetcp']))
 				$cmd .= " -v";
 			$cmd .= " {$g['varetc_path']}/nsupdatecmds";

@@ -4,7 +4,7 @@
 	graph.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2004 T. Lechat <dev@lechat.org> and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2004-2005 T. Lechat <dev@lechat.org> and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without

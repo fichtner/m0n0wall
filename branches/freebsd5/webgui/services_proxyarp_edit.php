@@ -4,7 +4,7 @@
 	services_proxyarp_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "Proxy ARP", "Edit");
 require("guiconfig.inc");
 
 if (!is_array($config['proxyarp']['proxyarpnet'])) {
@@ -131,12 +132,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: Proxy ARP: Edit");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function typesel_change() {
@@ -163,11 +159,6 @@ function typesel_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: Proxy ARP: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="services_proxyarp_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -192,6 +183,7 @@ function typesel_change() {
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="type" class="formfld" onChange="typesel_change()">
                             <option value="single" <?php if (!$pconfig['range_from'] && $pconfig['subnet_bits'] == 32) echo "selected"; ?>> 
                             Single address</option>
@@ -203,6 +195,7 @@ function typesel_change() {
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="subnet" type="text" class="formfld" id="subnet" size="20" value="<?=htmlspecialchars($pconfig['subnet']);?>">
                   / 
                           <select name="subnet_bits" class="formfld" id="select">
@@ -216,6 +209,7 @@ function typesel_change() {
                       </tr>
                       <tr> 
                         <td>Range:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="range_from" type="text" class="formfld" id="range_from" size="20" value="<?=htmlspecialchars($pconfig['range_from']);?>">
 - 
                           <input name="range_to" type="text" class="formfld" id="range_to" size="20" value="<?=htmlspecialchars($pconfig['range_to']);?>">                          
@@ -248,5 +242,3 @@ typesel_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

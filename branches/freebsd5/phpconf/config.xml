@@ -2,6 +2,7 @@
 <!-- m0n0wall default system configuration -->
 <m0n0wall>
 	<version>1.4</version>
+	<lastchange></lastchange>
 	<system>
 		<hostname>m0n0wall</hostname>
 		<domain>local</domain>
@@ -19,17 +20,23 @@
 			<certificate></certificate>
 			<private-key></private-key>
 			<noassigninterfaces/>
+			<expanddiags/>
+			<noantilockout></noantilockout>
 			-->
 		</webgui>
 		<!-- <disableconsolemenu/> -->
 		<!-- <disablefirmwarecheck/> -->
 		<!-- <shellcmd></shellcmd> -->
+		<!-- <earlyshellcmd></earlyshellcmd> -->
+		<!-- <harddiskstandby></harddiskstandby> -->
 	</system>
 	<interfaces>
 		<lan>
 			<if>sis0</if>
 			<ipaddr>192.168.1.1</ipaddr>
 			<subnet>24</subnet>
+			<media></media>
+			<mediaopt></mediaopt>
 			<!--
 			<wireless>
 				*see below (opt[n])*
@@ -45,7 +52,10 @@
 			<gateway></gateway>
 			<blockpriv/>
 			<dhcphostname></dhcphostname>
+			<media></media>
+			<mediaopt></mediaopt>
 			<!--
+			<ispointtopoint/>
 			<wireless>
 				*see below (opt[n])*
 			</wireless>
@@ -58,8 +68,11 @@
 			<if></if>
 			<ipaddr></ipaddr>
 			<subnet></subnet>
+			<media></media>
+			<mediaopt></mediaopt>
 			<bridge>lan|wan|opt[n]</bridge>
 			<wireless>
+				<standard>11a|11b|11g</standard>
 				<mode>hostap *or* bss *or* ibss</mode>
 				<ssid></ssid>
 				<channel></channel>
@@ -97,6 +110,10 @@
 		<username></username>
 		<password></password>
 		<provider></provider>
+		<!--
+		<ondemand/>
+		<timeout></timeout>
+		-->
 	</pppoe>
 	<pptp>
 		<username></username>
@@ -104,6 +121,10 @@
 		<local></local>
 		<subnet></subnet>
 		<remote></remote>
+		<!--
+		<ondemand/>
+		<timeout></timeout>
+		-->
 	</pptp>
 	<bigpond>
 		<username></username>
@@ -121,6 +142,16 @@
 		<mx></mx>
 		<!-- <wildcard/> -->
 	</dyndns>
+	<dnsupdate>
+		<!--
+		<enable/>
+		<host></host>
+		<ttl></ttl>
+		<keyname></keyname>
+		<keydata></keydata>
+		</usetcp>
+		-->
+	</dnsupdate>
 	<dhcpd>
 		<lan>
 			<enable/>
@@ -132,6 +163,11 @@
 			<winsserver>xxx.xxx.xxx.xxx</winsserver>
 			<defaultleasetime></defaultleasetime>
 			<maxleasetime></maxleasetime>
+			<gateway>xxx.xxx.xxx.xxx</gateway>
+			<domain></domain>
+			<dnsserver></dnsserver>
+			<next-server></next-server>
+			<filename></filename>
 			-->
 		</lan>
 		<!--
@@ -152,6 +188,8 @@
 		<redir></redir>
 		<localip></localip>
 		<remoteip></remoteip>
+		<!-- <dnsserver></dnsserver> -->
+		<!-- <accounting/> -->
 		<!--
 		<user>
 			<name></name>
@@ -159,6 +197,51 @@
 		</user>
 		-->
 	</pptpd>
+	<ovpn>
+		<!--
+		<server>
+			<enable/>
+			<ca_cert></ca_cert>
+			<srv_cert></srv_cert>
+			<srv_key></srv_key>
+			<dh_param></dh_param>
+			<verb></verb>
+			<tun_iface></tun_iface>
+			<port></port>
+			<bind_iface></bind_iface>
+			<cli2cli/>
+			<maxcli></maxcli>
+			<prefix></prefix>
+			<ipblock></ipblock>
+			<crypto></crypto>
+			<dupcn/>
+			<psh_options>
+				<redir></redir>
+				<redir_loc></redir_loc>
+				<rte_delay></rte_delay>
+				<ping></ping>
+				<pingrst></pingrst>
+				<pingexit></pingexit>
+				<inact></inact>
+			</psh_options>
+		</server>
+		<client>
+			<tunnel></tunnel>
+			<ca_cert></ca_cert>
+			<cli_cert></cli_cert>
+			<cli_key></cli_key>
+			<type></type>
+			<tunnel>
+				<if></if>
+				<proto></proto>
+				<cport></cport>
+				<saddr></saddr>
+				<sport></sport>
+				<crypto></crypto>
+			</tunnel>
+		</client>
+		-->
+	</ovpn>
 	<dnsmasq>
 		<enable/>
 		<!--
@@ -206,9 +289,15 @@
 			<htmltext></htmltext>
 			<errtext></errtext>
 		</page>
+		<httpslogin/>
+		<httpsname></httpsname>
+		<certificate></certificate>
+		<private-key></private-key>
+		<redirurl></redirurl>
 		<radiusip></radiusip>
 		<radiusport></radiusport>
 		<radiuskey></radiuskey>
+		<nomacfilter/>
 	</captiveportal>
 	-->
 	<nat>
@@ -259,6 +348,8 @@
 		-->
 	</nat>
 	<filter>
+		<!-- <tcpidletimeout></tcpidletimeout> -->
+		<!-- <bypassstaticroutes/> -->
 		<rule>
 			<type>pass</type>
 			<descr>Default LAN -&gt; any</descr>
@@ -277,6 +368,7 @@
 			<descr>...</descr>
 			<interface>lan|opt[n]|wan|pptp</interface>
 			<protocol>tcp|udp|tcp/udp|...</protocol>
+			<icmptype></icmptype>
 			<source>
 				<not/>
 				
@@ -348,6 +440,7 @@
 		<!-- syntax:
 		<tunnel>
 			<disabled/>
+			<auto/>
 			<descr></descr>
 			<interface>lan|wan|opt[n]</interface>
 			<local-subnet>

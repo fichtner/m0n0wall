@@ -3,7 +3,7 @@
     globals.inc
     part of m0n0wall (http://m0n0.ch/wall)
     
-    Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,8 @@ $g = array(
     "pptp_subnet" => 28,
     "debug" => false,
     "latest_config" => "1.4",
-    "nopccard_platforms" => array("wrap", "net48xx")
+    "nopccard_platforms" => array("wrap", "net48xx"),
+    "wireless_regex" => "/^(wi|ath|an)/"
 );
 
 ?>

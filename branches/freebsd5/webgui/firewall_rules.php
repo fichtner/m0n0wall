@@ -4,7 +4,7 @@
 	firewall_rules.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Rules");
 require("guiconfig.inc");
 
 if (!is_array($config['filter']['rule'])) {
@@ -51,7 +52,7 @@ for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 }
 
 if (!$if || !isset($iflist[$if]))
-	$if = "lan";
+	$if = "wan";
 
 if ($_POST) {
 
@@ -140,17 +141,57 @@ if (isset($_POST['del_x'])) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Rules");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Rules</p>
+<script language="JavaScript">
+<!--
+function fr_toggle(id) {
+	var checkbox = document.getElementById('frc' + id);
+	checkbox.checked = !checkbox.checked;
+	fr_bgcolor(id);
+}
+function fr_bgcolor(id) {
+	var row = document.getElementById('fr' + id);
+	var checkbox = document.getElementById('frc' + id);
+	var cells = row.getElementsByTagName("td");
+	
+	for (i = 2; i <= 6; i++) {
+		cells[i].style.backgroundColor = checkbox.checked ? "#FFFFBB" : "#FFFFFF";
+	}
+	cells[7].style.backgroundColor = checkbox.checked ? "#FFFFBB" : "#D9DEE8";
+}
+function fr_insline(id, on) {
+	var row = document.getElementById('fr' + id);
+	if (id != 0) {
+		var prevrow = document.getElementById('fr' + (id-1));
+	} else {
+		var prevrow = document.getElementById('frheader');
+	}
+	
+	var cells = row.getElementsByTagName("td");
+	var prevcells = prevrow.getElementsByTagName("td");
+	
+	for (i = 2; i <= 7; i++) {
+		if (on) {
+			prevcells[i].style.borderBottom = "3px solid #999999";
+			prevcells[i].style.paddingBottom = (id != 0) ? 2 : 3;
+		} else {
+			prevcells[i].style.borderBottomWidth = "1px";
+			prevcells[i].style.paddingBottom = (id != 0) ? 4 : 5;
+		}
+	}
+	
+	for (i = 2; i <= 7; i++) {
+		if (on) {
+			cells[i].style.borderTop = "2px solid #999999";
+			cells[i].style.paddingTop = 2;
+		} else {
+			cells[i].style.borderTopWidth = 0;
+			cells[i].style.paddingTop = 4;
+		}
+	}
+}
+// -->
+</script>
 <form action="firewall_rules.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_filterconfdirty_path)): ?><p>
@@ -158,28 +199,29 @@ if (isset($_POST['del_x'])) {
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-<?php foreach ($iflist as $ifent => $ifname):
+<?php $i = 0; foreach ($iflist as $ifent => $ifname):
 	if ($ifent == $if): ?>
     <li class="tabact"><?=htmlspecialchars($ifname);?></li>
 <?php else: ?>
-    <li class="tabinact"><a href="firewall_rules.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
+    <li class="<?php if ($i == 0) echo "tabinact1"; else echo "tabinact";?>"><a href="firewall_rules.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
 <?php endif; ?>
-<?php endforeach; ?>
+<?php $i++; endforeach; ?>
   </ul>
   </td></tr>
   <tr> 
     <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
+                <tr id="frheader">
+                  <td width="3%" class="list">&nbsp;</td>
                   <td width="5%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">Proto</td>
                   <td width="15%" class="listhdrr">Source</td>
                   <td width="10%" class="listhdrr">Port</td>
                   <td width="15%" class="listhdrr">Destination</td>
                   <td width="10%" class="listhdrr">Port</td>
-                  <td width="25%" class="listhdr">Description</td>
+                  <td width="22%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 				<?php $nrules = 0; for ($i = 0; isset($a_filter[$i]); $i++):
@@ -187,8 +229,9 @@ if (isset($_POST['del_x'])) {
 					if ($filterent['interface'] != $if)
 						continue;
 				?>
-                <tr valign="top">
-                  <td class="listt">
+                <tr valign="top" id="fr<?=$nrules;?>">
+                  <td class="listt"><input type="checkbox" id="frc<?=$nrules;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nrules;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
+                  <td class="listt" align="center">
 				  <?php if ($filterent['type'] == "block")
 				  			$iconfn = "block";
 						else if ($filterent['type'] == "reject") {
@@ -215,32 +258,32 @@ if (isset($_POST['del_x'])) {
 				  <br><img src="<?=$iconfn;?>.gif" width="11" height="15" border="0">
 				  <?php endif; ?>
 				  </td>
-                  <td class="listlr"> 
+                  <td class="listlr" onClick="fr_toggle(<?=$nrules;?>)"> 
                     <?=$textss;?><?php if (isset($filterent['protocol'])) echo strtoupper($filterent['protocol']); else echo "*"; ?><?=$textse;?>
                   </td>
-                  <td class="listr">
+                  <td class="listr" onClick="fr_toggle(<?=$nrules;?>)">
 				    <?=$textss;?><?php echo htmlspecialchars(pprint_address($filterent['source'])); ?><?=$textse;?>
                   </td>
-                  <td class="listr">
+                  <td class="listr" onClick="fr_toggle(<?=$nrules;?>)">
                     <?=$textss;?><?php echo htmlspecialchars(pprint_port($filterent['source']['port'])); ?><?=$textse;?>
                   </td>
-                  <td class="listr"> 
+                  <td class="listr" onClick="fr_toggle(<?=$nrules;?>)"> 
 				    <?=$textss;?><?php echo htmlspecialchars(pprint_address($filterent['destination'])); ?><?=$textse;?>
                   </td>
-                  <td class="listr"> 
+                  <td class="listr" onClick="fr_toggle(<?=$nrules;?>)"> 
                     <?=$textss;?><?php echo htmlspecialchars(pprint_port($filterent['destination']['port'])); ?><?=$textse;?>
                   </td>
-                  <td class="listbg"> 
+                  <td class="listbg" onClick="fr_toggle(<?=$nrules;?>)"> 
                     <?=$textss;?><?=htmlspecialchars($filterent['descr']);?>&nbsp;<?=$textse;?>
                   </td>
                   <td valign="middle" nowrap class="list">
 				    <table border="0" cellspacing="0" cellpadding="1">
 					<tr>
+					  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"></td>
 					  <td><a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
-					  <td align="center" valign="middle"><input type="checkbox" name="rule[]" value="<?=$i;?>" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
 					</tr>
 					<tr>
-					  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule"></td>
+					  <td align="center" valign="middle"></td>
 					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a></td>
 					</tr>
 					</table>
@@ -248,6 +291,7 @@ if (isset($_POST['del_x'])) {
 				</tr>
 			  <?php $nrules++; endfor; ?>
 			  <?php if ($nrules == 0): ?>
+              <td class="listt"></td>
 			  <td class="listt"></td>
 			  <td class="listlr" colspan="6" align="center" valign="middle">
 			  <span class="gray">
@@ -256,18 +300,25 @@ if (isset($_POST['del_x'])) {
 			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="absmiddle"></a> button to add a new rule.</span>
 			  </td>
 			  <?php endif; ?>
-                <tr> 
-                  <td class="list" colspan="7"></td>
+                <tr id="fr<?=$nrules;?>"> 
+                  <td class="list"></td>
+                  <td class="list"></td>
+                  <td class="list">&nbsp;</td>
+                  <td class="list">&nbsp;</td>
+                  <td class="list">&nbsp;</td>
+                  <td class="list">&nbsp;</td>
+                  <td class="list">&nbsp;</td>
+                  <td class="list">&nbsp;</td>
                   <td class="list">
 				    <table border="0" cellspacing="0" cellpadding="1">
 					<tr>
 				      <td>
-					  <?php if ($nrules == 0): ?><img src="left_d.gif" width="17" height="17" title="move selected rules to end" border="0"><?php else: ?><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules to end"><?php endif; ?></td>
-					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
+					  <?php if ($nrules == 0): ?><img src="left_d.gif" width="17" height="17" title="move selected rules to end" border="0"><?php else: ?><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules to end" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"><?php endif; ?></td>
+					  <td></td>
 				    </tr>
 					<tr>
 					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
-					  <td></td>
+					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
 					</tr>
 				    </table>
 				  </td>
@@ -309,13 +360,11 @@ if (isset($_POST['del_x'])) {
 </table>
   <p>
   <strong><span class="red">Hint:<br>
-  </span></strong>rules are evaluated on a first-match basis (i.e. 
+  </span></strong>Rules are evaluated on a first-match basis (i.e. 
   the action of the first rule to match a packet will be executed). 
   This means that if you use block rules, you'll have to pay attention 
   to the rule order. Everything that isn't explicitly passed is blocked 
   by default.</p>
-<input type="hidden" name="if" value="<?=$if;?>">
+  <input type="hidden" name="if" value="<?=$if;?>">
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

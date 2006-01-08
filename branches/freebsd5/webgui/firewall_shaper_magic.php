@@ -31,6 +31,9 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Traffic shaper");
+require("guiconfig.inc");
+
 function wipe_magic () {
   global $config;
 
@@ -274,8 +277,6 @@ function create_magic ($maxup, $maxdown, $p2plow,$maskq) {
   $rulei++;
 }
 
-require("guiconfig.inc");
-
 if (!is_array($config['shaper']['rule'])) {
     $config['shaper']['rule'] = array();
 }
@@ -344,17 +345,7 @@ if ($_POST) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Traffic shaper");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Traffic shaper</p>
 <form action="firewall_shaper_magic.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
@@ -362,9 +353,9 @@ if ($_POST) {
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact"><a href="firewall_shaper.php">Rules</a></li>
+    <li class="tabinact1"><a href="firewall_shaper.php">Rules</a></li>
     <li class="tabinact"><a href="firewall_shaper_pipes.php">Pipes</a></li>
     <li class="tabinact"><a href="firewall_shaper_queues.php">Queues</a></li>
     <li class="tabact">Magic shaper wizard</li>
@@ -391,14 +382,14 @@ if ($_POST) {
           <td width="22%" class="vncellreq">Downstream<br>
             speed </td>
           <td width="78%" class="vtable">
-              <input name="maxdown" type="text" size="10" value="<?php if ($pconfig['maxdown']) echo $pconfig['maxdown']; ?>"> 
+              <?=$mandfldhtml;?><input name="maxdown" type="text" size="10" value="<?php if ($pconfig['maxdown']) echo $pconfig['maxdown']; ?>"> 
               kbps<br>
               Enter the speed of your WAN downstream link here.</td>
 		</tr>
         <tr valign="top">
           <td width="22%" class="vncellreq">Upstream<br>
             speed</td>
-          <td width="78%" class="vtable"><input name="maxup" type="text" size="10" value="<?php if ($pconfig['maxup']) echo $pconfig['maxup']; ?>">
+          <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="maxup" type="text" size="10" value="<?php if ($pconfig['maxup']) echo $pconfig['maxup']; ?>">
               kbps<br>
               Enter the speed of your WAN upstream link here.</td>
 		</tr>
@@ -419,5 +410,3 @@ if ($_POST) {
 </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

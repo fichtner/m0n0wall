@@ -4,7 +4,7 @@
 	firewall_shaper_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "Traffic shaper", "Edit rule");
 require("guiconfig.inc");
 
 if (!is_array($config['shaper']['rule'])) {
@@ -347,12 +348,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: Traffic shaper: Edit rule");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 var portsenabled = 1;
@@ -451,18 +447,13 @@ function dst_rep_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: Traffic shaper: Edit rule</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (is_array($config['shaper']['pipe']) && (count($config['shaper']['pipe']) > 0)): ?>
             <form action="firewall_shaper_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td valign="top" class="vncellreq">Target</td>
-                  <td class="vtable"> <select name="target" class="formfld">
+                  <td class="vtable"><select name="target" class="formfld">
                       <?php 
 					  foreach ($config['shaper']['pipe'] as $pipei => $pipe): ?>
                       <option value="<?="targetpipe:$pipei";?>" <?php if ("targetpipe:$pipei" == $pconfig['target']) echo "selected"; ?>> 
@@ -495,7 +486,7 @@ function dst_rep_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
-                  <td width="78%" class="vtable"> <select name="interface" class="formfld">
+                  <td width="78%" class="vtable"><select name="interface" class="formfld">
                       <?php $interfaces = array('lan' => 'LAN', 'wan' => 'WAN', 'pptp' => 'PPTP');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
@@ -511,7 +502,7 @@ function dst_rep_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Protocol</td>
-                  <td width="78%" class="vtable"> <select name="proto" class="formfld" onchange="proto_change()">
+                  <td width="78%" class="vtable"><select name="proto" class="formfld" onchange="proto_change()">
                       <?php $protocols = explode(" ", "TCP UDP ICMP ESP AH GRE IPv6 IGMP any"); foreach ($protocols as $proto): ?>
                       <option value="<?=strtolower($proto);?>" <?php if (strtolower($proto) == $pconfig['proto']) echo "selected"; ?>> 
                       <?=htmlspecialchars($proto);?>
@@ -529,6 +520,7 @@ function dst_rep_change() {
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="srctype" class="formfld" onChange="typesel_change()">
                             <?php $sel = is_specialnet($pconfig['src']); ?>
                             <option value="any" <?php if ($pconfig['src'] == "any") { echo "selected"; } ?>> 
@@ -550,6 +542,7 @@ function dst_rep_change() {
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="src" type="text" class="formfldalias" id="src" size="20" value="<?php if (!is_specialnet($pconfig['src'])) echo htmlspecialchars($pconfig['src']);?>">
                           / 
                           <select name="srcmask" class="formfld" id="srcmask">
@@ -609,6 +602,7 @@ function dst_rep_change() {
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
+						<td></td>
                         <td><select name="dsttype" class="formfld" onChange="typesel_change()">
                             <?php $sel = is_specialnet($pconfig['dst']); ?>
                             <option value="any" <?php if ($pconfig['dst'] == "any") { echo "selected"; } ?>> 
@@ -630,6 +624,7 @@ function dst_rep_change() {
                       </tr>
                       <tr> 
                         <td>Address:&nbsp;&nbsp;</td>
+						<td><?=$mandfldhtmlspc;?></td>
                         <td><input name="dst" type="text" class="formfldalias" id="dst" size="20" value="<?php if (!is_specialnet($pconfig['dst'])) echo htmlspecialchars($pconfig['dst']);?>">
                           / 
                           <select name="dstmask" class="formfld" id="dstmask">
@@ -772,5 +767,3 @@ proto_change();
 <p><strong>You need to create a pipe or queue before you can add a new rule.</strong></p>
 <?php endif; ?>
 <?php include("fend.inc"); ?>
-</body>
-</html>

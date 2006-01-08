@@ -4,7 +4,7 @@
 	firewall_nat_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "NAT", "Edit");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['rule'])) {
@@ -109,6 +110,8 @@ if ($_POST) {
 			continue;
 		if ($natent['external-address'] != $_POST['extaddr'])
 			continue;
+		if (($natent['proto'] != $_POST['proto']) && ($natent['proto'] != "tcp/udp") && ($_POST['proto'] != "tcp/udp"))
+			continue;
 		
 		list($begp,$endp) = explode("-", $natent['external-port']);
 		if (!$endp)
@@ -175,12 +178,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: NAT: Edit");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function ext_change() {
@@ -209,11 +207,6 @@ function ext_rep_change() {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: NAT: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_nat_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -304,7 +297,7 @@ function ext_rep_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">NAT IP</td>
                   <td width="78%" class="vtable"> 
-                    <input name="localip" type="text" class="formfldalias" id="localip" size="20" value="<?=htmlspecialchars($pconfig['localip']);?>"> 
+                    <?=$mandfldhtml;?><input name="localip" type="text" class="formfldalias" id="localip" size="20" value="<?=htmlspecialchars($pconfig['localip']);?>"> 
                     <br> <span class="vexpl">Enter the internal IP address of 
                     the server on which you want to map the ports.<br>
                     e.g. <em>192.168.1.12</em></span></td>
@@ -361,5 +354,3 @@ ext_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>

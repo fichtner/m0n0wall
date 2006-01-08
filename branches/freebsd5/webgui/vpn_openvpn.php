@@ -28,6 +28,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("VPN", "OpenVPN");
 require("guiconfig.inc");
 require_once("openvpn.inc");
 
@@ -147,17 +148,7 @@ if ($_POST) {
 $pconfig = $config['ovpn']['server'];
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("VPN: OpenVPN");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">VPN: OpenVPN</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
 
@@ -362,5 +353,3 @@ $pconfig = $config['ovpn']['server'];
 </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

@@ -3,7 +3,7 @@
 	config.inc
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -35,9 +35,11 @@ require_once("xmlparse.inc");
 
 /* read platform */
 if (file_exists("{$g['etc_path']}/platform")) {
-	$g['platform'] = chop(file_get_contents("{$g['etc_path']}/platform"));
+	$g['fullplatform'] = chop(file_get_contents("{$g['etc_path']}/platform"));
+	$pla = explode("_", $g['fullplatform']);
+	$g['platform'] = $pla[0];
 } else {
-	$g['platform'] = "unknown";
+	$g['platform'] = $g['fullplatform'] = "unknown";
 }
 
 if ($g['booting']) {
@@ -102,7 +104,6 @@ EOD;
 		$fd = fopen("{$g['etc_path']}/fstab", "w");
 		
 		$fstab = "/dev/{$cfgpartition} {$g['cf_path']} {$cfgfstype} ro 1 1\n";
-		$fstab .= "proc /proc procfs rw 0 0\n";
 		
 		fwrite($fd, $fstab);
 		fclose($fd);

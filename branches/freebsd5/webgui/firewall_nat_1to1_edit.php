@@ -4,7 +4,7 @@
 	firewall_nat_1to1_edit.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Firewall", "NAT", "Edit 1:1");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['onetoone'])) {
@@ -139,17 +140,7 @@ if ($_POST) {
 	}
 }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Firewall: NAT: Edit 1:1");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: NAT: Edit 1:1</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_nat_1to1_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -174,7 +165,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">External subnet</td>
                   <td width="78%" class="vtable"> 
-                    <input name="external" type="text" class="formfld" id="external" size="20" value="<?=htmlspecialchars($pconfig['external']);?>">
+                    <?=$mandfldhtml;?><input name="external" type="text" class="formfld" id="external" size="20" value="<?=htmlspecialchars($pconfig['external']);?>">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
                       <?php for ($i = 32; $i >= 0; $i--): ?>
@@ -189,7 +180,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Internal subnet</td>
                   <td width="78%" class="vtable"> 
-                    <input name="internal" type="text" class="formfld" id="internal" size="20" value="<?=htmlspecialchars($pconfig['internal']);?>"> 
+                    <?=$mandfldhtml;?><input name="internal" type="text" class="formfld" id="internal" size="20" value="<?=htmlspecialchars($pconfig['internal']);?>"> 
                     <br>
                      <span class="vexpl">Enter the internal (LAN) subnet for the 1:1 mapping. The subnet size specified for the external subnet also applies to the internal subnet (they  have to be the same).</span></td>
                 </tr>
@@ -212,5 +203,3 @@ if ($_POST) {
               </table>
 </form>
 <?php include("fend.inc"); ?>
-</body>
-</html>

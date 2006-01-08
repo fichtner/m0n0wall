@@ -4,7 +4,7 @@
 	status_interfaces.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Status", "Interfaces");
 require("guiconfig.inc");
 
 $wancfg = &$config['interfaces']['wan'];
@@ -166,8 +167,11 @@ function get_interface_info($ifdescr) {
 			if (preg_match("/channel (\S*)/", $ici, $matches)) {
 				$ifinfo['channel'] = $matches[1];
 			}
-			if (preg_match("/ssid (\S*)/", $ici, $matches)) {
-				$ifinfo['ssid'] = $matches[1];
+			if (preg_match("/ssid (\".*?\"|\S*)/", $ici, $matches)) {
+				if ($matches[1][0] == '"')
+					$ifinfo['ssid'] = substr($matches[1], 1, -1);
+				else
+					$ifinfo['ssid'] = $matches[1];
 			}
 		}
 		
@@ -204,17 +208,7 @@ function get_interface_info($ifdescr) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Status: Interfaces");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Status: Interfaces</p>
 <form action="" method="post">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <?php $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
@@ -237,13 +231,13 @@ function get_interface_info($ifdescr) {
                   interface</td>
               </tr>
               <tr> 
-                <td width="22%" class="listhdrr">Status</td>
+                <td width="22%" class="vncellt">Status</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['status']);?>
                 </td>
               </tr><?php if ($ifinfo['dhcplink']): ?>
 			  <tr> 
-				<td width="22%" class="listhdrr">DHCP</td>
+				<td width="22%" class="vncellt">DHCP</td>
 				<td width="78%" class="listr"> 
 				  <?=htmlspecialchars($ifinfo['dhcplink']);?>&nbsp;&nbsp;
 				  <?php if ($ifinfo['dhcplink'] == "up"): ?>
@@ -254,7 +248,7 @@ function get_interface_info($ifdescr) {
 				</td>
 			  </tr><?php endif; if ($ifinfo['pppoelink']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">PPPoE</td>
+                <td width="22%" class="vncellt">PPPoE</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['pppoelink']);?>&nbsp;&nbsp;
 				  <?php if ($ifinfo['pppoelink'] == "up"): ?>
@@ -265,7 +259,7 @@ function get_interface_info($ifdescr) {
                 </td>
               </tr><?php  endif; if ($ifinfo['pptplink']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">PPTP</td>
+                <td width="22%" class="vncellt">PPTP</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['pptplink']);?>&nbsp;&nbsp;
 				  <?php if ($ifinfo['pptplink'] == "up"): ?>
@@ -276,7 +270,7 @@ function get_interface_info($ifdescr) {
                 </td>
               </tr><?php  endif; if ($ifinfo['macaddr']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">MAC address</td>
+                <td width="22%" class="vncellt">MAC address</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['macaddr']);?>
                 </td>
@@ -284,59 +278,59 @@ function get_interface_info($ifdescr) {
 			  <?php if ($ifinfo['dhcplink'] != "down" && $ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down"): ?>
 			  <?php if ($ifinfo['ipaddr']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">IP address</td>
+                <td width="22%" class="vncellt">IP address</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['ipaddr']);?>
                   &nbsp; </td>
               </tr><?php endif; ?><?php if ($ifinfo['subnet']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">Subnet mask</td>
+                <td width="22%" class="vncellt">Subnet mask</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['subnet']);?>
                 </td>
               </tr><?php endif; ?><?php if ($ifinfo['gateway']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">Gateway</td>
+                <td width="22%" class="vncellt">Gateway</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['gateway']);?>
                 </td>
               </tr><?php endif; if ($ifdescr == "wan" && file_exists("{$g['varetc_path']}/nameservers.conf")): ?>
-                <td width="22%" class="listhdrr">ISP DNS servers</td>
+                <td width="22%" class="vncellt">ISP DNS servers</td>
                 <td width="78%" class="listr"><?php echo nl2br(file_get_contents("{$g['varetc_path']}/nameservers.conf")); ?></td>
 			  <?php endif; endif; if ($ifinfo['media']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">Media</td>
+                <td width="22%" class="vncellt">Media</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['media']);?>
                 </td>
               </tr><?php endif; ?><?php if ($ifinfo['channel']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">Channel</td>
+                <td width="22%" class="vncellt">Channel</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['channel']);?>
                 </td>
               </tr><?php endif; ?><?php if ($ifinfo['ssid']): ?>
               <tr> 
-                <td width="22%" class="listhdrr">SSID</td>
+                <td width="22%" class="vncellt">SSID</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['ssid']);?>
                 </td>
               </tr><?php endif; ?>
               <tr> 
-                <td width="22%" class="listhdrr">In/out packets</td>
+                <td width="22%" class="vncellt">In/out packets</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['inpkts'] . "/" . $ifinfo['outpkts'] . " (" . 
 				  		format_bytes($ifinfo['inbytes']) . "/" . format_bytes($ifinfo['outbytes']) . ")");?>
                 </td>
               </tr><?php if (isset($ifinfo['inerrs'])): ?>
               <tr> 
-                <td width="22%" class="listhdrr">In/out errors</td>
+                <td width="22%" class="vncellt">In/out errors</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['inerrs'] . "/" . $ifinfo['outerrs']);?>
                 </td>
               </tr><?php endif; ?><?php if (isset($ifinfo['collisions'])): ?>
               <tr> 
-                <td width="22%" class="listhdrr">Collisions</td>
+                <td width="22%" class="vncellt">Collisions</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['collisions']);?>
                 </td>
@@ -351,5 +345,3 @@ triggers it. To substantiate this point: disconnecting manually
 will <strong>not</strong> prevent dial-on-demand from making connections
 to the outside! Don't use dial-on-demand if you want to make sure that the line is kept disconnected.
 <?php include("fend.inc"); ?>
-</body>
-</html>

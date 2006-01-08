@@ -29,6 +29,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pgtitle = array("Services", "DHCP relay");
+require("guiconfig.inc");
+
 function get_wan_dhcp_server() {
 	global $config, $g;
 	$dhclientfn = $g['vardb_path'] . "/dhclient.leases";
@@ -49,9 +52,6 @@ function get_wan_dhcp_server() {
 	}		  	
 	return $dhcpserver[1];
 }
-
-
-require("guiconfig.inc");
 
 $if = $_GET['if'];
 if ($_POST['if'])
@@ -99,6 +99,7 @@ if ($_POST) {
 			/* make sure that the DHCP server isn't enabled on this interface */
 			if (isset($config['dhcpd'][$if]['enable'])) 
 				$input_errors[] = "You must disable the DHCP server on the {$iflist[$if]} interface before enabling the DHCP Relay.";
+			
 			/* make sure that the DHCP server isn't running on any of the implied interfaces */
 			foreach ($config['interfaces'] as $ifname => $ifcfg) {
 				$subnet = $ifcfg['ipaddr'] . "/" . $ifcfg['subnet'];
@@ -107,7 +108,7 @@ if ($_POST) {
 			}	
 			if (!isset($destif)) 
 				$destif = "wan";
-			if (isset($config['dhcpd'][$destif]['enable'])) 
+			if (isset($config['dhcpd'][$destif]['enable']) && !$input_errors)
 				$input_errors[] = "You must disable the DHCP server on the {$destif} interface before enabling the DHCP Relay.";
 				
 			/* if proxydhcp is selected, make sure DHCP is enabled on WAN */
@@ -136,12 +137,7 @@ if ($_POST) {
 }
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title><?=gentitle("Services: DHCP relay");?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="gui.css" rel="stylesheet" type="text/css">
+<?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
 function enable_change(enable_over) {
@@ -160,24 +156,19 @@ function enable_change(enable_over) {
 }
 //-->
 </script>
-</head>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">Services: DHCP relay</p>
 <form action="services_dhcp_relay.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr><td class="tabnavtbl">
   <ul id="tabnav">
-<?php foreach ($iflist as $ifent => $ifname):
+<?php $i = 0; foreach ($iflist as $ifent => $ifname):
 	if ($ifent == $if): ?>
     <li class="tabact"><?=htmlspecialchars($ifname);?></li>
 <?php else: ?>
-    <li class="tabinact"><a href="services_dhcp_relay.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
+    <li class="<?php if ($i == 0) echo "tabinact1"; else echo "tabinact";?>"><a href="services_dhcp_relay.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
 <?php endif; ?>
-<?php endforeach; ?>
+<?php $i++; endforeach; ?>
   </ul>
   </td></tr>
   <tr> 
@@ -225,5 +216,3 @@ enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>
-</body>
-</html>
