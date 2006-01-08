@@ -56,7 +56,7 @@ if ($fp) {
 		if ($line) {
 			$cpent = explode(",", $line);
 			if ($_GET['showact'])
-				$cpent[4] = captiveportal_get_last_activity($cpent[1]);
+				$cpent[7] = captiveportal_get_last_activity($cpent[1]);
 			$cpdb[] = $cpent;
 		}
 	}
@@ -68,8 +68,10 @@ if ($fp) {
 			$order = 2;
 		else if ($_GET['order'] == "mac")
 			$order = 3;
-		else if ($_GET['order'] == "lastact")
+		else if ($_GET['order'] == "user")
 			$order = 4;
+		else if ($_GET['order'] == "lastact")
+			$order = 7;
 		else
 			$order = 0;
 		usort($cpdb, "clientcmp");
@@ -81,12 +83,11 @@ captiveportal_unlock();
   <tr>
     <td class="listhdrr"><a href="?order=ip&showact=<?=$_GET['showact'];?>">IP address</a></td>
     <td class="listhdrr"><a href="?order=mac&showact=<?=$_GET['showact'];?>">MAC address</a></td>
-	<?php if ($_GET['showact']): ?>
     <td class="listhdrr"><a href="?order=start&showact=<?=$_GET['showact'];?>">Session start</a></td>
-    <td class="listhdr"><a href="?order=lastact&showact=<?=$_GET['showact'];?>">Last activity</a></td>
-	<?php else: ?>
-    <td class="listhdr"><a href="?order=start&showact=<?=$_GET['showact'];?>">Session start</a></td>
+	<?php if ($_GET['showact']): ?>
+    <td class="listhdrr"><a href="?order=lastact&showact=<?=$_GET['showact'];?>">Last activity</a></td>
 	<?php endif; ?>
+    <td class="listhdr"><a href="?order=user&showact=<?=$_GET['showact'];?>">Username</a></td>
     <td class="list"></td>
   </tr>
 <?php foreach ($cpdb as $cpent): ?>
@@ -95,10 +96,11 @@ captiveportal_unlock();
     <td class="listr"><?=$cpent[3];?>&nbsp;</td>
     <td class="listr"><?=htmlspecialchars(date("m/d/Y H:i:s", $cpent[0]));?></td>
 	<?php if ($_GET['showact']): ?>
-    <td class="listr"><?php if ($cpent[4]) echo htmlspecialchars(date("m/d/Y H:i:s", $cpent[4]));?></td>
+    <td class="listr"><?php if ($cpent[7]) echo htmlspecialchars(date("m/d/Y H:i:s", $cpent[7]));?></td>
 	<?php endif; ?>
+    <td class="listr"><?=$cpent[4];?>&nbsp;</td>
 	<td valign="middle" class="list" nowrap>
-	<a href="?order=<?=$_GET['order'];?>&showact=<?=$_GET['showact'];?>&act=del&id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+	<a href="?order=<?=$_GET['order'];?>&showact=<?=$_GET['showact'];?>&act=del&id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" title="disconnect client" width="17" height="17" border="0"></a></td>
   </tr>
 <?php endforeach; ?>
 </table>

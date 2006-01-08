@@ -140,13 +140,13 @@ Click the MAC address to wake up a computer. <br>
                   <td class="listbg">
                     <?=htmlspecialchars($wolent['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_wol_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_wol.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_wol_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0"></a>
+                     &nbsp;<a href="services_wol.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="services_wol_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="services_wol_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0"></a></td>
 				</tr>
               </table>
 </form>

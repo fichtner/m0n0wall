@@ -46,6 +46,7 @@ $pconfig['bypassstaticroutes'] = isset($config['filter']['bypassstaticroutes']);
 $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
 $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
+$pconfig['polling_enable'] = isset($config['system']['polling']);
 
 if ($_POST) {
 
@@ -88,6 +89,7 @@ if ($_POST) {
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
+		$config['system']['polling'] = $_POST['polling_enable'] ? true : false;
 			
 		write_config();
 		
@@ -112,6 +114,7 @@ if ($_POST) {
 			$retval |= interfaces_optional_configure();
 			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa)
 				$retval |= vpn_ipsec_configure();
+			$retval |= system_polling_configure();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
@@ -276,6 +279,17 @@ function enable_change(enable_over) {
                     <strong>Prefer old IPsec SAs</strong><br>
 					By default, if several SAs match, the newest one is preferred if it's at least 30 seconds old.
 					Select this option to always prefer old SAs over new ones.
+					</td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">Device polling</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="polling_enable" type="checkbox" id="polling_enable" value="yes" <?php if ($pconfig['polling_enable']) echo "checked"; ?>>
+                    <strong>Use device polling</strong><br>
+					Device polling is a technique that lets the system periodically poll network devices for new
+					data instead of relying on interrupts. This can reduce CPU load and therefore increase
+					throughput, at the expense of a slightly higher forwarding delay (the devices are polled 1000 times
+					per second). Not all NICs support polling; see the m0n0wall homepage for a list of supported cards.
 					</td>
                 </tr>
                 <tr> 

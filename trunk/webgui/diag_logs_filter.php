@@ -32,13 +32,59 @@
 $pgtitle = array("Diagnostics", "Logs");
 require("guiconfig.inc");
 
+$protocols = explode(" ", "TCP UDP TCP/UDP ICMP ESP AH GRE IPv6 IGMP any");
+
 $nentries = $config['syslog']['nentries'];
+$resolve = $config['syslog']['resolve'];
+
 if (!$nentries)
 	$nentries = 50;
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 262144 /var/log/filter.log");
 }
+
+
+if (isset($_GET['act']) && preg_match("/^[pb]+$/", $_GET['act'])) {
+	$action = $_GET['act'];
+	$ifstring  .= "&act=$action";
+	$srcstring .= "&act=$action";
+	$dststring .= "&act=$action";
+	$prstring  .= "&act=$action";
+}
+
+if (isset($_GET['if']) && ($_GET['if'] != "")) {
+	$iface = $_GET['if'];
+	$actstring .= "&if=$iface";
+	$srcstring .= "&if=$iface";
+	$dststring .= "&if=$iface";
+	$prstring  .= "&if=$iface";
+}
+
+if (isset($_GET['pr']) && in_array($_GET['pr'], $protocols)) {
+	$proto = $_GET['pr'];
+	$actstring .= "&pr=$proto";
+	$ifstring  .= "&pr=$proto";
+	$srcstring .= "&pr=$proto";
+	$dststring .= "&pr=$proto";
+}
+
+if (isset($_GET['sp']) && (is_numeric($_GET['sp']))) {
+	$srcport = $_GET['sp'];
+	$actstring .= "&sp=$srcport";
+	$ifstring  .= "&sp=$srcport";
+	$dststring .= "&sp=$srcport";
+	$prstring  .= "&sp=$srcport";
+}
+
+if (isset($_GET['dp']) && (is_numeric($_GET['dp']))) {
+	$dstport = $_GET['dp'];
+	$actstring .= "&dp=$dstport";
+	$ifstring  .= "&dp=$dstport";
+	$srcstring .= "&dp=$dstport";
+	$prstring  .= "&dp=$dstport";
+}
+
 
 function dump_clog($logfile, $tail, $withorig = true) {
 	global $g, $config;
@@ -62,7 +108,7 @@ function dump_clog($logfile, $tail, $withorig = true) {
 }
 
 function conv_clog($logfile, $tail) {
-	global $g, $config;
+	global $g, $config, $iface, $action, $proto, $srcport, $dstport;
 	
 	/* make interface/port table */
 	$iftable = array();
@@ -76,7 +122,7 @@ function conv_clog($logfile, $tail) {
 	exec("/usr/sbin/clog " . $logfile . " | tail {$sor} -n " . $tail, $logarr);
 	
 	$filterlog = array();
-	
+
 	foreach ($logarr as $logent) {
 		$logent = preg_split("/\s+/", $logent, 6);
 		$ipfa = explode(" ", $logent[5]);
@@ -89,40 +135,58 @@ function conv_clog($logfile, $tail) {
 			$flent['count'] = substr($ipfa[$i], 0, -1);
 			$i++;
 		}
-		if ($iftable[$ipfa[$i]])
+		if (!isset($iface) || ($iftable[$ipfa[$i]] && strstr($iface, $iftable[$ipfa[$i]])))
 			$flent['interface'] = $iftable[$ipfa[$i]];
-		else
+		else if (!isset($iface) || strstr($iface, $ipfa[$i]))
 			$flent['interface'] = $ipfa[$i];
+		else continue;
 		$i += 2;
-		$flent['act'] = $ipfa[$i];
+		if (!isset($action) || strstr($action, $ipfa[$i]))
+			$flent['act'] = $ipfa[$i];
+		else continue; 
 		$i++;
-		$flent['src'] = format_ipf_ip($ipfa[$i]);
+		list($flent['src'], $flent['srcport']) = format_ipf_ip($ipfa[$i],$srcport);
+		if (!isset($flent['src'])) continue;
 		$i += 2;
-		$flent['dst'] = format_ipf_ip($ipfa[$i]);
+		list($flent['dst'], $flent['dstport']) = format_ipf_ip($ipfa[$i],$dstport);
+		if (!isset($flent['dst'])) continue;
 		$i += 2;
-		$flent['proto'] = strtoupper($ipfa[$i]);
-		
+		$protocol = strtoupper($ipfa[$i]);
+		if (!isset($proto) || ($proto == $protocol))
+			$flent['proto'] = $protocol;
+		else continue;
+		if (isset($resolve)) {
+			$flent['dst'] = gethostbyaddr($flent['dst']);
+			$flent['src'] = gethostbyaddr($flent['src']);
+		}
+		if ($protocol == "ICMP") {
+			$i += 5;
+			$flent['dst'] = $flent['dst'] . ", type " . $ipfa[$i];
+		}
 		$filterlog[] = $flent;
 	}
 	
 	return $filterlog;
 }
 
-function format_ipf_ip($ipfip) {
+function format_ipf_ip($ipfip,$uport) {
 	list($ip,$port) = explode(",", $ipfip);
 	if (!$port)
-		return $ip;
-	
-	return $ip . ", port " . $port;
-}
+		return array($ip, "");
 
+	if ($uport == "" || ($uport == $port))
+		return array($ip . ", port " . $port, $port);
+
+	return;
+}
 ?>
+
 <?php include("fbegin.inc"); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabinact1"><a href="diag_logs.php">System</a></li>
-    <li class="tabact">Firewall</li>
+    <li class="tabact"><a href="diag_logs_filter.php" style="color:black" title="reset filter and reload firewall logs page">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
     <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
     <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
@@ -139,13 +203,21 @@ function format_ipf_ip($ipfip) {
 			    Last <?=$nentries;?> firewall log entries</td>
 			</tr>
 			<tr>
-			  <td width="10%" class="listhdrr">Act</td>
+			  <td width="10%" class="listhdrr"><a href="?<?=substr($actstring, 1);?>" style="color:black" title="reset action and reload firewall logs page">Act</a></td>
 			  <td width="20%" class="listhdrr">Time</td>
-			  <td width="10%" class="listhdrr">If</td>
-			  <td width="20%" class="listhdrr">Source</td>
-			  <td width="20%" class="listhdrr">Destination</td>
-			  <td width="10%" class="listhdrr">Proto</td>
-			</tr><?php foreach ($filterlog as $filterent): ?>
+			  <td width="10%" class="listhdrr"><a href="?<?=substr($ifstring, 1);?>" style="color:black" title="reset interface and reload firewall logs page">If</a></td>
+			  <td width="20%" class="listhdrr"><a href="?<?=substr($srcstring, 1);?>" style="color:black" title="reset source port entry and reload firewall logs page">Source</a></td>
+			  <td width="20%" class="listhdrr"><a href="?<?=substr($dststring, 1);?>" style="color:black" title="reset destination port entry and reload firewall logs page">Destination</a></td>
+			  <td width="10%" class="listhdrr"><a href="?<?=substr($prstring, 1);?>" style="color:black" title="reset protocol entry and reload firewall logs page">Proto</a></td>
+			</tr>
+	<?php
+	$actstring .= '">';
+	$ifstring  .= '" style="color:black" title="click to select interface">';
+	$srcstring .= '" style="color:black" title="click to select source port">';
+	$dststring .= '" style="color:black" title="click to select destination port">';
+	$prstring  .= '" style="color:black" title="click to select protocol">';
+	?>
+			 <?php foreach ($filterlog as $filterent): ?>
 			<tr>
 			  <td class="listlr" nowrap>
 			  <?php if (strstr(strtolower($filterent['act']), "p"))
@@ -153,15 +225,33 @@ function format_ipf_ip($ipfip) {
 					 else 
 					 	$img = "block.gif";
 			 	?>
-			  <img src="<?=$img;?>" width="11" height="11" align="absmiddle">
+			  <a href="?act=<?=$filterent['act'];?><?=$actstring;?><img src="<?=$img;?>" width="11" height="11" align="absmiddle" border="0" title="click to select action"></a>
 			  <?php if ($filterent['count']) echo $filterent['count'];?></td>
 			  <td class="listr" nowrap><?=htmlspecialchars($filterent['time']);?></td>
-			  <td class="listr" nowrap><?=htmlspecialchars($filterent['interface']);?></td>
-			  <td class="listr" nowrap><?=htmlspecialchars($filterent['src']);?></td>
-			  <td class="listr" nowrap><?=htmlspecialchars($filterent['dst']);?></td>
-			  <td class="listr" nowrap><?=htmlspecialchars($filterent['proto']);?></td>
+			  <td class="listr" nowrap>
+			    <a href="?if=<?=$filterent['interface'];?><?=$ifstring;?><?=htmlspecialchars($filterent['interface']);?></a></td>
+			  <td class="listr" nowrap>
+			    <a href="?sp=<?=htmlspecialchars($filterent['srcport']);?><?=$srcstring;?><?=htmlspecialchars($filterent['src']);?></a></td>
+			  <td class="listr" nowrap>
+			    <a href="?dp=<?=htmlspecialchars($filterent['dstport']);?><?=$dststring;?><?=htmlspecialchars($filterent['dst']);?></a></td>
+			  <td class="listr" nowrap>
+			    <a href="?pr=<?=htmlspecialchars($filterent['proto']);?><?=$prstring;?><?=htmlspecialchars($filterent['proto']);?></a></td>
 			</tr><?php endforeach; ?>
                     </table>
+		<br><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr> 
+                        <td width="100%"><strong><span class="red">Note:</span></strong><br>
+                          There are many possibilities to filter this log.
+                          Just click on the accept (<img src="pass.gif">) or
+			  deny symbol (<img src="block.gif">) to filter for
+			  accepted or denied IP packets. Do the same for the desired
+			  interface, source/destination port or protocol. To deselect
+			  a selected filter entry, click on the column description above.
+                          To reset all filter entries and reload the firewall logs page,
+			  click on the &quot;Firewall&quot; tab below &quot;Diagnostics: Logs&quot;.
+                        </td>
+		      </tr>
+		</table>
 <?php else: ?>
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tr> 

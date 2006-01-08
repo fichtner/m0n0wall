@@ -132,9 +132,34 @@ function vpn_ipsec_configure($ipchg = false) {
 			}
 				
 			$racoonconf = "path pre_shared_key \"{$g['varetc_path']}/psk.txt\";\n\n";
+			$racoonconf .= "path certificate  \"{$g['varetc_path']}\";\n\n";
 			
+			/* generate CA certificates files */
+			$cacertnum = 0;
+			if (is_array($ipseccfg['cacert']) && count($ipseccfg['cacert']))
+				foreach ($ipseccfg['cacert'] as $cacert) {
+					++$cacertnum;
+					if (isset($cacert['cert'])) {
+						$cert = base64_decode($cacert['cert']);
+						$x509cert = openssl_x509_parse(openssl_x509_read($cert));
+						if(is_array($x509cert) && isset($x509cert['hash'])) {
+							$fd1 = fopen("{$g['varetc_path']}/{$x509cert['hash']}.0", "w");
+							if (!$fd1) {
+								printf("Error: cannot open {$x509cert['hash']}.0 in vpn.\n");
+								return 1;
+							}
+							chmod("{$g['varetc_path']}/{$x509cert['hash']}.0", 0600);
+							fwrite($fd1, $cert);
+							fclose($fd1);
+						}
+					}
+				}
+						
+			$tunnelnumber = 0;
 			if (is_array($ipseccfg['tunnel']) && count($ipseccfg['tunnel']))
 				foreach ($ipseccfg['tunnel'] as $tunnel) {
+				
+				++$tunnelnumber;
 			
 				if (isset($tunnel['disabled']))
 					continue;
@@ -158,11 +183,68 @@ function vpn_ipsec_configure($ipchg = false) {
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
  				}
-			
+				
+				if (isset($tunnel['p1']['authentication_method'])) {
+					$authmethod = $tunnel['p1']['authentication_method'];
+				} else {$authmethod = 'pre_shared_key';}
+				
+				$certline = '';	
+				
+				if ($authmethod == 'rsasig') {
+					if ($tunnel['p1']['cert'] && $tunnel['p1']['private-key']) {
+						$cert = base64_decode($tunnel['p1']['cert']);
+						$private_key = base64_decode($tunnel['p1']['private-key']);
+					} else {
+						/* null certificate/key */
+						$cert = '';
+						$private_key = '';
+					}
+					
+					if ($tunnel['p1']['peercert']) 
+						$peercert = base64_decode($tunnel['p1']['peercert']);
+					else 
+						$peercert = '';
+					
+					$fd1 = fopen("{$g['varetc_path']}/server{$tunnelnumber}-signed.pem", "w");
+					if (!$fd1) {
+						printf("Error: cannot open server{$tunnelnumber}-signed.pem in vpn.\n");
+						return 1;
+					}
+					chmod("{$g['varetc_path']}/server{$tunnelnumber}-signed.pem", 0600);
+					fwrite($fd1, $cert);
+					fclose($fd1);
+					
+					$fd1 = fopen("{$g['varetc_path']}/server{$tunnelnumber}-key.pem", "w");
+					if (!$fd1) {
+						printf("Error: cannot open server{$tunnelnumber}-key.pem in vpn.\n");
+						return 1;
+					}
+					chmod("{$g['varetc_path']}/server{$tunnelnumber}-key.pem", 0600);
+					fwrite($fd1, $private_key);
+					fclose($fd1);
+
+					$certline = "certificate_type x509 \"server{$tunnelnumber}-signed.pem\" \"server{$tunnelnumber}-key.pem\";";
+					
+					if ($peercert!=''){
+						$fd1 = fopen("{$g['varetc_path']}/peer{$tunnelnumber}-signed.pem", "w");
+						if (!$fd1) {
+							printf("Error: cannot open server{$tunnelnumber}-signed.pem in vpn.\n");
+							return 1;
+						}
+						chmod("{$g['varetc_path']}/peer{$tunnelnumber}-signed.pem", 0600);
+						fwrite($fd1, $peercert);
+						fclose($fd1);		
+						$certline .= <<<EOD
+						
+	peers_certfile "peer{$tunnelnumber}-signed.pem";
+EOD;
+					} 					
+				} 
 				$racoonconf .= <<<EOD
 remote {$tunnel['remote-gateway']} \{
 	exchange_mode {$tunnel['p1']['mode']};
 	my_identifier {$myidentt} "{$myident}";
+	{$certline}
 	peers_identifier address {$tunnel['remote-gateway']};
 	initial_contact on;
 	support_proxy on;
@@ -171,7 +253,7 @@ remote {$tunnel['remote-gateway']} \{
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
 		hash_algorithm {$tunnel['p1']['hash-algorithm']};
-		authentication_method pre_shared_key;
+		authentication_method {$authmethod};
 		dh_group {$tunnel['p1']['dhgroup']};
 
 EOD;
@@ -223,11 +305,52 @@ EOD;
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
  				}
-			
+				
+				if (isset($tunnel['p1']['authentication_method'])) {
+					$authmethod = $tunnel['p1']['authentication_method'];
+				} else {$authmethod = 'pre_shared_key';}
+				
+				$certline = '';					
+				if ($authmethod == 'rsasig') {
+					if ($tunnel['p1']['cert'] && $tunnel['p1']['private-key']) {
+						$cert = base64_decode($tunnel['p1']['cert']);
+						$private_key = base64_decode($tunnel['p1']['private-key']);
+					} else {
+						/* null certificate/key */
+						$cert = '';
+						$private_key = '';
+					}
+					
+					if ($tunnel['p1']['peercert']) 
+						$peercert = base64_decode($tunnel['p1']['peercert']);
+					else 
+						$peercert = '';
+					
+					$fd1 = fopen("{$g['varetc_path']}/server-mobile{$tunnelnumber}-signed.pem", "w");
+					if (!$fd1) {
+						printf("Error: cannot open server-mobile{$tunnelnumber}-signed.pem in vpn.\n");
+						return 1;
+					}
+					chmod("{$g['varetc_path']}/server-mobile{$tunnelnumber}-signed.pem", 0600);
+					fwrite($fd1, $cert);
+					fclose($fd1);
+					
+					$fd1 = fopen("{$g['varetc_path']}/server-mobile{$tunnelnumber}-key.pem", "w");
+					if (!$fd1) {
+						printf("Error: cannot open server-mobile{$tunnelnumber}-key.pem in vpn.\n");
+						return 1;
+					}
+					chmod("{$g['varetc_path']}/server-mobile{$tunnelnumber}-key.pem", 0600);
+					fwrite($fd1, $private_key);
+					fclose($fd1);
+
+					$certline = "certificate_type x509 \"server-mobile{$tunnelnumber}-signed.pem\" \"server-mobile{$tunnelnumber}-key.pem\";";
+				}
 				$racoonconf .= <<<EOD
 remote anonymous \{
 	exchange_mode {$tunnel['p1']['mode']};
 	my_identifier {$myidentt} "{$myident}";
+	{$certline}
 	initial_contact on;
 	passive on;
 	generate_policy on;
@@ -237,7 +360,7 @@ remote anonymous \{
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
 		hash_algorithm {$tunnel['p1']['hash-algorithm']};
-		authentication_method pre_shared_key;
+		authentication_method {$authmethod};
 		dh_group {$tunnel['p1']['dhgroup']};
 
 EOD;

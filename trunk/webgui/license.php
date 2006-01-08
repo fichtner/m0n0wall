@@ -80,6 +80,7 @@ require("guiconfig.inc");
               <br>
               Peter Allgeyer (<a href="mailto:allgeyer@web.de">allgeyer@web.de</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules; dial-on-demand; WAN connect/disconnect; auto-add proxy ARP </font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">firewall log filtering</font></em><br>
               <br>
               Thierry Lechat (<a href="mailto:dev@lechat.org">dev@lechat.org</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SVG-based traffic grapher</font></em><br>
@@ -122,7 +123,10 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal local user database</font></em><br>
 			  <br>
               Matt Juszczak (<a href="mailto:matt@atopia.net">matt@atopia.net</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal logging</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal logging</font></em><br>
+			  <br>
+              Enrique Maldonado (<a href="mailto:enrique@directemar.cl">enrique@directemar.cl</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPsec certificate support</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

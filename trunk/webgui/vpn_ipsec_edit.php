@@ -111,7 +111,11 @@ if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['p1halgo'] = $a_ipsec[$id]['p1']['hash-algorithm'];
 	$pconfig['p1dhgroup'] = $a_ipsec[$id]['p1']['dhgroup'];
 	$pconfig['p1lifetime'] = $a_ipsec[$id]['p1']['lifetime'];
+	$pconfig['p1authentication_method'] = $a_ipsec[$id]['p1']['authentication_method'];
 	$pconfig['p1pskey'] = $a_ipsec[$id]['p1']['pre-shared-key'];
+	$pconfig['p1cert'] = base64_decode($a_ipsec[$id]['p1']['cert']);
+	$pconfig['p1peercert'] = base64_decode($a_ipsec[$id]['p1']['peercert']);
+	$pconfig['p1privatekey'] = base64_decode($a_ipsec[$id]['p1']['private-key']);
 	$pconfig['p2proto'] = $a_ipsec[$id]['p2']['protocol'];
 	$pconfig['p2ealgos'] = $a_ipsec[$id]['p2']['encryption-algorithm-option'];
 	$pconfig['p2halgos'] = $a_ipsec[$id]['p2']['hash-algorithm-option'];
@@ -125,6 +129,7 @@ if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['localnet'] = "lan";
 	$pconfig['p1mode'] = "aggressive";
 	$pconfig['p1myidentt'] = "myaddress";
+	$pconfig['p1authentication_method'] = "pre_shared_key";
 	$pconfig['p1ealgo'] = "3des";
 	$pconfig['p1halgo'] = "sha1";
 	$pconfig['p1dhgroup'] = "2";
@@ -147,8 +152,20 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	$reqdfields = explode(" ", "localnet remotenet remotebits remotegw p1pskey p2ealgos p2halgos");
-	$reqdfieldsn = explode(",", "Local network,Remote network,Remote network bits,Remote gateway,Pre-Shared Key,P2 Encryption Algorithms,P2 Hash Algorithms");
+	if ($_POST['p1authentication_method'] == "pre_shared_key") {
+		$reqdfields = explode(" ", "localnet remotenet remotebits remotegw p1pskey p2ealgos p2halgos");
+		$reqdfieldsn = explode(",", "Local network,Remote network,Remote network bits,Remote gateway,Pre-Shared Key,P2 Encryption Algorithms,P2 Hash Algorithms");
+	}
+	else {
+		$reqdfields = explode(" ", "localnet remotenet remotebits remotegw p2ealgos p2halgos");
+		$reqdfieldsn = explode(",", "Local network,Remote network,Remote network bits,Remote gateway,P2 Encryption Algorithms,P2 Hash Algorithms");	
+		if (!strstr($_POST['p1cert'], "BEGIN CERTIFICATE") || !strstr($_POST['p1cert'], "END CERTIFICATE"))
+			$input_errors[] = "This certificate does not appear to be valid.";
+		if (!strstr($_POST['p1privatekey'], "BEGIN RSA PRIVATE KEY") || !strstr($_POST['p1privatekey'], "END RSA PRIVATE KEY"))
+			$input_errors[] = "This key does not appear to be valid.";	
+		if ($_POST['p1peercert']!="" && (!strstr($_POST['p1peercert'], "BEGIN CERTIFICATE") || !strstr($_POST['p1peercert'], "END CERTIFICATE")))
+			$input_errors[] = "This peer certificate does not appear to be valid.";	
+	}
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
@@ -220,6 +237,10 @@ if ($_POST) {
 		$ipsecent['p1']['dhgroup'] = $_POST['p1dhgroup'];
 		$ipsecent['p1']['lifetime'] = $_POST['p1lifetime'];
 		$ipsecent['p1']['pre-shared-key'] = $_POST['p1pskey'];
+		$ipsecent['p1']['private-key'] = base64_encode($_POST['p1privatekey']);
+		$ipsecent['p1']['cert'] = base64_encode($_POST['p1cert']);
+		$ipsecent['p1']['peercert'] = base64_encode($_POST['p1peercert']);
+		$ipsecent['p1']['authentication_method'] = $_POST['p1authentication_method'];
 		$ipsecent['p2']['protocol'] = $_POST['p2proto'];
 		$ipsecent['p2']['encryption-algorithm-option'] = $_POST['p2ealgos'];
 		$ipsecent['p2']['hash-algorithm-option'] = $_POST['p2halgos'];
@@ -259,6 +280,22 @@ function typesel_change() {
 			document.iform.localnet.disabled = 1;
 			document.iform.localnetmask.value = "";
 			document.iform.localnetmask.disabled = 1;
+			break;
+	}
+}
+function methodsel_change() {
+	switch (document.iform.p1authentication_method.selectedIndex) {
+		case 1:	/* rsa */
+			document.iform.p1pskey.disabled = 1;
+			document.iform.p1privatekey.disabled = 0;
+			document.iform.p1cert.disabled = 0;
+			document.iform.p1peercert.disabled = 0;
+			break;
+		default: /* pre-shared */
+			document.iform.p1pskey.disabled = 0;
+			document.iform.p1privatekey.disabled = 1;
+			document.iform.p1cert.disabled = 1;
+			document.iform.p1peercert.disabled = 1;
 			break;
 	}
 }
@@ -435,10 +472,44 @@ function typesel_change() {
                     seconds</td>
                 </tr>
                 <tr> 
+                  <td width="22%" valign="top" class="vncellreq">Authentication method</td>
+                  <td width="78%" class="vtable">
+					<select name="p1authentication_method" class="formfld" onChange="methodsel_change()">
+                      <?php foreach ($p1_authentication_methods as $method => $methodname): ?>
+                      <option value="<?=$method;?>" <?php if ($method == $pconfig['p1authentication_method']) echo "selected"; ?>> 
+                      <?=htmlspecialchars($methodname);?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select> <br> <span class="vexpl">Must match the setting 
+                    chosen on the remote side.</span></td>
+                </tr>
+                <tr> 
                   <td width="22%" valign="top" class="vncellreq">Pre-Shared Key</td>
                   <td width="78%" class="vtable"> 
                     <?=$mandfldhtml;?><input name="p1pskey" type="text" class="formfld" id="p1pskey" size="40" value="<?=htmlspecialchars($pconfig['p1pskey']);?>"> 
                   </td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncellreq">Certificate</td>
+                  <td width="78%" class="vtable"> 
+                    <textarea name="p1cert" cols="65" rows="7" id="p1cert" class="formpre"><?=htmlspecialchars($pconfig['p1cert']);?></textarea>
+                    <br> 
+                    Paste a certificate in X.509 PEM format here.</td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncellreq">Key</td>
+                  <td width="78%" class="vtable"> 
+                    <textarea name="p1privatekey" cols="65" rows="7" id="p1privatekey" class="formpre"><?=htmlspecialchars($pconfig['p1privatekey']);?></textarea>
+                    <br> 
+                    Paste an RSA private key in PEM format here.</td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Peer certificate</td>
+                  <td width="78%" class="vtable"> 
+                    <textarea name="p1peercert" cols="65" rows="7" id="p1peercert" class="formpre"><?=htmlspecialchars($pconfig['p1peercert']);?></textarea>
+                    <br> 
+                    Paste the peer X.509 certificate in PEM format here.<br>
+                    Leave this blank if you want to use a CA certificate for identity validation.</td>
                 </tr>
                 <tr> 
                   <td colspan="2" class="list" height="12"></td>
@@ -514,6 +585,7 @@ function typesel_change() {
 <script language="JavaScript">
 <!--
 typesel_change();
+methodsel_change();
 //-->
 </script>
 <?php include("fend.inc"); ?>

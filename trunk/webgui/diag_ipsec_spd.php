@@ -118,7 +118,7 @@ foreach ($spd as $sp): ?>
 			$args .= "&dst=" . rawurlencode($sp['dst']);
 			$args .= "&dir=" . rawurlencode($sp['dir']);
 		?>
-		  <a href="diag_ipsec_spd.php?act=del&<?=$args;?>" onclick="return confirm('Do you really want to delete this security policy?')"><img src="x.gif" width="17" height="17" border="0"></a>
+		  <a href="diag_ipsec_spd.php?act=del&<?=$args;?>" onclick="return confirm('Do you really want to delete this security policy?')"><img src="x.gif" title="delete SP" width="17" height="17" border="0"></a>
 		</td>
 				
 	</tr>

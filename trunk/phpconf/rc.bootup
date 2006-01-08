@@ -70,6 +70,9 @@
 	/* establish ipfilter ruleset */
 	filter_configure();
 	
+	/* set up device polling */
+	system_polling_configure();
+	
 	/* configure loopback interface */
 	interfaces_loopback_configure();
 	
@@ -151,6 +154,9 @@
 	
 	/* run any shell commands specified in config.xml */
 	system_do_shell_commands();
+	
+	/* enable HD standby */
+	system_set_harddisk_standby();
 	
 	/* done */
 	unlink("{$g['varrun_path']}/booting");

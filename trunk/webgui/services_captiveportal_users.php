@@ -224,15 +224,15 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
                   <td class="listbg">
                     <?=$user['expirationdate']; ?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_users.php?act=edit&username=<?=$username; ?>"><img src="e.gif" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_captiveportal_users.php?act=delete&username=<?=$username; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_users.php?act=edit&username=<?=$username; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
+                     &nbsp;<a href="services_captiveportal_users.php?act=delete&username=<?=$username; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
 		</tr>
 <?php
 		}
 	} ?>
 	<tr> 
 			  <td class="list" colspan="3"></td>
-			  <td class="list"> <a href="services_captiveportal_users.php?act=new"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+			  <td class="list"> <a href="services_captiveportal_users.php?act=new"><img src="plus.gif" title="add user" width="17" height="17" border="0"></a></td>
 		</tr>
  </table>
 <?php } ?>

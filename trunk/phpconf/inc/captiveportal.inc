@@ -36,6 +36,7 @@
 	
 /* include all configuration functions */
 require_once("functions.inc");
+require_once("radius_authentication.inc");
 require_once("radius_accounting.inc") ;
 
 function captiveportal_configure() {
@@ -222,6 +223,7 @@ EOD;
 		
 	} else {
 		killbypid("{$g['varrun_path']}/mini_httpd.cp.pid");
+		killbypid("{$g['varrun_path']}/mini_httpd.cps.pid");
 		killbypid("{$g['varrun_path']}/minicron.pid");
 
 		captiveportal_radius_stop_all();
@@ -324,7 +326,8 @@ EOD;
 }
 
 /* remove clients that have been around for longer than the specified amount of time */
-/* db file structure: timestamp,ipfw_rule_no,clientip,clientmac,username,sessionid */
+/* db file structure: timestamp,ipfw_rule_no,clientip,clientmac,username,sessionid,password */
+/* (password is in Base64 and only saved when reauthentication is enabled) */
 function captiveportal_prune_old() {
 	
 	global $g, $config;
@@ -340,7 +343,7 @@ function captiveportal_prune_old() {
 	else
 		$idletimeout = 0;
 	
-	if (!$timeout && !$idletimeout)
+	if (!$timeout && !$idletimeout && !isset($config['captiveportal']['reauthenticate']))
 		return;
 	
 	captiveportal_lock();
@@ -371,6 +374,55 @@ function captiveportal_prune_old() {
 			captiveportal_disconnect($cpdb[$i], $radiusservers);
 			captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "TIMEOUT");
 			unset($cpdb[$i]);
+		}
+		
+		/* do periodic RADIUS reauthentication? */
+		if (!$timedout && isset($config['captiveportal']['reauthenticate']) &&
+			($radiusservers !== false)) {
+		
+			if (isset($config['captiveportal']['radacct_enable'])) {
+				if ($config['captiveportal']['reauthenticateacct'] == "stopstart") {
+					/* stop and restart accounting */
+					RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
+										   $cpdb[$i][4], // username
+										   $cpdb[$i][5], // sessionid
+										   $cpdb[$i][0], // start time
+										   $radiusservers[0]['ipaddr'],
+										   $radiusservers[0]['acctport'],
+										   $radiusservers[0]['key'],
+										   $cpdb[$i][2]); //clientip
+					exec("/sbin/ipfw zero {$cpdb[$i][1]}");
+					RADIUS_ACCOUNTING_START($cpdb[$i][4],
+											$cpdb[$i][5],
+											$radiusservers[0]['ipaddr'],
+											$radiusservers[0]['acctport'],
+											$radiusservers[0]['key'],
+											$cpdb[$i][2]);
+				} else if ($config['captiveportal']['reauthenticateacct'] == "interimupdate") {
+					RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
+										   $cpdb[$i][4], // username
+										   $cpdb[$i][5], // sessionid
+										   $cpdb[$i][0], // start time
+										   $radiusservers[0]['ipaddr'],
+										   $radiusservers[0]['acctport'],
+										   $radiusservers[0]['key'],
+										   $cpdb[$i][2], //clientip
+										   true);
+				}
+			}
+		
+			/* check this user against RADIUS again */
+			$auth_val = RADIUS_AUTHENTICATION($cpdb[$i][4],
+										  base64_decode($cpdb[$i][6]),
+							  			  $radiusservers[0]['ipaddr'],
+							  			  $radiusservers[0]['port'],
+							  			  $radiusservers[0]['key']);
+			
+			if ($auth_val == 3) {
+				captiveportal_disconnect($cpdb[$i], $radiusservers);
+				captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "RADIUS_DISCONNECT");
+				unset($cpdb[$i]);
+			}
 		}
 	}
 	

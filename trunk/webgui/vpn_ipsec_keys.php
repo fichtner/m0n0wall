@@ -62,6 +62,7 @@ if ($_GET['act'] == "del") {
     <li class="tabinact1"><a href="vpn_ipsec.php">Tunnels</a></li>
     <li class="tabinact"><a href="vpn_ipsec_mobile.php">Mobile clients</a></li>
     <li class="tabact">Pre-shared keys</li>
+    <li class="tabinact"><a href="vpn_ipsec_ca.php">CAs</a></li>
   </ul>
   </td></tr>
   <tr> 
@@ -80,13 +81,13 @@ if ($_GET['act'] == "del") {
                   <td class="listr">
                     <?=htmlspecialchars($secretent['pre-shared-key']);?>
                   </td>
-                  <td class="list" nowrap> <a href="vpn_ipsec_keys_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="vpn_ipsec_keys.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this pre-shared key?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list" nowrap> <a href="vpn_ipsec_keys_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit key" width="17" height="17" border="0"></a>
+                     &nbsp;<a href="vpn_ipsec_keys.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this pre-shared key?')"><img src="x.gif" title="delete key" width="17" height="17" border="0"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="2"></td>
-                  <td class="list"> <a href="vpn_ipsec_keys_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="vpn_ipsec_keys_edit.php"><img src="plus.gif" title="add key" width="17" height="17" border="0"></a></td>
 				</tr>
               </table>
 			 </td>

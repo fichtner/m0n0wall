@@ -115,13 +115,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg"> 
                     <?=htmlspecialchars($natent['descr']);?>&nbsp;
                   </td>
-                  <td class="list" nowrap> <a href="firewall_nat_server_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="firewall_nat_server.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list" nowrap> <a href="firewall_nat_server_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0"></a>
+                     &nbsp;<a href="firewall_nat_server.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="2"></td>
-                  <td class="list"> <a href="firewall_nat_server_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="firewall_nat_server_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0"></a></td>
 				</tr>
               </table><br>
 			        <span class="vexpl"><span class="red"><strong>Note:<br>

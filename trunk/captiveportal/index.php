@@ -74,7 +74,7 @@ if ($clientmac && portal_mac_fixed($clientmac)) {
 							  			  $radiusservers[0]['key']);
 		if ($auth_val == 2) {
 			captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"LOGIN");
-			$sessionid = portal_allow($clientip, $clientmac, $_POST['auth_user']);
+			$sessionid = portal_allow($clientip, $clientmac, $_POST['auth_user'], $_POST['auth_pass']);
 			if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
 				$auth_val = RADIUS_ACCOUNTING_START($_POST['auth_user'],
 													$sessionid,
@@ -173,7 +173,7 @@ function portal_mac_fixed($clientmac) {
 	return FALSE ;
 }	
 
-function portal_allow($clientip,$clientmac,$clientuser) {
+function portal_allow($clientip,$clientmac,$clientuser,$password = "") {
 
 	global $orig_host, $orig_request, $g, $config;
 
@@ -245,7 +245,9 @@ function portal_allow($clientip,$clientmac,$clientuser) {
 			fwrite($fd, join(",", $cpent) . "\n");
 		}
 		/* write in this new entry */
-		fwrite($fd, time().",{$ruleno},{$clientip},{$clientmac},{$clientuser},{$sessionid}\n") ;
+		/* encode password in Base64 just in case it contains commas */
+		$bpassword = base64_encode($password);
+		fwrite($fd, time().",{$ruleno},{$clientip},{$clientmac},{$clientuser},{$sessionid},{$bpassword}\n") ;
 		fclose($fd);
 	}
 	

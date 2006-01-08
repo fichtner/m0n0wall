@@ -135,7 +135,7 @@ function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$rad
 	// See RFC2866 for this.
 }
 
-function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip) {
+function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$interimupdate=false) {
 	$sharedsecret=$radiuskey ;
 	# $debug = 1 ;
 
@@ -147,13 +147,13 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
 	exec("/sbin/ipfw show {$ruleno}", $ipfw) ;	
 	preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[0], $matches) ;
-	$output_pkts = $matches[2] ;
-	$output_bytes = $matches[3] ;
+	$input_pkts = $matches[2] ;
+	$input_bytes = $matches[3] ;
 
 	unset($matches) ;
 	preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[1], $matches) ;
-	$input_pkts = $matches[2] ;
-	$input_bytes = $matches[3] ;
+	$output_pkts = $matches[2] ;
+	$output_bytes = $matches[3] ;
 
 	$fd = @fsockopen("udp://$radiusip",$radiusport,$errno,$errstr,3) ;
 	if(!$fd) 
@@ -196,6 +196,11 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
 		6;			//Framed-IP-Address
 
+	if ($interimupdate)
+		$acctstatustype = 3;
+	else
+		$acctstatustype = 2;
+
 	//          v   v   v     v   v   v     v     v     v     1   1  1  1  1  1  1  v
 	// Line #   1   2   3     4   5   6     7     8     9     0   1  2  3  4  5  6  E
 	$data=pack("CCCCNNNNCCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
@@ -206,7 +211,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	    32,2+strlen($nasHostname[0]),$nasHostname[0],	// nasIdentifier
 	    5,6,0,0,0,0,						// nasPort
 	    61,6,0,0,0,15,						// nasPortType = Ethernet
-		40,6,0,0,0,2,						// Acct Status Type = Stop
+		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
 		49,6,1,		// Acct Terminate = User Request
@@ -234,7 +239,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	    32,2+strlen($nasHostname[0]),$nasHostname[0],	// nasIdentifier
 	    5,6,0,0,0,0,						// nasPort
 	    61,6,0,0,0,15,						// nasPortType = Ethernet
-		40,6,0,0,0,2,						// Acct Status Type = Stop
+		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
 		49,6,1,		// Acct Terminate = User Request

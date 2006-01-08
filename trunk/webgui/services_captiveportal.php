@@ -52,6 +52,8 @@ $pconfig['idletimeout'] = $config['captiveportal']['idletimeout'];
 $pconfig['enable'] = isset($config['captiveportal']['enable']);
 $pconfig['auth_method'] = $config['captiveportal']['auth_method'];
 $pconfig['radacct_enable'] = isset($config['captiveportal']['radacct_enable']);
+$pconfig['reauthenticate'] = isset($config['captiveportal']['reauthenticate']);
+$pconfig['reauthenticateacct'] = $config['captiveportal']['reauthenticateacct'];
 $pconfig['httpslogin_enable'] = isset($config['captiveportal']['httpslogin']);
 $pconfig['httpsname'] = $config['captiveportal']['httpsname'];
 $pconfig['cert'] = base64_decode($config['captiveportal']['certificate']);
@@ -124,6 +126,8 @@ if ($_POST) {
 		$config['captiveportal']['enable'] = $_POST['enable'] ? true : false;
 		$config['captiveportal']['auth_method'] = $_POST['auth_method'];
 		$config['captiveportal']['radacct_enable'] = $_POST['radacct_enable'] ? true : false;
+		$config['captiveportal']['reauthenticate'] = $_POST['reauthenticate'] ? true : false;
+		$config['captiveportal']['reauthenticateacct'] = $_POST['reauthenticateacct'];
 		$config['captiveportal']['httpslogin'] = $_POST['httpslogin_enable'] ? true : false;
 		$config['captiveportal']['httpsname'] = $_POST['httpsname'];
 		$config['captiveportal']['certificate'] = base64_encode($_POST['cert']);
@@ -170,6 +174,8 @@ function enable_change(enable_change) {
 	document.iform.radiuskey.disabled = endis;
 	document.iform.radacct_enable.disabled = endis;
 	document.iform.radiusacctport.disabled = endis;
+	document.iform.reauthenticate.disabled = endis;
+	document.iform.reauthenticateacct.disabled = endis;
 	document.iform.auth_method[0].disabled = endis;
 	document.iform.auth_method[1].disabled = endis;
 	document.iform.auth_method[2].disabled = endis;
@@ -289,14 +295,25 @@ to access after they've authenticated.</td>
  		</tr>
 		<tr>
           <td>Accounting:&nbsp;&nbsp;</td>
-          <td><input name="radacct_enable" type="checkbox" id="radacct_enable" value="yes" <?php if($pconfig['radacct_enable']) echo "checked"; ?>></td>
+          <td><input name="radacct_enable" type="checkbox" id="radacct_enable" value="yes" <?php if($pconfig['radacct_enable']) echo "checked"; ?>>
+          send RADIUS accounting packets</td>
 		  </tr>
 		<tr>
           <td>Accounting port:&nbsp;&nbsp;</td>
           <td><input name="radiusacctport" type="text" class="formfld" id="radiusacctport" size="5" value="<?=htmlspecialchars($pconfig['radiusacctport']);?>"></td>
-		  </tr></table>
+		  </tr>
+		<tr>
+          <td valign="top">Reauthentication:&nbsp;&nbsp;</td>
+          <td><input name="reauthenticate" type="checkbox" id="reauthenticate" value="yes" <?php if($pconfig['reauthenticate']) echo "checked"; ?>>
+          reauthenticate connected users every minute<br><br>
+          <input name="reauthenticateacct" type="radio" value="" <?php if(!$pconfig['reauthenticateacct']) echo "checked"; ?>> no accounting updates<br>
+          <input name="reauthenticateacct" type="radio" value="stopstart" <?php if($pconfig['reauthenticateacct'] == "stopstart") echo "checked"; ?>> stop/start accounting<br>
+          <input name="reauthenticateacct" type="radio" value="interimupdate" <?php if($pconfig['reauthenticateacct'] == "interimupdate") echo "checked"; ?>> interim update</td>
+		  </tr>
+		</table>
  		<br>
  	When using RADIUS authentication, enter the IP address and port of the RADIUS server which users of the captive portal have to authenticate against.  Leave port number blank to use the default port (1812). Leave the RADIUS shared secret blank to not use a RADIUS shared secret. RADIUS accounting packets will also be sent to the RADIUS server if  accounting is enabled (default port is 1813).
+ 	<br><br>If reauthentication is enabled, Access-Requests will be sent to the RADIUS server for each user that is logged in every minute. If an Access-Reject is received for a user, that user is disconnected from the captive portal immediately.
 	</tr>
 	<tr>
       <td valign="top" class="vncell">HTTPS login</td>

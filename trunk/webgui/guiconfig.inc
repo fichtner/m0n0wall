@@ -99,6 +99,7 @@ $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
 $p2_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
 					'cast128' => 'CAST128', 'rijndael' => 'Rijndael (AES)');
 $p1_halgos = array('sha1' => 'SHA1', 'md5' => 'MD5');
+$p1_authentication_methods = array('pre_shared_key' => 'Pre-shared key', 'rsasig' => 'RSA signature');
 $p2_halgos = array('hmac_sha1' => 'SHA1', 'hmac_md5' => 'MD5');
 $p2_protos = array('esp' => 'ESP', 'ah' => 'AH');
 $p2_pfskeygroups = array('0' => 'off', '1' => '1', '2' => '2', '5' => '5');
@@ -432,6 +433,16 @@ function wol_sort() {
 	}
 	
 	usort($config['wol']['wolentry'], "wolcmp");
+}
+
+function ipsec_ca_sort() {
+	global $g, $config;
+
+	function ipseccacmp($a, $b) {
+		return strcmp($a['ident'], $b['ident']);
+	}
+
+	usort($config['ipsec']['cacert'], "ipseccacmp");
 }
 
 ?>
