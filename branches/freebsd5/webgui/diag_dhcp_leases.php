@@ -42,6 +42,11 @@ function leasecmp($a, $b) {
 	return strcmp($a[$_GET['order']], $b[$_GET['order']]);
 }
 
+function adjust_gmt($dt) {
+	$ts = strtotime($dt . " GMT");
+	return strftime("%Y/%m/%d %H:%M:%S", $ts);
+}
+
 $fp = @fopen("{$g['vardb_path']}/dhcpd.leases","r");
 
 if ($fp):
@@ -163,8 +168,8 @@ foreach ($leases as $data) {
 		echo "<td class=\"listlr\">{$fspans}{$data['ip']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['mac']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['hostname']}{$fspane}&nbsp;</td>\n";
-		echo "<td class=\"listr\">{$fspans}{$data['start']}{$fspane}&nbsp;</td>\n";
-		echo "<td class=\"listr\">{$fspans}{$data['end']}{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['start']) . "{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['end']) . "{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"list\" valign=\"middle\"><a href=\"services_dhcp_edit.php?if={$data['if']}&mac={$data['mac']}\"><img src=\"plus.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"add a static mapping for this MAC address\"></a></td>\n";
 		echo "</tr>\n";
 	}

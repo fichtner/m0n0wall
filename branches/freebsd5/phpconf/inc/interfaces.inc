@@ -112,8 +112,12 @@ function interfaces_lan_configure() {
 		mwexec($cmd);
 	}
 	
+	$addflags = "";
+	if (strpos($lancfg['if'], "fxp") !== false)
+		$addflags .= " link0";
+	
 	mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " " . 
-		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']));
+		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']) . $addflags);
 	
 	if (!$g['booting']) {
 		/* make new hosts file */
@@ -236,6 +240,10 @@ function interfaces_optional_configure_if($opti) {
  			if (strstr($if, "tap"))
  				ovpn_link_tap();
  		}
+	
+		$addflags = "";
+		if (strpos($optcfg['if'], "fxp") !== false)
+			$addflags .= " link0";
 		
 		/* bridged? */
 		if ($optcfg['bridge']) {
@@ -250,7 +258,7 @@ function interfaces_optional_configure_if($opti) {
 				":" . $opti;
 		} else {
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " " . 
-				escapeshellarg($optcfg['ipaddr'] . "/" . $optcfg['subnet']));
+				escapeshellarg($optcfg['ipaddr'] . "/" . $optcfg['subnet']) . $addflags);
 		}
 	} else {
 		mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
@@ -374,6 +382,10 @@ function interfaces_wan_configure() {
 		mwexec($cmd);
 	}
 	
+	$addflags = "";
+	if (strpos($wancfg['if'], "fxp") !== false)
+		$addflags .= " link0";
+	
 	switch ($wancfg['ipaddr']) {
 	
 		case 'dhcp':
@@ -397,10 +409,10 @@ function interfaces_wan_configure() {
 			if (isset($wancfg['ispointtopoint']) && $wancfg['pointtopoint']) {
 				mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
 					escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']) . 
-					" " . escapeshellarg($wancfg['pointtopoint']) . " up");
+					" " . escapeshellarg($wancfg['pointtopoint']) . $addflags . " up");
 			} else {
 				mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
-					escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']));
+					escapeshellarg($wancfg['ipaddr'] . "/" . $wancfg['subnet']) . $addflags);
 			}
 			
 			/* install default route */

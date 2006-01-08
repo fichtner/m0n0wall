@@ -124,6 +124,7 @@ function format_ipf_ip($ipfip) {
     <li class="tabinact1"><a href="diag_logs.php">System</a></li>
     <li class="tabact">Firewall</li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
+    <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
     <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
   </ul>

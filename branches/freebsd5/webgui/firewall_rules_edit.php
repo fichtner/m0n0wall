@@ -32,7 +32,7 @@
 $pgtitle = array("Firewall", "Rules", "Edit");
 require("guiconfig.inc");
 
-$specialsrcdst = explode(" ", "any lan pptp");
+$specialsrcdst = explode(" ", "any wanip lan pptp");
 
 if (!is_array($config['filter']['rule'])) {
 	$config['filter']['rule'] = array();
@@ -535,6 +535,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             Single host or alias</option>
                             <option value="network" <?php if (!$sel) echo "selected"; ?>>
                             Network</option>
+                            <option value="wanip" <?php if ($pconfig['src'] == "wanip") { echo "selected"; } ?>>
+                            WAN address</option>
                             <option value="lan" <?php if ($pconfig['src'] == "lan") { echo "selected"; } ?>>
                             LAN subnet</option>
                             <option value="pptp" <?php if ($pconfig['src'] == "pptp") { echo "selected"; } ?>>
@@ -619,6 +621,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             Single host or alias</option>
                             <option value="network" <?php if (!$sel) echo "selected"; ?>>
                             Network</option>
+                            <option value="wanip" <?php if ($pconfig['dst'] == "wanip") { echo "selected"; } ?>>
+                            WAN address</option>
                             <option value="lan" <?php if ($pconfig['dst'] == "lan") { echo "selected"; } ?>>
                             LAN subnet</option>
                             <option value="pptp" <?php if ($pconfig['dst'] == "pptp") { echo "selected"; } ?>>

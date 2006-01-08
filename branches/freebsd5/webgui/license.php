@@ -114,7 +114,13 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Traffic shaper packet loss rate/queue size</font></em><br>
 			  <br>
               Rob Parker, Keycom PLC (<a href="mailto:rob.parker@keycom.co.uk">rob.parker@keycom.co.uk</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal per-user bandwidth restrictions</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal per-user bandwidth restrictions</font></em><br>
+			  <br>
+              Pascal Suter (<a href="mailto:d-monodev@psuter.ch">d-monodev@psuter.ch</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal local user database</font></em><br>
+			  <br>
+              Matt Juszczak (<a href="mailto:matt@atopia.net">matt@atopia.net</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal logging</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -180,4 +186,8 @@ All rights reserved.<br>
 			  <br>
 			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
 			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;
+              <br>
+              <br>
+ataidle (<a href="http://www.cran.org.uk/bruce/software/ataidle.php" target="_blank">http://www.cran.org.uk/bruce/software/ataidle.php</a>)<br>
+Copyright 2004-2005 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.
 <?php include("fend.inc"); ?>

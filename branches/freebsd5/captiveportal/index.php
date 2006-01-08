@@ -4,7 +4,7 @@
 	index.php
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,7 @@ if ($clientmac && portal_mac_fixed($clientmac)) {
 		$bw_up = $auth_returns[1];
 		$bw_down = $auth_returns[2];
 		if ($auth_val == 2) {
+			captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,TRUE);
 			if (isset($config['captiveportal']['peruserbw'])) {
 				$sessionid = portal_allow($clientip, $clientmac, $_POST['auth_user'],$bw_up,$bw_down);
 			} else {
@@ -100,12 +101,28 @@ if ($clientmac && portal_mac_fixed($clientmac)) {
 													$clientip);
 			}
 		} else {
+			captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,FALSE);
 			readfile("{$g['varetc_path']}/captiveportal-error.html");
 		}
 	} else {
 		readfile("{$g['varetc_path']}/captiveportal-error.html");
 	}
-
+	
+} else if ($_POST['accept'] && $config['captiveportal']['auth_method'] == "local") {
+	//check against local usermanager
+	
+	//erase expired accounts
+	if(trim($config['users'][$_POST['auth_user']]['expirationdate'])!="" && strtotime("-1 day")>strtotime($config['users'][$_POST['auth_user']]['expirationdate'])){
+		unset($config['users'][$_POST['auth_user']]);
+		write_config();
+	}
+	if($config['users'][$_POST['auth_user']]['password']==md5($_POST['auth_pass'])){
+		captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,TRUE);
+		portal_allow($clientip, $clientmac,$_POST['auth_user'],0,0);
+	} else {
+		captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,FALSE);
+		readfile("{$g['varetc_path']}/captiveportal-error.html");
+	}
 } else if ($_POST['accept'] && $clientip) {
 	//KEYCOM: authorised up and down bandwidth defaults (set from webgui). If not set, use 128/128
 	if (isset($config['captiveportal']['peruserbw'])) {
@@ -469,4 +486,19 @@ function disconnect_client($sessionid) {
 	
 	portal_unlock();
 }
+
+/* log successful captive portal authentication to syslog */
+/* part of this code from php.net */
+function captiveportal_logportalauth($user,$mac,$ip,$status) {
+	define_syslog_variables();
+	openlog("logportalauth", LOG_PID, LOG_LOCAL4);
+	if ($status == TRUE)
+		$statuspr = "SUCCESS";
+	else
+		$statuspr = "FAILURE";
+	// Log it
+	syslog(LOG_INFO, "$statuspr: $user $mac $ip");
+	closelog();
+}
+
 ?>

@@ -195,8 +195,9 @@ function system_syslogd_start() {
 		$syslogconf = <<<EOD
 local0.*					%/var/log/filter.log
 local3.*					%/var/log/vpn.log
+local4.*					%/var/log/portalauth.log
 local7.*					%/var/log/dhcpd.log
-*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local7.none %/var/log/system.log
+*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local7.none %/var/log/system.log
 security.*					%/var/log/system.log
 auth.info;authpriv.info;daemon.info		%/var/log/system.log
 *.emerg						*
@@ -216,6 +217,13 @@ local3.*					@{$syslogcfg['remoteserver']}
 
 EOD;
 		}
+		
+		if (isset($syslogcfg['portalauth'])) {
+			$syslogconf .= <<<EOD
+local4.*					@{$syslogcfg['remoteserver']}
+
+EOD;
+		}
 
 		if (isset($syslogcfg['dhcp'])) {
 			$syslogconf .= <<<EOD
@@ -226,7 +234,7 @@ EOD;
 
 		if (isset($syslogcfg['system'])) {
 			$syslogconf .= <<<EOD
-*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local7.none @{$syslogcfg['remoteserver']}
+*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local7.none @{$syslogcfg['remoteserver']}
 security.*					@{$syslogcfg['remoteserver']}
 auth.info;authpriv.info;daemon.info		@{$syslogcfg['remoteserver']}
 *.emerg						@{$syslogcfg['remoteserver']}
@@ -539,20 +547,13 @@ function system_set_harddisk_standby() {
 		if ($g['booting']) {
 			echo 'Setting harddisk standby time... ';
 		}
-
-		$standby = $config['system']['harddiskstandby'];
-		// Check for a numeric value
-		if (is_numeric($standby)) {
-			// Sync the disk(s)
-			mwexec('/bin/sync');
-			if (!mwexec('/sbin/sysctl hw.ata.standby=' . ((int)$standby))) {
-				// Reinitialize ATA-drives
-				mwexec('/usr/local/sbin/atareinit');
-				if ($g['booting']) {
-					echo "done\n";
-				}
-			} else if ($g['booting']) {
-				echo "failed\n";
+		
+		// Sync the disk(s)
+		mwexec('/bin/sync');
+		
+		if (!mwexec("/usr/local/sbin/ataidle -S " . escapeshellarg($config['system']['harddiskstandby']) . " 0 0")) {
+			if ($g['booting']) {
+				echo "done\n";
 			}
 		} else if ($g['booting']) {
 			echo "failed\n";

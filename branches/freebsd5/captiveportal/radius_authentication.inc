@@ -46,12 +46,6 @@
 
 function RADIUS_AUTHENTICATION($username,$password,$radiusip,$radiusport,$radiuskey) {
 	global $config;
-
-	//radius database, hack this if we need to
-	
-	$radius_db[1]=="Nomadix-Bw-Up";
-	$radius_db[2]=="Nomadix-Bw-Down";
-	$radius_db[5]=="Nomadix-Expiration";
 	
 	$sharedsecret=$radiuskey ;
 	#$debug = 1 ;
@@ -123,7 +117,11 @@ function RADIUS_AUTHENTICATION($username,$password,$radiusip,$radiusport,$radius
 	#turn off magic quotes so we're binary-safe on fread.
 	set_magic_quotes_runtime(0);
 	$readdata = fread($fd,1024);
+	//turn off errors here - if we've got a '3' then we may not have everything we need to unpack...
+	error_reporting(0);
 	$pack_upack = unpack("Ctype/Cuid/nlength/A16resp/A*payload",$readdata);
+	//turn them back on again
+	error_reporting(E_ERROR);
 	if($pack_upack[type]==2) {
 		//only for 'Access-Accept' packets, otherwise throw back the number so error page is shown
 		$payload_upack = unpack("Cnum/Clen/C*value",$pack_upack[payload]);
@@ -200,28 +198,24 @@ function RADIUS_AUTHENTICATION($username,$password,$radiusip,$radiusport,$radius
 		//we give them a default of 64kbit. this should be an option in the webgui too.
 		if(!isset($bw_up)) {
 			//go for default bw up
-			$bw_up==$config['captiveportal']['bwdefaultup'];
+			$bw_up=$config['captiveportal']['bwdefaultup'];
 			if(!isset($bw_up)) {
 				$bw_up=64;
 			}
 		}
 		if(!isset($bw_down)) {
 			//go for default bw down
-			$bw_down==$config['captiveportal']['bwdefaultdn'];
+			$bw_down=$config['captiveportal']['bwdefaultdn'];
 			if(!isset($bw_down)) {
 				$bw_down=64;
 			}
 		}
-
-		//whilst we're debugging, we're also going to syslog this
-		syslog(LOG_INFO,"Authenticated user $username. Setting bandwidth to $bwdown/$bwup KBit/s");
 
 		return $retvalue . "/" . $bw_up . "/" . $bw_down;
 	} else {
 		//we're returning 5kbit/s each way here, but really it doesn't matter
 		//if it's a 3, it's Access-Reject anyway, so the user will actually get
 		//nothing at all. :)
-		syslog(LOG_INFO,"Authentication failed for $username");
 		return "3/5/5";
 	}
 	// 2 -> Access-Accept

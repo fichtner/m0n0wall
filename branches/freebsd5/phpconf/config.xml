@@ -274,6 +274,8 @@
 		<filter/>
 		<dhcp/>
 		<system/>
+		<portalauth/>
+		<vpn/>
 		<nologdefaultblock/>
 		-->
 	</syslog>
@@ -292,6 +294,7 @@
 		<certificate></certificate>
 		<private-key></private-key>
 		<redirurl></redirurl>
+		<auth_method>none|radius|local</auth_method>
 		<radiusip></radiusip>
 		<radiusport></radiusport>
 		<radiuskey></radiuskey>

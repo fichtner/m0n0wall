@@ -191,7 +191,7 @@ EOD;
 		captiveportal_allowedip_configure() ;
 
 		/* generate radius server database */
-		if($config['captiveportal']['radiusip']) {
+		if($config['captiveportal']['radiusip'] && (!isset($config['captiveportal']['auth_method']) || ($config['captiveportal']['auth_method'] == "radius"))) {
 			$radiusip = $config['captiveportal']['radiusip'] ;
 
 			if($config['captiveportal']['radiusport'])
@@ -457,6 +457,12 @@ function captiveportal_radius_stop_all() {
 								   $radiusservers[0]['acctport'],
 								   $radiusservers[0]['key'],
 								   $cpdb[$i][2]); //clientip
+			
+			//delete our rules if everyone is removed
+			if(isset($config['captiveportal']['peruserbw'])) {
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+40500));
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+45500));
+			}
 		}
 	}
 	captiveportal_unlock() ;

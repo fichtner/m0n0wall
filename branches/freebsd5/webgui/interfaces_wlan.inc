@@ -28,6 +28,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$wlchannels = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,40,42,44,48,50,52,56,58,60,64,149,152,153,157,160,161,165);
+
 function wireless_config_init() {
 	global $optcfg, $pconfig;
 	
@@ -94,7 +96,7 @@ function wireless_config_post() {
 }
 
 function wireless_config_print() {
-	global $optcfg, $pconfig;
+	global $optcfg, $pconfig, $wlchannels;
 ?>
                 <tr> 
                   <td colspan="2" valign="top" height="16"></td>
@@ -143,13 +145,15 @@ function wireless_config_print() {
                 <tr> 
                   <td valign="top" class="vncellreq">Channel</td>
                   <td class="vtable"><select name="channel" class="formfld" id="channel">
+                      <option <?php if ($pconfig['channel'] == 0) echo "selected";?> value="0">Auto</option>
                       <?php
-					  for ($i = 0; $i <= 14; $i++): ?>
-                      <option <?php if ($i == $pconfig['channel']) echo "selected";?>>
-                      <? echo($i==0 ? "Auto" : $i) ?>
+					  foreach ($wlchannels as $channel): ?>
+                      <option <?php if ($channel == $pconfig['channel']) echo "selected";?> value="<?=$channel;?>">
+                      <?=$channel;?>
                       </option>
-                      <?php endfor; ?>
-                    </select></td>
+                      <?php endforeach; ?>
+                    </select> <br>
+                    Note: Not all channels may be supported by your card</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">Station name</td>

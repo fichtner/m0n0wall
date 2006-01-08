@@ -258,23 +258,15 @@ function filter_nat_rules_generate() {
 		}
 	}
 	
-	if ($pptpdcfg['mode'] && $pptpdcfg['mode'] != "off") {
-	
-		if ($pptpdcfg['mode'] == "server")
-			$pptpdtarget = "127.0.0.1";
-		else if ($pptpdcfg['mode'] == "redir")
-			$pptpdtarget = $pptpdcfg['redir'];
-	
-		if ($pptpdtarget) {
+	if ($pptpdcfg['mode'] == "redir" && $pptpdcfg['redir']) {
 	
 		$natrules .= <<<EOD
 
 # PPTP
-rdr $wanif 0/0 port 0 -> $pptpdtarget port 0 gre
-rdr $wanif 0/0 port 1723 -> $pptpdtarget port 1723 tcp
+rdr $wanif 0/0 port 0 -> {$pptpdcfg['redir']} port 0 gre
+rdr $wanif 0/0 port 1723 -> {$pptpdcfg['redir']} port 1723 tcp
 
 EOD;
-		}
 	}
 	
 	return $natrules;
@@ -289,6 +281,8 @@ function filter_rules_generate() {
 	
 	$lanif = $lancfg['if'];
 	$wanif = get_real_wan_interface();
+	
+	$curwanip = get_current_wan_address();
 	
 	/* rule groups (optional interfaces: see below) */
 	$ifgroups = array("lan" => 100, "wan" => 200);
@@ -484,8 +478,6 @@ EOD;
 		count($config['ipsec']['tunnel'])) ||
 			isset($config['ipsec']['mobileclients']['enable']))) {
 		
-		$curwanip = get_current_wan_address();
-		
 		if ($curwanip)
 			$ipfrules .= filter_rules_ipsec_generate($wanif, $curwanip);
 		
@@ -559,17 +551,19 @@ EOD;
 	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off")) {
 	
 		if ($pptpdcfg['mode'] == "server")
-			$pptpdtarget = "127.0.0.1";
+			$pptpdtarget = $curwanip;
 		else
 			$pptpdtarget = $pptpdcfg['redir'];
-			
-		$ipfrules .= <<<EOD
+		
+		if ($pptpdtarget) {
+			$ipfrules .= <<<EOD
 
 # PPTP rules
 pass in quick proto gre from any to $pptpdtarget keep state group 200
 pass in quick proto tcp from any to $pptpdtarget port = 1723 keep state group 200
 
 EOD;
+		}
 	}
 	
 	/* BigPond client enabled? */
@@ -706,6 +700,9 @@ EOD;
 						$optcfg[$rule['source']['network']]['sn'];
 				} else {
 					switch ($rule['source']['network']) {
+						case 'wanip':
+							$src = $curwanip;
+							break;
 						case 'lan':
 							$src = "$lansa/$lansn";
 							break;
@@ -760,6 +757,9 @@ EOD;
 						$optcfg[$rule['destination']['network']]['sn'];
 				} else {
 					switch ($rule['destination']['network']) {
+						case 'wanip':
+							$dst = $curwanip;
+							break;
 						case 'lan':
 							$dst = "$lansa/$lansn";
 							break;

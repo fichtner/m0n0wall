@@ -131,8 +131,6 @@ function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$rad
 	else
 		$retvalue = ord($readdata) ;
 
-	syslog(LOG_INFO,"Sent Accounting-Request Start packet to RADIUS for $username");
-
 	return $retvalue ;
 	// 5 -> Accounting-Response
 	// See RFC2866 for this.
@@ -195,11 +193,12 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		6+				// output bytes
 		6+				// output packets
 		2+strlen($nas_ip_address)+		//Called-Station-ID
-		2+strlen($clientip);	//Calling-Station-ID
+		2+strlen($clientip)+	//Calling-Station-ID
+		6;			//Framed-IP-Address
 
 	//          v   v   v     v   v   v     v     v     v     1   1  1  1  1  1  1  v
 	// Line #   1   2   3     4   5   6     7     8     9     0   1  2  3  4  5  6  E
-	$data=pack("CCCCNNNNCCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*",
+	$data=pack("CCCCNNNNCCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
 	    4,$thisidentifier,$length/256,$length%256,		// header
 	    0,0,0,0,						// authcode
 	    6,6,0,0,0,1,					// service type
@@ -217,7 +216,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		43,6,$output_bytes, // Output Octets
 		48,6,$output_pkts,	// Output Packets
 		30,2+strlen($nas_ip_address),$nas_ip_address,	//Called-Station-ID
-		31,2+strlen($clientip),$clientip				//Calling-Station-ID
+		31,2+strlen($clientip),$clientip,				//Calling-Station-ID
+		8,6,$ip_exp[0],$ip_exp[1],$ip_exp[2],$ip_exp[3]	//Framed-IP-Address
 	    );
 
 	/* Generate Accounting Request Authenticator */
@@ -225,7 +225,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
 	//          v   v v     v   v   v     v     v     v     1   1  1  1  1  1  1  v
 	// Line #   1   2 3     4   5   6     7     8     9     0   1  2  3  4  5  6  E
-	$data=pack("CCCCH*CCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*",
+	$data=pack("CCCCH*CCCCCCCCa*CCa*CCCCCCCCCCCCCCCCCCCCCCCCCCa*CCNCCNCCNCCNCCNCCNCCa*CCa*CCCCCC",
 	    4,$thisidentifier,$length/256,$length%256,		// header
 	    $RA,						// authcode
 	    6,6,0,0,0,1,					// service type
@@ -243,7 +243,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		43,6,$output_bytes, // Output Octets
 		48,6,$output_pkts,	// Output Packets
 		30,2+strlen($nas_ip_address),$nas_ip_address,	//Called-Station-ID
-		31,2+strlen($clientip),$clientip				//Calling-Station-ID
+		31,2+strlen($clientip),$clientip,				//Calling-Station-ID
+		8,6,$ip_exp[0],$ip_exp[1],$ip_exp[2],$ip_exp[3]	//Framed-IP-Address
 	    );
 
 	if($debug) {
@@ -266,8 +267,6 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		$retvalue = 1 ;
 	else
 		$retvalue = ord($readdata) ;
-
-	syslog(LOG_INFO,"Sent Accounting-Request Stop packet to RADIUS for $username");
 
 	return $retvalue ;
 	// 5 -> Accounting-Response

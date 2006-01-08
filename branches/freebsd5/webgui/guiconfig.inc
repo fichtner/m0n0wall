@@ -75,7 +75,7 @@ $iptos = array("lowdelay", "throughput", "reliability", "mincost", "congestion")
 /* TCP flags */
 $tcpflags = array("fin", "syn", "rst", "psh", "ack", "urg");
 
-$specialnets = array("lan" => "LAN net", "pptp" => "PPTP clients");
+$specialnets = array("wanip" => "WAN address", "lan" => "LAN net", "pptp" => "PPTP clients");
 
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 	$specialnets['opt' . $i] = $config['interfaces']['opt' . $i]['descr'] . " net";
