@@ -51,14 +51,37 @@ if ($_POST) {
 	if (!$input_errors) {
 		$do_ping = true;
 		$host = $_POST['host'];
+		$interface = $_POST['interface'];
 		$count = $_POST['count'];
-
 	}
 }
 if (!isset($do_ping)) {
 	$do_ping = false;
 	$host = '';
 	$count = DEFAULT_COUNT;
+}
+
+function get_interface_addr($ifdescr) {
+	
+	global $config, $g;
+	
+	/* find out interface name */
+	if ($ifdescr == "wan")
+		$if = get_real_wan_interface();
+	else
+		$if = $config['interfaces'][$ifdescr]['if'];
+	
+	/* try to determine IP address and netmask with ifconfig */
+	unset($ifconfiginfo);
+	exec("/sbin/ifconfig " . $if, $ifconfiginfo);
+	
+	foreach ($ifconfiginfo as $ici) {
+		if (preg_match("/inet (\S+)/", $ici, $matches)) {
+			return $matches[1];
+		}
+	}
+	
+	return false;
 }
 ?>
 <?php include("fbegin.inc"); ?>
@@ -69,6 +92,24 @@ if (!isset($do_ping)) {
 				  <td width="22%" valign="top" class="vncellreq">Host</td>
 				  <td width="78%" class="vtable"> 
                     <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>"></td>
+				</tr>
+				<tr>
+				  <td width="22%" valign="top" class="vncellreq">Interface</td>
+				  <td width="78%" class="vtable">
+				  <select name="interface" class="formfld">
+                      <?php $interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
+					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+					    if (isset($config['interfaces']['opt' . $i]['enable']) &&
+							!$config['interfaces']['opt' . $i]['bridge'])
+					  		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+					  }
+					  foreach ($interfaces as $iface => $ifacename): ?>
+                      <option value="<?=$iface;?>" <?php if ($iface == $interface) echo "selected"; ?>> 
+                      <?=htmlspecialchars($ifacename);?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select>
+				  </td>
 				</tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncellreq">Count</td>
@@ -91,7 +132,11 @@ if (!isset($do_ping)) {
 					echo("<strong>Ping output:</strong><br>");
 					echo('<pre>');
 					ob_end_flush();
-					system("/sbin/ping -c$count " . escapeshellarg($host));
+					$ifaddr = get_interface_addr($interface);
+					if ($ifaddr)
+						system("/sbin/ping -S$ifaddr -c$count " . escapeshellarg($host));
+					else
+						system("/sbin/ping -c$count " . escapeshellarg($host));
 					echo('</pre>');
 				}
 				?>

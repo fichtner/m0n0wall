@@ -38,6 +38,9 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 32768 /var/log/dhcpd.log");
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_logs_dhcp.php");
+	exit;
 }
 
 function dump_clog($logfile, $tail, $withorig = true) {
@@ -68,7 +71,7 @@ function dump_clog($logfile, $tail, $withorig = true) {
   <ul id="tabnav">
     <li class="tabinact1"><a href="diag_logs.php">System</a></li>
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
-    <li class="tabact">DHCP</li>
+    <li class="tabact"><a href="diag_logs_dhcp.php" style="color:black" title="reload page">DHCP</a></li>
     <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
     <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>

@@ -147,17 +147,17 @@ if ($_POST) {
 		
 		touch($d_natconfdirty_path);
 
-                if ($_POST['autoaddproxy']) {
-                        /* auto-generate a matching proxy arp entry */
-                        $arpent = array();           
-                        $arpent['interface'] = $_POST['interface'];
-                        $arpent['network'] = $_POST['external'] . "/" . $_POST['subnet'];
-                        $arpent['descr'] = "NAT " . $_POST['descr'];
-                        
-                        $config['proxyarp']['proxyarpnet'][] = $arpent;
-                        
-                        touch($d_proxyarpdirty_path);
-                }
+		if ($_POST['autoaddproxy']) {
+			/* auto-generate a matching proxy arp entry */
+			$arpent = array();           
+			$arpent['interface'] = $_POST['interface'];
+			$arpent['network'] = $_POST['external'] . "/" . $_POST['subnet'];
+			$arpent['descr'] = "NAT " . $_POST['descr'];
+			
+			$config['proxyarp']['proxyarpnet'][] = $arpent;
+			
+			touch($d_proxyarpdirty_path);
+		}
 		
 		write_config();
 		

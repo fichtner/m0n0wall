@@ -82,9 +82,9 @@ function showhide(tspan, tri) {
 			  <br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/interfaces_lan.php" class="navlnk">LAN</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/interfaces_wan.php" class="navlnk">WAN</a><br>
-			  <?php for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++): if (!isset($config['interfaces']['opt' . $i]['ovpn'])): ?>
+			  <?php for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++): ?>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/interfaces_opt.php?index=<?=$i;?>" class="navlnk"><?=htmlspecialchars($config['interfaces']['opt' . $i]['descr']);?></a><br>
-			  <?php endif; endfor; ?>
+			  <?php endfor; ?>
               <strong>Firewall</strong><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/firewall_rules.php" class="navlnk">Rules</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/firewall_nat.php" class="navlnk">NAT</a><br>
@@ -104,10 +104,13 @@ function showhide(tspan, tri) {
               <strong>VPN</strong><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_ipsec.php" class="navlnk">IPsec</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_pptp.php" class="navlnk">PPTP</a><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_openvpn.php" class="navlnk">OpenVPN</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/vpn_openvpn_srv.php" class="navlnk">OpenVPN</a><br>
               <strong>Status</strong><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/index.php" class="navlnk">System</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_interfaces.php" class="navlnk">Interfaces</a><br>
+			  <?php if (is_array($config['ovpn']['server']['tunnel'])): ?>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_ovpn.php" class="navlnk">OpenVPN</a><br>
+	      	  <?php endif; ?>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_graph.php" class="navlnk">Traffic graph</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/status_wireless.php" class="navlnk">Wireless</a><br>
 			  <?php if (isset($config['captiveportal']['enable'])): ?>
@@ -141,6 +144,9 @@ endif;
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_dhcp_leases.php" class="navlnk">DHCP leases</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ipsec_sad.php" class="navlnk">IPsec</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ping.php" class="navlnk">Ping</a><br>
+				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_traceroute.php" class="navlnk">Traceroute</a><br>
+				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_arp.php" class="navlnk">ARP table</a><br>
+				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_ipfstat.php" class="navlnk">Firewall states</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_resetstate.php" class="navlnk">Reset state</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_backup.php" class="navlnk">Backup/Restore</a><br>
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/diag_defaults.php" class="navlnk">Factory 

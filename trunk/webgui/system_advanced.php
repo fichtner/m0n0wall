@@ -47,6 +47,7 @@ $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
 $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
+$pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
 
 if ($_POST) {
 
@@ -59,6 +60,9 @@ if ($_POST) {
 	}
 	if ($_POST['tcpidletimeout'] && !is_numericint($_POST['tcpidletimeout'])) {
 		$input_errors[] = "The TCP idle timeout must be an integer.";
+	}
+	if ($_POST['ipfstatentries'] && !is_numericint($_POST['ipfstatentries'])) {
+		$input_errors[] = "The 'firewall states displayed' value must be an integer.";
 	}
 	if (($_POST['cert'] && !$_POST['key']) || ($_POST['key'] && !$_POST['cert'])) {
 		$input_errors[] = "Certificate and key must always be specified together.";
@@ -90,7 +94,11 @@ if ($_POST) {
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
 		$config['system']['polling'] = $_POST['polling_enable'] ? true : false;
-			
+		if (!$_POST['ipfstatentries'])
+			unset($config['diag']['ipfstatentries']);
+		else
+			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
+		
 		write_config();
 		
 		if (($config['system']['webgui']['certificate'] != $oldcert)
@@ -115,6 +123,7 @@ if ($_POST) {
 			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa)
 				$retval |= vpn_ipsec_configure();
 			$retval |= system_polling_configure();
+			$retval |= system_set_termcap();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
@@ -292,6 +301,15 @@ function enable_change(enable_over) {
 					per second). Not all NICs support polling; see the m0n0wall homepage for a list of supported cards.
 					</td>
                 </tr>
+				<tr>
+                  <td valign="top" class="vncell">Firewall states displayed</td>
+                  <td class="vtable">
+                    <input name="ipfstatentries" type="text" class="formfld" id="ipfstatentries" size="8" value="<?=htmlspecialchars($pconfig['ipfstatentries']);?>">
+                    entries<br>
+    				<span class="vexpl">Maxmimum number of firewall state entries to be displayed on the <a href="diag_ipfstat.php">Diagnostics: Firewall state</a> page.
+    				Default is 300. Setting this to a very high value will cause a slowdown when viewing the
+    				firewall states page, depending on your system's processing power.</span></td>
+			    </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
@@ -300,7 +318,7 @@ function enable_change(enable_over) {
                 </tr>
               </table>
 </form>
-            <script language="JavaScript">
+<script language="JavaScript">
 <!--
 enable_change(false);
 //-->

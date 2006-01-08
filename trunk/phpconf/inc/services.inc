@@ -311,6 +311,14 @@ daemon
 
 EOD;
 
+		/* enable server[:port]? */
+		if ($dyndnscfg['server']) {
+			if ($dyndnscfg['port'])
+				$ezipupdateconf .= "server={$dyndnscfg['server']}:{$dyndnscfg['port']}\n";
+			else
+				$ezipupdateconf .= "server={$dyndnscfg['server']}\n";
+		}
+
 		/* enable MX? */
 		if ($dyndnscfg['mx']) {
 			$ezipupdateconf .= "mx={$dyndnscfg['mx']}\n";
@@ -363,6 +371,12 @@ function services_dnsmasq_configure() {
 			
 			$args .= " -l {$g['vardb_path']}/dhcpd.leases" . 
 				" -s {$config['system']['domain']}";
+		}
+		
+		if (isset($config['dnsmasq']['domainoverrides']) && is_array($config['dnsmasq']['domainoverrides'])) {
+			foreach($config['dnsmasq']['domainoverrides'] as $override) {
+				$args .= escapeshellarg(' --server=/' . $override['domain'] . '/' . $override['ip']);
+			}
 		}
 
 		/* run dnsmasq */

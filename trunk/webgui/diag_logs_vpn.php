@@ -38,6 +38,9 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 65536 /var/log/vpn.log");
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_logs_vpn.php");
+	exit;
 }
 
 function dump_clog($logfile, $tail) {
@@ -74,7 +77,7 @@ function dump_clog($logfile, $tail) {
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
     <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
-    <li class="tabact">PPTP VPN</li>
+    <li class="tabact"><a href="diag_logs_vpn.php" style="color:black" title="reload page">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
   </ul>
   </td></tr>

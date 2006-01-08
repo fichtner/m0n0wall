@@ -31,6 +31,7 @@
 /* kill a process by pid file */
 function killbypid($pidfile) {
 	sigkillbypid($pidfile, "TERM");
+	unlink_if_exists($pidfile);
 }
 
 /* sigkill a process by pid file */
@@ -42,7 +43,7 @@ function sigkillbypid($pidfile, $sig) {
 
 /* kill a process by name */
 function killbyname($procname) {
-	mwexec("/usr/bin/killall " . escapeshellarg($procname));
+	return mwexec("/usr/bin/killall " . escapeshellarg($procname));
 }
 
 /* return the subnet address given a host address and a subnet bit count */
@@ -233,7 +234,7 @@ function get_interface_list() {
 		if (substr($ifname, -1) == "*")
 			$ifname = substr($ifname, 0, strlen($ifname) - 1);
 		
-		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|vlan)/", $ifname)) {
+		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|vlan|tun)/", $ifname)) {
 			$iflist[$ifname] = array();
 			
 			$iflist[$ifname]['mac'] = chop($alink[3]);

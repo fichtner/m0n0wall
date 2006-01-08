@@ -88,7 +88,8 @@ if ($_GET['act'] == "del") {
                       <?php $interfaces = array('lan' => 'LAN');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					    if (isset($config['interfaces']['opt' . $i]['enable']) &&
-							!$config['interfaces']['opt' . $i]['bridge'])
+							!$config['interfaces']['opt' . $i]['bridge'] &&
+							!$config['interfaces']['opt' . $i]['ovpn'])
 					  		$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 					  }
 					  foreach ($interfaces as $iface => $ifacename): ?>

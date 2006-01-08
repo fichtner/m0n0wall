@@ -39,47 +39,7 @@ if (!is_array($config['ovpn']['client'])){
 	$config['ovpn']['client']['tunnel'] = array();
 }
 
-function getnxt_if($type) {
-	/* find the first available device of type $type */
-	global $config;
-	$a_client = $config['ovpn']['client']['tunnel'];
-	$max = ($type == 'tun') ? 17 : 4;
-	for ($i = 1; $i < $max ; $i++) {
-		$hit = false;
-		foreach ($a_client as $client) {
-			if ($client['iface'] == $type . $i) {
-				$hit = true;
-				break;
-			}
-		}
-		if (!$hit) 
-			return $type . $i;
-	}
-	return false;
-}
 
-
-function getnxt_port() {
-	/* Get first unused port */
-	global $config;
-	$a_client = $config['ovpn']['client']['tunnel'];
-	$port = 5001;
-	while (true) {
-		$hit = false;
-		foreach ($a_client as $client) {
-			if ($client['cport'] == $port) {
-				$hit = true;
-				break;
-			}
-		}
-		if (!$hit) 
-			return $port;
-		$port++;
-	}
-	return false; /* should never get here */
-}
-			
-		 
 $ovpncli =& $config['ovpn']['client']['tunnel'];
 
 $id = $_GET['id'];
@@ -96,7 +56,7 @@ else {
 	$pconfig = array();
 	$pconfig['type'] = 'tun';
 	$pconfig['proto'] = 'udp';
-	$pconfig['sport'] = '5000';
+	$pconfig['sport'] = '1194';
 	$pconfig['ver'] = '2';
 	$pconfig['crypto'] = 'BF-CBC';
 	$pconfig['pull'] = true;
@@ -104,8 +64,24 @@ else {
 }
 
 if (isset($_POST['pull'])) {
+
 	/* Called from form */
 	unset($input_errors);
+
+	/* input validation */
+	$reqdfields = explode(" ", "type saddr sport");
+	$reqdfieldsn = explode(",", "Tunnel type,Address,Port");
+
+	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+ 
+	/* valid Port */
+	if (($_POST['sport'] && !is_port($_POST['sport'])))
+		$input_errors[] = "The server's port must be an integer between 1 and 65535 (default 1194).";
+
+	/* valid FQDN or IP address */
+	if (($_POST['saddr'] && !is_ipaddr($_POST['saddr']) && !is_domain($_POST['saddr'])))
+		$input_errors[] = "The server name contains invalid characters.";
+
 	if (is_null($_POST['ca_cert']))
 		$input_errors[] = "You must provide a CA certificate file";
 	elseif (!strstr($_POST['ca_cert'], "BEGIN CERTIFICATE") || !strstr($_POST['ca_cert'], "END CERTIFICATE"))
@@ -120,59 +96,93 @@ if (isset($_POST['pull'])) {
 		$input_errors[] = "You must provide a client key file";
 	elseif (!strstr($_POST['cli_key'], "BEGIN RSA PRIVATE KEY") || !strstr($_POST['cli_key'], "END RSA PRIVATE KEY"))
 		$input_errors[] = "The client key does not appear to be valid.";
-	
+
+	if (isset($_POST['tlsauth']) && empty($_POST['pre-shared-key']))
+		$input_errors[] = "You must provide a pre-shared secret file";
+	if (!empty($_POST['pre-shared-key']))
+		if (!strstr($_POST['pre-shared-key'], "BEGIN OpenVPN Static key") || !strstr($_POST['pre-shared-key'], "END OpenVPN Static key"))
+			$input_errors[] = "Pre-shared secret does not appear to be valid.";
+                                
+	if (isset($id)) {
+		/* Editing an existing entry */
+		$ovpnent = $ovpncli[$id];
+
+		if ( $ovpncli[$id]['sport'] != $_POST['sport'] ||
+			$ovpncli[$id]['proto'] != $_POST['proto'] ) {
+
+			/* some entries changed */
+			for ($i = 0; isset($config['ovpn']['client']['tunnel'][$i]); $i++) {
+				$current = &$config['ovpn']['client']['tunnel'][$i];
+
+				if ($current['sport'] == $_POST['sport'])
+					if ($current['proto'] == $_POST['proto'])
+						$input_errors[] = "You already have this combination for port and protocol settings. You can't use it twice";
+			}
+		}
+
+		/* Test Server type hasn't changed */
+		if ($ovpnent['type'] != $_POST['type']) {
+			$input_errors[] = "Delete this interface first before changing the type of the tunnel to " . strtoupper($_POST['type']) .".";
+			/* Temporarily disabled */
+			/*
+			 * $nxt_if = getnxt_client_if($_POST['type']);
+			 * if (!$nxt_if)
+			 * 	$input_errors[] = "Run out of devices for a tunnel of type {$_POST['type']}";
+			 * else
+			 * 	$ovpnent['if'] = $nxt_if;
+			 */
+
+			/* Need to reboot in order to create interfaces cleanly */
+			/* touch($d_sysrebootreqd_path); */
+		}
+		/* Has the enable/disable state changed? */
+		if (isset($ovpnent['enable']) && isset($_POST['disabled'])) {
+			touch($d_ovpnclidirty_path);
+		}
+		if (!isset($ovpnent['enable']) && !isset($_POST['disabled'])) {
+			touch($d_ovpnclidirty_path);
+		}
+	} else {
+		/* Creating a new entry */
+		$ovpnent = array();
+		$nxt_if = getnxt_client_if($_POST['type']);
+		if (!$nxt_if)
+			$input_errors[] = "Run out of devices for a tunnel of type {$_POST['type']}";
+		else
+			$ovpnent['if'] = $nxt_if;
+
+		$ovpnent['port'] = getnxt_client_port();
+
+		/* I think we have to reboot to have the interface created cleanly */
+		touch($d_sysrebootreqd_path);
+	}
+
 	if (!$input_errors) {
-		if (isset($id)) {
-			/* Editing an existing entry */
-			$ovpnent = $ovpncli[$id];
-			/* Test Server type hasn't changed */
-			if ($ovpnent['type'] != $_POST['type']) {
-				$nxt_if = getnxt_if($_POST['type']);
-				if (!$nxt_if)
-					$input_errors[] = "Run out of devices for a tunnel of type {$_POST['type']}";
-				else
-					$ovpnent['if'] = $nxt_if;
-				/* Need to reboot in order to create interfaces cleanly */
-				touch($d_sysrebootreqd_path);
-			}
-			/* Has the enable/disable state changed? */
-			if (isset($ovpnent['enable']) && isset($_POST['disabled'])) {
-				touch($d_sysrebootreqd_path);
-				touch($d_ovpnclidirty_path);
-				ovpn_client_kill($id);
-				ovpn_client_iface_del($id);
-			}
-			if (!isset($ovpnent['enable']) && !isset($_POST['disabled'])) {
-				touch($d_sysrebootreqd_path);
-				touch($d_ovpnclidirty_path);
-			}
-		}
-		else {
-			/* Creating a new entry */
-			$ovpnent = array();
-			$nxt_if = getnxt_if($_POST['type']);
-			if (!$nxt_if)
-				$input_errors[] = "Run out of devices for a tunnel of type {$_POST['type']}";
-			else
-				$ovpnent['if'] = $nxt_if;
-			$ovpnent['cport'] = getnxt_port();
-			/* I think we have to reboot to have the interface created cleanly */
-			touch($d_sysrebootreqd_path);
-		}
+
+		$ovpnent['enable'] = isset($_POST['disabled']) ? false : true;
 		$ovpnent['type'] = $_POST['type'];
 		$ovpnent['proto'] = $_POST['proto'];
 		$ovpnent['sport'] = $_POST['sport'];
 		$ovpnent['ver'] = $_POST['ver'];
 		$ovpnent['saddr'] = $_POST['saddr'];
 		$ovpnent['descr'] = $_POST['descr'];
+		$ovpnent['ca_cert'] = $pconfig['ca_cert'];
+		$ovpnent['cli_cert'] = $pconfig['cli_cert'];
+		$ovpnent['cli_key'] = $pconfig['cli_key'];
+		$ovpnent['crypto'] = $_POST['crypto'];
+		$ovpnent['pull'] = true; //This is a fixed config for this version
+		$ovpnent['tlsauth'] = false;
+
+		unset($ovpnent['pre-shared-key']);
+		if ($_POST['tlsauth']) {
+			$ovpnent['tlsauth'] = true;
+			$ovpnent['pre-shared-key'] = base64_encode($_POST['pre-shared-key']); 
+		}
+
 		$ovpnent['ca_cert'] = base64_encode($_POST['ca_cert']);
 		$ovpnent['cli_cert'] = base64_encode($_POST['cli_cert']);
 		$ovpnent['cli_key'] = base64_encode($_POST['cli_key']);
-		$ovpnent['crypto'] = $_POST['crypto'];
-		$ovpnent['pull'] = true; //This is a fixed config for this version
-		$ovpnent['enable'] = isset($_POST['disabled']) ? false : true;
-		
-	
+
 		if (isset($id) && $ovpncli[$id]){
 			$ovpncli[$id] = $ovpnent;
 		}
@@ -182,13 +192,38 @@ if (isset($_POST['pull'])) {
 		
 		write_config();
 		touch($d_ovpnclidirty_path);
+
 		header("Location: vpn_openvpn_cli.php");
 		exit;
+	} else {
+		$pconfig = $_POST;
+
+		$pconfig['enable'] = "true";
+		if (isset($_POST['disabled']))
+			unset($pconfig['enable']);
+
+		if ($_POST['tlsauth'])
+			$pconfig['pre-shared-key'] = base64_encode($_POST['pre-shared-key']); 
+
+		$pconfig['ca_cert'] = base64_encode($_POST['ca_cert']);
+		$pconfig['cli_cert'] = base64_encode($_POST['cli_cert']);
+		$pconfig['cli_key'] = base64_encode($_POST['cli_key']);
 	}
 }
 
 ?>
 <?php include("fbegin.inc"); ?>
+<script language="JavaScript">
+function enable_change(enable_over) {
+	var endis;
+	endis = !(document.iform.tlsauth.checked || enable_over);
+
+	document.iform.psk.disabled = endis;
+}
+
+//-->
+</script>
+
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
 <form action="vpn_openvpn_cli_edit.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
@@ -228,7 +263,7 @@ if (isset($_POST['pull'])) {
       <td width="22%" valign="top" class="vncellreq">Port</td>
       <td width="78%" class="vtable">
         <input name="sport" type="text" class="formfld" size="5" maxlength="5" value="<?=htmlspecialchars($pconfig['sport']);?>"><br>
-        Enter the server's port number (default is 5000).</td>
+        Enter the server's port number (default is 1194).</td>
     </tr>
     
     <tr>
@@ -319,7 +354,23 @@ if (isset($_POST['pull'])) {
 	  Select the data channel encryption cipher.  This must match the setting on the server.
 	</td>
       </tr>
-      
+
+      <tr>
+        <td width="22%" valign="top" class="vncell">TLS auth</td>
+        <td width="78%" class="vtable">
+	  <input name="tlsauth" type="checkbox" value="yes" <?php if (isset($pconfig['tlsauth'])) echo "checked";?> onClick="enable_change(false)">
+	  <strong>TLS auth</strong><br>
+          The tls-auth directive adds an additional HMAC signature to all SSL/TLS handshake packets for integrity verification.</td>
+      </tr>
+
+      <tr> 
+	<td width="22%" valign="top" class="vncell">Pre-shared secret</td>
+	<td width="78%" class="vtable">
+	  <textarea name="pre-shared-key" id="psk" cols="65" rows="4" class="formpre"><?=htmlspecialchars(base64_decode($pconfig['pre-shared-key']));?></textarea>
+	  <br>
+	  Paste your own pre-shared secret here.</td>
+      </tr>
+
      <tr>
        <td width="22%" valign="top" class="vncellreq">Options</td>
        <td width="78%" class="vtable">
@@ -338,5 +389,9 @@ if (isset($_POST['pull'])) {
      </tr>
    </table>
 </form>
-
+<script language="JavaScript">
+<!--
+enable_change(false);
+//-->
+</script>
 <?php include("fend.inc"); ?>

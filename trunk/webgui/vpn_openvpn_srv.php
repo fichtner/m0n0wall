@@ -1,9 +1,10 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	vpn_openvpn_cli.php
+	vpn_openvpn_srv.php
 
 	Copyright (C) 2004 Peter Curran (peter@closeconsultants.com).
+	Copyright (C) 2005 Peter Allgeyer (allgeyer@web.de).
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -34,66 +35,68 @@ require_once("openvpn.inc");
 
 if (!is_array($config['ovpn']))
 	$config['ovpn'] = array();
-if (!is_array($config['ovpn']['client'])){
-	$config['ovpn']['client'] =  array();
-	$config['ovpn']['client']['tunnel'] =  array();
+if (!is_array($config['ovpn']['server'])){
+	$config['ovpn']['server'] =  array();
+	$config['ovpn']['server']['tunnel'] =  array();
 }
+
+$ovpnsrv = &$config['ovpn']['server']['tunnel'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-	$id = $_POST['id'];
+        $id = $_POST['id'];
 
-$ovpncli =& $config['ovpn']['client']['tunnel'];
 
 if ($_POST['apply']) {
 		$retval = 0;
 		if (file_exists($d_sysrebootreqd_path)) {
 			/* Rewrite interface definitions */
-			$retval = ovpn_client_iface();
+			$retval = ovpn_server_iface();
 		}
 		else{
 			ovpn_lock();
-			$retval = ovpn_config_client();
+			$retval = ovpn_server_iface();
+			$retval = ovpn_config_server(false);
 			ovpn_unlock();
 		}
-		if (file_exists($d_ovpnclidirty_path))
-			unlink($d_ovpnclidirty_path);
+		if (file_exists($d_ovpnsrvdirty_path))
+			unlink($d_ovpnsrvdirty_path);
 		$savemsg = get_std_save_message($retval);	
 }
 
 if ($_GET['act'] == "del") {
-	if ($ovpncli[$id]) {
-		$ovpnent = $ovpncli[$id];
-		unset($ovpncli[$id]);
-
+	if ($ovpnsrv[$id]) {
+		$ovpnent = $ovpnsrv[$id];
+		unset($ovpnsrv[$id]);
+									      
 		/* Kill running processes */
 		/* Remove old certs & keys */
-		ovpn_client_kill($ovpnent['if']);
+		ovpn_server_kill($ovpnent['tun_iface']);
 
 		/* Remove interface from list of optional interfaces */
-		ovpn_client_iface_del($ovpnent['if']);
+		ovpn_server_iface_del($ovpnent['tun_iface']);
 
 		write_config();
 		touch($d_sysrebootreqd_path);
-		header("Location: vpn_openvpn_cli.php");
+		header("Location: vpn_openvpn_srv.php");
 		exit;
 	}
 }
 ?>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if (file_exists($d_sysrebootreqd_path) && !file_exists($d_ovpnclidirty_path)) print_info_box(get_std_save_message(0)); ?>
-<form action="vpn_openvpn_cli.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<?php if (file_exists($d_ovpnclidirty_path)): ?><p>
-<?php print_info_box_np("The OpenVPN client configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
+<?php if (file_exists($d_sysrebootreqd_path) && !file_exists($d_ovpnsrvdirty_path)) print_info_box(get_std_save_message(0)); ?>
+<form action="vpn_openvpn_srv.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<?php if (file_exists($d_ovpnsrvdirty_path)): ?><p>
+<?php print_info_box_np("The OpenVPN server configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
   <ul id="tabnav">	        
-	<li class="tabinact1"><a href="vpn_openvpn_srv.php">Server</a></li>
-	<li class="tabact">Client</li>
+	<li class="tabact">Server</li>
+	<li class="tabinact"><a href="vpn_openvpn_cli.php">Client</a></li>
   </ul>
   </td></tr>
   <tr>
@@ -104,50 +107,55 @@ if ($_GET['act'] == "del") {
     </span></strong>
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-	  <td width="10%" class="listhdrr">Interface</td>
+	  <td width="5%" class="listhdrr">Interface</td>
 	  <td width="5%" class="listhdrr">Protocol</td>
-	  <td width="15%" class="listhdrr">Socket</td>
-	  <td width="15%" class="listhdrr">Server address</td>
-	  <td width="5%" class="listhdrr" align="center">Version</td>
-	  <td width="40%" class="listhdr">Description</td>
+	  <td width="5%" class="listhdrr">Socket</td>
+	  <td width="25%" class="listhdrr">IP Block</td>
+	  <td width="15%" class="listhdrr">Crypto</td>
+	  <td width="35%" class="listhdr">Description</td>
 	  <td width="10%" class="list"></td>
 	</tr>
 	
-	<?php $i = 0; foreach ($ovpncli as $client):
-					if (!isset($client['enable'])) {
+	<?php $i = 0; foreach ($ovpnsrv as $server):
+					if (!isset($server['enable'])) {
 						$spans = "<span class=\"gray\">";
 						$spane = "</span>";
 					} else {
 						$spans = $spane = "";
 					}
+					
+		if ($server['bind_iface'] == 'all')
+			$ipaddr = "0.0.0.0";
+		else
+			$ipaddr = ovpn_get_ip($server['bind_iface']);
 	?>
 	
 	<tr>
 	  <td class="listlr"><?=$spans;?>
-		<?= $config['interfaces'][ovpn_get_opt_interface($client['if'])]['descr'] . " (" . $client['if'] . ")";?>
+		<?= $config['interfaces'][ovpn_get_opt_interface($server['tun_iface'])]['descr'] . " (" . $server['tun_iface'] . ")";?>	
 	  <?=$spane;?></td>
 	  <td class="listr"><?=$spans;?>
-		<?= strtoupper($client['proto']);?>     
-          <?=$spane;?></td>
-	  <td class="listr"><?=$spans;?>
-		<?= "0.0.0.0:" . $client['port'];?>	
+		<?= strtoupper($server['proto']);?>	
 	  <?=$spane;?></td>
 	  <td class="listr"><?=$spans;?>
-		<?= $client['saddr'].":".$client['sport'];?>
+		<?= $ipaddr.":".$server['port'];?>
 	  <?=$spane;?></td>
-	  <td align="middle" class="listr"><?=$spans;?>
-	  	<?= $client['ver'];?>
+	  <td class="listr"><?=$spans;?>
+		<?= $server['ipblock']."/".$server['prefix'];?>	
+	  <?=$spane;?></td>
+	  <td class="listr"><?=$spans;?>
+		<?= $server['crypto'];?>	
 	  <?=$spane;?></td>
 	   <td class="listbg"><?=$spans;?>
-	  	<?= htmlspecialchars($client['descr']);?>&nbsp;
+	  	<?= htmlspecialchars($server['descr']);?>&nbsp;
 	  <?=$spane;?></td>
-	  <td valign="middle" nowrap class="list"> <a href="vpn_openvpn_cli_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit client configuration" width="17" height="17" border="0"></a>
-		 &nbsp;<a href="vpn_openvpn_cli.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this client configuration?')"><img src="x.gif" title="delete client configuration" width="17" height="17" border="0"></a></td>
+	  <td valign="middle" nowrap class="list"> <a href="vpn_openvpn_srv_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit server configuration" width="17" height="17" border="0"></a>
+		 &nbsp;<a href="vpn_openvpn_srv.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this server configuration?')"><img src="x.gif" title="delete server configuration" width="17" height="17" border="0"></a></td>
 	</tr>
   	<?php $i++; endforeach; ?>
 	<tr> 
 	  <td class="list" colspan="6">&nbsp;</td>
-	  <td class="list"> <a href="vpn_openvpn_cli_edit.php"><img src="plus.gif" title="add client configuration" width="17" height="17" border="0"></a></td>
+	  <td class="list"> <a href="vpn_openvpn_srv_edit.php"><img src="plus.gif" title="add server configuration" width="17" height="17" border="0"></a></td>
 	</tr>
     </table>
   </td>

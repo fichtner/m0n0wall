@@ -422,6 +422,103 @@ function convert_config() {
 		$config['version'] = "1.4";
 	}
 	
+	/* convert 1.4 -> 1.5 */
+	if ($config['version'] == "1.4") {
+		/* Remove old certs & keys */
+		unlink_if_exists("{$g['vardb_path']}/ovpn_ca_cert.pem");
+		unlink_if_exists("{$g['vardb_path']}/ovpn_srv_cert.pem");
+		unlink_if_exists("{$g['vardb_path']}/ovpn_srv_key.pem");
+		unlink_if_exists("{$g['vardb_path']}/ovpn_dh.pem");
+
+		/* convert openvpn tunnels */
+		if (isset($config['ovpn']['server'])) {
+			$current = &$config['ovpn']['server'];
+
+			/* construct new tunnel array */
+			$config['ovpn']['server']['tunnel'] = array();
+
+			/* make new pipe and associate with this rule */
+			$newpipe = array();
+			if (isset($current['enable']))
+				$newpipe['enable'] = $current['enable'];
+			$newpipe['descr'] = "";
+			$newpipe['tun_iface'] = $current['tun_iface'];
+			if (preg_match("/tun/", $current['tun_iface']))
+				$newpipe['type'] = "tun";
+			else
+				$newpipe['type'] = "tap";
+			$newpipe['psh_options'] = array();
+			if (isset($current['psh_options']['redir']))
+				$newpipe['psh_options']['redir'] = $current['psh_options']['redir'];
+			if (isset($current['psh_options']['redir_loc']))
+				$newpipe['psh_options']['redir_loc'] = $current['psh_options']['redir_loc'];
+
+			if (isset($current['psh_options']['rtedelay'])) {
+				$newpipe['psh_options']['rtedelay_int'] = $current['psh_options']['rtedelay'];
+				$newpipe['psh_options']['rtedelay'] = true;
+			}
+			if (isset($current['psh_options']['inact'])) {
+				$newpipe['psh_options']['inact_int'] = $current['psh_options']['inact'];
+				$newpipe['psh_options']['inact'] = true;
+			}
+			if (isset($current['psh_options']['ping'])) {
+				$newpipe['psh_options']['ping_int'] = $current['psh_options']['ping'];
+				$newpipe['psh_options']['ping'] = true;
+			}
+			if (isset($current['psh_options']['pingexit'])) {
+				$newpipe['psh_options']['pingexit_int'] = $current['psh_options']['pingexit'];
+				$newpipe['psh_options']['pingexit'] = true;
+			}
+			if (isset($current['psh_options']['pingrst'])) {
+				$newpipe['psh_options']['pingrst_int'] = $current['psh_options']['pingrst'];
+				$newpipe['psh_options']['pingrst'] = true;
+			}
+			$newpipe['port'] = $current['port'];
+			$newpipe['proto'] = strtolower($current['proto']);
+			if (isset($current['maxcli']))
+				$newpipe['maxcli'] = $current['maxcli'];
+			$newpipe['crypto'] = $current['crypto'];
+			if (isset($current['dupcn']))
+				$newpipe['dupcn'] = $current['dupcn'];
+			$newpipe['verb'] = $current['verb'];
+			$newpipe['bind_iface'] = $current['bind_iface'];
+			$newpipe['ipblock'] = $current['ipblock'];
+			$newpipe['prefix'] = $current['prefix'];
+			if (isset($current['cli2cli']))
+				$newpipe['cli2cli'] = $current['cli2cli'];
+			if (isset($current['dynip']))
+				$newpipe['dynip'] = $current['dynip'];
+			$newpipe['ca_cert'] = $current['ca_cert'];
+			$newpipe['srv_key'] = $current['srv_key'];
+			$newpipe['srv_cert'] = $current['srv_cert'];
+			$newpipe['dh_param'] = $current['dh_param'];
+
+			$config['ovpn']['server']['tunnel'][$i] = $newpipe;
+
+			/* destroy old array */
+			unset($current['enable']);
+			unset($current['tun_iface']);
+			unset($current['psh_options']);
+			unset($current['port']);
+			unset($current['proto']);
+			unset($current['maxcli']);
+			unset($current['crypto']);
+			unset($current['dupcn']);
+			unset($current['verb']);
+			unset($current['bind_iface']);
+			unset($current['ipblock']);
+			unset($current['prefix']);
+			unset($current['cli2cli']);
+			unset($current['dynip']);
+			unset($current['ca_cert']);
+			unset($current['srv_key']);
+			unset($current['srv_cert']);
+			unset($current['dh_param']);
+		}
+
+		$config['version'] = "1.5";
+	}
+	
 	write_config();
 	
 	if ($g['booting'])

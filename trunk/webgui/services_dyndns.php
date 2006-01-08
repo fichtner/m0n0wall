@@ -39,6 +39,8 @@ if (!is_array($config['dnsupdate'])) {
 $pconfig['username'] = $config['dyndns']['username'];
 $pconfig['password'] = $config['dyndns']['password'];
 $pconfig['host'] = $config['dyndns']['host'];
+$pconfig['server'] = $config['dyndns']['server'];
+$pconfig['port'] = $config['dyndns']['port'];
 $pconfig['mx'] = $config['dyndns']['mx'];
 $pconfig['type'] = $config['dyndns']['type'];
 $pconfig['enable'] = isset($config['dyndns']['enable']);
@@ -74,6 +76,12 @@ if ($_POST) {
 	if (($_POST['host'] && !is_domain($_POST['host']))) {
 		$input_errors[] = "The host name contains invalid characters.";
 	}
+	if (($_POST['server'] && !is_domain($_POST['server']) && !is_ipaddr($_POST['server']))) {
+		$input_errors[] = "The server name contains invalid characters.";
+	}
+	if (($_POST['port'] && !is_port($_POST['port']))) {
+		$input_errors[] = "The server port must be an integer between 1 and 65535.";
+	}
 	if (($_POST['mx'] && !is_domain($_POST['mx']))) {
 		$input_errors[] = "The MX contains invalid characters.";
 	}
@@ -96,6 +104,8 @@ if ($_POST) {
 		$config['dyndns']['username'] = $_POST['username'];
 		$config['dyndns']['password'] = $_POST['password'];
 		$config['dyndns']['host'] = $_POST['host'];
+		$config['dyndns']['server'] = $_POST['server'];
+		$config['dyndns']['port'] = $_POST['port'];
 		$config['dyndns']['mx'] = $_POST['mx'];
 		$config['dyndns']['wildcard'] = $_POST['wildcard'] ? true : false;
 		$config['dyndns']['enable'] = $_POST['enable'] ? true : false;
@@ -130,6 +140,8 @@ function enable_change(enable_change) {
 	
 	endis = !(document.iform.enable.checked || enable_change);
 	document.iform.host.disabled = endis;
+	document.iform.server.disabled = endis;
+	document.iform.port.disabled = endis;
 	document.iform.mx.disabled = endis;
 	document.iform.type.disabled = endis;
 	document.iform.wildcard.disabled = endis;
@@ -174,6 +186,19 @@ function enable_change(enable_change) {
                   <td width="78%" class="vtable"> 
                     <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="30" value="<?=htmlspecialchars($pconfig['host']);?>"> 
                   </td>
+				</tr>
+                 <tr> 
+                  <td width="22%" valign="top" class="vncell">Server</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="server" type="text" class="formfld" id="server" size="30" value="<?=htmlspecialchars($pconfig['server']);?>">
+                    <br>Special server to connect to. This can usually be left blank.</td>
+				</tr>
+                <tr> 
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Port</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="port" type="text" class="formfld" id="port" size="5" value="<?=htmlspecialchars($pconfig['port']);?>">
+                    <br>Special server port to connect to. This can usually be left blank.</td>
 				</tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">MX</td>

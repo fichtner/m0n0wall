@@ -197,7 +197,11 @@ if ($_GET['act'] == "add") {
 	<td class="list">&nbsp;</td>
   </tr>
   <?php foreach ($config['interfaces'] as $ifname => $iface):
-  	if ($iface['descr'])
+  	/* we don't want to see the OpenVPN tun interfaces */
+	if (isset($iface['ovpn']))
+		continue;
+
+	if ($iface['descr'])
 		$ifdescr = $iface['descr'];
 	else
 		$ifdescr = strtoupper($ifname);

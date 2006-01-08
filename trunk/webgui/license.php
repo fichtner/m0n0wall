@@ -80,7 +80,7 @@ require("guiconfig.inc");
               <br>
               Peter Allgeyer (<a href="mailto:allgeyer@web.de">allgeyer@web.de</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">&quot;reject&quot; type filter rules; dial-on-demand; WAN connect/disconnect; auto-add proxy ARP </font></em><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">firewall log filtering</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">firewall log filtering; DynDNS server/port; OpenVPN improvements</font></em><br>
               <br>
               Thierry Lechat (<a href="mailto:dev@lechat.org">dev@lechat.org</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SVG-based traffic grapher</font></em><br>
@@ -126,7 +126,16 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal logging</font></em><br>
 			  <br>
               Enrique Maldonado (<a href="mailto:enrique@directemar.cl">enrique@directemar.cl</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPsec certificate support</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPsec certificate support</font></em><br>
+			  <br>
+              Ken Wiesner (<a href="mailto:ken.wiesner@clearshout.com">ken.wiesner@clearshout.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Ping source interface selection</font></em><br>
+			  <br>
+              Joe Suhre (<a href="mailto:jsuhre@nullconcepts.com">jsuhre@nullconcepts.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">DNS forwarder domain overriding</font></em><br>
+			  <br>
+              Paul Taylor (<a href="mailto:paultaylor@winndixie.com">paultaylor@winndixie.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ARP table, Traceroute and Filter state pages</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

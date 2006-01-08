@@ -46,7 +46,7 @@ $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
 $d_ipsecconfdirty_path = $g['varrun_path'] . "/ipsec.conf.dirty";
 $d_shaperconfdirty_path = $g['varrun_path'] . "/shaper.conf.dirty";
 $d_pptpuserdirty_path = $g['varrun_path'] . "/pptpd.user.dirty";
-$d_hostsdirty_path = $g['varrun_path'] . "/hosts.dirty";
+$d_dnsmasqdirty_path = $g['varrun_path'] . "/dnsmasq.dirty";
 $d_staticmapsdirty_path = $g['varrun_path'] . "/staticmaps.dirty";
 $d_staticroutesdirty_path = $g['varrun_path'] . "/staticroutes.dirty";
 $d_aliasesdirty_path = $g['varrun_path'] . "/aliases.dirty";
@@ -57,6 +57,7 @@ $d_sysrebootreqd_path = $g['varrun_path'] . "/sysreboot.reqd";
 $d_passthrumacsdirty_path = $g['varrun_path'] . "/passthrumacs.dirty";
 $d_allowedipsdirty_path = $g['varrun_path'] . "/allowedips.dirty";
 $d_ovpnclidirty_path = $g['varrun_path'] . "/ovpnclient.dirty";
+$d_ovpnsrvdirty_path = $g['varrun_path'] . "/ovpnserver.dirty";
 
 if (file_exists($d_firmwarelock_path)) {
 	if (!$d_isfwfile) {
@@ -330,6 +331,16 @@ function pptpd_users_sort() {
 	usort($config['pptpd']['user'], "usercmp");
 }
 
+function captiveportal_users_sort() {
+	global $g, $config;
+	
+	function cpusercmp($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
+	usort($config['captiveportal']['user'], "cpusercmp");
+}
+
 function staticroutes_sort() {
 	global $g, $config;
 
@@ -344,10 +355,23 @@ function hosts_sort() {
 	global $g, $config;
 
 	function hostcmp($a, $b) {
-		return strcasecmp($a['host'], $b['host']);
+		if (strcasecmp($a['domain'], $b['domain']) == 0)
+			return strcasecmp($a['host'], $b['host']);
+		else
+			return strcasecmp($a['domain'], $b['domain']);
 	}
 
 	usort($config['dnsmasq']['hosts'], "hostcmp");
+}
+
+function domainoverrides_sort() {
+	global $g, $config;
+
+	function domainoverridescmp($a, $b) {
+		return strcasecmp($a['domain'], $b['domain']);
+	}
+
+	usort($config['dnsmasq']['domainoverrides'], "domainoverridescmp");
 }
 
 function staticmaps_sort($if) {

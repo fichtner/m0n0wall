@@ -38,6 +38,9 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_logs.php");
+	exit;
 }
 
 function dump_clog($logfile, $tail, $withorig = true) {
@@ -66,7 +69,7 @@ function dump_clog($logfile, $tail, $withorig = true) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabact">System</li>
+	<li class="tabact"><a href="diag_logs.php" style="color:black" title="reload page">System</a></li>
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
     <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>

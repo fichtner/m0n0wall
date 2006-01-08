@@ -33,7 +33,7 @@
 $listtags = explode(" ", "rule user key dnsserver winsserver " .
 	"encryption-algorithm-option hash-algorithm-option hosts tunnel onetoone " .
 	"staticmap route alias pipe queue shellcmd cacert earlyshellcmd mobilekey " .
-	"servernat proxyarpnet passthrumac allowedip wolentry vlan");
+	"servernat proxyarpnet passthrumac allowedip wolentry vlan domainoverrides");
 
 function startElement($parser, $name, $attrs) {
 	global $depth, $curpath, $config, $havedata, $listtags;

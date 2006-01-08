@@ -195,7 +195,7 @@ function filter_nat_rules_generate() {
 		for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 			$optcfg = $config['interfaces']['opt' . $i];
 			
-			if (isset($optcfg['enable']) && !$optcfg['bridge']) {
+			if (isset($optcfg['enable']) && !$optcfg['bridge'] && !isset($optcfg['ovpn'])) {
 				$optsa = gen_subnet($optcfg['ipaddr'], $optcfg['subnet']);
 				$natrules .= filter_nat_rules_generate_if($wanif, 
 					$optsa . "/" . $optcfg['subnet'], "", null);
@@ -300,6 +300,7 @@ function filter_rules_generate() {
 		if (isset($oc['enable']) && $oc['if']) {
 			$oic = array();
 			$oic['if'] = $oc['if'];
+			$oic['ovpn'] = $oc['ovpn'];
 			
 			if ($oc['bridge']) {
 				if (!strstr($oc['bridge'], "opt") || 
@@ -355,7 +356,9 @@ EOD;
 
 	/* allow access to DHCP server on optional interfaces */
 	foreach ($optcfg as $on => $oc) {
-		if (isset($config['dhcpd'][$on]['enable']) && (!$oc['bridge'])) {
+		if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
+				($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
+					
 			$ipfrules .= <<<EOD
 
 # allow access to DHCP server on {$on}
@@ -410,6 +413,11 @@ block in $log quick on $wanif from $lansa/$lansn to any
 EOD;
 
 	foreach ($optcfg as $oc) {
+		if (isset($oc['ovpn'])) {
+			/* exclude OpenVPN tunneling interfaces */
+			/* $ovpnclient = true; */
+			continue;
+		}
 		if (!$oc['bridge'])
 			$ipfrules .= "block in $log quick on $wanif from {$oc['sa']}/{$oc['sn']} to any\n";
 	}
@@ -455,7 +463,7 @@ EOD;
 	/* OPT spoof check */
 	foreach ($optcfg as $on => $oc) {
 		/* omit for bridged interfaces when the filtering bridge is on */
-		if ($oc['ip'] && (!$oc['bridge'] || !isset($config['bridge']['filteringbridge'])))
+		if ($oc['ip'] && (!$oc['bridge'] || !isset($config['bridge']['filteringbridge'])) && $oc['sa'] != "0.0.0.0")
 			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
 	}
 	

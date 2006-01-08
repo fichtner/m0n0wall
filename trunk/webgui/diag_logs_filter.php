@@ -35,13 +35,16 @@ require("guiconfig.inc");
 $protocols = explode(" ", "TCP UDP TCP/UDP ICMP ESP AH GRE IPv6 IGMP any");
 
 $nentries = $config['syslog']['nentries'];
-$resolve = $config['syslog']['resolve'];
+$resolve = isset($config['syslog']['resolve']);
 
 if (!$nentries)
 	$nentries = 50;
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 262144 /var/log/filter.log");
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_logs_filter.php");
+	exit;
 }
 
 
@@ -135,30 +138,38 @@ function conv_clog($logfile, $tail) {
 			$flent['count'] = substr($ipfa[$i], 0, -1);
 			$i++;
 		}
-		if (!isset($iface) || ($iftable[$ipfa[$i]] && strstr($iface, $iftable[$ipfa[$i]])))
+		
+		if ($iftable[$ipfa[$i]])
 			$flent['interface'] = $iftable[$ipfa[$i]];
-		else if (!isset($iface) || strstr($iface, $ipfa[$i]))
+		else if (strpos($ipfa[$i], "ng") !== false)
+			$flent['interface'] = "PPTP";
+		else
 			$flent['interface'] = $ipfa[$i];
-		else continue;
+		
+		if (isset($iface)) {
+			if ($iface != $flent['interface'])
+				continue;
+		}
+		
 		$i += 2;
 		if (!isset($action) || strstr($action, $ipfa[$i]))
 			$flent['act'] = $ipfa[$i];
-		else continue; 
+		else
+			continue; 
 		$i++;
 		list($flent['src'], $flent['srcport']) = format_ipf_ip($ipfa[$i],$srcport);
-		if (!isset($flent['src'])) continue;
+		if (!isset($flent['src']))
+			continue;
 		$i += 2;
 		list($flent['dst'], $flent['dstport']) = format_ipf_ip($ipfa[$i],$dstport);
-		if (!isset($flent['dst'])) continue;
+		if (!isset($flent['dst']))
+			continue;
 		$i += 2;
 		$protocol = strtoupper($ipfa[$i]);
 		if (!isset($proto) || ($proto == $protocol))
 			$flent['proto'] = $protocol;
-		else continue;
-		if (isset($resolve)) {
-			$flent['dst'] = gethostbyaddr($flent['dst']);
-			$flent['src'] = gethostbyaddr($flent['src']);
-		}
+		else
+			continue;
 		if ($protocol == "ICMP") {
 			$i += 5;
 			$flent['dst'] = $flent['dst'] . ", type " . $ipfa[$i];
@@ -170,13 +181,21 @@ function conv_clog($logfile, $tail) {
 }
 
 function format_ipf_ip($ipfip,$uport) {
+	global $resolve;
+
 	list($ip,$port) = explode(",", $ipfip);
+	if ($resolve) {
+		if (!$port)
+			return array(gethostbyaddr($ip), "");
+		if ($uport == "" || ($uport == $port))
+			return array(gethostbyaddr($ip) . ", port " . $port, $port);
+		return;
+	}
+
 	if (!$port)
 		return array($ip, "");
-
 	if ($uport == "" || ($uport == $port))
 		return array($ip . ", port " . $port, $port);
-
 	return;
 }
 ?>

@@ -125,8 +125,7 @@ if ($_POST) {
                     </select> <br> <span class="vexpl">If 'source' or 'destination' 
                     is chosen, a dynamic queue associated with the pipe and with 
                     the weight given above will be created for each source/destination 
-                    IP address encountered, respectively. This makes it possible 
-                    to easily specify bandwidth limits per host.</span></td>
+                    IP address encountered, respectively.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>

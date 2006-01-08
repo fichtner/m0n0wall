@@ -38,6 +38,9 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("/usr/sbin/clog -i -s 32768 /var/log/portalauth.log");
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_logs_portal.php");
+	exit;
 }
 
 function dump_clog($logfile, $tail) {
@@ -64,7 +67,7 @@ function dump_clog($logfile, $tail) {
     <li class="tabinact1"><a href="diag_logs.php">System</a></li>
     <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
     <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
-    <li class="tabact">Captive portal</li>
+    <li class="tabact"><a href="diag_logs_portal.php" style="color:black" title="reload page">Captive portal</a></li>
     <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
     <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
   </ul>

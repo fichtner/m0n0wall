@@ -30,6 +30,8 @@ function doCmdT($title, $command, $isstr) {
 					/* remove password tag contents */
 					$line = preg_replace("/<password>.*?<\\/password>/", "<password>xxxxx</password>", $line);
 					$line = preg_replace("/<pre-shared-key>.*?<\\/pre-shared-key>/", "<pre-shared-key>xxxxx</pre-shared-key>", $line);
+					$line = preg_replace("/<srv_key>.*?<\\/srv_key>/", "<srv_key>xxxxx</srv_key>", $line);
+					$line = preg_replace("/<cli_key>.*?<\\/cli_key>/", "<cli_key>xxxxx</cli_key>", $line);
 					$line = str_replace("\t", "    ", $line);
 					echo htmlspecialchars($line,ENT_NOQUOTES);
 				}

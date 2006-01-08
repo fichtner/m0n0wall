@@ -162,6 +162,16 @@ function create_magic ($maxup, $maxdown, $p2plow,$maskq) {
   if ($p2plow) 
     populate_p2p($rulei);
 
+  $config['shaper']['rule'][$rulei]['descr'] = "m_TCP ACK Upload";
+  $config['shaper']['rule'][$rulei]['targetqueue'] = 2;
+  $config['shaper']['rule'][$rulei]['interface'] = "wan";
+  $config['shaper']['rule'][$rulei]['direction'] = "out";
+  $config['shaper']['rule'][$rulei]['source']['any'] = TRUE;
+  $config['shaper']['rule'][$rulei]['destination']['any'] = TRUE;
+  $config['shaper']['rule'][$rulei]['iplen'] = "0-80";
+  $config['shaper']['rule'][$rulei]['protocol'] = "tcp";
+  $config['shaper']['rule'][$rulei]['tcpflags'] = "ack";
+  $rulei++; 
   $config['shaper']['rule'][$rulei]['descr'] = "m_Small Pkt Upload";
   $config['shaper']['rule'][$rulei]['targetqueue'] = 0;
   $config['shaper']['rule'][$rulei]['interface'] = "wan";
@@ -211,16 +221,6 @@ function create_magic ($maxup, $maxdown, $p2plow,$maskq) {
   $config['shaper']['rule'][$rulei]['destination']['any'] = TRUE;
   $config['shaper']['rule'][$rulei]['protocol'] = "icmp";
   $rulei++;
-  $config['shaper']['rule'][$rulei]['descr'] = "m_TCP ACK Upload";
-  $config['shaper']['rule'][$rulei]['targetqueue'] = 2;
-  $config['shaper']['rule'][$rulei]['interface'] = "wan";
-  $config['shaper']['rule'][$rulei]['direction'] = "out";
-  $config['shaper']['rule'][$rulei]['source']['any'] = TRUE;
-  $config['shaper']['rule'][$rulei]['destination']['any'] = TRUE;
-  $config['shaper']['rule'][$rulei]['iplen'] = "0-80";
-  $config['shaper']['rule'][$rulei]['protocol'] = "tcp";
-  $config['shaper']['rule'][$rulei]['tcpflags'] = "ack";
-  $rulei++; 
   $config['shaper']['rule'][$rulei]['descr'] = "m_Catch-All Upload";
   $config['shaper']['rule'][$rulei]['targetqueue'] = 3;
   $config['shaper']['rule'][$rulei]['interface'] = "wan";
