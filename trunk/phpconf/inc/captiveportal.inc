@@ -385,7 +385,7 @@ function captiveportal_prune_old() {
 	else
 		$idletimeout = 0;
 	
-	if (!$timeout && !$idletimeout && !isset($config['captiveportal']['reauthenticate']))
+	if (!$timeout && !$idletimeout && !isset($config['captiveportal']['reauthenticate']) && !isset($config['captiveportal']['radiussession_timeout']))
 		return;
 	
 	captiveportal_lock();
