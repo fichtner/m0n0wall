@@ -174,7 +174,7 @@ if ($_POST) {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">DNS servers</td>
-                  <td width="78%" class="vtable"> <p> 
+                  <td width="78%" class="vtable">
                       <input name="dns1" type="text" class="formfld" id="dns1" size="20" value="<?=htmlspecialchars($pconfig['dns1']);?>">
                       <br>
                       <input name="dns2" type="text" class="formfld" id="dns22" size="20" value="<?=htmlspecialchars($pconfig['dns2']);?>">
@@ -188,7 +188,7 @@ if ($_POST) {
                       If this option is set, m0n0wall will use DNS servers assigned 
                       by a DHCP/PPP server on WAN for its own purposes (including 
                       the DNS forwarder). They will not be assigned to DHCP and 
-                      PPTP VPN clients, though.</span></p></td>
+                      PPTP VPN clients, though.</span></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">Username</td>

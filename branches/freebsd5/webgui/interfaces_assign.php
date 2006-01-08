@@ -240,14 +240,14 @@ if ($_GET['act'] == "add") {
   </tr>
   <?php endif; ?>
 </table>
-                      <input name="Submit" type="submit" class="formbtn" value="Save">
-                    <p><span class="vexpl"><strong><span class="red">Warning:</span><br>
-                    </strong>After you click &quot;Save&quot;, you must reboot the firewall to make the changes take effect. You may also have to do one or more of the following steps before you can access your firewall again: </span></p>
-                    <ul>
-                      <li><span class="vexpl">change the IP address of your computer</span></li>
-                      <li><span class="vexpl">renew its DHCP lease</span></li>
-                      <li><span class="vexpl">access the webGUI with the new IP address</span></li>
-                    </ul></td>
+  <input name="Submit" type="submit" class="formbtn" value="Save"><br><br>
+<p><span class="vexpl"><strong><span class="red">Warning:</span><br>
+</strong>After you click &quot;Save&quot;, you must reboot the firewall to make the changes take effect. You may also have to do one or more of the following steps before you can access your firewall again: </span></p>
+<ul>
+  <li><span class="vexpl">change the IP address of your computer</span></li>
+  <li><span class="vexpl">renew its DHCP lease</span></li>
+  <li><span class="vexpl">access the webGUI with the new IP address</span></li>
+</ul></td>
 	</tr>
 </table>
 </form>

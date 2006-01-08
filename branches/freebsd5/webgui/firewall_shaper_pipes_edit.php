@@ -41,6 +41,8 @@ if (isset($_POST['id']))
 if (isset($id) && $a_pipes[$id]) {
 	$pconfig['bandwidth'] = $a_pipes[$id]['bandwidth'];
 	$pconfig['delay'] = $a_pipes[$id]['delay'];
+	$pconfig['plr'] = $a_pipes[$id]['plr'];
+	$pconfig['qsize'] = $a_pipes[$id]['qsize'];
 	$pconfig['mask'] = $a_pipes[$id]['mask'];
 	$pconfig['descr'] = $a_pipes[$id]['descr'];
 }
@@ -62,6 +64,12 @@ if ($_POST) {
 	if (($_POST['delay'] && !is_numericint($_POST['delay']))) {
 		$input_errors[] = "The delay must be an integer.";
 	}
+	if ($_POST['plr'] && (!is_numeric($_POST['plr']) || $_POST['plr'] < 0 || $_POST['plr'] > 1)) {
+		$input_errors[] = "The packet loss rate must be a number between 0 and 1.";
+	}
+	if ($_POST['qsize'] && (!is_numericint($_POST['qsize']) || $_POST['qsize'] < 2 || $_POST['qsize'] > 100)) {
+		$input_errors[] = "The queue size must be an integer between 2 and 100.";
+	}
 
 	if (!$input_errors) {
 		$pipe = array();
@@ -69,6 +77,10 @@ if ($_POST) {
 		$pipe['bandwidth'] = $_POST['bandwidth'];
 		if ($_POST['delay'])
 			$pipe['delay'] = $_POST['delay'];
+		if ($_POST['plr'])
+			$pipe['plr'] = $_POST['plr'];
+		if ($_POST['qsize'])
+			$pipe['qsize'] = $_POST['qsize'];
 		if ($_POST['mask'])
 			$pipe['mask'] = $_POST['mask'];
 		$pipe['descr'] = $_POST['descr'];
@@ -102,6 +114,20 @@ if ($_POST) {
                     should specify 0 here (or leave the field empty)</span></td>
                 </tr>
                 <tr> 
+                  <td width="22%" valign="top" class="vncell">Packet loss rate</td>
+                  <td width="78%" class="vtable"> <input name="plr" type="text" id="plr" size="5" value="<?=htmlspecialchars($pconfig['plr']);?>"> 
+                    <br> <span class="vexpl">Hint: in most cases, you 
+                    should specify 0 here (or leave the field empty). A value of 0.001 means one packet in 1000 gets dropped.</span></td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Queue size</td>
+                  <td width="78%" class="vtable"> <input name="qsize" type="text" id="qsize" size="8" value="<?=htmlspecialchars($pconfig['qsize']);?>"> 
+                    &nbsp;slots<br> 
+                    <span class="vexpl">Hint: in most cases, you 
+                    should leave the field empty. All packets in this pipe are placed into a fixed-size queue first,
+                    then they are delayed by value specified in the Delay field, and then they are delivered to their destination.</span></td>
+                </tr>
+                <tr> 
                   <td width="22%" valign="top" class="vncell">Mask</td>
                   <td width="78%" class="vtable"> <select name="mask" class="formfld">
                       <option value="" <?php if (!$pconfig['mask']) echo "selected"; ?>>none</option>
@@ -109,7 +135,7 @@ if ($_POST) {
                       <option value="destination" <?php if ($pconfig['mask'] == "destination") echo "selected"; ?>>destination</option>
                     </select> <br>
                     <span class="vexpl">If 'source' or 'destination' is chosen, 
-                    a dynamic pipe with the bandwidth and delay given above will 
+                    a dynamic pipe with the bandwidth, delay, packet loss and queue size given above will 
                     be created for each source/destination IP address encountered, 
                     respectively. This makes it possible to easily specify bandwidth 
                     limits per host.</span></td>

@@ -102,13 +102,19 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ipfilter window scaling fix; ipnat ICMP checksum adjustment fix; IPsec dead SA fixes</font></em><br>
 			  <br>
               Michael Hanselmann (<a href="mailto:m0n0@hansmi.ch">m0n0@hansmi.ch</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby; exec.php arrow keys</font></em><br>
 			  <br>
               Audun Larsen (<a href="mailto:larsen@xqus.com">larsen@xqus.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CPU/memory usage display</font></em><br>
 			  <br>
               Peter Curran (<a href="mailto:peter@closeconsultants.com">peter@closeconsultants.com</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">OpenVPN support</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">OpenVPN support</font></em><br>
+			  <br>
+              Pavel A. Grodek (<a href="mailto:pg@abletools.com">pg@abletools.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Traffic shaper packet loss rate/queue size</font></em><br>
+			  <br>
+              Rob Parker, Keycom PLC (<a href="mailto:rob.parker@keycom.co.uk">rob.parker@keycom.co.uk</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal per-user bandwidth restrictions</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

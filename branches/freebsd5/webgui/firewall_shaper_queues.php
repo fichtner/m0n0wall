@@ -131,10 +131,9 @@ if ($_GET['act'] == "del") {
                         <td class="list" colspan="5"></td>
                         <td class="list"> <a href="firewall_shaper_queues_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
-                    </table>
-			        <p>
+                    </table><br>
                     <strong><span class="red">Note:</span></strong> a queue can 
-                    only be deleted if it is not referenced by any rules.</td></p>
+                    only be deleted if it is not referenced by any rules.</td>
 	</tr>
 </table>
             </form>

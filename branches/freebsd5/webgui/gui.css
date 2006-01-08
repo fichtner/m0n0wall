@@ -5,6 +5,9 @@ body,td,th,input,select {
 form {
 	margin: 0px;
 }
+p {
+	margin: 0 0 10px 0;
+}
 .pgtitle {
 	font-size: 18px;
 	color: #777777;

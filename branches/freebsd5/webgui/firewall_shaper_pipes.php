@@ -111,10 +111,12 @@ if ($_GET['act'] == "del") {
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                       <tr> 
                         <td width="10%" class="listhdrr">No.</td>
-                        <td width="20%" class="listhdrr">Bandwidth</td>
-                        <td width="15%" class="listhdrr">Delay</td>
+                        <td width="15%" class="listhdrr">Bandwidth</td>
+                        <td width="10%" class="listhdrr">Delay</td>
+                        <td width="10%" class="listhdrr">PLR</td>
+                        <td width="10%" class="listhdrr">Queue</td>
                         <td width="15%" class="listhdrr">Mask</td>
-                        <td width="30%" class="listhdr">Description</td>
+                        <td width="20%" class="listhdr">Description</td>
                         <td width="10%" class="list"></td>
                       </tr>
                       <?php $i = 0; foreach ($a_pipes as $pipe): ?>
@@ -131,6 +133,16 @@ if ($_GET['act'] == "del") {
                           <?php endif; ?>
                           &nbsp; </td>
                         <td class="listr"> 
+                          <?php if ($pipe['plr']): ?>
+                          <?=$pipe['plr'];?>
+                          <?php endif; ?>
+                          &nbsp; </td>
+                        <td class="listr"> 
+                          <?php if ($pipe['qsize']): ?>
+                          <?=htmlspecialchars($pipe['qsize']);?>
+                          <?php endif; ?>
+                          &nbsp; </td>
+                        <td class="listr"> 
                           <?php if ($pipe['mask']): ?>
                           <?=$pipe['mask'];?>
                           <?php endif; ?>
@@ -143,13 +155,12 @@ if ($_GET['act'] == "del") {
                       </tr>
                       <?php $i++; endforeach; ?>
                       <tr> 
-                        <td class="list" colspan="5"></td>
+                        <td class="list" colspan="7"></td>
                         <td class="list"> <a href="firewall_shaper_pipes_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
-                    </table>
-			        <p>
+                    </table><br>
                     <strong><span class="red">Note:</span></strong> a pipe can 
-                    only be deleted if it is not referenced by any rules or queues.</td></p>
+                    only be deleted if it is not referenced by any rules or queues.</td>
 	</tr>
 </table>
             </form>

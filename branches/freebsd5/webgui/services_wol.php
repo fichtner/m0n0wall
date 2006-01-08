@@ -48,6 +48,8 @@ if ($_POST || $_GET['mac']) {
 		$mac = $_POST['mac_input'];
 		$if = $_POST['interface'];
 	}
+	
+	$mac = str_replace("-", ":", $mac);
 
 	/* input validation */
 	if (!$mac || !is_macaddr($mac))

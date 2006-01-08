@@ -84,7 +84,7 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="baseline" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <p> Click this button to download the system configuration 
+                    Click this button to download the system configuration 
                       in XML format.<br>
                       <br>
                       <input name="Submit" type="submit" class="formbtn" id="download" value="Download configuration"></td>

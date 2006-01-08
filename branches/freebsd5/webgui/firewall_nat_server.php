@@ -123,9 +123,9 @@ if ($_GET['act'] == "del") {
                   <td class="list" colspan="2"></td>
                   <td class="list"> <a href="firewall_nat_server_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
-              </table>
-			        <p><span class="vexpl"><span class="red"><strong>Note:<br>
-                      </strong></span>The external IP addresses defined on this page may be used in <a href="firewall_nat.php">inbound NAT</a> mappings. Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span></p>
+              </table><br>
+			        <span class="vexpl"><span class="red"><strong>Note:<br>
+                      </strong></span>The external IP addresses defined on this page may be used in <a href="firewall_nat.php">inbound NAT</a> mappings. Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span>
 </td>
   </tr>
 </table>

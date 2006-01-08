@@ -101,10 +101,9 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
 		        <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
-                  <td class="vtable"><p><span class="vexpl"> </span> 
+                  <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
-                      <strong>Enable IPsec<br>
-                      </strong></p></td>
+                      <strong>Enable IPsec</strong></td>
                 </tr>
                 <tr> 
                   <td> <input name="submit" type="submit" class="formbtn" value="Save"> 

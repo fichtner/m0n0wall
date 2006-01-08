@@ -125,9 +125,9 @@ if ($_GET['act'] == "del") {
                   <td class="list" colspan="4"></td>
                   <td class="list"> <a href="firewall_nat_1to1_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
-              </table>
-			  			        <p><span class="vexpl"><span class="red"><strong>Note:<br>
-                      </strong></span>Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span></p>
+              </table><br>
+			  	<span class="vexpl"><span class="red"><strong>Note:<br>
+                </strong></span>Depending on the way your WAN connection is setup, you may also need <a href="services_proxyarp.php">proxy ARP</a>.</span>
 </td>
 </tr>
 </table>

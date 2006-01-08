@@ -92,10 +92,9 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
-                  <td class="vtable"><p>
+                  <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if (isset($config['nat']['advancedoutbound']['enable'])) echo "checked";?>>
-                      <strong>Enable advanced outbound NAT<br>
-                      </strong></p></td>
+                      <strong>Enable advanced outbound NAT</strong></td>
                 </tr>
                 <tr> 
                   <td> <input name="submit" type="submit" class="formbtn" value="Save"> 
@@ -113,7 +112,6 @@ if ($_GET['act'] == "del") {
                     </td>
                 </tr>
               </table>
-              &nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr> 
                   <td width="10%" class="listhdrr">Interface</td>

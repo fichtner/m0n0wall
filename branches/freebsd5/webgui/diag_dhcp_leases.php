@@ -141,6 +141,7 @@ if ($_GET['order'])
     <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=hostname">Hostname</a></td>
     <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=start">Start</a></td>
     <td class="listhdr"><a href="?all=<?=$_GET['all'];?>&order=end">End</a></td>
+    <td class="list"></td>
 	</tr>
 <?php
 foreach ($leases as $data) {
@@ -151,18 +152,26 @@ foreach ($leases as $data) {
 		} else {
 			$fspans = $fspane = "";
 		}
+		$lip = ip2long($data['ip']);
+		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf) {
+			if (($lip >= ip2long($dhcpifconf['range']['from'])) && ($lip <= ip2long($dhcpifconf['range']['to']))) {
+				$data['if'] = $dhcpif;
+				break;
+			}
+		}
 		echo "<tr>\n";
 		echo "<td class=\"listlr\">{$fspans}{$data['ip']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['mac']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['hostname']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['start']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}{$data['end']}{$fspane}&nbsp;</td>\n";
+		echo "<td class=\"list\" valign=\"middle\"><a href=\"services_dhcp_edit.php?if={$data['if']}&mac={$data['mac']}\"><img src=\"plus.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"add a static mapping for this MAC address\"></a></td>\n";
 		echo "</tr>\n";
 	}
 }
 ?>
 </table>
-<p>
+<br>
 <form action="diag_dhcp_leases.php" method="GET">
 <input type="hidden" name="order" value="<?=$_GET['order'];?>">
 <?php if ($_GET['all']): ?>
@@ -174,6 +183,6 @@ foreach ($leases as $data) {
 <?php endif; ?>
 </form>
 <?php else: ?>
-<p><strong>No leases file found. Is the DHCP server active?</strong></p>
+<strong>No leases file found. Is the DHCP server active?</strong>
 <?php endif; ?>
 <?php include("fend.inc"); ?>

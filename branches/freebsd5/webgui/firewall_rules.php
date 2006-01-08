@@ -357,14 +357,13 @@ function fr_insline(id, on) {
               </table>
     </td>
   </tr>
-</table>
-  <p>
+</table><br>
   <strong><span class="red">Hint:<br>
   </span></strong>Rules are evaluated on a first-match basis (i.e. 
   the action of the first rule to match a packet will be executed). 
   This means that if you use block rules, you'll have to pay attention 
   to the rule order. Everything that isn't explicitly passed is blocked 
-  by default.</p>
+  by default.
   <input type="hidden" name="if" value="<?=$if;?>">
 </form>
 <?php include("fend.inc"); ?>

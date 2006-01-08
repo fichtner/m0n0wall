@@ -167,13 +167,11 @@ function interfaces_optional_configure() {
 		
 		if (isset($config['bridge']['filteringbridge'])) {
 			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=1");
-			mwexec("/sbin/sysctl net.link.ether.bridge.ipfw=1");
 		}
 		
 		mwexec("/sbin/sysctl net.link.ether.bridge.enable=1");
 	} else {
 		mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
-		mwexec("/sbin/sysctl net.link.ether.bridge.ipfw=0");
 		mwexec("/sbin/sysctl net.link.ether.bridge.enable=0");
 	}
 	

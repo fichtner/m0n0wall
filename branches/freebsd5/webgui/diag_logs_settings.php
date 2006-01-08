@@ -171,7 +171,7 @@ function enable_change(enable_over) {
                         </td>
                       </tr>
                       <tr> 
-                        <td width="22%" height="53" valign="top">&nbsp;</td>
+                        <td width="22%" valign="top">&nbsp;</td>
                         <td width="78%"><strong><span class="red">Note:</span></strong><br>
                           syslog sends UDP datagrams to port 514 on the specified 
                           remote syslog server. Be sure to set syslogd on the 

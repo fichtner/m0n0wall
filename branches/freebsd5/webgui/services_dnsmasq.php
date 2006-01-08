@@ -83,20 +83,19 @@ if ($_GET['act'] == "del") {
 <?php endif; ?>
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
-                  <td class="vtable"><p> 
+                  <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
-                      <strong>Enable DNS forwarder<br>
-                      </strong></p></td>
+                      <strong>Enable DNS forwarder</strong></td>
                 </tr>
                 <tr> 
-                  <td class="vtable"><p> 
+                  <td class="vtable">
                       <input name="regdhcp" type="checkbox" id="regdhcp" value="yes" <?php if ($pconfig['regdhcp']) echo "checked";?>>
                       <strong>Register DHCP leases in DNS forwarder<br>
                       </strong>If this option is set, then machines that specify 
                       their hostname when requesting a DHCP lease will be registered 
                       in the DNS forwarder, so that their name can be resolved. 
                       You should also set the domain in <a href="system.php">System: 
-                      General setup</a> to the proper value.</p>
+                      General setup</a> to the proper value.
                     </td>
                 </tr>
                 <tr> 
@@ -121,7 +120,6 @@ if ($_GET['act'] == "del") {
                       forwarders below.</p></td>
                 </tr>
               </table>
-              &nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="20%" class="listhdrr">Host</td>

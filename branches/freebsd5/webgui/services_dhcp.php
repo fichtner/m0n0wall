@@ -280,7 +280,6 @@ function enable_change(enable_over) {
                             </span></p></td>
                       </tr>
                     </table>
-					&nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="35%" class="listhdrr">MAC address </td>

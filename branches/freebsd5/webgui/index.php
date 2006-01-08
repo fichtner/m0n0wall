@@ -122,29 +122,7 @@ if ($fd) {
 			  <tr> 
                 <td width="25%" class="vncellt">CPU usage</td>
                 <td width="75%" class="listr">
-<?php
-$cpuTicks = explode(" ", `/sbin/sysctl -n kern.cp_time`);
-sleep(1);
-$cpuTicks2 = explode(" ", `/sbin/sysctl -n kern.cp_time`);
-
-$diff = array();
-$diff['user'] = $cpuTicks2[0] - $cpuTicks[0];
-$diff['nice'] = $cpuTicks2[1] - $cpuTicks[1];
-$diff['sys'] = $cpuTicks2[2] - $cpuTicks[2];
-$diff['intr'] = $cpuTicks2[3] - $cpuTicks[3];
-$diff['idle'] = $cpuTicks2[4] - $cpuTicks[4];
-
-$totalDiff = $diff['user'] + $diff['nice'] + $diff['sys'] + $diff['intr'] + $diff['idle'];
-
-$cpuUsage = round(100 * (1 - $diff['idle'] / $totalDiff), 0);
-									
-echo "<img src='bar_left.gif' height='15' width='4' border='0' align='absmiddle'>";
-echo "<img src='bar_blue.gif' height='15' width='" . $cpuUsage . "' border='0' align='absmiddle'>";
-echo "<img src='bar_gray.gif' height='15' width='" . (100 - $cpuUsage) . "' border='0' align='absmiddle'>";
-echo "<img src='bar_right.gif' height='15' width='5' border='0' align='absmiddle'> ";
-echo $cpuUsage . "%";
-?>
-                </td>
+				<a href="status_graph_cpu.php">view graph</a></td>
               </tr>
 			  <tr> 
                 <td width="25%" class="vncellt">Memory usage</td>

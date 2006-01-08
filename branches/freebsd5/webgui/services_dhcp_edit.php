@@ -56,6 +56,8 @@ if (isset($id) && $a_maps[$id]) {
 	$pconfig['mac'] = $a_maps[$id]['mac'];
 	$pconfig['ipaddr'] = $a_maps[$id]['ipaddr'];
 	$pconfig['descr'] = $a_maps[$id]['descr'];
+} else {
+	$pconfig['mac'] = $_GET['mac'];
 }
 
 if ($_POST) {
@@ -68,6 +70,8 @@ if ($_POST) {
 	$reqdfieldsn = explode(",", "MAC address");
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	
+	$_POST['mac'] = str_replace("-", ":", $_POST['mac']);
 	
 	if (($_POST['ipaddr'] && !is_ipaddr($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";

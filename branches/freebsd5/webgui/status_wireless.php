@@ -173,6 +173,6 @@ function get_wireless_info($ifdescr) {
               <?php $i++; endforeach; ?>
             </table>
 <?php else: ?>
-<p><strong>No supported wireless interfaces were found for status display.</strong></p>
+<strong>No supported wireless interfaces were found for status display (only cards that use the wi[n] driver are supported).</strong>
 <?php endif; ?>
 <?php include("fend.inc"); ?>

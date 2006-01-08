@@ -117,6 +117,8 @@ if ($_POST) {
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	}
 	
+	$_POST['spoofmac'] = str_replace("-", ":", $_POST['spoofmac']);
+	
 	if (($_POST['ipaddr'] && !is_ipaddr($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";
 	}

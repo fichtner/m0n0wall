@@ -128,10 +128,9 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
-                  <td class="vtable"><p>
+                  <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
-                      <strong>Enable traffic shaper<br>
-                      </strong></p></td>
+                      <strong>Enable traffic shaper</strong></td>
                 </tr>
                 <tr> 
                   <td> <input name="submit" type="submit" class="formbtn" value="Save"> 
@@ -247,8 +246,8 @@ if ($_GET['act'] == "del") {
                         <td><img src="out_d.gif" width="11" height="11"></td>
                         <td>outgoing (disabled)</td>
                       </tr>
-                    </table>
-			        <p><span class="red"><strong>Note:</strong></span><strong><br>
+                    </table><br>
+			        <span class="red"><strong>Note:</strong></span><strong><br>
                     </strong>the first rule that matches a packet will be executed.<br>
                     The following match patterns are not shown in the list above: 
                     IP packet length, TCP flags.</td>

@@ -366,17 +366,15 @@ if ($_POST) {
      <table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr> 
 		  <td width="22%" valign="top" class="vtable">&nbsp;</td>
-		  <td width="78%" class="vtable"><p>
+		  <td width="78%" class="vtable">
 			  <input name="p2plow" type="checkbox" id="p2plow" value="yes" <?php if ($pconfig['p2plow']) echo "checked";?>>
-			  Set P2P traffic to lowest priority<br>
-			  </p></td>
+			  Set P2P traffic to lowest priority</td>
 		</tr>
 		<tr> 
 		  <td width="22%" valign="top" class="vtable">&nbsp;</td>
-		  <td width="78%" class="vtable"><p>
+		  <td width="78%" class="vtable">
 			  <input name="maskq" type="checkbox" id="maskq" value="yes" <?php if ($pconfig['maskq']) echo "checked";?>>
-			  Share bandwidth evenly on LAN<br>
-			  </p></td>
+			  Share bandwidth evenly on LAN</td>
 		</tr>
         <tr valign="top">
           <td width="22%" class="vncellreq">Downstream<br>
@@ -395,16 +393,16 @@ if ($_POST) {
 		</tr>
 		<tr> 
 		  <td width="22%">&nbsp;</td>
-		  <td width="78%"><p>
+		  <td width="78%">
 		        <input name="install" type="submit" class="formbtn" id="install" value="Install/Update"> 
 		      &nbsp;
 			    <input name="remove" type="submit" class="formbtn" id="remove" value="Remove">
-		  </p>
-		    <p><span class="red"><strong>All existing traffic shaper <strong>rules</strong>/pipes/queues will be deleted once "Install/Update" has been pressed! Backup your configuration before proceeding! </strong></span></p></td>
+		  <br><br>
+		    <span class="red"><strong>All existing traffic shaper <strong>rules</strong>/pipes/queues will be deleted once "Install/Update" has been pressed! Backup your configuration before proceeding! </strong></span></td>
 		</tr>
-	  </table>
-		<p><span class="vexpl"><span class="red"><strong>Note:</strong></span><strong><br>
-		</strong>By entering your maximum upload and download values and pressing the "Install/Update" button, the magic shaper will do its best to create the optimum shaping rules, queues, and pipes for you.  These rules will help ensure that interactive traffic remains acceptable while the upstream bandwidth is being consumed by heavy traffic.</span></p>
+	  </table><br>
+		<span class="vexpl"><span class="red"><strong>Note:</strong></span><strong><br>
+		</strong>By entering your maximum upload and download values and pressing the "Install/Update" button, the magic shaper will do its best to create the optimum shaping rules, queues, and pipes for you.  These rules will help ensure that interactive traffic remains acceptable while the upstream bandwidth is being consumed by heavy traffic.</span>
 	</td>
     </tr>
 </table>

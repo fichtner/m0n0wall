@@ -339,7 +339,8 @@ function get_interface_info($ifdescr) {
               <?php $i++; endforeach; ?>
             </table>
 </form>
-<p><strong class="red">Note:<br>
+<br>
+<strong class="red">Note:<br>
 </strong>Using dial-on-demand will bring the connection up again if any packet
 triggers it. To substantiate this point: disconnecting manually 
 will <strong>not</strong> prevent dial-on-demand from making connections

@@ -54,7 +54,7 @@ if ($_POST) {
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
-                  <td width="78%" class="vtable"> <p> 
+                  <td width="78%" class="vtable">
                       <input name="nattable" type="checkbox" id="nattable" value="yes" checked>
                       <strong>NAT table</strong><br>
                       <input name="statetable" type="checkbox" id="statetable" value="yes" checked>
@@ -72,7 +72,7 @@ if ($_POST) {
                       <br>
                       NOTE: If you reset the firewall state table, the browser 
                       session may appear to be hung after clicking &quot;Reset&quot;. 
-                      Simply refresh the page to continue.</span></p>
+                      Simply refresh the page to continue.</span>
                     </td>
 				</tr>
                 <tr> 

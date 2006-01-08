@@ -149,11 +149,11 @@ if ($_GET['act'] == "del") {
                   <td class="list" colspan="6"></td>
                   <td class="list"> <a href="firewall_nat_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
 				</tr>
-              </table>
-                    <p><span class="vexpl"><span class="red"><strong>Note:<br>
+              </table><br>
+                    <span class="vexpl"><span class="red"><strong>Note:<br>
                       </strong></span>It is not possible to access NATed services 
                       using the WAN IP address from within LAN (or an optional 
-                      network).</span></p></td>
+                      network).</span></td>
   </tr>
 </table>
             </form>

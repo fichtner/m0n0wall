@@ -168,19 +168,17 @@
 			<dnsserver></dnsserver>
 			<next-server></next-server>
 			<filename></filename>
+			<staticmap>
+				<mac>xx:xx:xx:xx:xx:xx</mac>
+				<ipaddr>xxx.xxx.xxx.xxx</ipaddr>
+				<descr></descr>
+			</staticmap>
 			-->
 		</lan>
 		<!--
 		<opt[n]>
 			...
 		</opt[n]>
-		-->
-		<!--
-		<staticmap>
-			<mac>xx:xx:xx:xx:xx:xx</mac>
-			<ipaddr>xxx.xxx.xxx.xxx</ipaddr>
-			<descr></descr>
-		</staticmap>
 		-->
 	</dhcpd>
 	<pptpd>

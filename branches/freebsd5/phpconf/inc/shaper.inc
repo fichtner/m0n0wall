@@ -70,13 +70,13 @@ function shaper_configure() {
 		unlink("{$g['tmp_path']}/ipfw.rules");
 		
 		/* make sure bridged packets are shaped as well */
-		mwexec("/sbin/sysctl net.link.ether.bridge_ipfw=1");
+		//mwexec("/sbin/sysctl net.link.ether.bridge_ipfw=1");
 		
 		if ($g['booting'])
 			echo "done\n";
 		
 	} else {
-		mwexec("/sbin/sysctl net.link.ether.bridge_ipfw=0");
+		//mwexec("/sbin/sysctl net.link.ether.bridge_ipfw=0");
 		if (!isset($config['captiveportal']['enable'])) {
 			/* unload ipfw and dummynet */
 			mwexec("/sbin/kldunload dummynet");
@@ -351,6 +351,14 @@ function shaper_rules_generate() {
 			
 			if ($pipe['delay']) {
 				$line .= "delay {$pipe['delay']} ";
+			}
+			
+			if ($pipe['plr']) {
+				$line .= "plr {$pipe['plr']} ";
+			}
+			
+			if ($pipe['qsize']) {
+				$line .= "queue {$pipe['qsize']} ";
 			}
 			
 			switch ($pipe['mask']) {

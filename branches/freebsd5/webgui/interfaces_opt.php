@@ -258,6 +258,6 @@ enable_change(false);
 //-->
 </script>
 <?php else: ?>
-<p><strong>Optional <?=$index;?> has been disabled because there is no OPT<?=$index;?> interface.</strong></p>
+<strong>Optional <?=$index;?> has been disabled because there is no OPT<?=$index;?> interface.</strong>
 <?php endif; ?>
 <?php include("fend.inc"); ?>

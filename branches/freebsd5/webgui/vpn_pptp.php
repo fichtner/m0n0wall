@@ -233,7 +233,6 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS</td>
                   <td width="78%" class="vtable"> 
-                    <p> 
                       <input name="radiusenable" type="checkbox" id="radiusenable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radiusenable']) echo "checked"; ?>>
                       <strong>Use a RADIUS server for authentication<br>
                       </strong>When set, all users will be authenticated using 
@@ -242,24 +241,22 @@ function enable_change(enable_over) {
                       <br>
                       <input name="radacct_enable" type="checkbox" id="radacct_enable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radacct_enable']) echo "checked"; ?>>
                       <strong>Enable RADIUS accounting <br>
-                      </strong>Sends accounting packets to the RADIUS server. </p></td>
+                      </strong>Sends accounting packets to the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS server </td>
-                  <td width="78%" class="vtable"> 
-                    <p> 
+                  <td width="78%" class="vtable">
                       <input name="radiusserver" type="text" class="formfld" id="radiusserver" size="20" value="<?=htmlspecialchars($pconfig['radiusserver']);?>">
                       <br>
-                      Enter the IP address of the RADIUS server.</p></td>
+                      Enter the IP address of the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS shared secret</td>
-                  <td width="78%" valign="top" class="vtable"> 
-                    <p> 
+                  <td width="78%" valign="top" class="vtable">
                       <input name="radiussecret" type="password" class="formfld" id="radiussecret" size="20" value="<?=htmlspecialchars($pconfig['radiussecret']);?>">
                       <br>
                       Enter the shared secret that will be used to authenticate 
-                      to the RADIUS server.</p></td>
+                      to the RADIUS server.</td>
                 </tr>
                 <tr> 
                   <td height="16" colspan="2" valign="top"></td>

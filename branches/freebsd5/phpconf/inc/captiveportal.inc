@@ -26,6 +26,12 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
+
+	This version of captiveportal.inc has been modified by Rob Parker
+	<rob.parker@keycom.co.uk> to include changes for per-user bandwidth management
+	via returned RADIUS attributes. This page has been modified to delete any
+	added rules which may have been created by other per-user code (index.php, etc).
+	These changes are (c) 2004 Keycom PLC.
 */
 	
 /* include all configuration functions */
@@ -367,9 +373,18 @@ function captiveportal_prune_old() {
 									   $cpdb[$i][0], // start time
 									   $radiusservers[0]['ipaddr'],
 									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
+									   $radiusservers[0]['key'],
+									   $cpdb[$i][2]); //clientip
+				syslog(LOG_INFO,"Authenticated user $cpdb[$i][4] timed out");
 			}
+			//KEYCOM: we need to delete +40500 and +45500 as well...
+			//these are the rule numbers we use to control traffic shaping for each logged in user via captive portal
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+			//we only need to remove our rules if peruserbw is turned on.
+			if(isset($config['captiveportal']['peruserbw'])) {
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+40500));
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+45500));
+			}
 			unset($cpdb[$i]);
 		}
 	}
@@ -402,9 +417,16 @@ function captiveportal_disconnect_client($id) {
 									   $cpdb[$i][0], // start time
 									   $radiusservers[0]['ipaddr'],
 									   $radiusservers[0]['acctport'],
-									   $radiusservers[0]['key']);
+									   $radiusservers[0]['key'],
+									   $cpdb[$i][2]); //clientip
+				syslog(LOG_INFO,"Authenticated user $cpdb[$i][4] disconnected");
 			}
 			mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+			//we only need to remove our rules if peruserbw is turned on.
+			if(isset($config['captiveportal']['peruserbw'])) {
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+40500));
+				mwexec("/sbin/ipfw delete " . ($cpdb[$i][1]+45500));
+			}
 			unset($cpdb[$i]);
 			break;
 		}
@@ -433,7 +455,8 @@ function captiveportal_radius_stop_all() {
 								   $cpdb[$i][0], // start time
 								   $radiusservers[0]['ipaddr'],
 								   $radiusservers[0]['acctport'],
-								   $radiusservers[0]['key']);
+								   $radiusservers[0]['key'],
+								   $cpdb[$i][2]); //clientip
 		}
 	}
 	captiveportal_unlock() ;
