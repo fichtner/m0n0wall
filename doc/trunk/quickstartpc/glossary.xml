@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: glossary.xml,v 1.1 2005/09/25 04:11:11 chris Exp $ -->
+<glossary>
+  <?dbhtml filename="glossary.html"?>
+
+  <title>Glossary</title>
+
+  <glossdiv>
+    <title></title>
+
+    <glossentry id="gloss.DHCP">
+      <glossterm>DHCP</glossterm>
+
+      <glossdef>
+        <para>Dynamic Host Configuration Protocol.</para>
+      </glossdef>
+      
+      <glossseealso><ulink type=""
+        url="http://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol">
+        Wikipedia DHCP page</ulink>
+      </glossseealso>
+      
+    </glossentry>
+
+    <glossentry id="gloss.LAN">
+      <glossterm>LAN</glossterm>
+
+      <glossdef>
+        <para>Local Area Network. A network that typically includes computers
+        which are physically close, such as in one office, usually connected
+        with hubs and switches rather than routers.</para>
+      </glossdef>
+
+    </glossentry>
+
+    <glossentry id="gloss.NIC">
+      <glossterm>NIC</glossterm>
+
+      <glossdef>
+        <para>Network Interface Card.  A.k.a. network card, or Ethernet card.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.NAT">
+      <glossterm>NAT</glossterm>
+
+      <glossdef>
+        <para>Network Address Translation. A technique whereby IP traffic
+        from multiple IP addresses
+        behind a firewall are made to look to the outside as if they all come
+        from a single public IP address.</para>
+        
+        <glossseealso><ulink url="http://en.wikipedia.org/wiki/Network_address_translation">
+            Wikipedia Network Address Translation page</ulink>
+        </glossseealso>
+        
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="gloss.WAN">
+      <glossterm>WAN</glossterm>
+
+      <glossdef>
+        <para>Wide Area Network. A network that spans a large area, typically
+        including routers, gateways, and many different IP networks.</para>
+        
+        <para>In the context of firewalls, the WAN interface is the one directly
+        connected to the Internet. </para>
+        
+      </glossdef>
+    </glossentry>
+  </glossdiv>
+</glossary>
