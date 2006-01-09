@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: hackersguide.xml,v 1.2 2005/09/26 01:06:33 chris Exp $ -->
+<chapter id="HackersGuide">
+  <?dbhtml filename="hackersguide.html"?>
+
+  <title>m0n0wall Hacker's Guide</title>
+
+  <note>This chapter is somewhat dated, though much of it
+  remains applicable.  The most recent m0n0wall development
+  documentation is the image building guide chapter.</note>
+
+  <remark>This chapter is based on Rudi van Drunen's <ulink
+  url="http://www.m0n0.ch/wall/hack/">m0n0wall Hackers Guide</ulink>, used
+  with permission.</remark>
+
+  <para>m0n0wall is open-source software: if it doesn't quite do what you
+  want, you can change it yourself, or have someone else of your choice change
+  it for you. This chapter describes how to do that.</para>
+
+  <para>Note that the instructions in this guide are meant as guidelines, your
+  mileage may vary. Also, hacking low level things may seriously mess up your
+  development system, target system, or other systems, please take
+  care.</para>
+
+  <sect1>
+    <?dbhtml filename="dev-host.html"?>
+
+    <title>Setting Up a Host Development Environment</title>
+
+    <para>In order to get a development environment for m0n0wall you will need
+    the target hardware and a host system. typically this will be a soekris
+    NET45xx board and a FreeBSD 4.8-RELEASE (Intel x86) system.</para>
+
+    <para>You will be booting the m0n0wall from the host system, so no CF card
+    is needed. The boot image is located on the host and changes in the kernel
+    or root filesystem are easily made by hacking them on the host machine.
+    Once ready, the root filesystem or kernel image can be created and put in
+    the /tftpboot directory (as described below) and the target (soekris) can
+    be booted from this image over the network.</para>
+
+    <para>Now you can test the image, make your desired changes on the host,
+    rebuild the root and / or kernel and test again. If you are confident with
+    the changes you made, you will be able to build an image for the CF card.
+    This image can then be used to "firmware upgrade" the m0n0wall (when
+    running from CF) as usual though the WEB user interface.</para>
+
+    <para>As you will be network (PXE (Preboot Execution Environment)) booting
+    the soekris from your host system and be able to generate image files to
+    load you will have to set up some environment on the host to support just
+    that. First of all, be sure that you have a kernel running that contains
+    the vnode driver. You will need this feature to be able to turn a file
+    into a device. Add the following to your kernel config and rebuild the
+    kernel:</para>
+
+    <programlisting>pseudo-device   vn              # Vnode driver (turns a file into a device)</programlisting>
+
+    <para>Instructions for rebuilding the kernel can be found in chapter 9 of
+    the FreeBSD handbook.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-pxe.html"?>
+
+    <title>PXE Booting</title>
+
+    <para>The PXE boot environment needs a DHCP server on the subnet and a
+    tftp server on the subnet, reachable by the soekris. The pxeboot provided
+    with FreeBSD (at least the 4.8 build) is not compiled with TFTP support.
+    If you're running NFS this is not a problem as you can put the files in a
+    NFS accessible directory. To use TFTP (which seems easier) you need to do
+    the following:</para>
+
+    <para>First edit your make file config (/etc/make.conf) and add the
+    following line:</para>
+
+    <programlisting>LOADER_TFTP_SUPPORT=YES</programlisting>
+
+    <para>Then, rebuild the pxeboot file:</para>
+
+    <programlisting>cd /usr/src/sys/boot
+make clean
+make depend
+make</programlisting>
+
+    <para>And copy the just created pxeboot file to /tftpboot:</para>
+
+    <programlisting>cp /usr/src/sys/boot/i386/pxeldr/pxeboot /tftpboot</programlisting>
+
+    <sect2>
+      <title>DHCP server</title>
+
+      <para>Check if you have a (running) DHCP server on the network where the
+      soekris (and the development system) are on. If not, build isc-dhcp from
+      the ports tree with:</para>
+
+      <programlisting>cd /usr/ports/net/isc-dhcp3; make all install clean</programlisting>
+
+      <para>PXE boot needs some extra entries in the dhcp record for the
+      (soekris) target. It needs the (tftp)server address from which to
+      retrieve the bootfile (denoted by the next-server keyword) and the
+      actual name of the bootfile (denoted by filename). An example of the
+      dhcp record for the soekris is shown below:</para>
+
+      <programlisting>host soekris {                
+     hardware ethernet 0:0:24:ad:bc:ac;                                     
+     fixed-address soekris.example.net;
+     filename "pxeboot"; 
+     next-server 192.168.1.2;
+     option root-path "/tftpboot";
+ }</programlisting>
+
+      <para>Here we assume the SOEKRIS having the ip number refrenced by the
+      name soekris.example.net. You could put the ip address here (when not
+      running DNS). The host system (the machine where the SOEKRIS is booted
+      from) is assumed to have the address 192.168.1.2 in this example. Please
+      change these addresses to reflect your network setup.</para>
+    </sect2>
+
+    <sect2>
+      <title>tftp server</title>
+
+      <para>To enable the tftp server to be started from inetd (you should be
+      running inetd, did I mention this ??) uncomment the following line in
+      /etc/inetd.conf:</para>
+
+      <programlisting>tftp  dgram  udp wait root /usr/libexec/tftpd  tftpd -s  /tftpboot</programlisting>
+
+      <para>Now, restart inetd:</para>
+
+      <programlisting>kill -HUP `cat /var/run/inetd.pid`</programlisting>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-host.html"?>
+
+    <title>Setting up m0n0wall on the host</title>
+
+    <para></para>
+
+    <sect2>
+      <title>The Kernel</title>
+
+      <para>In order to get m0n0wall to build we have to compile the kernel
+      for m0n0wall using the kernel config file as found on
+      http://m0n0.ch/wall/downloads. Place this config file (M0N0WALL_NET45XX)
+      in /usr/src/sys/i386/conf. Now build the kernel:</para>
+
+      <programlisting>cd /usr/src/sys/i386/conf; config M0N0WALL_NET45XX
+cd /usr/src/sys/compile/M0N0WALL_NET45XX; make depend all          
+strip kernel         
+strip --remove-section=.note --remove-section=.comment kernel
+gzip -9v kernel</programlisting>
+
+      <para>Copy the kernel to /tftpboot:</para>
+
+      <programlisting>cp kernel.gz  /tftpboot</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>The Modules</title>
+
+      <programlisting>cd /usr/src/sys/compile/M0N0WALL_NET45XX; make modules</programlisting>
+
+      <para>Then, move the needed modules to the modules directory in the
+      m0n0wall root filesystem. In the pb8 version of m0n0wall the following
+      modules are needed:</para>
+
+      <programlisting>dummynet.ko
+ipfw.ko</programlisting>
+
+      <para>These newly-built modules can be found in
+      /usr/src/sys/compile/M0N0WALL_NET45XX/modules/usr/src/sys/modules.
+      modules directory).</para>
+    </sect2>
+
+    <sect2>
+      <title>The root filesystem</title>
+
+      <para>Fetch the root filesystem tar file from <ulink
+      url="http://m0n0.ch/wall">the m0n0wall web site</ulink> to a directory,
+      uncompress and untar. The contents of this directory will be in the root
+      of the target system later on. In this just created directory you will
+      be making the changes you like. As we will not not have mounted compact
+      flash card on-line (under /cf), (you could, just put it in, but make
+      sure it boots from the net instead of the flash) we will have to
+      relocate the (default) config file in the root directory:</para>
+
+      <programlisting>mkdir cf/conf ; cp conf.default/config.xml cf/conf</programlisting>
+
+      <para>Now make a tarfile again to be put onto the to imagefile:</para>
+
+      <programlisting>tar cfz ./rootfs.tgz &lt;path to your rootfs-dir&gt;</programlisting>
+
+      <para>Now, you can create an imagefile (mfsroot) from this
+      rootfilesystem. This imagefile has to be put into /tftpboot to be
+      downloaded during boot.</para>
+
+      <programlisting>dd if=/dev/zero of=./mfsroot.bin bs=1k count=10240
+vnconfig -s labels -c vn0 ./mfsroot.bin
+disklabel -rw vn0 auto
+newfs -b 8192 -f 1024 /dev/vn0c</programlisting>
+
+      <para>Now mount this file as device and copy the m0n0wall root
+      filesystem in:</para>
+
+      <programlisting>mount /dev/vn0c /mnt
+cd /mnt
+tar xfzP rootfs.tgz
+cd /
+umount /mnt
+vnconfig -u vn0</programlisting>
+
+      <para>Now your file mfsroot.bin file is the rootfilesystem image. When
+      this image is put into /tftpboot it will be loaded and unpacked in
+      memory once the kernel boots.</para>
+
+      <programlisting>mv mfsroot.bin /tftpboot</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>For the impatient</title>
+
+      <para>Another way to get the kernel.gz file without compiling is
+      extracting it from the net45xx-pbxrxxx.bin.gz image. To do just that,
+      uncompress the image file and mount it as device under /mnt.</para>
+
+      <para>The net45xx-pbxrxxx.img files have also to be uncompressed first
+      (check with file &lt; filename &gt;) . Just append a .gz at the filename
+      and gzip -d the resulting file.</para>
+
+      <programlisting>gzip -d net45xx-pbxrxxx.bin.gz
+vnconfig -s labels -c vn0 ./net45xx-pbxrxxx.bin
+mount /dev/vn0a /mnt
+cp /mnt/kernel.gz /tftpboot
+umount /mnt
+vnconfig -u vn0</programlisting>
+
+      <para>The root file system is also in the abovementioned image as the
+      file mfsroot.gz. You can use this file to reconstruct the root file
+      system by uncompressing and mounting it as device /dev/vx0c under
+      /mnt.</para>
+
+      <programlisting>gzip -d mvfsroot.gz
+vnconfig -s labels -c vn0 ./mfsroot
+mount /dev/vn0c /mnt
+cd /mnt
+tar cvf /tmp/mfs.tgz .
+umount /mnt
+vnconfig -u vn0
+cd 
+tar xvfzP /tmp/mfs.tgz</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>The loader and pxe config</title>
+
+      <para>The bootloader has to be available in the /tftpboot directory and
+      has to be configured to load kernel.gz and the mfsroot.bin file. To do
+      that make the following changes to the loader and configure pxeboot:
+      create the following files: loader.conf:</para>
+
+      <programlisting>rootfs_load="YES"
+rootfs_name="mfsroot.bin"
+rootfs_type="mfs_root"
+autoboot_delay=1</programlisting>
+
+      <para>loader.rc:</para>
+
+      <programlisting>include /boot/loader.4th
+start</programlisting>
+
+      <para>and populate the /tftpboot directory:</para>
+
+      <programlisting>mkdir -m 0755 -p /tftpboot/boot/defaults
+cp -p /boot/loader /tftpboot/boot/
+cp -p /boot/*.4th /tftpboot/boot/      
+cp -p /boot/defaults/loader.conf /tftpboot/boot/defaults/
+cp -p loader.conf loader.rc /tftpboot/boot/
+chown -R root:wheel /tftpboot</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>GO</title>
+
+      <para>Now boot the stuff....</para>
+
+      <para>Remember to turn on dhcp (if needed):</para>
+
+      <programlisting>/usr/local/sbin/dhcpd</programlisting>
+
+      <para>Now you can test you m0n0wall system. If you edit / cange
+      something in the root filesystem, or build a new kernel, do not forget
+      to update your mfsroot.bin or kernel.gz file in the /tftpboot directory.
+      Also remember that you have a virtual read-only memory filesystem,
+      (nothing will be written back to the mfsroot.bin file on the host) and
+      no flash, so changes in configuration will not be stored.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-nfs.html"?>
+
+    <title>NFS</title>
+
+    <para></para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-packing.html"?>
+
+    <title>Unpacking/Editing/Packing the Source</title>
+
+    <para>The next thing is, if you are really confident with your system to
+    create a new image that you can use to upgrade tha m0n0wall flash. The
+    best way to do that is build an image like Manual has on his web site, so
+    you can update the m0n0wall using the GUI tool. First reconstruct the root
+    filesystem to its initial state with respect to the link and the location
+    of the config file: (not really needed, the CF card will be mounted "over"
+    the /cf directory even when not empty) but to keep everything as clean as
+    possible you might do that</para>
+
+    <programlisting>rm -rf cf/conf</programlisting>
+
+    <para>Creating a flash image works about the same way as creating a rootfs
+    file, but we will need a disklabel that suits the flash card. After
+    creating a file device, we will be putting the kernel.gz file, the
+    rootfilesystem file, the conf directory and the default configuration on
+    the card (file). Also needed is the /boot directory, containing the boot
+    loader files A suitable disklabel (put it in the label.proto file) might
+    be:</para>
+
+    <programlisting># /dev/vn0c:
+type: unknown
+disk: amnesiac
+label: 
+flags:
+bytes/sector: 512
+sectors/track: 32
+tracks/cylinder: 64
+sectors/cylinder: 2048
+cylinders: 5
+sectors/unit: 10240
+rpm: 3600
+interleave: 1
+trackskew: 0
+cylinderskew: 0
+headswitch: 0           # milliseconds
+track-to-track seek: 0  # milliseconds
+drivedata: 0
+8 partitions:
+#        size   offset    fstype   [fsize bsize bps/cpg]
+  a:    10240        0    4.2BSD     1024  8192    26   # (Cyl.    0 - 4)
+  c:    10240        0    unused        0     0         # (Cyl.    0 - 4)</programlisting>
+
+    <para>First you might compress the rootfilesystem to save space:</para>
+
+    <programlisting>gzip -9 mfsroot.bin; mv mfsroot.bin mfsroot.gz</programlisting>
+
+    <para>Create the boot directory for inclusion on the flash image, and
+    populate it with the appropriate files:</para>
+
+    <programlisting>mkdir -m 0755 -p boot; cd boot
+cp /boot/boot? .
+cp /boot/loader .
+cp /boot/loader.help .
+cp /boot/loader.4th .
+cp /boot/mbr .
+cp /boot/support.4th .
+mkdir -m 0755 -p defaults
+cp /boot/defaults/loader.conf defaults</programlisting>
+
+    <para>Now create the custom files for the loader:</para>
+
+    <para>loader.conf:</para>
+
+    <programlisting>kernfs_load="NO"                # Kernel filesystem</programlisting>
+
+    <para>loader.rc:</para>
+
+    <programlisting>load /kernel
+load -t mfs_root /mfsroot
+autoboot 0</programlisting>
+
+    <para>Now you might start building the actual memory filesystem image
+    ....</para>
+
+    <programlisting>dd if=/dev/zero of=image.bin bs=1k count=5120
+vnconfig -s labels -c vn0 image.bin
+disklabel -BR vn0 label.proto
+newfs -b 8192 -f 1024 /dev/vn0a
+
+mount /dev/vn0a /mnt
+cp -Rp boot /mnt
+cp -p mfsroot.bin kernel.gz /mnt
+mkdir /mnt/conf
+cp -p /conf.default/config.xml /mnt/conf
+umount /mnt
+vnconfig -u vn0
+gzip -9 image.bin</programlisting>
+
+    <para>Now your new-and-improved-with-your-most-wanted-feature m0n0wall
+    image is ready to be loaded !!</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-cf.html"?>
+
+    <title>Writing a CF Image</title>
+
+    <para></para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="dev-contrib.html"?>
+
+    <title>Submitting Changes</title>
+
+    <para>To submit any changes you've made to m0n0wall, email
+    them to the <ulink url="http://m0n0.ch/wall/mailinglist.php">
+        development list</ulink> or email them to Manuel directly.
+    </para>
+    
+    <para>It's best to send to the development list, as that way
+    if they do not get included in the base m0n0wall for some
+    reason, they are available for others to use who might find
+    them helpful.</para>
+    
+  </sect1>
+</chapter>

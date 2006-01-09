@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: book.xml,v 1.6 2005/09/26 00:54:02 chris Exp $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+<!ENTITY __imageguide__dev SYSTEM "image-guide.xml">
+<!ENTITY __hackersguide__dev SYSTEM "hackersguide.xml">
+<!ENTITY __otherdoc__dev SYSTEM "otherdoc.xml">
+<!ENTITY __faq__dev SYSTEM "faq.xml">
+]>
+<book>
+  <bookinfo>
+    <title>m0n0wall Developers' Handbook</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Manuel</firstname>
+
+        <surname>Kasper</surname>
+      </author>
+
+
+      <editor>
+        <firstname>Chris</firstname>
+
+        <surname>Buechler</surname>
+      </editor>
+
+      <othercredit>
+        <othername>Additional Contributors listed in the
+        <ulink url="http://doc.m0n0.ch/handbook/intro-credits.html">
+          m0n0wall Handbook</ulink>.
+        </othername>
+      </othercredit>
+    </authorgroup>
+
+    <copyright>
+      <year>2005</year>
+
+      <holder>m0n0wall Documentation Project</holder>
+    </copyright>
+
+    <pubdate>September 2005</pubdate>
+
+    <abstract>
+      <para>A guide for m0n0wall developers.</para>
+
+      <para><mediaobject id="m0n0wall.logo">
+          <imageobject>
+            <imagedata fileref="m0n0icon.png" />
+          </imageobject>
+        </mediaobject></para>
+    </abstract>
+
+    <releaseinfo>m0n0wall Version 1.2, October 2005</releaseinfo>
+
+    <legalnotice>
+      <para>All rights reserved.</para>
+
+      <para>Redistribution and use in any form, with or without modification,
+      are permitted provided that the following conditions are met:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Redistributions must retain the above copyright notice, this
+          list of conditions and the following disclaimer.</para>
+        </listitem>
+
+        <listitem>
+          <para>Neither the name of the m0n0wall Documentation Project nor the
+          names of its contributors may be used to endorse or promote products
+          derived from this documentation without specific prior written
+          permission.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+      CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+      BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+      FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+      COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+      NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+      USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+      ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+      THIS DOCUMENTATION OR THE ASSOCIATED SOFTWARE, EVEN IF ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGE.</para>
+    </legalnotice>
+  </bookinfo>
+
+  &__imageguide__dev;
+  &__hackersguide__dev;
+  &__otherdoc__dev;
+  &__faq__dev; 
+  
+</book>

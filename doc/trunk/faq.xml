@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+  <?dbhtml filename="faq.html"?>
+  <title>Development Frequently Asked Questions</title>
+
+  <para>This chapter contains development-related FAQ's.  For
+  non-development related FAQ's, see the main m0n0wall FAQ.</para>
+  
+    <sect1>
+    <?dbhtml filename="faq-develop-no-FreeBSD.html"?>
+
+    <!--imported Drupal contribution from Michael Iedema <iedemam@pluto.dsu.edu>-->
+
+    <title>I don't have a FreeBSD box to develop new features for m0n0wall, is
+    there an easier way?</title>
+
+    <para>You can use m0n0wall's built in features to test newly developed
+    features. With this method you are not able to compile new binaries on the
+    box, but are able to add php pages into the environment, as well as
+    pre-compiled binaries.</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Develop the page</para>
+      </listitem>
+
+      <listitem>
+        <para>Open a browser and point it to
+        http://m0n0wall-ip/exec.php</para>
+      </listitem>
+      
+      <listitem>
+        <para>Upload the page and any binaries needed for it to function
+        properly via exec.php.</para>
+      </listitem>
+
+      <listitem>
+        <para>Execute the following to place php pages into the www
+        root.</para>
+
+        <programlisting>cp /tmp/*.php /usr/local/www </programlisting>
+      </listitem>
+
+      <listitem>
+        <para>If you need any binaries for the page to work, copy them into
+        the appropriate places.</para>
+      </listitem>
+
+      <listitem>
+        <para>Type in the address of your new page to try out your
+        experiment.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Using this method, the image will revert after a reboot in case
+    you messed something up. You may wish to write a script to move everything
+    into its proper place and upload that along with your pages / binaries if
+    the feature requires many files. Then simply execute the script in
+    exec.php. After you've successfully tested the feature, and are happy with
+    the result, submit your work to <email>mk@neon1.net</email> or the <ulink
+    url="http://m0n0.ch/wall/mailinglist.php">m0n0wall development list</ulink>
+    for it to be added to the project.</para>
+    
+  </sect1>
+
+
+  <sect1>
+    <?dbhtml filename="faq-patches.html"?>
+
+    <!--imported Drupal contribution from Steven Honson <steven@honson.org> -->
+
+    <title>What patches have been applied to the FreeBSD source that is used
+    in m0n0wall, and are they available?</title>
+
+    <para>The following patches have been applied to the FreeBSD kernel source
+    that is used to build m0n0wall releases:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>clock.c: fix writing the day of week back to the RTC (Soekris
+        BIOS resets the date to 1-1-1970 if it's invalid - 0 is not a valid
+        weekday as per the AT specification)</para>
+      </listitem>
+
+      <listitem>
+        <para>if_ethersubr.c: disable multicast warning in bridge code</para>
+      </listitem>
+
+      <listitem>
+        <para>if_xl.c: disable hardware TX checksumming</para>
+      </listitem>
+
+      <listitem>
+        <para>ip_input.c: fix problem with packets from dummynet pipes getting
+        NATed again</para>
+      </listitem>
+
+      <listitem>
+        <para>ip_nat.c: fix ipfilter bug (only required for 3.4.31)</para>
+      </listitem>
+
+      <listitem>
+        <para>ip_output.c: reverse ipfilter/ipfw processing order</para>
+      </listitem>
+
+      <listitem>
+        <para>ng_pptpgre.c: reduce ACK timeout to 1 second, disable PPTP
+        windowing</para>
+      </listitem>
+
+      <listitem>
+        <para>subr_diskslice.c: disable warning about partition size</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>They are available to download from <ulink
+    url="http://m0n0.ch/wall/downloads/kernel-patches.tgz">http://m0n0.ch/wall/downloads/kernel-patches.tgz</ulink>.</para>
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-sourcecode.html"?>
+    <title>Where can I find the m0n0wall source code?</title>
+    
+    <para>The m0n0wall source code can be found in rootfs-version.tar.gz on the
+    <ulink url="http://m0n0.ch/wall/downloads.php">downloads page</ulink>.</para>
+    
+  </sect1>
+
+
+  <sect1>
+    <?dbhtml filename="faq-extensions.html"?>
+
+    <!--imported Drupal contribution from Steven Honson <steven@honson.org> -->
+
+    <title>Is there any information available on the unsupported extensions
+    support?</title>
+
+    <para>The following mailing list posts have information about this
+    <emphasis role="bold">unsupported</emphasis> feature of m0n0wall which is
+    available as of version 1.1.</para>
+
+    <para><ulink
+    url="http://m0n0.ch/wall/list/?action=show_msg&amp;actionargs[]=44&amp;actionargs[]=76">Extensions</ulink></para>
+
+    <para><ulink
+    url="http://m0n0.ch/wall/list/?action=show_msg&amp;actionargs[]=43&amp;actionargs[]=19">Re:
+    [m0n0wall] Announcement: Package functionality underserious
+    consideration!</ulink></para>
+
+    <para><ulink
+    url="http://m0n0.ch/wall/list/?action=show_msg&amp;actionargs[]=43&amp;actionargs[]=50">Re:
+    [m0n0wall] Announcement: Package functionality underserious
+    consideration!</ulink></para>
+  </sect1>  
+
+
+</chapter>
