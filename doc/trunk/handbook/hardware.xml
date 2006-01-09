@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: hardware.xml,v 1.17 2005/10/07 06:03:13 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="hardware.html"?>
+
+  <title>Hardware Compatibility</title>
+
+  <sect1>
+    <?dbhtml filename="hardware-arch.html"?>
+
+    <title>Supported Hardware Architectures </title>
+
+    <para>m0n0wall is supported only on the x86 architecture.  The types of devices
+    supported range from standard PC's to a variety of embedded devices.  It is
+    targeted at embedded x86-based PCs.</para>
+    
+    <para>This <emphasis role="bold">excludes</emphasis> non-x86 devices like the
+    MIPS-based Linksys devices, ARM-based D-Link devices, etc.  FreeBSD does not
+    support the MIPS or ARM platforms.  For a list of FreeBSD supported platforms,
+    see <ulink url="http://www.freebsd.org/platforms/index.html">this page</ulink>.
+    Some shown there are not yet functional (like MIPS, for example).  The only
+    platform supported by m0n0wall at this point is x86.</para>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="hardware-pc.html"?>
+
+    <title>Supported Standard PC-Based Hardware </title>
+    
+    <para>m0n0wall will run on any standard x86 PC that supports at least two 
+	network interfaces.</para>
+    
+    <sect2>
+        <title>Minimum Requirements</title>
+    
+        <para><emphasis role="bold">486 processor</emphasis> - Any 486 or
+        higher processor is sufficient for m0n0wall.  Exactly how much
+        processor you will need for your particular implementation varies
+        depending on your Internet connection bandwidth, number of
+        simultaneous connections required, what features you will use, etc.
+        For most deployments, a 486 or Pentium processor is sufficient. </para>
+    
+        <para><emphasis role="bold">64 MB of RAM</emphasis> - 64 MB RAM is
+        the official suggested minimum.  The CD version of m0n0wall has
+        been reported to work fine for some people with only 32 MB.  When
+        using the CompactFlash or hard drive versions of m0n0wall, expect
+        upgrades to fail with less than 64 MB.  This is because m0n0wall
+        stores everything in RAM and uses no swap space - when it runs out
+        of RAM, it has nothing to fall back on.</para>
+    
+    </sect2>
+    
+    <sect2>
+        <title>Recommended System BIOS Changes</title>
+        
+        <para>There are some BIOS settings that may need to be changed for
+        m0n0wall to function properly.  </para>
+        
+        <para><emphasis role="bold">Plug and Play OS</emphasis></para>
+        
+        <para>Most system BIOS have a setting for "Plug and Play OS" or something
+        similar.  This should always be set to "no" or "disable".  With this setting
+        turned off, the BIOS assigns system resources rather than leaving that up
+        to the OS.  FreeBSD (and hence m0n0wall) works best when the BIOS handles
+        this task.</para>
+        
+        <para><emphasis role="bold">Disabling Unnecessary Devices</emphasis></para>
+        
+        <para>You most likely won't have to worry about this, but if you have
+        hardware-related issues, we recommend disabling all unnecessary devices
+        in the BIOS, such as onboard sound, and in some cases parallel ports,
+        serial ports, and other unused devices.  If you aren't using it, it is safe
+        to disable it.  </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Storage Medium</title>
+        <para>m0n0wall will run off of a CompactFlash card, hard drive, or CD with floppy to store the configuration.</para>
+    
+        <para><emphasis role="bold">CompactFlash</emphasis></para>
+        <para>At least an 8 MB CompactFlash card is required.</para>
+        
+        <para><emphasis role="bold">Hard Drive</emphasis></para>
+        <para>Any IDE or SCSI (with supported controller) hard drive will work fine with m0n0wall.</para>
+        
+        <para><emphasis role="bold">CD/floppy setup</emphasis></para>
+        <para>Any IDE or SCSI (with supported controller) CD-ROM or DVD drive will work with
+            m0n0wall.  Also required for this setup is a 1.44 MB floppy drive with blank floppy disk formatted with
+            MS-DOS/FAT file system.  Any standard floppy drive will work.  For this setup, you must have a PC that
+            supports booting from CD-ROM.</para>
+        
+        <para><emphasis role="bold">Zip drive setup</emphasis></para>
+        <para>Starting with 1.2b3, m0n0wall can run the hard drive image from a
+        Zip drive.  Write the disk the same way you would write a hard drive.  </para>
+            
+    </sect2>   
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="hardware-embedded.html"?>
+    
+    <title>Supported Embedded Devices</title>
+    
+    <para>The following embedded x86 machines will run m0n0wall.  </para>
+    
+    <sect2>
+        <title>Soekris Engineering</title>
+    
+        <para>All <ulink url="http://soekris.com">Soekris</ulink> devices are
+        fully compatible with m0n0wall.  For the net4501 and other
+        45xx models, use the net45xx image.  For the net4801 and net4826, use
+        the net48xx image.  </para>
+    
+        <para><emphasis role="bold">Specifications</emphasis></para>
+        
+        <blockquote>
+      <literallayout class="monospaced">
+    net4501-30: 133 Mhz CPU, 64 Mbyte SDRAM, 3 Ethernet, 2 Serial, CF socket, 1 Mini-PCI socket, 3.3V PCI connector.
+    net4511-30: 100 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Single PC-Card socket, PoE.
+    net4521-30: 133 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Dual PC-Card socket, PoE.
+    net4526-20: 100 Mhz CPU, 32 Mbyte SDRAM, 1 Ethernet, 1 Serial, 16 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
+    net4526-30: 133 Mhz CPU, 64 Mbyte SDRAM, 1 Ethernet, 1 Serial, 64 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
+    net4801-50: 266 Mhz CPU, 128 Mbyte SDRAM, 3 Ethernet, 2 serial, USB connector, CF socket, 44 pins IDE connector, 1 Mini-PCI socket, 3.3V PCI connector.
+    </literallayout></blockquote>
+
+        <para>For a detailed walk-through of getting up and running with m0n0wall
+        on Soekris hardware, see the <ulink url="http://doc.m0n0.ch/quickstartsoekris/">
+        m0n0wall Soekris Quick Start Guide</ulink>.  </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>PC Engines WRAP</title>
+        
+        <para><emphasis role="bold">Wireless Router Application Platform (WRAP)</emphasis></para>
+        
+        <para><ulink url="http://www.pcengines.ch/">PC Engines</ulink> <ulink url="http://www.pcengines.ch/wrap.htm">WRAP</ulink> boards
+        are fully compatible with m0n0wall.  Use the WRAP images available on the download page.  </para>
+    </sect2>
+    
+    <sect2>
+        <title>Nokia IPxxx boxes</title>
+        
+        <para>The Nokia IPxxx boxes were built to run Check Point, but they are standard PC hardware and will run m0n0wall.</para>
+
+        <para>You can pick up a used IP110 or IP120 for around $100 USD on eBay.</para>
+
+        <para><emphasis role="bold">IP110, 120 and 130</emphasis></para>
+        <literallayout>
+            Three 10/100 Ethernet interfaces
+            National GX1 300 MHz processor
+            64 MB RAM on 110, 128 MB on 120, 256 MB on 130
+            5 GB hard drive
+            Two serial ports (auxiliary and console)
+            Quiet - hard drive is only moving component, no fans
+        </literallayout>
+        
+        
+        <para><emphasis role="bold">IP330</emphasis></para>
+        <literallayout>
+            Three 10/100 Ethernet interfaces
+            National GX1 300 MHz processor
+            RAM typically between 64 MB and 256 MB
+            Hard drive typically ranging from 4-20 GB
+            Two serial ports (auxiliary and console)
+            Has case fans, so not quiet like the IP1xx
+        </literallayout>
+
+        <para><emphasis role="bold">IP440, 530, 650, 740</emphasis></para>
+
+        <para>Even in the used market, these boxes are usually out of the price
+        range for a typical m0n0wall installation, and you can buy or assemble a
+        comparable standard PC for far cheaper.  But, if you have one laying
+        around or can find one cheaply, these will run m0n0wall.  Some of the
+        optional interfaces like HSSI, T-1 CSU/DSU, V.35 and X.21 serial, OC-3
+        ATM, FDDI, etc. will not work, but the Ethernet will work fine.</para>
+
+        <para><note>There are some tricks to getting m0n0wall working on Nokia
+        hardware because the NIC's initially show MAC address ff:ff:ff:ff:ff:ff.
+        For pictures and complete instructions, see
+        <ulink url="http://chrisbuechler.com/m0n0wall/nokia/ip110.html">this
+        page.</ulink></note></para>
+
+    </sect2>
+    
+    <sect2>
+        <title>NexCom NexGate Appliances</title>
+        
+        <para><ulink url="http://nexcom.com">NexCom's</ulink> <ulink
+        url="http://nsa.nexcom.com.tw/index.jsp">Nexgate</ulink>
+        line of appliances all support m0n0wall.  These are much more
+        high end than the WRAP and Soekris platforms, and hence are much
+        more costly.  There are a number of different configurations
+        available, with prices starting over $500 USD for the most
+        basic model.  Contact NexCom for pricing.  </para>
+        
+    </sect2>
+    
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="hardware-virtualization.html"?>
+    <title>Virtualization</title>
+    
+    <para>m0n0wall works fine with most virtualization software like VMware
+    Workstation, GSX, and ESX, and Microsoft Virtual PC and Virtual Server.
+    </para>
+    
+    <para>While these types of configurations work, we don't recommend running
+    any production firewalls under any sort of virtualization.  m0n0wall as a
+    virtual machine is very well suited to testing and development environments.
+    In fact much of the m0n0wall documentation is written by Chris Buechler using
+    VMware Workstation teams with 10-15 virtual machines.  </para>
+    
+    <para>If you plan to use m0n0wall in VMware for testing purposes, we suggest
+    using Chris Buechler's pre-configured <ulink
+    url="http://chrisbuechler.com/index.php?id=18">m0n0wall VMware images</ulink>.
+    </para>
+    
+    <para>For using m0n0wall in MS VPC or VS, you may want to check out the
+    pre-configured <ulink url="http://chrisbuechler.com/index.php?id=31">m0n0wall
+    images for Microsoft Virtual PC and Virtual Server</ulink> for download
+    from Chris Buechler's site, make by Chris Nottingham.
+    </para>
+    
+  </sect1>
+        
+  
+  <sect1>
+    <?dbhtml filename="hardware-sizing.html"?>
+    <title>Hardware Sizing</title>
+    
+    <para>Determining the exact hardware sizing for your m0n0wall deployment can
+    be difficult at best, because network environments differ dramatically.  The
+    following will provide some base guidelines on choosing what hardware is sufficient
+    for your installation.  Stated throughput numbers are very conservative for most
+    environments, leaving some room for error and future expandability.</para>
+    
+    <sect2>
+        <title>Embedded Devices</title>
+        
+        <para>The following can be used as a rough guide to determining which embedded
+        platform, if any, is suitable for your environment. 
+        </para>
+        
+        <sect3>
+            <title>Soekris 45xx</title>
+            
+            <para>The Soekris 45xx line is sufficient for any Internet connection under
+            10 Mbps.  If IPsec VPN's will be used, a 45xx is sufficient up to around 3 Mbps of
+            sustained IPsec throughput.  Other features will not cause enough of a
+            performance hit to make a substantial difference.  
+            </para>
+            
+            <para>One thing to keep in mind is the maximum throughput between interfaces, if
+            you plan on utilizing a DMZ segment or second LAN segment.  A 45xx maxes out at
+            around 17 Mbps.  If you need more than 17 Mbps of throughput between your internal
+            networks, you will need to go with a faster platform.</para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>Soekris 48xx</title>
+            
+            <para>The Soekris 48xx line is sufficient for most Internet connections less
+            than 30 Mbps.  If IPsec VPN's will be used, a 48xx is sufficient up to around
+            </para>
+            
+            <para>One thing to keep in mind is the maximum throughput between interfaces, if
+            you plan on utilizing a DMZ segment or second LAN segment.  A 48xx maxes out at
+            around 40 Mbps.  If you need more than 40 Mbps of throughput between your internal
+            networks, you will need to go with a faster platform.</para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>WRAP</title>
+            
+            <para>WRAP boards are sufficient for most Internet connections less than 30 Mbps.
+            If IPsec VPN's will be used, a WRAP is sufficient up to around
+            </para>
+
+            <para>One thing to keep in mind is the maximum throughput between interfaces, if
+            you plan on utilizing a DMZ segment or second LAN segment.  A 48xx maxes out at
+            around 40 Mbps.  If you need more than 40 Mbps of throughput between your internal
+            networks, you will need to go with a faster platform.</para>
+            
+        </sect3>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Network Cards</title>
+        
+        <note>This is only applicable to PC-based installations</note>
+        
+        <para>Your selection of network cards (NIC's) is the single most important
+        performance factor in your setup.  Cheap NIC's will keep your CPU very busy
+        with interrupt handling, causing your CPU to be the bottleneck in your
+        configuration.  A quality NIC can increase your maximum throughput as much
+        as two to three fold, if not more.  </para>
+        
+        <para>FreeBSD refers to network cards by their driver name followed by the
+        interface number.  For example, if you have two Intel Pro/100 cards (fxp
+        driver) and one 3Com 3C905 card (xl driver), you will have interfaces fxp0,
+        fxp1, and xl0 respectively.
+        </para>
+        
+        <para>Intel Pro/100 and Pro/1000 cards tend to be the best performing and
+        most reliable on m0n0wall.  Cheap cards like those containing Realtek
+        chipsets (FreeBSD rl driver) are very poor performers in comparison.  If you
+        are purchasing NIC's for your m0n0wall installation, we strongly recommend
+        purchasing Intel cards.  You can find them on ebay for less than $30 USD for
+        3-5 cards in a bulk lot.  </para>
+        
+        <para>For low throughput environments, like any typical broadband connection
+        6 Mbps or less, any NIC will suffice.  If you require fast throughput (more than
+        30-40 Mbps) between interfaces for multiple LAN networks, or between a DMZ and
+        your LAN, then using quality NIC's becomes much more important.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Processor</title>
+        
+        <para>Your CPU will generally be the bottleneck in your system.  Network throughput
+        with cheap NIC's will max out your CPU long before it will get maxed out with quality
+        NIC's, so the most important factor with CPU sizing is the quality of your NIC's.</para>
+        
+        <para>If you are using good quality NIC's like Intel cards, as a general measure, a Pentium
+        will suffice up to 30-40 Mbps, a Pentium III will do 100 Mb at wire speed, and for gigabit
+        wire speeds you will need a 2.8+ GHz Pentium 4.  </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>RAM</title>
+        
+        <para>The stock m0n0wall images will not use more than 64 MB RAM under any circumstance.
+        You can install as much memory as you like, but even with all features enabled and heavy
+        loads, you will not exhaust 64 MB. </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Storage Medium</title>
+        
+        <para>m0n0wall will work fine on any hard drive or compact flash card at least 8 MB in
+        size.  At boot, m0n0wall is loaded into RAM and runs from RAM, so the speed and type
+        of storage medium used is not a factor in system performance.  </para>
+        
+        <para>Slower storage mediums like compact flash will take slightly longer to boot than
+        hard drives will, but boot time is the only performance factor in selecting your storage
+        medium.  Compact flash is suggested for maximum reliability since it is much less likely
+        to fail than a hard drive.</para>  
+        
+    </sect2>
+    
+    <sect2>
+        <title>High Throughput Environments</title>
+        
+        <para>In environments where extremely high throughput through several interfaces is
+        required, especially with gigabit interfaces, PCI bus speed must be taken into account.
+        When using multiple interfaces in the same system, the bandwidth of the PCI bus
+        can easily become a bottleneck.  Most typical motherboards only have one or two PCI
+        buses, and each can run an absolute maximum of 133 MBps, or 1064 Mbps.  That's less
+        than one gigabit interface can transfer.  PCI-X can transfer up to 1056 MBps, or about
+        8.25 Gbps.</para>
+        
+        <para>If you need sustained gigabit throughput at wire speed, you will want a
+        server-class motherboard with PCI-X slots and PCI-X NIC's.</para>
+        
+    </sect2>
+    
+  </sect1>
+        
+  
+  <sect1>
+    <?dbhtml filename="hardware-wireless.html"?>
+    <title>Wireless Cards</title>
+    
+    <para>Before considering using m0n0wall as an access point, read
+    <link linkend="FAQ.AP">this FAQ entry</link>.</para>
+
+    <para>These cards are broken into two lists - readily available cards, and
+        discontinued / difficult to obtain cards.  </para>    
+    
+    <sect2>
+        <title>Unsupported Cards</title>
+        
+        <para><emphasis role="bold">Currently all g, b/g, and a/b/g wireless cards are incompatible
+        with m0n0wall.</emphasis>  These require drivers that are only found in FreeBSD 5.x and 6.x,
+        while m0n0wall is on 4.11.  They will be supported when m0n0wall is <link linkend="FAQ.FBSD5">
+        on a newer version of FreeBSD</link>.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Readily Available Cards</title>
+        
+        <para>The following list, to the best of our knowledge, is 100% accurate.  Please report any findings
+        to the contrary to <ulink url="mailto:cbuechler@gmail.com">Chris Buechler</ulink>.</para>
+        
+        <para><emphasis role="bold">Not all wireless cards support hostap mode!</emphasis> (i.e. can function
+        as an access point)  This is a limitation of the hardware itself, not m0n0wall or FreeBSD.  If this list does not
+        say "no hostap" next to the card, it <emphasis>should</emphasis> support hostap.</para>
+        
+        <para><note>The m0n0wall Documentation Project does not endorse any
+                vendors you may find through froogle.google.com.  We simply link
+                there for your convenience.  The searches provided may also
+                bring up unrelated hardware in addition to the compatible
+                hardware.</note></para>
+        
+        <itemizedlist>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=3crwe737a">3COM 3crwe737A AirConnect Wireless LAN PC Card</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=cisco+340">Cisco Systems Aironet 340</ulink> - <emphasis role="bold">no hostap</emphasis></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=cisco+350">Cisco Systems Aironet 350</ulink> - <emphasis role="bold">no hostap</emphasis></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=compaq+wl100">Compaq WL100</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=compaq+wl110">Compaq WL110</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=dwl-520">D-Link DWL-520</ulink> - <emphasis role="bold">NOT DWL-520+</emphasis> as it uses a different, unsupported, chipset.</listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=dwl-650">D-Link DWL-650</ulink> - Revisions A1-J3 ONLY.  K1, L1, M, and P revisions not supported.</listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=TrueMobile+1150">Dell TrueMobile 1150 Series</ulink> - <emphasis role="bold">no hostap</emphasis></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=Intel+PRO%2FWireless+2011">Intel PRO/Wireless 2011 LAN PC Card</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=wpc11">Linksys Instant Wireless WPC11</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=Netgear+MA311">Netgear MA311</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=Netgear+MA401">Netgear MA401</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=SMC+2632W">SMC 2632W PC Card</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=SMC+2602W">SMC 2602W PCI</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=US+Robotics+Wireless+Card+2410">US Robotics Wireless Card 2410</ulink></listitem>
+            <listitem><ulink url="http://netgate.com/EL2511.html">NL-2511CD</ulink></listitem>
+        </itemizedlist>
+        
+        <para><emphasis role="bold">miniPCI</emphasis></para>
+        
+        <itemizedlist>
+            <listitem><ulink url="http://tinyurl.com/65ye7">2511MP</ulink></listitem>
+            <listitem><ulink url="http://froogle.google.com/froogle?q=TrueMobile+1150">Dell TrueMobile 1150 Series</ulink></listitem>
+        </itemizedlist>
+
+    </sect2>
+    
+    <sect2>
+        <title>Discontinued / Difficult to Obtain</title>
+
+        <note>Some of the following do not support hostap.  To determine if they do, search Google for the card
+        name and FreeBSD, to determine which driver the card uses.  If it is 'wi', it will work.  Cards that use
+        drivers other than wi do not support hostap.</note>
+        
+        <itemizedlist>
+            <listitem>Accton airDirect WN3301</listitem>
+            <listitem>Addtron AWA100</listitem>
+            <listitem>Adtec ADLINK340APC</listitem>
+            <listitem>Aironet 4500/4800 series (PCMCIA, PCI, and ISA adapters are all supported)</listitem>
+            <listitem>Airway 802.11 Adapter</listitem>
+            <listitem>Avaya Wireless PC Card</listitem>
+            <listitem>BayStack 650 and 660</listitem>
+            <listitem>Blue Concentric Circle CF Wireless LAN Model WL-379F</listitem>
+            <listitem>BreezeNET PC-DS.11</listitem>
+            <listitem>Buffalo WLI-CF-S11G</listitem>
+            <listitem>Cabletron RoamAbout 802.11 DS</listitem>
+            <listitem>Corega KK Wireless LAN PCC-11, PCCA-11, PCCB-11</listitem>
+            <listitem>ELECOM Air@Hawk/LD-WL11/PCC</listitem>
+            <listitem>ELSA AirLancer MC-11</listitem>
+            <listitem>Farallon Skyline 11Mbps Wireless</listitem>
+            <listitem>Farallon SkyLINE Wireless</listitem>
+            <listitem>ICOM SL-1100</listitem>
+            <listitem>Icom SL-200</listitem>
+            <listitem>IBM High Rate Wireless LAN PC Card</listitem>
+            <listitem>IO Data WN-B11/PCM</listitem>
+            <listitem>Laneed Wireless card</listitem>
+            <listitem>Lucent Technologies WaveLAN/IEEE 802.11 PCMCIA and ISA standard speed (2Mbps) and turbo speed (6Mbps) wireless network adapters and workalikes</listitem>
+            <listitem>Lucent WaveLAN/IEEE 802.11</listitem>
+            <listitem>Melco Airconnect WLI-PCM-S11, WLI-PCM-L11</listitem>
+            <listitem>Melco WLI-PCM</listitem>
+            <listitem>NCR WaveLAN/IEEE 802.11</listitem>
+            <listitem>NEC Wireless Card CMZ-RT-WP</listitem>
+            <listitem>NEC Aterm WL11C (PC-WL/11C)</listitem>
+            <listitem>NEC PK-WL001</listitem>
+            <listitem>NEL SSMagic</listitem>
+            <listitem>Netwave AirSurfer Plus and AirSurfer Pro</listitem>
+            <listitem>PLANEX GeoWave/GW-NS110</listitem>
+            <listitem>Proxim Harmony, RangeLAN-DS</listitem>
+            <listitem>Raytheon Raylink PC Card</listitem>
+            <listitem>Sony PCWA-C100</listitem>
+            <listitem>TDK LAK-CD011WL</listitem>
+            <listitem>Toshiba Wireless LAN Card</listitem>
+            <listitem>Webgear Aviator</listitem>
+            <listitem>Webgear Aviator Pro</listitem>
+            <listitem>Xircom Wireless Ethernet adapter (rebadged Aironet)</listitem>
+            <listitem>ZoomAir 4000</listitem>
+        </itemizedlist>
+    </sect2>
+    
+
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="hardware-ethernet.html"?>
+    <title>Ethernet Cards</title>
+    
+    <para>m0n0wall supports most any Ethernet card (NIC).  However some are more reliable,
+    less troublesome, and faster than others.  In general, you'll find the opinion
+    of the m0n0wall community to be that cheap chipsets, such as Realtek
+    chipsets, are more troublesome and slower than quality NIC's like Intel
+    no matter what software and OS you are running.  It is especially important to run quality
+    NIC's if you are running a high traffic firewall.  The cheaper ones will flood your
+    system with interrupts when under load.  Because interrupts can take up
+    substantial amounts of CPU time
+    and the first system bottleneck on a firewall is typically CPU, 
+    good quality NIC's are extremely important in higher throughput 
+    environments.
+    </para>
+    
+    <para>I would personally recommend Intel NIC's over any others.  The
+    Intel PRO/100 cards are easy to find, and if you have to buy
+    some, they're cheap.  You could outfit your firewall with
+    three interfaces for less than $25 USD on eBay. </para>
+
+    <sect2>
+	<title>Supported Cards</title>
+
+	<para>We recommend just trying whatever Ethernet cards you 
+	already have without bothering with the compatibility list 
+	since it includes virtually every NIC.  One notable exception
+	is some newer gigabit cards.  For this reason, we suggest 
+	checking the list below for gigabit cards, or just get Intel
+	Pro/1000 cards which are well supported.  </para>
+
+	<para>If you have any question on what cards are compatible, 
+	refer to the <ulink url="http://www.freebsd.org/releases/4.11R/hardware-i386.html#ETHERNET">
+	FreeBSD 4.11-RELEASE Hardware Notes</ulink> for a 
+	list of supported Ethernet cards.  </para>
+
+    </sect2>
+    
+    <sect2>
+        <title>ISA Network Cards</title>
+        
+        <para>While a large number of ISA Ethernet cards are supported, we recommend
+        you stay away from them if possible.  They can be very time consuming
+        and difficult to get working properly.  The cost of a few PCI network cards
+        is, in my opinion, well worth the headaches it will prevent.  The only time
+        you should use ISA NIC's is when you don't have any or enough PCI slots.  
+        </para>
+        
+        <para>If you have ISA cards that you'd like to try, by all means give them
+        a shot.  It might work out of the box, especially if you only have one ISA
+        card along with some PCI cards.  But if you experience problems
+        getting them to work, you've been warned! </para>
+        
+        <para>If you need to get an ISA card working, you'll probably need to change
+        some things.  First, most ISA NIC's, including the common 3Com ISA cards,
+        have a "plug and play" mode on the card that is selected by default.  FreeBSD
+        doesn't always play nicely with devices that are set to plug and play.  In the
+        case of the 3Com cards, 3Com has a DOS utility on their support site that you
+        will have to run in DOS to set up the resources on all of the cards manually.
+        Check your network card manufacturer's support site for information on
+        disabling any plug and play settings on ISA cards.  This is typically jumpers on
+        the card or a firmware utility.</para>
+        
+        <para>Another thing you may have to do is to change some settings in the
+        system BIOS.  For example you may need to set the IRQ used by the NIC to
+        ISA/PnP.</para>
+        
+    </sect2>
+
+  </sect1>
+
+</chapter>

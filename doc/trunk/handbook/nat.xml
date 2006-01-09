@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<chapter>
+  <?dbhtml filename="nat.html"?>
+
+  <title>Network Address Translation</title>
+
+    <sect1>
+        <title>NAT Primer</title>
+        
+        <para>Network Address Translation (NAT) allows you to use RFC 1918 private IP
+        addresses for addressing on your internal network, and allow all hosts on the
+        internal networks to access the Internet using one public IP address.  
+        </para>
+        
+        <para>Due to the typical expense of obtaining public IP addresses, most networks do not
+        purchase one public IP address for each network host.  NAT allows multiple
+        machines to connect to the Internet using a single public IP address.  </para>
+        
+        
+        <sect2>
+          <title>Types of NAT</title>
+        
+          <para>There are two most commonly used and most familiar
+          types of NAT, bidirectional or 1:1 (pronounced one to one),
+          and Port Address Translation, or PAT.  </para>
+          
+          <sect3>
+            <title>1:1 NAT Explained</title>
+            
+            <para>1:1 NAT maps one public IP address to one private
+            IP address, for both incoming traffic and outgoing traffic.  
+            </para>
+            
+          </sect3>
+          
+          <sect3>
+            <title>PAT Explained</title>
+            
+            <para>
+            </para>
+            
+          </sect3>
+        
+        </sect2>
+        
+        <sect2>
+          <title>Other Resources</title>
+        
+          <para><ulink url="http://www.faqs.org/rfcs/rfc1918.html">RFC 1918 - Address
+          Allocation for Private Internets</ulink> - February 1996</para>
+        
+          <para><ulink url="http://www.faqs.org/rfcs/rfc1631.html">RFC 1631 - The IP
+          Network Address Translator (NAT)</ulink> - May 1994</para>
+        
+          <para><ulink url="http://en.wikipedia.org/wiki/Network_Address_Translation">
+          Network Address Translation at Wikipedia</ulink></para>
+          
+        </sect2>
+          
+        
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="nat-inbound.html"?>
+        <title>Inbound NAT</title>
+        
+        <para>Inbound NAT allows you to open up TCP and/or UDP ports or port ranges to
+        hosts on networks protected by m0n0wall.  You may need to open ports to allow
+        certain NAT-unfriendly applications and protocols to function properly.  Also if
+        you run any services or applications that require inbound connections to a
+        machine on your internal network, you will need inbound NAT.
+        </para>
+        
+        
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="nat-server.html"?>
+        <title>Server NAT</title>
+        
+        <para>Server NAT just gives you the ability to define extra IP addresses, other than
+        the WAN IP, to be available for use for Inbound NAT.</para>
+        
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="nat-1to1.html"?>
+        <title>1:1 NAT</title>
+        
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="nat-outbound.html"?>
+        <title>Outbound NAT</title>
+        
+        <para>By default, m0n0wall automatically adds NAT rules to all interfaces
+        to NAT your internal hosts to your WAN IP address for outbound traffic.
+        The only exception is for any hosts for which you have configured 1:1 NAT
+        entries.  Therefore, if you are using public IP addresses on any of the
+        interfaces behind your m0n0wall (with the exception of bridged interfaces)
+        you need to change m0n0wall's default NAT behavior by enabling advanced
+        outbound NAT.
+        </para>
+        
+        <para>If you are using public IP addresses on all the interfaces behind
+        your m0n0wall, check the "Enable advanced outbound NAT" box and click Save.
+        Now nothing will be NAT'ed by m0n0wall.  </para>
+        
+        <para>If you have a public IP subnet off one of your interfaces behind m0n0wall
+        and a private IP subnet behind another interface, you will need to enter your
+        own NAT mappings on this screen.  For example, if you have a LAN subnet of
+        192.168.1.0/24 and a DMZ subnet with public IP addresses, you will need to
+        enable advanced outbound NAT, and click the plus at the bottom of this tab
+        to add a NAT mapping for your LAN network.  For this scenario, you will
+        want to add a rule for interface WAN, source 192.168.1.0/24, destination
+        any, target box blank, and enter a description of your choosing. </para>  
+        
+    </sect1>
+    
+    <sect1>
+      <?dbhtml filename="nat-choosing.html"?>
+      <title>Choosing the approprate NAT for your network</title>
+      
+      <para>So by now you may be thinking "so what kind of NAT do I need?", to which
+      the answer is "it depends."  </para>
+      
+      <para>For networks with <emphasis role="bold">one public IP</emphasis>, the
+      only option is Inbound NAT, since that public IP will be assigned to m0n0wall's
+      WAN interface.  </para>
+      
+      <para>For networks with <emphasis role="bold">multiple public IP addresses</emphasis>,
+      the best choice is either 1:1 NAT, or Server and Inbound NAT, or a combination of
+      both.  If you have more servers than public IP addresses, you will need to use Server
+      and Inbound NAT, or 1:1 NAT combined with Server and Inbound NAT.  If you have sufficient
+      public IP addresses for all of your servers, you should use 1:1 NAT for them all.  </para>
+      
+      <para>Inbound and Server NAT is most suitable when you have more servers than public IP
+      addresses.  For example, if you have three servers, one HTTP, one SMTP, and one FTP,
+      and have only two public IP addresses, you must use Server and Inbound NAT.  For small
+      deployments, this isn't bad to deal with.  As the number of hosts increases, things get
+      far more complicated.  You'll end up having to remember things like for public IP address
+      1.2.3.4, port 80 goes to server A, port 25 goes to server B, port 21 goes to server C, etc.
+      If you can't clearly picture a network in your head while troubleshooting problems, things
+      become much more difficult.  With ports going all over the place like this, once you get a
+      number of ports forwarded it's extremely difficult to picture the network in your head.
+      Given the complexity introduced by such a configuration, we recommend having one public IP
+      address per publicly-accessible host.  </para>
+      
+    </sect1>
+        
+
+</chapter>

@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: book.xml,v 1.4 2005/09/27 23:42:13 chris Exp $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY __intro__dqw7kgl9 SYSTEM "intro.xml">
+<!ENTITY __hardware__dqw7kgm0 SYSTEM "hardware.xml">
+<!ENTITY __setup__dqw7kofo SYSTEM "setup.xml">
+<!ENTITY __config__dqw7kw2s SYSTEM "config.xml">
+<!ENTITY __firewall__dqw73d2s SYSTEM "firewall.xml">
+<!ENTITY __nat__dqw7sd23 SYSTEM "nat.xml">
+<!ENTITY __trafficshaping__dqw7ew91 SYSTEM "trafficshaping.xml">
+<!ENTITY __ipsec__du4ydlzq SYSTEM "ipsec.xml">
+<!ENTITY __pptp__du4zlre9 SYSTEM "pptp.xml">
+<!ENTITY __openvpn__du4zdae9 SYSTEM "openvpn.xml">
+<!ENTITY __wireless__du4zda29 SYSTEM "wireless.xml">
+<!ENTITY __captiveportal__du4zda39 SYSTEM "captiveportal.xml">
+<!ENTITY __ref__dqw7lc8p SYSTEM "ref.xml">
+<!ENTITY __examples__dqw7lip4 SYSTEM "examples.xml">
+<!ENTITY __examplevpn__dqw7lip8 SYSTEM "examplevpn.xml">
+<!ENTITY __faq__dqw7lq5t SYSTEM "faq.xml">
+<!ENTITY __otherdoc__dugbfzsq SYSTEM "otherdoc.xml">
+<!ENTITY __thirdparty__dugb32sd SYSTEM "thirdparty.xml">
+<!ENTITY __troubleshooting__dul42vek SYSTEM "troubleshooting.xml">
+<!ENTITY __bibliography__dul42vek SYSTEM "bibliography.xml">
+<!ENTITY __glossary__du5ss10h SYSTEM "glossary.xml">
+<!ENTITY __license__dul42vek SYSTEM "license.xml">
+]>
+<book>
+  <bookinfo>
+    <title>m0n0wall Handbook</title>
+
+    <authorgroup>
+
+      <author>
+        <firstname>Chris</firstname>
+
+        <surname>Buechler</surname>
+      </author>
+
+      <author>
+        <firstname>Manuel</firstname>
+
+        <surname>Kasper</surname>
+      </author>
+
+      <othercredit>
+        <othername>m0n0wall written by <ulink url="http://neon1.net">Manuel Kasper</ulink>.  Most
+        documentation written by <ulink url="http://chrisbuechler.com">Chris Buechler</ulink>.
+        Additional Contributors listed in <link
+        endterm="Intro.Credits.title"
+        linkend="Intro.Credits"></link></othername>
+      </othercredit>
+    </authorgroup>
+
+    <copyright>
+      <year>2005</year>
+
+      <holder>m0n0wall Documentation Project</holder>
+    </copyright>
+
+    <pubdate>September 2005</pubdate>
+
+    <abstract>
+      <para>A freely-redistributable complete embedded firewall software
+      package.</para>
+
+      <para><mediaobject id="m0n0wall.logo">
+          <imageobject>
+            <imagedata fileref="m0n0icon.png" />
+          </imageobject>
+        </mediaobject></para>
+    </abstract>
+
+    <releaseinfo>m0n0wall Version 1.2</releaseinfo>
+
+    <legalnotice>
+      <para>All rights reserved.</para>
+
+      <para>Redistribution and use in any form, with or without modification,
+      are permitted provided that the following conditions are met:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Redistributions must retain the above copyright notice, this
+          list of conditions and the following disclaimer.</para>
+        </listitem>
+
+        <listitem>
+          <para>Neither the name of the m0n0wall Documentation Project nor the
+          names of its contributors may be used to endorse or promote products
+          derived from this documentation without specific prior written
+          permission.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+      CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+      BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+      FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+      COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+      NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+      USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+      ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+      THIS DOCUMENTATION OR THE ASSOCIATED SOFTWARE, EVEN IF ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGE.</para>
+    </legalnotice>
+  </bookinfo>
+
+  &__intro__dqw7kgl9;
+  
+  &__hardware__dqw7kgm0;
+
+  &__setup__dqw7kofo;
+
+  &__config__dqw7kw2s;
+  
+  &__firewall__dqw73d2s;
+
+  &__nat__dqw7sd23;
+  
+  &__trafficshaping__dqw7ew91;
+
+  &__ipsec__du4ydlzq;
+
+  &__pptp__du4zlre9;
+  
+  &__openvpn__du4zdae9;
+
+  &__wireless__du4zda29;
+
+  &__captiveportal__du4zda39;
+
+  &__ref__dqw7lc8p;
+
+  &__examples__dqw7lip4;
+  
+  &__examplevpn__dqw7lip8;
+
+  &__faq__dqw7lq5t;
+
+  &__otherdoc__dugbfzsq;
+
+  &__thirdparty__dugb32sd;
+
+  &__troubleshooting__dul42vek;
+
+  &__bibliography__dul42vek;
+
+  &__glossary__du5ss10h;
+
+  &__license__dul42vek;
+  
+</book>

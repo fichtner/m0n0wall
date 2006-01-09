@@ -1,0 +1,776 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: license.xml,v 1.1 2005/07/05 00:43:50 chris Exp $ -->
+<appendix>
+  <?dbhtml filename="license.html"?>
+
+  <title>License</title>
+
+  <para><emphasis role="bold">m0n0wall is Copyright © 2002-2004 by Manuel
+  Kasper <email>mk@neon1.net</email>. All rights reserved.</emphasis></para>
+
+  <para>Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:</para>
+
+  <orderedlist>
+    <listitem>
+      <para>Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.</para>
+    </listitem>
+
+    <listitem>
+      <para>Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the
+      distribution.</para>
+    </listitem>
+  </orderedlist>
+
+  <para><emphasis role="bold">THIS SOFTWARE IS PROVIDED "AS IS'' AND ANY
+  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</emphasis></para>
+
+  <sect1>
+    <title>The FreeBSD Copyright</title>
+
+    <para>Copyright 1994-2004 The FreeBSD Project. All rights reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE FREEBSD PROJECT ``AS IS'' AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE FREEBSD PROJECT OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.</para>
+
+    <para>The views and conclusions contained in the software and
+    documentation are those of the authors and should not be interpreted as
+    representing official policies, either expressed or implied, of the
+    FreeBSD Project.</para>
+  </sect1>
+
+  <sect1>
+    <title>The PHP License</title>
+
+    <para>The PHP License, version 3.0 Copyright © 1999 - 2004 The PHP Group.
+    All rights reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, is permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>The name "PHP" must not be used to endorse or promote products
+        derived from this software without prior written permission. For
+        written permission, please contact group@php.net.</para>
+      </listitem>
+
+      <listitem>
+        <para>Products derived from this software may not be called "PHP", nor
+        may "PHP" appear in their name, without prior written permission from
+        group@php.net. You may indicate that your software works in
+        conjunction with PHP by saying "Foo for PHP" instead of calling it
+        "PHP Foo" or "phpfoo"</para>
+      </listitem>
+
+      <listitem>
+        <para>The PHP Group may publish revised and/or new versions of the
+        license from time to time. Each version will be given a distinguishing
+        version number.</para>
+
+        <para>Once covered code has been published under a particular version
+        of the license, you may always continue to use it under the terms of
+        that version. You may also choose to use such covered code under the
+        terms of any subsequent version of the license published by the PHP
+        Group. No one other than the PHP Group has the right to modify the
+        terms applicable to covered code created under this License.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions of any form whatsoever must retain the following
+        acknowledgment:</para>
+
+        <para>"This product includes PHP, freely available from
+        &lt;http://www.php.net/&gt;".</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE PHP DEVELOPMENT TEAM ``AS IS'' AND
+    ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE PHP DEVELOPMENT TEAM OR ITS
+    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>mini_httpd License</title>
+
+    <para>Copyright © 1999, 2000 by Jef Poskanzer &lt;jef@acme.com&gt;. All
+    rights reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>ISC DHCP Server License</title>
+
+    <para>Copyright © 2004 by Internet Systems Consortium, Inc. ("ISC")</para>
+
+    <para>Copyright © 1996-2003 by Internet Software Consortium</para>
+
+    <para>Permission to use, copy, modify, and distribute this software for
+    any purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.</para>
+
+    <para>THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR ANY
+    SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</para>
+  </sect1>
+
+  <sect1>
+    <title>ipfilter License</title>
+
+    <para>Copyright © 1993-2002 by Darren Reed.</para>
+
+    <para>The author accepts no responsibility for the use of this software
+    and provides it on an ``as is'' basis without express or implied
+    warranty.</para>
+
+    <para>Redistribution and use, with or without modification, in source and
+    binary forms, are permitted provided that this notice is preserved in its
+    entirety and due credit is given to the original author and the
+    contributors.</para>
+
+    <para>The license and distribution terms for any publicly available
+    version or derivative of this code cannot be changed. i.e. this code
+    cannot simply be copied, in part or in whole, and put under another
+    distribution license [including the GNU Public License.]</para>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+
+    <para>I hate legalese, don't you ?</para>
+  </sect1>
+
+  <sect1>
+    <title>MPD License</title>
+
+    <para>Copyright © 2003-2004, Archie L. Cobbs, Michael Bretterklieber,
+    Alexander Motin</para>
+
+    <para>All rights reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>Neither the name of the authors nor the names of its
+        contributors may be used to endorse or promote products derived from
+        this software without specific prior written permission.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>ez-ipupdate License</title>
+
+    <para>Copyright © 1998-2001 Angus Mackay. All rights reserved;</para>
+
+    <para>This program is free software; you can redistribute it and/or modify
+    it under the terms of the <ulink
+    url="http://www.gnu.org/licenses/gpl.html">GNU General Public
+    License</ulink> as published by the Free Software Foundation; either
+    version 2, or (at your option) any later version.</para>
+
+    <para>THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+    EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>Circular log support for FreeBSD syslogd License</title>
+
+    <para>Copyright © 2001 Jeff Wheelhouse (jdw@wwwi.com)</para>
+
+    <para>This code was originally developed by Jeff Wheelhouse
+    (jdw@wwwi.com).</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistribution of source code must retail the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY JEFF WHEELHOUSE ``AS IS'' AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL JEFF WHEELHOUSE BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>dnsmasq License</title>
+
+    <para>dnsmasq is Copyright © 2000 Simon Kelley</para>
+
+    <para>This program is free software; you can redistribute it and/or modify
+    it under the terms of the <ulink
+    url="http://www.gnu.org/licenses/gpl.html">GNU General Public
+    License</ulink> as published by the Free Software Foundation; version 2
+    dated June, 1991.</para>
+
+    <para>This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.</para>
+  </sect1>
+
+  <sect1>
+    <title>racoon License</title>
+
+    <para>Copyright © 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 and 2003
+    WIDE Project. All rights reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>Neither the name of the project nor the names of its
+        contributors may be used to endorse or promote products derived from
+        this software without specific prior written permission.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS''
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>General Public License for the software known as MSNTP</title>
+
+    <para>© Copyright, N.M. Maclaren, 1996, 1997, 2000</para>
+
+    <para>© Copyright, University of Cambridge, 1996, 1997, 2000</para>
+
+    <para>Free use of MSNTP in source and binary forms is permitted, provided
+    that this entire license is duplicated in all copies, and that any
+    documentation, announcements, and other materials related to use
+    acknowledge that the software was developed by N.M. Maclaren (hereafter
+    refered to as the Author) at the University of Cambridge. Neither the name
+    of the Author nor the University of Cambridge may be used to endorse or
+    promote products derived from this material without specific prior written
+    permission.</para>
+
+    <para>The Author and the University of Cambridge retain the copyright and
+    all other legal rights to the software and make it available
+    non-exclusively. All users must ensure that the software in all its
+    derivations carries a copyright notice in the form:</para>
+
+    <para>© Copyright N.M. Maclaren,</para>
+
+    <para>© Copyright University of Cambridge.</para>
+
+    <bridgehead>NO WARRANTY</bridgehead>
+
+    <para>Because the MSNTP software is licensed free of charge, the Author
+    and the University of Cambridge provide absolutely no warranty, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the MSNTP software is
+    with you. Should MSNTP prove defective, you assume the cost of all
+    necessary servicing or repair.</para>
+
+    <para>In no event, unless required by law, will the Author or the
+    University of Cambridge, or any other party who may modify and
+    redistribute this software as permitted in accordance with the provisions
+    below, be liable for damages for any losses whatsoever, including but not
+    limited to lost profits, lost monies, lost or corrupted data, or other
+    special, incidental or consequential losses that may arise out of the use
+    or inability to use the MSNTP software.</para>
+
+    <bridgehead>COPYING POLICY</bridgehead>
+
+    <para>Permission is hereby granted for copying and distribution of copies
+    of the MSNTP source and binary files, and of any part thereof, subject to
+    the following license conditions:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>You may distribute MSNTP or components of MSNTP, with or without
+        additions developed by you or by others. No charge, other than an
+        "at-cost" distribution fee, may be charged for copies, derivations, or
+        distributions of this material without the express written consent of
+        the copyright holders.</para>
+      </listitem>
+
+      <listitem>
+        <para>You may also distribute MSNTP along with any other product for
+        sale, provided that the cost of the bundled package is the same
+        regardless of whether MSNTP is included or not, and provided that
+        those interested only in MSNTP must be notified that it is a product
+        freely available from the University of Cambridge.</para>
+      </listitem>
+
+      <listitem>
+        <para>If you distribute MSNTP software or parts of MSNTP, with or
+        without additions developed by you or others, then you must either
+        make available the source to all portions of the MSNTP system
+        (exclusive of any additions made by you or by others) upon request, or
+        instead you may notify anyone requesting source that it is freely
+        available from the University of Cambridge.</para>
+      </listitem>
+
+      <listitem>
+        <para>You may not omit any of the copyright notices on either the
+        source files, the executable files, or the documentation.</para>
+      </listitem>
+
+      <listitem>
+        <para>You may not omit transmission of this License agreement with
+        whatever portions of MSNTP that are distributed.</para>
+      </listitem>
+
+      <listitem>
+        <para>Any users of this software must be notified that it is without
+        warranty or guarantee of any nature, express or implied, nor is there
+        any fitness for use represented.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>October 1996</para>
+
+    <para>April 1997</para>
+
+    <para>October 2000</para>
+  </sect1>
+
+  <sect1>
+    <title>ucd-snmp License</title>
+
+    <para></para>
+
+    <sect2>
+      <title>CMU/UCD copyright notice</title>
+
+      <para>Copyright 1989, 1991, 1992 by Carnegie Mellon University</para>
+
+      <para>Derivative Work - 1996, 1998-2000</para>
+
+      <para>Copyright 1996, 1998-2000 The Regents of the University of
+      California</para>
+
+      <para>All Rights Reserved</para>
+
+      <para>Permission to use, copy, modify and distribute this software and
+      its documentation for any purpose and without fee is hereby granted,
+      provided that the above copyright notice appears in all copies and that
+      both that copyright notice and this permission notice appear in
+      supporting documentation, and that the name of CMU and The Regents of
+      the University of California not be used in advertising or publicity
+      pertaining to distribution of the software without specific written
+      permission.</para>
+
+      <para>CMU AND THE REGENTS OF THE UNIVERSITY OF CALIFORNIA DISCLAIM ALL
+      WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED
+      WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL CMU OR THE
+      REGENTS OF THE UNIVERSITY OF CALIFORNIA BE LIABLE FOR ANY SPECIAL,
+      INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
+      FROM THE LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+      NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
+      WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</para>
+    </sect2>
+
+    <sect2>
+      <title>Networks Associates Technology, Inc copyright notice</title>
+
+      <para>Copyright © 2001-2002, Networks Associates Technology, Inc</para>
+
+      <para>All rights reserved.</para>
+
+      <para>Redistribution and use in source and binary forms, with or without
+      modification, are permitted provided that the following conditions are
+      met:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.</para>
+        </listitem>
+
+        <listitem>
+          <para>Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided with
+          the distribution.</para>
+        </listitem>
+
+        <listitem>
+          <para>Neither the name of the Networks Associates Technology, Inc
+          nor the names of its contributors may be used to endorse or promote
+          products derived from this software without specific prior written
+          permission.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+      CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+      BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+      FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+      COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+      NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+      USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+      ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+      THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</para>
+    </sect2>
+
+    <sect2>
+      <title>Cambridge Broadband Ltd. copyright notice</title>
+
+      <para>Portions of this code are copyright © 2001-2002, Cambridge
+      Broadband Ltd.</para>
+
+      <para>All rights reserved.</para>
+
+      <para>Redistribution and use in source and binary forms, with or without
+      modification, are permitted provided that the following conditions are
+      met:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.</para>
+        </listitem>
+
+        <listitem>
+          <para>Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided with
+          the distribution.</para>
+        </listitem>
+
+        <listitem>
+          <para>The name of Cambridge Broadband Ltd. may not be used to
+          endorse or promote products derived from this software without
+          specific prior written permission.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER ``AS IS'' AND
+      ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+      IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+      PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE
+      FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+      CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+      SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+      INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+      CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+      ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+      THE POSSIBILITY OF SUCH DAMAGE.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>choparp License</title>
+
+    <para>choparp - cheap &amp; omitted proxy arp</para>
+
+    <para>Copyright © 1997 Takamichi Tateoka (tree@mma.club.uec.ac.jp)</para>
+
+    <para>Copyright © 2002 Thomas Quinot (thomas@cuivre.fr.eu.org)</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>Neither the name of the authors nor the names of their
+        contributors may be used to endorse or promote products derived from
+        this software without specific prior written permission.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS''
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>bpalogin License</title>
+
+    <para>BPALogin - lightweight portable BIDS2 login client</para>
+
+    <para>Copyright © 2001-3 Shane Hyde, and others.</para>
+
+    <para>This program is free software; you can redistribute it and/or modify
+    it under the terms of the <ulink
+    url="http://www.gnu.org/licenses/gpl.html">GNU General Public
+    License</ulink> as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.</para>
+
+    <para>This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.</para>
+  </sect1>
+
+  <sect1>
+    <title>php-radius License</title>
+
+    <para>Copyright 2000, 2001, 2002 by Edwin Groothuis. All rights
+    reserved.</para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.</para>
+      </listitem>
+
+      <listitem>
+        <para>Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the
+        distribution.</para>
+      </listitem>
+
+      <listitem>
+        <para>All advertising materials mentioning features or use of this
+        software must display the following acknowledgement:</para>
+
+        <para>This product includes software developed by Edwin
+        Groothuis.</para>
+      </listitem>
+
+      <listitem>
+        <para>Neither the name of Edwin Groothuis may be used to endorse or
+        promote products derived from this software without specific prior
+        written permission.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+    EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</para>
+  </sect1>
+
+  <sect1>
+    <title>wol License</title>
+
+    <para>wol - wake on lan client</para>
+
+    <para>Copyright © 2000,2001,2002,2003,2004 Thomas Krennwallner
+    &lt;krennwallner@aon.at&gt;</para>
+
+    <para>This program is free software; you can redistribute it and/or modify
+    it under the terms of the <ulink
+    url="http://www.gnu.org/licenses/gpl.html">GNU General Public
+    License</ulink> as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.</para>
+
+    <para>This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.</para>
+
+    <para>You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.</para>
+  </sect1>
+</appendix>

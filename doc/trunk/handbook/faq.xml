@@ -1,0 +1,1405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: faq.xml,v 1.15 2005/10/13 01:50:49 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="faq.html"?>
+
+  <title>FAQ</title>
+
+  <para>Everything you ever wanted to know about m0n0wall but were afraid to
+  ask. This is a must-read before posting questions to the mailing
+  list!  
+  </para>
+
+  <sect1>
+    <?dbhtml filename="faq-muvpn.html"?>
+
+    <title>How do I setup mobile user VPN with IPsec?</title>
+
+    <para>This tutorial tries to explain how to setup mobile user IPsec VPN
+    with m0n0wall and Windows clients that use SafeNet SoftRemoteLT, a popular
+    IPsec VPN client. You need m0n0wall pb25 or later for mobile user
+    VPN.</para>
+
+    <sect2>
+      <title>m0n0wall setup</title>
+
+      <orderedlist>
+        <listitem>
+          <para>Log into your m0n0wall and go to the IPsec: Mobile clients
+          page.</para>
+        </listitem>
+
+        <listitem>
+          <para>Configure the settings as shown in the following
+          picture:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-6.png" />
+            </imageobject>
+          </mediaobject>
+
+          <para>You <emphasis role="bold">must</emphasis> use aggressive mode,
+          as only IP addresses can be used as identifiers in main mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Click "Save", then go to the IPsec: Pre-shared keys
+          page.</para>
+        </listitem>
+
+        <listitem>
+          <para>Add a new key for each mobile user (use different keys, and at
+          least 8 characters!). Use the e-mail address of the corresponding
+          user as the identifier.</para>
+        </listitem>
+
+        <listitem>
+          <para>Go to the IPsec: Tunnels page, check "Enable IPsec" and click
+          "Save".</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+
+    <sect2>
+      <title>Client setup</title>
+
+      <para>This example assumes version 10 of SafeNet SoftRemoteLT.</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Install SafeNet SoftRemoteLT, if not already installed, and
+          reboot.</para>
+        </listitem>
+
+        <listitem>
+          <para>Right-click on the SoftRemote icon next to the clock and
+          select "Security Policy Editor".</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose Edit -&gt; Add -&gt; Connection.</para>
+        </listitem>
+
+        <listitem>
+          <para>Configure the connection properties as follows:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-1.png" />
+            </imageobject>
+          </mediaobject>
+
+          <para>Insert your LAN subnet + mask and enter the external IP
+          address (or hostname) of your m0n0wall instead of
+          "12.34.56.78".</para>
+        </listitem>
+
+        <listitem>
+          <para>Select "Security Policy" and use the following
+          settings:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-3.png" />
+            </imageobject>
+          </mediaobject>
+        </listitem>
+
+        <listitem>
+          <para>Select "My Identity" and use the following settings:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-2.png" />
+            </imageobject>
+          </mediaobject>
+
+          <para>Enter the user's e-mail address, then click the button
+          "Pre-Shared Key" and enter the pre-shared key. The e-mail address
+          (and pre-shared key) must correspond with an entry on the IPsec:
+          Pre-shared keys page on m0n0wall.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select "Authentication (Phase 1) -&gt; Proposal 1" and use the
+          following settings:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-4.png" />
+            </imageobject>
+          </mediaobject>
+        </listitem>
+
+        <listitem>
+          <para>Select "Key Exchange (Phase 1) -&gt; Proposal 1" and use the
+          following settings:</para>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/muvpn/srlt-5.png" />
+            </imageobject>
+          </mediaobject>
+
+          <para>If you have a crypto accelerator card in your m0n0wall, you
+          may want to use Triple DES instead of AES-256 as the encryption
+          algorithm (some crypto accelerators do not support AES).</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose File -&gt; Save.</para>
+        </listitem>
+
+	<listitem>
+          <para>If you have a crypto accelerator card in your m0n0wall, you
+          may want to use Triple DES instead of AES-256 as the encryption
+          algorithm (some crypto accelerators do not support AES).</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose File -&gt; Save.</para>
+        </listitem>
+
+        <listitem>
+          <para>Make sure that the Internet connection is established. Try to
+          ping a host on your LAN (e.g. your m0n0wall's LAN IP address). The
+          first few pings will time out as it takes a few seconds for the
+          IPsec tunnel to be established. Use SoftRemote's log viewer and
+          connection monitor to tell you what's going on (right-click on the
+          SoftRemote icon next to the clock to open them).</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+  </sect1>
+
+
+  <sect1>
+    <?dbhtml filename="faq-ackprio.html"?>
+
+    <title>How can I prioritize ACK packets with m0n0wall?</title>
+
+    <para>On asymmetric Internet links like DSL and often Cable, a big upload
+    that consumes all of the available upstream bandwidth can render the link
+    almost unusable by producing a huge backlog in the DSL/Cable modem's
+    buffer, thus increasing the delay to several seconds. Because ACK packets
+    (TCP acknowledgments) for received data are delayed or even lost as well,
+    download speed drops, too.</para>
+
+    <para>This problem can be solved by prioritizing these ACK packets, so
+    they will be sent out before any other upload packets. Here's how to do it
+    with m0n0wall:</para>
+
+    <para>First of all, you need m0n0wall pb24 or later. Start by adding a new
+    pipe to the traffic shaper. This is necessary because we need to move the
+    upstream queue into m0n0wall (where the order in which packets are sent
+    out can be changed while packets are in the queue) rather than the
+    DSL/Cable modem. Once the packets are in the DSL/Cable modem's output
+    queue, there's no way of having ACK packets sent out immediately anymore.
+    Therefore, it is very important to set that pipe's bandwidth to a value
+    that is slightly below the effective upstream bandwidth of your Internet
+    link. Don't forget that e.g. 128 kbps ADSL line speed is only about 100
+    kbps effective. If you set this value too high, your modem buffer will
+    still become full and prioritization will accomplish nothing.</para>
+
+    <para>When you have added that pipe, add two queues linked to that pipe
+    with different weights, e.g. one queue with weight = 10 and one with
+    weight = 1. The first queue becomes your high priority queue.</para>
+
+    <para>Now it's time to add rules that classify upstream traffic into one
+    of these two queues. There are loads of possibilities, e.g. prioritizing
+    by TCP/UDP port, but for now we'll focus on IP packet length and TCP
+    flags. Add a new traffic shaper rule, link it to the first (high-priority)
+    queue, interface = WAN, protocol = TCP, source = any, destination = any,
+    direction = out, IP packet length 0-80, TCP flags: ACK = set, everything
+    else = don't care. It is not sufficient to classify packets into the
+    high-priority queue based on the ACK flag only, because (big) upstream TCP
+    data packets can have the ACK flag set as well. 0-80 is just an example to
+    get you started. Save the rule, and add another one below it, linked to
+    the second (low priority) queue, interface = WAN, protocol = any, source =
+    any, destination = any, direction = out. Enable the traffic shaper if
+    necessary, apply the changes - that's it. Here are a few points to
+    remember:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>make sure no upstream Internet traffic can bypass the
+        pipe</para>
+      </listitem>
+
+      <listitem>
+        <para>despite ACK prioritization, the delay will still go up, as it is
+        not possible to stop sending a big packet mid-way. For example, a
+        full-size (1500 bytes) packet at 100 kbps will take 120 ms</para>
+      </listitem>
+
+      <listitem>
+        <para>if you want to be able to surf the web while performing a large
+        upload, you'll also have to prioritize HTTP upstream traffic (i.e.
+        destination port = 80) - otherwise, TCP SYN packets (for connection
+        establishment) to web servers will not get prioritized, and there will
+        be a big initial delay until a connection is established. Prioritizing
+        DNS packets is a good idea as well.</para>
+      </listitem>
+
+      <listitem>
+        <para>If you want to find out what prioritization does for you, add a
+        rule to classify outgoing ICMP packets into the high-priority queue
+        and try pinging some Internet host while you're uploading - once with
+        the traffic shaper on, and once off. There should be a huge difference
+        in response times.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-lannat.html"?>
+
+    <title>Why isn't it possible to access NATed services by the public IP
+    address from LAN?</title>
+
+    <formalpara>
+      <title>Problem</title>
+
+      <para>It is not possible to access NATed services using the public (WAN)
+      IP address from within LAN (or an optional network). Example: you've got
+      a server in your LAN behind m0n0wall and added a NAT/filter rule to
+      allow external access to its HTTP port. While you can access it just
+      fine from the Internet, you cannot access http://your-external-ip/ from
+      within your LAN.</para>
+    </formalpara>
+
+    <formalpara>
+      <title>Reason</title>
+
+      <para>This is due to a limitation in ipfilter/ipnat (which are used in
+      m0n0wall). Read the ipfilter FAQ for details. m0n0wall does not (and
+      probably will not) include a "bounce" utility.</para>
+    </formalpara>
+
+    <formalpara>
+      <title>Solution</title>
+
+      <para>If you use m0n0wall's built-in DNS forwarder for your LAN clients,
+      you can add one or more overrides so that they will get the internal
+      (LAN) IP address of your server instead of the external one, while
+      external clients still get the real/public IP address.</para>
+      
+      <note>This will only work if you use m0n0wall as the primary DNS server
+      on your LAN hosts.  If you use another DNS server, you need to use its
+      functionality to resolve that host to the appropriate private IP.  See your
+      DNS server documentation for more information.</note>
+      
+    </formalpara>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-pptprules.html"?>
+
+    <!--imported Drupal contribution from Michael Iedema <iedemam@pluto.dsu.edu>-->
+
+    <title>I enabled my PPTP server, but am unable to pass traffic into my
+    LAN</title>
+
+    <para>You neglected to create a firewall rule to allow this
+    traffic.</para>
+
+    <para>Go to Firewall Rules and add a rule on the PPTP interface to permit
+    traffic from PPTP clients. (ex: interface PPTP, protocol any, source PPTP
+    clients, destination any)</para>
+
+    <para>Traffic should now pass through the interface correctly.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-newif.html"?>
+
+    <title>I just added a new interface to my m0n0wall box, and now it doesn't
+    show up in the webGUI!</title>
+
+    <para>You probably forgot to assign a function to the interface. Use the
+    console menu's "assign network ports" option to do that.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-macfilt.html"?>
+
+    <title>Does m0n0wall support MAC address filtering?</title>
+
+    <para><emphasis role="bold">Short answer:</emphasis>  Not yet.  (i.e. you cannot
+    specify MAC addresses in firewall rules)</para>
+    
+    <para><emphasis role="bold">Long answer:</emphasis>  There are several "hacks" you
+    may be able to use to achieve
+    the desired end result.  </para>
+    
+    <note>There is no bulletproof method of access control by MAC address.  Keep in
+    mind that MAC addresses are easy to change and spoof.   </note>
+    
+    <sect2>
+        <title>Using Captive Portal and MAC pass-through</title>
+    
+    <para>You can utilize Captive Portal and its MAC pass-through functionality for
+    rudimentary MAC address restrictions.</para>
+    
+    <orderedlist>
+      <listitem>Enable Captive Portal on the desired interface (e.g. LAN) at the Services -&gt;
+        Captive Portal screen.  Create a HTML page of your liking that does not
+        include the submit button so the user cannot authenticate with the captive
+        portal.  Other settings can all be left at their defaults.</listitem>
+
+      <listitem>Click the "Pass-through MAC" tab on the Captive Portal screen.  Click the
+        + to start adding permitted MAC addresses.  In the MAC address box, type in the
+        six hex octets separated by colons (e.g. ab:cd:ef:12:34:56), optionally (but recommended)
+        enter a description, and click Save.   Repeat for every authorized host on your
+        network.</listitem>
+    </orderedlist>
+    </sect2>
+
+    <sect2>
+        <title>Using DHCP reservations and firewall rules</title>
+    
+    <para>First, set up your DHCP scope.  At the bottom of the Services -&gt; DHCP screen,
+    add every authorized MAC address on your network, and check the "Deny unknown clients"
+    box.  This will prevent an unauthorized machine from getting an IP address from DHCP.
+    </para>
+    
+    </sect2>
+    
+    <sect2>
+        <title>Using Static ARP</title>
+        
+        <para>You can ensure certain MAC addresses can only use a certain IP by using static ARP.  
+        </para>
+            
+        <para>To add a static ARP entry, use /exec.php to run the arp command.
+        </para>
+        <literallayout class="monospaced">arp -s 192.168.1.11 ab:cd:ef:12:34:56</literallayout>
+        
+        <para>To verify this addition, run 'arp -a' in exec.php and you'll see the following in the list.</para>
+        
+        <literallayout class="monospaced">? (192.168.1.11) at ab:cd:ef:12:34:56 on sis2 [ethernet]</literallayout>
+        
+        <para>This change will <emphasis role="bold">not</emphasis> survive a reboot.  You need to put the arp -s
+        command in your config.xml in &lt;shellcmd&gt;.  See <link linkend="FAQ.hiddenopts">this FAQ entry</link>
+        for more information on hidden config.xml options</para>
+    </sect2>
+    
+    <note>An unauthorized user with a clue will be able to get around this second method more easily
+    than the first method by just assigning a static IP address that isn't in use.  Either method
+    is easy enough to get around for a user with a decent amount of knowledge.  </note>
+    
+        
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-smp.html"?>
+
+    <!--imported Drupal contribution from Steven Honson <steven@honson.org> -->
+
+    <title>Does m0n0wall support SMP systems?</title>
+
+    <para>SMP support isn’t built in to m0n0wall, and the current versions have
+    no add-on SMP support available.  m0n0wall will run on SMP systems,
+    however it will only utilize one processor. </para>
+    
+    <note>Michael's SMP support hasn't been updated in quite some time, and will
+    not work with current m0n0wall releases.</note>
+    
+    <para>Michael Iedema has written a
+    program to automatically add SMP support to a m0n0wall release, which is
+    available from <ulink
+    url="http://www.michael-i.com/files/projects/m0n0smp">http://www.michael-i.com/files/projects/m0n0smp</ulink>.</para>
+
+    <para>The script requires <computeroutput>pseudo-device
+    vn</computeroutput> built into your kernel. When first run, it downloads
+    the latest SMP kernel from Michael’s site and updates the image. The
+    --update flag will re-download the SMP kernel in the event that Michael
+    releases a new revision of the kernel. Michael also has a pre-built copy
+    of the latest generic-pc image with SMP available for download from his
+    page.</para>
+  </sect1>
+
+  <sect1 id="FAQ.bridge">
+    <?dbhtml filename="faq-bridge.html"?>
+
+    <!--imported Drupal contribution from Bruce A. Mah <bmah@freebsd.org>-->
+
+    <title>Why can't hosts on a NATed interface talk to hosts on a bridged
+    interface?</title>
+
+    <para>This frequently happens when someone wants to bridge an interface to
+    their WAN to use it as a DMZ, and wants to put all of the hosts on their
+    LAN interface behind a NAT. This is actually a fairly reasonable and
+    natural thing to want to do.</para>
+
+    <para>The problem here is that ipnat and bridging (at least as implemented
+    in FreeBSD) don't play well together. Packets from the LAN to the DMZ go
+    out just fine, but in the other direction, it seems like the packets
+    arriving on the unnumbered bridge interface don't get looked up correctly
+    in the ipnat state tables.</para>
+
+    <para>I've managed to convince myself that solving this is Really Really
+    Hard (TM). The irritating thing is that there's no theoretical reason why
+    this should be difficult...it all comes down to implementation
+    details.</para>
+    
+    <para>Contribution from Bruce A. Mah &lt;bmah (at) freebsd.org&gt;</para>
+  </sect1>
+
+
+  <sect1>
+    <?dbhtml filename="faq-goals.html"?>
+
+    <title>What were the goals behind the m0n0wall project?</title>
+
+    <para>Back in January 2004, Manuel, the guy behind m0n0wall, posted the
+    following to the m0n0wall mailing list,</para>
+
+    <blockquote>
+      <literallayout class="monospaced">Hey folks,
+
+I feel the need to state once and for all what the intention with which 
+I started m0n0wall was. My goal was to create a free/open-source 
+alternative to smaller commercial firewall boxes - no more, no less. I 
+figured that on a Soekris or similar embedded PC, it could be made to 
+look and behave just like a commercial firewall - only cheaper and with 
+me in control of the features. When I started working on it, I 
+especially had the following models in mind:
+
+- WatchGuard SOHO
+- ZyXEL ZyWALL 10
+- SonicWALL SOHO
+- NetScreen 5XP
+
+I didn't intend to create an enterprise-class firewall, and I didn't 
+intend to make a file, mail, print, web or whatever server. And despite 
+the fact that m0n0wall runs well (and in the majority of installations, 
+according to the survey!) on normal PCs, it is targeted at embedded PCs, 
+which means they dictate what is possible in terms of storage, CPU speed 
+and RAM size.
+
+I think m0n0wall mostly meets or even exceeds the feature range of the 
+aforementioned products, so my goal has already been reached. That 
+doesn't mean there's no room for or point in improvements. I just want 
+to make it clear that I don't think we're ever going to see things like 
+the following in m0n0wall:
+
+- caching proxy
+- file server (Samba etc.)
+- mail server
+- web server (Apache etc.)
+- very extensive statistics
+
+simply because it wasn't my goal to produce some all-in-one thing like 
+e-smith, but a packet filtering firewall. Furthermore, these things 
+usually don't mix well with embedded PCs for several reasons.
+
+Why do we have a DHCP server then? Because all the commercial products I 
+mentioned before do, because it's small and lightweight enough to fit in 
+with the rest, and because it considerably increases ease-of-use 
+(meaning that if your Internet connection uses DHCP too, like for 
+example cable, you don't have to configure anything at all to let your 
+clients access the Internet - that's why it's on by default too).
+
+Now, about the NTP server... Rest assured that if msntp didn't have 
+problems with Windows XP clients, there would have been a nice little 
+NTP server configuration page in the webGUI, or at least a checkbox on 
+the general setup page (with default to off of course), since pb15. But 
+I don't like stuff that works only half of the time, so that's why it 
+hasn't happened yet.
+
+There you go... Hope I've explained my point of view now.
+
+Regards,
+
+Manuel</literallayout>
+    </blockquote>
+  </sect1>
+
+  <sect1 id="FAQ.IpAlias">
+    <?dbhtml filename="faq-ipalias.html"?>
+
+    <title>How do I setup multiple IP addresses on the WAN interface?</title>
+
+    <para>Although the m0n0wall webGUI only allows setting up a single IP
+    address on the WAN interface, you can still have m0n0wall accept packets
+    destined to secondary IP addresses. It is not necessary to tell m0n0wall
+    to use these IP addresses on the WAN interface (however in some cases
+    proxy ARP has to be used - see below), but you have to tell it what to do
+    with packets that are sent to them. There are two possibilities:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis role="bold">Routing</emphasis></para>
+
+        <para>You can use this if you have an entire subnet of public IP
+        addresses (with m0n0wall's WAN IP address <emphasis
+        role="bold">not</emphasis> being in that subnet!).</para>
+
+        <para>Example: you have several servers connected to an optional
+        interface (let's assume OPT1). Choose an IP address out of your public
+        subnet for m0n0wall's IP address on OPT1. Use it as the default
+        gateway on all the servers connected to OPT1 (it goes without saying
+        that you assign public IP addresses directly to the servers on OPT1 in
+        this scenario). Make sure to get the subnet mask right on m0n0wall and
+        the OPT1 servers. Turn on advanced outbound NAT and define a rule for
+        your LAN, but not for OPT1. This will effectively disable NAT between
+        WAN and OPT1. Now you can add filter rules to selectively permit
+        traffic to/from OPT1.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">NAT</emphasis></para>
+
+        <itemizedlist>
+          <listitem>
+            <para>inbound/server NAT</para>
+
+            <para>Use this if you want to redirect connections for different
+            ports of a given public IP address to different hosts (define one
+            or more of your secondary IP addresses for server NAT, then use
+            them with inbound NAT as usual).</para>
+          </listitem>
+
+          <listitem>
+            <para>1:1 NAT</para>
+
+            <para>Use this if you have enough public IP addresses for all your
+            servers, but can't use routing because you don't have a whole
+            subnet.</para>
+          </listitem>
+
+          <listitem>
+            <para>advanced outbound NAT</para>
+
+            <para>Use this if you want to take control over the IP addresses
+            that are used for outgoing connections from machines that don't
+            have 1:1 mappings (by default, m0n0wall's WAN IP address is
+            used).</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </itemizedlist>
+
+    <sect2 id="Proxy.ARP">
+      <title>Proxy ARP</title>
+
+      <para>If any of the following applies to your setup, you should be fine
+      <emphasis role="bold">without</emphasis> proxy ARP:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>the additional IP addresses that you're trying to use are part
+          of a subnet that is routed to you by your ISP (i.e. your ISP has a
+          static route for that subnet with your m0n0wall's WAN IP address as
+          the gateway)</para>
+        </listitem>
+
+        <listitem>
+          <para>you're using PPPoE or PPTP on WAN</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Using proxy ARP under these conditions will not achieve anything.
+      If however you use static IP addresses or DHCP on WAN and don't have a
+      routed subnet, adding proxy ARP entries for the additional
+      addresses/ranges/subnets in the webGUI will make sure that m0n0wall
+      responds to ARP queries for these addresses on the WAN interface.</para>
+      
+      <para><emphasis role="bold">Adding Proxy ARP when it is not required usually
+      will not hurt anything, so when in doubt, add it!</emphasis></para>
+      
+      <note>Do <emphasis role="bold">not</emphasis> add Proxy ARP entries for IP
+      addresses that are not assigned to you!  Most DHCP servers will attempt to
+      do an ARP query before assigning an IP address to a client, and if you enable
+      Proxy ARP on IP's that are not yours, they will appear to be in use to the
+      DHCP server.  We have heard of instances where people enabled Proxy ARP for
+      their entire WAN subnet, and got disconnected because they were "taking up
+      all the DHCP addresses."  Technically you aren't taking all the leases, you're
+      just answering ARP on all of them which is just as bad.  This is typically
+      only an issue when your WAN is an Ethernet network, but don't ever do it.
+      </note>
+
+      <para>Note that it is never necessary <emphasis role="bold">(and strongly
+      discouraged)</emphasis> to use
+      IP aliasing on the WAN interface (by means of ifconfig commands).</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="FAQ.WebFilter">
+    <?dbhtml filename="faq-webfilter.html"?>
+
+    <title>Can I filter/restrict/block certain websites with m0n0wall?</title>
+
+    <para>There are no filtering capabilities built into m0n0wall based on web
+    site content, keywords, etc., nor any supported add-ons with such
+    functionality.</para>
+
+    <para><emphasis role="bold">Blocking by IP
+    Address/Subnet</emphasis></para>
+
+    <para>You can block specific sites by putting in firewall rules to deny
+    access to the undesired server's IP address. If you take this path, it is
+    recommended you use "reject" rather than "block" in the firewall rules so
+    inaccessible sites time out immediately.</para>
+
+    <para><emphasis role="bold">Blocking by DNS Override</emphasis></para>
+
+    <para>If you use your m0n0wall as your only DNS server, you can also block
+    specific sites by putting in DNS override for the undesired site to point
+    to an internal or invalid IP address. To block www.example.com, put in a
+    DNS override pointing it to 1.2.3.4 or some other invalid IP address, or
+    an address of a LAN web server. If you use an invalid IP address, you
+    should put in a firewall rule to reject packets to this address so the
+    requests time out immediately.</para>
+
+    <para>Note this is easy to get around by either using a different DNS
+    server or editing the hosts file on the local machine, though this is
+    beyond the capabilities and knowledge of most any user.</para>
+
+    <para><emphasis role="bold">Using a Proxy Server</emphasis></para>
+
+    <para>The ideal solution would be to use a proxy server on your LAN, and
+    block outgoing traffic from your LAN hosts other than the proxy
+    server.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-plaintextpass.html"?>
+
+    <title>Why are some passwords stored in plaintext in config.xml?</title>
+
+    <para>PPPoE/PPTP client, PPTP VPN, and DynDNS passwords as well as RADIUS
+    and IPsec shared secrets appear in plaintext in config.xml. This is a
+    deliberate design decision. The implementations of PPP, IKE, RADIUS and
+    the way DynDNS works require plaintext passwords to be available. We could
+    of course use some snake oil encryption on those passwords, but that would
+    only create a false sense of security. Since we cannot prompt the user for
+    a password each time a PPP session is established or the DynDNS name needs
+    to be updated, any encryption we apply to the passwords can be reversed by
+    anyone with access to the m0n0wall sources - i.e. everybody. Hashes like
+    MD5 cannot be used where the plaintext password is needed at a later
+    stage, unlike for the system password, which is only stored as a hash. By
+    leaving the passwords in plaintext, it is made very clear that config.xml
+    deserves to be stored in a secure location (or encrypted with one of the
+    countless programs out there).</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-performancespecifications.html"?>
+
+    <title>Are there any performance benchmarks available?</title>
+
+    <para>Needs updating.</para>
+    
+  </sect1>
+
+  <sect1 id="FAQ.hiddenopts">
+    <?dbhtml filename="faq-hiddenopts.html"?>
+    <title>What about hidden config.xml options?</title>
+
+    <para>Some m0n0wall options are only accessible by modifying config.xml
+    directly. This is usually the case for strange/exotic options that only
+    few people (should) use. Instead of cluttering the webGUI with lots of
+    options that almost nobody really uses, they can only be set in
+    config.xml. For the ultimate reference on all available options in
+    config.xml, see the latest default config.xml available at <ulink
+    url="http://m0n0.ch/wall/downloads/config.xml">http://m0n0.ch/wall/downloads/config.xml</ulink>.
+    Not all of these options may be available unless you're using the latest
+    beta. </para>
+    
+    <para>To put in these options, download your config.xml via the backup
+    feature and open it in a text editor.  Put in the desired options in the
+    appropriate location in the file, as shown in the default config.xml linked
+    above.  After saving your desired changes, use the restore feature in
+    m0n0wall to restore the changed configuration.  </para>
+    
+    <para>Some options are documented below:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>system/webgui/noassigninterfaces</para>
+
+        <para>hides the "assign interfaces" link in the navigation bar</para>
+      </listitem>
+
+      <listitem>
+        <para>system/earlyshellcmd and system/shellcmd</para>
+
+        <para>may contain a shell command that is executed before the boot
+        scripts actually start setting up the system (for earlyshellcmd), or
+        after the boot scripts have finished setting up the system (for
+        shellcmd). You can have multiple (early)shellcmd tags. Don't forget to
+        replace special characters with their XML equivalents (most notably
+        <command>&lt;</command> and <command>&gt;</command>
+        (<command>&amp;lt;</command> and <command>&amp;gt;</command>).</para>
+      </listitem>
+
+      <listitem>
+        <para>interfaces/(if)/media and interfaces/(if)/mediaopt</para>
+
+        <para>If you need to force your NIC to a specific media type (e.g.
+        10Base-T half duplex), you can use these two options. Refer to the
+        appropriate FreeBSD manpage for the driver you're using to see which
+        options are available (or run <command>ifconfig -m</command>).</para>
+      </listitem>
+
+      <listitem>
+        <para>dhcpd/(if)/gateway</para>
+
+        <para>Allows you to specify a custom gateway to assign to DHCP clients
+        (instead of m0n0wall's IP address on the corresponding
+        interface)</para>
+      </listitem>
+
+      <listitem>
+        <para>dhcpd/(if)/domain</para>
+
+        <para>Assigns a custom domain name to DHCP clients (instead of the one
+        configured on System: General setup)</para>
+      </listitem>
+
+      <listitem>
+        <para>dhcpd/(if)/dnsserver</para>
+
+        <para>Assigns custom DNS servers to DHCP clients (instead of
+        m0n0wall's IP address if the DNS forwarder is enabled, or the DNS
+        servers configured on System: General setup otherwise)</para>
+      </listitem>
+
+      <listitem>
+        <para>dhcpd/(if)/next-server and dhcpd/(if)/filename</para>
+
+        <para>These are used for PXE booting, and you should know what they do
+        if you're trying to set up PXE.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+  
+  <sect1 id="FAQ.SNMPoverVPN">
+    <?dbhtml filename="faq-snmpovervpn.html"?>
+    <title>Why can't I query SNMP over VPN?</title>
+
+    <para>With an out of the box configuration, you cannot query SNMP on the LAN
+    interface of a remote m0n0wall over a VPN connection.  Fred Wright explained
+    in a post to the mailing list on September 12, 2004 why this is.</para>
+
+<blockquote>
+<literallayout class="monospaced">
+Due to the way IPsec tunnels are kludged into the FreeBSD kernel, any
+traffic *initiated* by m0n0wall to go through an IPsec tunnel gets the
+wrong source IP (and typically doesn't go through the tunnel at all as a
+result).  Theoretically this *shouldn't* be an issue for the *server* side
+of SNMP, but perhaps the server has a bug (well, deficiency, at least)
+where it doesn't send the response out through a socket bound to the
+request packet.
+
+You can fake it out by adding a bogus static route to the remote end of
+the tunnel via the m0n0wall's LAN IP (assuming that's within the near-end
+tunnel range).  A good test is to see whether you can ping something at
+the remote end of the tunnel (e.g. the SNMP remote) *from* the m0n0wall.
+
+There's an annoying but mostly harmless side-effect to this - every LAN
+packet to the tunnel elicits a no-change ICMP Redirect.
+</literallayout></blockquote>
+
+    <para>To do this, click "Static Routes" in the webGUI.  Click the + to add a
+    static route.  In the Interface box, choose LAN, for destination network, enter
+    the remote end VPN subnet, and for the gateway put in the LAN IP address of
+    your local m0n0wall.</para>
+    
+  </sect1>
+  
+  <sect1 id="FAQ.PPTPClient">
+    <?dbhtml filename="faq-pptpclient.html"?>
+    <title>Can I use m0n0wall's WAN PPTP feature to connect to a remote PPTP VPN?</title>
+    
+    <para>The m0n0wall WAN PPTP feature is for ISP's that require you to connect
+    using PPTP (some in Europe require this).  </para>
+    
+    <para>This feature <emphasis>cannot</emphasis> be used as a PPTP client to
+    connect to a remote PPTP server to allow m0n0wall to route over the PPTP
+    connection.  </para>
+  </sect1>
+  
+  <sect1 id="FAQ.DualWAN">
+    <?dbhtml filename="faq-dualwan.html"?>
+    <title>Can I use multiple WAN connections for load balancing or failover on m0n0wall?</title>
+    
+    <para>Not yet.</para>
+    
+  </sect1>
+  
+  <sect1 id="FAQ.webGUIfromWAN">
+    <?dbhtml filename="faq-webGUI-from-WAN.html"?>
+    <title>Can I access the webGUI from the WAN?</title>
+    
+    <para>Not in a default configuration.  This is disabled for security reasons.</para>
+    
+    <para>To enable this, first switch to SSL if you haven't already.  To do so, go
+    to System -&gt; General Setup, and change webGUI protocol from HTTP to HTTPS.</para>
+    
+    <note>You may need to change the port number used by the webGUI.  If you have used inbound NAT
+    to open HTTPS to a web server, you'll have to change that port number to something other than
+    the default 443, and change the destination port on the firewall rule shown below accordingly.</note>
+    
+    <sect2>
+        <title>When using static IP on WAN</title>
+    
+    <para>Now click Firewall -&gt; Rules and click the <imageobject><imagedata fileref="icons/plus.gif" />
+    </imageobject> on that screen.  Add a rule like the following, replacing the made up
+    IP 12.221.133.125 with the public IP of the remote system you wish to use to administer
+    your m0n0wall, and 64.22.12.25 with the public IP of your m0n0wall.  </para>
+    
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="screens/firewall/rules/remoteadmin.png" />
+        </imageobject>
+    </mediaobject>
+    
+    </sect2>
+    
+    <sect2>
+        <title>When using dynamic IP on WAN</title>
+        
+        <para>This makes things a little trickier.  You can't set the destination IP because it
+        will change, and when it changes you would no longer be able to get to the webGUI.  You
+        can set the source to "any" rather than the WAN IP.  Note that this will grant access to
+        anything with an inbound NAT entry for the port (likely HTTPS), or anything behind a bridged
+        interface with a public IP on that port.  Unless you have multiple public IP's, this will
+        not grant access to anything other than the webGUI.  This does <emphasis role="bold">not</emphasis>
+        grant that host access to HTTPS for anything on your LAN.  Even if you do have multiple public
+        IP's, opening HTTPS to a host you intend to allow to configure your firewall is likely of
+        little to no concern.  </para>
+        
+    </sect2>
+    
+    <note>Opening your webGUI to the entire internet is a <emphasis role="bold">bad idea</emphasis>.
+    Limit it to only the IP address required.  If the remote administration host is on DHCP, you can
+    limit it to the remote machine's ISP's netblock rather than opening it to the entire internet.
+    Opening your firewall administration interface to the entire internet, even with strong
+    authentication, is <emphasis role="bold">strongly discouraged</emphasis> on any firewall.</note>
+    
+  </sect1>
+  
+  <sect1 id="FAQ.shell">
+    <?dbhtml filename="faq-shell.html"?>
+    <title>Can I access a shell prompt?</title>
+    
+    <para>There is no true shell prompt per se in m0n0wall, and no supported way to add one.  You can
+    get some limited shell functionality by going to the hidden /exec.php page.  </para>
+
+  </sect1>
+  
+  <sect1 id="FAQ.configonCD">
+  <?dbhtml filename="faq-configonCD.html"?>
+  <title>Can I put my configuration file into the m0n0wall CD?</title>
+  
+  <para>Yes, but keep in mind this means you will need to burn a new CD any time you want
+  to change anything on the configuration.</para>
+  
+  <para>To do this, replace the file /conf.default/config.xml on the iso with your
+  config.xml file.</para>
+  
+  </sect1>
+  
+  <sect1 id="FAQ.PerIPMonitoring">
+  <?dbhtml filename="faq-per-ip-monitoring.html"?>
+  <title>How can I monitor/graph/report on bandwidth usage per LAN host?</title>
+  
+  <para>John Voigt posted the a way to accomplish this to the m0n0wall
+  mailing list on September 22, 2004.</para>
+  
+  <para>Chris Buechler is working on making this more understandable and easier
+  to follow.  You can see the work in progress on the wiki
+  <ulink url="http://wiki.m0n0.ch/wikka.php?wakka=HostTracking">here
+  </ulink>for now.  </para>
+    
+  </sect1>
+    
+  <sect1 id="FAQ.translations">
+    <?dbhtml filename="faq-translations.html"?>
+
+    <title>Will there ever be translated versions of m0n0wall? Can I translate
+    m0n0wall into my language?</title>
+
+    <para>The short answer is: no.</para>
+
+    <para>The long answer is: the author of m0n0wall has decided that
+    translations add an extreme amount of overhead, since each time a new
+    feature is developed (or an existing feature is modified), all the
+    translators need to be contacted to get the proper translations for the
+    new strings. Experience shows that people are often eager to start
+    something new, but lose interest and give up or go away after a while, so
+    it'd be hard to keep all the different languages synchronized. Failure to
+    do so would lead to incomplete or mixed (with English) translations -
+    something which immediately creates a very bad impression in most users.
+    Furthermore, translating the interface of a firewall isn't as easy as it
+    seems - the translator needs to fully understand all the concepts that are
+    involved in order to produce accurate translations.</para>
+
+    <para>Side note: the native language of the author of m0n0wall is
+    <emphasis>not</emphasis> English either. However, he believes that anyone
+    who's trying to accomplish anything non-trivial with a firewall,
+    especially an open source one, will never get around learning English
+    anyway.</para>
+
+    <para>That said, everybody's free to start their own (translated) m0n0wall
+    branch - the BSD license, under which m0n0wall is placed, essentially
+    permits anyone to do anything with m0n0wall as long as the original
+    copyright notice and license are preserved somewhere (see the <ulink
+    url="http://m0n0.ch/wall/license.php">license</ulink> for details). It
+    should be made clear that it's not an "official" version though.</para>
+  </sect1>
+  
+  <sect1 id="FAQ.TransparentProxy">
+  <?dbhtml filename="faq-transparentproxy.html"?>
+
+  <title>Does m0n0wall support transparent proxying?</title>
+  
+  <para>Currently it does not.  The following was taken from a post by Manuel Kasper,
+  m0n0wall's author, in a post to the mailing list on October 5, 2004.  </para>
+  
+  <blockquote><literallayout class="monospaced">
+I think this is very appropriate, but the reason why it hasn't
+happened yet is that nobody has figured out how to do it yet. ;) The
+problem always seems to be how to tell the proxy which IP
+address/port the user initially tried to connect to. But that may not
+even be necessary (HTTP Host header). If a clean solution with
+ipfilter/ipnat is possible, that would be cool.
+    </literallayout></blockquote>
+
+  </sect1>
+  
+  <sect1 id="FAQ.AP">
+    <?dbhtml filename="faq-ap.html"?>
+    <title>Should I use m0n0wall as an access point?</title>
+    
+    <para>Manuel Kasper, author of m0n0wall, posted the following to the
+    m0n0wall mailing list on December 29, 2004.</para>
+    <blockquote><literallayout class="monospaced">    
+If you want to be really happy with your wireless, then by all means
+buy a real dedicated AP. hostap just never matches the performance
+and reliability (not even under Linux) of a *good* AP, and is only
+intended as a solution for people who absolutely need to do
+everything on one box.
+    </literallayout></blockquote>
+    
+    <para>Chris Buechler has this to add:
+        </para>
+        
+    <blockquote><literallayout class="monospaced">
+I have a 2511MP+ in my 4501, though honestly, I don't use it
+much anymore for anything other than m0n0wall testing.  I got
+a Linksys WRT54G to use for wireless.  FreeBSD 4.11's hostap
+just plain sucks IMO.  It's starting to show its age (the 4.x
+version is several years old).  There are many newer cards
+you just can't get to connect to it no matter what (more than
+half the b/g and a/b/g cards I've tried), some that require
+configuration changes to connect, and in general it's just
+a pain.  Given the cost of miniPCI cards, a Linksys or
+similar is a good alternative for about the same cost - just
+bridge the wireless over to an OPT port on m0n0wall, as I do.
+    
+Things should improve very much in the next m0n0wall version,
+including support for a/b/g cards and none of the pains of
+4.11's dated hostap, so you may want to hold off for a few
+months or so if you can.
+    </literallayout></blockquote>
+
+   </sect1>
+   
+   <sect1>
+    <?dbhtml filename="faq-legit-traffic-dropped.html"?>
+    <title>Why am I seeing traffic that I permitted getting dropped?</title>
+    
+    <para>Assuming your firewall rules are set up appropriately to allow
+    this traffic, the reason is because they are duplicate or last packets
+    of a session.  This is explained as follows by the IPFilter howto.</para>
+    
+    <blockquote>
+Due to the often laggy nature of the Internet, sometimes packets will
+be regenerated. Sometimes, you'll get two copies of the same packet,
+and your state rule which keeps track of sequence numbers will have
+already seen this packet, so it will assume that the packet is part of
+a different connection. Eventually this packet will run into a real
+rule and have to be dealt with. You'll often see the last packet of a
+session being closed get logged because the keep state code has
+already torn down the connection before the last packet has had a
+chance to make it to your firewall. This is normal, do not be
+alarmed.
+    </blockquote>
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-ipsec-multiple-subnets.html"?>
+    <title>How can I route multiple subnets over a site to site IPsec VPN?</title>
+    
+    <para>There are two ways to accomplish this.  Which is most suitable depends
+    on if you are able to summarize the subnets, and how many subnets are involved.
+    For either way, the subnets do not need to be directly connected to m0n0wall.
+    They can be behind a router on the LAN behind m0n0wall.  In that case, you'll
+    need to set up static routes on m0n0wall's LAN interface pointing to the LAN
+    router for each of the subnets in question.  You can also summarize the subnets
+    in static routes.  
+    </para>
+    
+    <sect2>
+        <title>Summarizing the subnets using a larger mask</title>
+        
+        <para>If you are using, for example, 192.168.1.0/24 at one site, and the
+        other site  uses 10.0.0.0/24, 10.0.1.0/24, 10.0.2.0/24, and 10.0.3.0/24,
+        you can summarize the 10.x.x.x site with 10.0.0.0/22.  10.0.0.0/22 includes
+        10.0.0.0-10.0.3.255.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Setting up multiple IPsec connections</title>
+        
+        <para>You can set up one IPsec connection for each subnet you want to
+        connect to on the remote side.  If you have a large number of subnets
+        on the remote side, it is recommended you number them so they're easily
+        summarized so you don't have to set up a large number of connections.
+        </para>
+        
+    </sect2>
+  
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-block-ip-range.html"?>
+    <title>How can I block/permit a range of IP addresses in a firewall rule?</title>
+    
+    <para>If you can summarize the IP addresses with a CIDR mask, you can enter
+    a rule to apply to those hosts.  For example, 10.0.0.8-10.0.0.15 can be summarized
+    with 10.0.0.8/29.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-msn-slow-file-transfer.html"?>
+    <title>Why does my MSN Messenger transfer files very slowly when using traffic
+    shaper?</title>
+    
+    <para>Because the traffic shaping rules to limit BitTorrent throughput cover the
+    same range of ports MSN uses.  Magic Shaper uses 6881-6999 to classify BitTorrent
+    traffic, which encompasses the MSN ports 6891-6900.  You can change the rules that
+    classify BitTorrent traffic in the traffic shaping pages.  Typically BitTorrent only
+    uses 6881-6889.</para>
+    
+    <para>Credit: Chris Bagnall</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-broadcasts-over-vpn.html"?>
+    <title>Can I forward broadcasts over VPN for gaming or other purposes?</title>
+    
+    <para>Not yet.  OpenVPN will make this possible in the future.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-no-nat.html"?>
+    <title>How can I use public IP's on the LAN side?  Or how can I disable NAT?</title>
+    
+    <para>If you're using public IP's on your LAN, or need to disable NAT for some other
+    reason, enable advanced outbound NAT, under Firewall -&gt; NAT, Outbound tab.  </para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-pcmcia.html"?>
+    <title>Are PCMCIA cards supported?</title>
+    
+    <para>The drivers are available for most PCMCIA cards, however FreeBSD 4.x typically doesn't
+    work out of the box with PCMCIA cards.  Wireless cards are generally an exception, but this
+    might also be the case for some.  Some customization to /etc/pccard.conf is typically required
+    for the card to be detected.  Google for your card model and FreeBSD and pccard.conf to find
+    the required values if the card is not detected.  You'll have to edit your m0n0wall image
+    appropriately. </para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-high-performance-tweaks.html"?>
+    <title>Are there any tweaks for systems that will need to support large loads?</title>
+    
+    <para>You may need to up the kern.ipc.nmbclusters sysctl.  If you are getting "out of mbuf"
+    errors, this will fix that.  </para>
+
+    <para>From 'man tuning':</para>
+
+<blockquote><literallayout class="monospaced">
+    kern.ipc.nmbclusters may be adjusted to increase the number of network
+    mbufs the system is willing to allocate.  Each cluster represents approx-
+    imately 2K of memory, so a value of 1024 represents 2M of kernel memory
+    reserved for network buffers.  You can do a simple calculation to figure
+    out how many you need.  If you have a web server which maxes out at 1000
+    simultaneous connections, and each connection eats a 16K receive and 16K
+    send buffer, you need approximately 32MB worth of network buffers to deal
+    with it.  A good rule of thumb is to multiply by 2, so 32MBx2 = 64MB/2K =
+    32768.  So for this case you would want to set kern.ipc.nmbclusters to
+    32768.  We recommend values between 1024 and 4096 for machines with mod-
+    erates amount of memory, and between 4096 and 32768 for machines with
+    greater amounts of memory.  Under no circumstances should you specify an
+    arbitrarily high value for this parameter, it could lead to a boot-time
+    crash.  The -m option to netstat(1) may be used to observe network clus-
+    ter use.  Older versions of FreeBSD do not have this tunable and require
+    that the kernel config(8) option NMBCLUSTERS be set instead.
+</literallayout></blockquote>
+
+    <para>Add a line like the following to the /boot/loader.rc on the image.</para>
+    
+    <blockquote><literallayout class="monospaced">set kern.ipc.nmbclusters=32768
+    </literallayout></blockquote>
+
+    <para>That would take 64 MB RAM.  With 128+ MB RAM and m0n0wall, you could set
+    it to that or higher, but setting it arbitrarily high may cause problems as stated
+    above.</para>
+
+    <para>The default on FreeBSD and m0n0wall is 1024, which is fine unless you require
+    a huge number of connections.  It's set to 1024 by default to limit memory
+    consumption, and 1024 is more than enough for the vast majority of m0n0wall
+    installations.</para>
+  
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-historical-graphing.html"?>
+    <title>Can I add MRTG or some other historical graphing package to m0n0wall?</title>
+    
+    <para>Or "why SVG, it doesn't tell me anything".  Not true, there are many uses for
+    real time graphing data that MRTG, ifgraph and similar historical packages cannot
+    provide.  These fill two different needs.</para>
+    
+    <para>Not directly on the firewall.  These packages all have heavy requirements
+    like Perl and others.  In order to keep m0n0wall light, these packages cannot be
+    added directly to the system.  m0n0wall's file system design, in that it runs from RAM
+    and does not maintain anything other than your configuration across reboots, is
+    not condusive to applications of this nature.</para>
+    
+    <para>You can run these from another system on your network.  See <link linkend="ifgraph">
+    ifgraph</link> section of this guide.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-captive-portal-bridged.html"?>
+    <title>Can Captive Portal be used on a bridged interface?</title>
+    
+    <para>No.  Because of the way Captive Portal is implemented, it
+    cannot function on a bridged interface.</para>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-captive-portal-bridged.html"?>
+    <title>Can I run Captive Portal on more than one interface?</title>
+    
+    <para>No.  Because of the way Captive Portal is implemented, it
+    cannot be used on more than one interface.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-ssh-timeout.html"?>
+    <title>Why do my SSH sessions time out after two hours?</title>
+    
+    <para>As of 1.2b2, the TCP idle timeout for the firewall is 2.5 hours
+    instead of the ipfilter default of 10 days (!) to keep the state table
+    from filling up with dead connections. This value can be modified on
+    the advanced setup page, though that is not recommended.  So
+    of course if your SSH connection doesn't transfer a single byte for
+    two hours, the ipfilter state table entry is deleted and the
+    connection breaks.  Turning on keep-alives in your SSH client is the
+    recommended means of avoiding broken sessions.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-list-replytoall.html"?>
+    <title>Why isn't the reply address of the list set to the list?</title>
+    
+    <para>The ezmlm FAQ <ulink url="http://www.ezmlm.org/faq-0.40/FAQ-9.html#ss9.8">
+    explains why this is not recommended</ulink>.  </para>
+    
+    <para>Manuel posted the following explanation to the list on May 12, 2003.  </para>
+    
+    <blockquote><literallayout class="monospaced">
+It will stay this way because I read this:
+http://www.ezmlm.org/faq-0.40/FAQ-9.html#ss9.8
+and found that they're right - I can live with the fact that people have
+to think twice before posting anything to the list. :) Besides, other
+lists behave in the same way, too (including soekris-tech and
+freebsd-small), and every better MUA has got a "Reply All" function, so
+that issue is settled as far as I'm concerned.
+    </literallayout></blockquote>
+    
+    <para>Also see <ulink url="http://www.unicom.com/pw/reply-to-harmful.html">
+        http://www.unicom.com/pw/reply-to-harmful.html</ulink>.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-ipfw-unloaded.html"?>
+    <title>Why am I seeing "IP Firewall Unloaded" log/console messages?</title>
+    
+    <para>Nothing to worry about. ipfw is only used for traffic shaping in
+    m0n0wall - you probably enabled and later disabled the traffic shaper
+    (the module is only loaded on demand). The real packet filtering is
+    done with ipfilter, which is compiled into the kernel and cannot be
+    unloaded.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-ipsec-nat-t.html"?>
+    <title>Why can't my IPsec VPN clients connect from behind NAT?</title>
+    
+    <para>That's because FreeBSD doesn't support NAT-T, which is required for
+    IPsec to work behind NAT on the remote end.</para>
+    
+    <para><ulink url="http://tinyurl.com/5w4t7">Reference</ulink></para>
+
+    <para>Unfortunately, there's no way to fix that at this point.  OpenVPN,
+    which is in the current beta versions, might be a good solution.</para>  
+
+  </sect1>
+  
+    
+  <sect1>
+    <?dbhtml filename="faq-logout.html"?>
+    <title>Why doesn't m0n0wall have a log out button?</title>
+    
+    <para>m0n0wall uses HTTP authentication.  For every page you request from
+    m0n0wall, your browser sends the username and password from its cache.  There
+    is no reliable way to force the browser to "forget" the username and password,
+    and session management to work around that would introduce potential security
+    vulnerabilities, so m0n0wall does not provide log out functionality.  To safely
+    log out, close your browser.</para>
+    
+    <para>Your web browser may have a way to clear cached HTTP credentials.  Check
+    your browser's documentation for further information.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="faq-increasedpptp.html"?>
+    <title>Can I have more than 16 simultaneous PPTP users?</title>
+    
+    <para>Yes, though this is not officially supported.  See
+    <ulink url="http://chrisbuechler.com/index.php?id=19">this page</ulink> on
+    Chris Buechler's website for images and further information.</para>
+    
+  </sect1>
+  
+    <sect1>
+    <?dbhtml filename="faq-redist.html"?>
+    <title>Can I sell m0n0wall (or use it in a commercial product)?</title>
+    
+    <para>m0n0wall is under the BSD license, which basically means that you can
+	do whatever you want with it (including modifying and
+	selling it) for free, as long as the original copyright notice and
+	license appear somewhere in the documentation and/or the software itself.
+	There are no warranties of any kind though.</para>
+
+	<para>For the full copyright notice/license text, see
+	<ulink url="http://m0n0.ch/wall/license.php">
+	http://m0n0.ch/wall/license.php</ulink>.</para>
+
+	<para>Although you don't have to pay anything for m0n0wall even if you
+	sell it, if you do find yourself making money by selling m0n0wall-based
+	products, a donation would be very much appreciated.</para>
+    
+  </sect1>
+  
+  <sect1>
+  	<?dbhtml filename="faq-logo.html"?>
+  	<title>Where can I get a high-resolution version of the m0n0wall logo?</title>
+  	
+  	<para>An EPS version of the logo is available
+  	<ulink url="http://m0n0.ch/wall/downloads/m0n0wall-logo.zip">here</ulink>.
+  	</para>
+  
+  </sect1>
+  
+  <sect1 id="FAQ.FreeBSDversion">
+    <?dbhtml filename="faq-freebsdversion.html"?>
+  	<title>When will m0n0wall be available on a newer FreeBSD version?</title>
+  	
+        <para>Beta versions 1.2b5 through b7 were based on FreeBSD 5.3, after much demand.
+        This brought
+        greatly improved wireless card support, but that's it.  Many other, more important
+        things were a major step back from the current FreeBSD 4.x.  Network performance
+        was anywhere from 20-50% of the speed it used to be on embedded platforms, and
+        stability was poor in comparison in some environments.  </para>
+        
+        <para>We consulted with members of the FreeBSD Core Team on the issues we
+        were seeing with performance, and their answer was basically "yes, we know
+        it is slower, and are working on improving it."  FreeBSD 6 is already much
+        improved, and the funded TCP optimization work currently being done will
+        improve things much more.  </para>
+        
+        <para>It was decided to revert back to 4.x to finish the 1.2 release,
+        and hence get it done much faster than would be possible on 5.x and with a
+        much better end result.  
+        </para>
+        
+        <para>After 1.2 is released, discussion will be started on the list as to which
+        operating system and firewall software is best suited for the next m0n0wall
+        release.  At this point, FreeBSD 6 looks like the most likely candidate, and
+        will bring back Atheros support amongst many other enhancements not available
+        in FreeBSD 4 or 5.</para>
+
+    </sect1>
+
+    <sect1>
+      <?dbhtml filename="faq-extraradius.html"?>
+	<title>Is there any extra Captive Portal RADIUS functionality available?</title>
+
+        <para>Jonathan De Graeve has implemented a number of new RADIUS 
+  	features for Captive Portal that will be implemented in a future
+ 	beta version.  For now, these features are available on test images 
+	available for download from <ulink url="http://inf.imelda.be/downloads/m0n0wall/">
+	http://inf.imelda.be/downloads/m0n0wall/</ulink>.  </para>
+
+	<para>Features currently implemented in the test images include:</para>
+
+	<itemizedlist>
+		<listitem>RADIUS-defined URL redirection taking precedence over URL 
+		redirection parameter in captive portal setup page.</listitem>
+
+		<listitem>Multiple RADIUS server support</listitem>
+
+		<listitem>Failure message on captive portal login error page, 
+		plus logging to the captive portal log on why authentication 
+		failed (user account exceeded bandwidth limit, bad password, 
+		etc.).  </listitem>
+
+		<listitem>Cisco-compatible feature (sending calling-station-id 
+		with clientip and called-station-id with clientmac instead of 
+		standard behavior calling-station-id and clientmac).</listitem>
+
+		<listitem>Timeout parameter and max authentication retries 
+		parameter</listitem>
+
+		<listitem>retrieval of user bandwidth settings</listitem>
+
+		<listitem>retrieval of user group</listitem>
+
+		<listitem>retrieval of session-timeout</listitem>
+
+	</itemizedlist>
+
+	<note>Retrieval means the variable is present and CAN be used, 
+	but there is no action bound to it yet.</note>
+
+	<para><emphasis role="bold">To do</emphasis> - GUI implementation 
+	and enhancements.</para>
+
+    </sect1>
+   
+</chapter>

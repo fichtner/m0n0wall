@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: glossary.xml,v 1.3 2005/09/07 00:45:56 chris Exp $ -->
+<glossary>
+  <?dbhtml filename="glossary.html"?>
+
+  <title>Glossary</title>
+
+  <glossdiv>
+    <title></title>
+
+    <glossentry id="gloss.ACL">
+      <glossterm>ACL</glossterm>
+
+      <glossdef>
+        <para>Access Control List.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.AH">
+      <glossterm>AH</glossterm>
+
+      <glossdef>
+        <para>Authentication Header. The Authentication Header is used to
+        provide connectionless integrity and data origin authentication for IP
+        datagrams. Note: AH will not work through <glossterm
+        linkend="gloss.NAT">NAT</glossterm>, so if you are placing your
+        m0n0wall behind another firewall or layer 2 router that is performing
+        NAT AH will not work. Unless you really have a reason, use <glossterm
+        linkend="gloss.ESP">ESP</glossterm>.</para>
+
+        <glossseealso><ulink type=""
+        url="http://www.networksorcery.com/enp/protocol/ah.htm">http://www.networksorcery.com/enp/protocol/ah.htm</ulink></glossseealso>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="gloss.BroadcastDomain">
+        <glossterm>Broadcast Domain</glossterm>
+        
+        <glossdef>
+            <para>A broadcast domain is the portion of a network sharing the same
+            layer two network segment.  In a network with a single switch, the
+            broadcast domain is that entire switch.  In a network with multiple switches
+            interconnected by crossover cables without the use of VLAN's, the broadcast
+            domain includes all of those switches.</para>
+            
+            <para>A single broadcast domain <emphasis>can</emphasis> contain more than
+            one IP subnet, however that is generally not considered good network design.
+            IP subnets should be segregated into separate broadcast domains via the use
+            of separate switches, or VLAN's.  </para>
+        </glossdef>
+        
+    </glossentry>
+
+    <glossentry>
+      <glossterm>DHCP</glossterm>
+
+      <glossdef>
+        <para>Dynamic Host Configuration Protocol. A protocol to automate the
+        assignment of <glossterm linkend="gloss.IP">IP</glossterm> addresses
+        and related information on a network.</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="gloss.DMZ">
+        <glossterm>DMZ</glossterm>
+        
+        <glossdef>
+            <para>A DMZ, or DeMilitarized Zone, is a segment of your network
+            specifically for publicly-accessible servers.  If you are most familiar
+            with residential-class routers like Linksys and similar, these
+            devices generally <emphasis role="bold">incorrectly</emphasis> refer to
+            inbound NAT (opening ports from the internet to your LAN) as "DMZ"
+            functionality.  </para>
+            
+            <para>A true DMZ resides on a separate <glossterm linkend="gloss.BroadcastDomain">
+            broadcast domain</glossterm> from the LAN, typically on a separate switch using a
+            third interface on the firewall.  <glossterm linkend="gloss.VLAN">VLAN's</glossterm>
+            can also be used, but to eliminate the potential of a switch misconfiguration exposing
+            your LAN to your DMZ and the potential effects of VLAN hopping attacks, this is not
+            recommended.
+            </para>
+            
+            <para>The main purpose of a DMZ is to segregate Internet-accessible servers from
+            the LAN, to protect your trusted networks if a DMZ host is compromised.</para>
+            
+            <formalpara>
+                <title>Typical DMZ Configuration</title>
+                
+                <para>The following diagram illustrates a typical DMZ configuration.</para>
+                
+                <para>
+                    <mediaobject>
+                        <imageobject>
+                          <imagedata fileref="networkdiagrams/example-dmz.png" />
+                        </imageobject>
+                    </mediaobject>
+                </para>
+                
+            </formalpara>
+        </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.ESP">
+      <glossterm>ESP</glossterm>
+
+      <glossdef>
+        <para>Encapsulating Security Payload. Encrypts and / or authenticates
+        everything above the <glossterm
+        linkend="gloss.IPsec">IPsec</glossterm> layer. ESP, most agree,
+        renders <glossterm linkend="gloss.AH">AH</glossterm> completely
+        unnecessary.</para>
+
+        <glossseealso><ulink type=""
+        url="http://www.networksorcery.com/enp/protocol/esp.htm">http://www.networksorcery.com/enp/protocol/esp.htm</ulink></glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.FQDN">
+      <glossterm>FQDN</glossterm>
+
+      <glossdef>
+        <para>Fully Qualified Domain Name. The host name of a computer,
+        including it's complete domain name, such as www.m0n0.ch.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.ICMP">
+      <glossterm>ICMP</glossterm>
+
+      <glossdef>
+        <para>Internet Control Message Protocol. A protocol, layered on top of
+        <glossterm linkend="gloss.IP">IP</glossterm>, used to send control
+        messages between computers, such as ping.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.IP">
+      <glossterm>IP</glossterm>
+
+      <glossdef>
+        <para>Internet Protocol. The protocol used to send packets across the
+        Internet at layer three.</para>
+
+        <glossseealso><glossterm linkend="gloss.ICMP">ICMP</glossterm>,
+        <glossterm linkend="gloss.TCP">TCP</glossterm></glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.IPsec">
+      <glossterm>IPsec</glossterm>
+
+      <glossdef>
+        <para>Secure transmission over <glossterm
+        linkend="gloss.IP">IP</glossterm>. IPsec is an extension of the IP
+        protocol used for encryption and authentication.  Encryption occurs
+        at the transport layer
+        of the <glossterm linkend="gloss.OSI">OSI</glossterm> model, the
+        application doesn't have to support encryption for the encryption
+        process to work. Therefore, all network traffic generated by
+        applications can be encrypted regardless of the application</para>
+
+        <glossseealso><ulink type=""
+        url="http://www.netbsd.org/Documentation/network/ipsec/">http://www.netbsd.org/Documentation/network/ipsec/</ulink></glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.LAN">
+      <glossterm>LAN</glossterm>
+
+      <glossdef>
+        <para>Local Area Network. A network that typically includes computers
+        which are physically close, such as in one office, usually connected
+        with hubs and switches rather than routers.</para>
+
+        <glossseealso><glossterm linkend="gloss.VPN">VPN</glossterm>,
+        <glossterm linkend="gloss.WAN">WAN</glossterm></glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.MX">
+      <glossterm>MX Records</glossterm>
+
+      <glossdef>
+        <para>MX records are DNS records that enable mail servers to find the mail servers for another domain when sending internet email.  
+	When a mail server needs to send an email to example.com, it performs a DNS lookup of the MX record for the domain, and sends the email 
+	to the resulting host.
+        </para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.NIC">
+      <glossterm>NIC</glossterm>
+
+      <glossdef>
+        <para>Network Interface Card.  A.k.a. network card, or Ethernet card.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.NAT">
+      <glossterm>NAT</glossterm>
+
+      <glossdef>
+        <para>Network Address Translation. A technique whereby <glossterm
+        linkend="gloss.IP">IP</glossterm> traffic from multiple IP addresses
+        behind a firewall are made to look to the outside as if they all come
+        from a single IP address.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.OSI">
+      <glossterm>OSI</glossterm>
+
+      <glossdef>
+        <para><ulink url="http://en.wikipedia.org/wiki/Open_Systems_Interconnect">Open Systems Interconnect</ulink></para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.ProxyARP">
+      <glossterm>Proxy ARP</glossterm>
+
+      <glossdef>
+        <para>Proxy ARP is a technique for using the ARP protocol to provide an ad hoc routing mechanism.</para>
+
+        <para>A multi-port networking device (e.g. a router, firewall, etc.) implementing Proxy ARP will respond to
+        ARP requests on one interface as being responsible for addresses of device addresses on another interface.
+        The device can then receive and forward packets addressed to the other devices.  (adapted from wikipedia.org)</para>
+        
+        <para>In m0n0wall, Proxy ARP can be used for 1:1, advanced outbound, and server <glossterm linkend="gloss.NAT">NAT
+        </glossterm>, amongst other potential uses.</para>
+        
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.PPP">
+      <glossterm>PPP</glossterm>
+
+      <glossdef>
+        <para>Point to Point Protocol.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.PPTP">
+      <glossterm>PPTP</glossterm>
+
+      <glossdef>
+        <para>Point to Point Tunneling Protocol.</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry id="gloss.racoon">
+      <glossterm>Racoon</glossterm>
+
+      <glossdef>
+        <para>A key management daemon.  The magic behind the
+        <glossterm linkend="gloss.VPN">VPN</glossterm> power of
+        m0n0wall.</para>
+
+        <glossseealso><ulink url="http://www.kame.net/racoon/">http://www.kame.net/racoon/</ulink></glossseealso>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.TCP">
+      <glossterm>TCP</glossterm>
+
+      <glossdef>
+        <para>Transmission Control Protocol. A protocol, layered on top of
+        <glossterm linkend="gloss.IP">IP</glossterm>, that handles connections
+        and reliable delivery.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.VLAN">
+      <glossterm>VLAN</glossterm>
+
+      <glossdef>
+        <para>Virtual Local Area Network.  VLAN's are a common function of
+        higher end switches.  They allow segregation of ports on the switch
+        into separate broadcast domains.  This is generally done for security
+        or performance reasons.  In very large networks, the amount of
+        broadcast traffic on the wire can inhibit the performance of the
+        entire network.  Segregating the network into multiple IP subnets and
+        using VLAN's to separate the broadcast domain</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.VPN">
+      <glossterm>VPN</glossterm>
+
+      <glossdef>
+        <para>Virtual Private Network.  A connection between two or more
+        machines or networks where the data travels over an insecure network
+        (typically the Internet), but is encrypted to prevent eavesdropping,
+        and packaged on either end in order to make the two ends appear to be
+        on a <glossterm linkend="gloss.WAN">WAN</glossterm>.</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry id="gloss.WOL">
+      <glossterm>WOL - Wake on LAN</glossterm>
+
+      <glossdef>
+        <para>Wake on LAN is a capability in some network cards permitting powering on the system over the network
+        with a specially crafted "Magic Packet".  
+        </para>
+        <para>Generally a WOL cable must be attached from the <glossterm linkend="gloss.NIC">NIC</glossterm> to the
+        motherboard of the system.  Most NIC's built into the motherboard have this support built in.  You must enable
+        WOL in the BIOS of the machine.  This is generally off by default.</para>
+      </glossdef>
+    </glossentry>
+
+
+    <glossentry id="gloss.WAN">
+      <glossterm>WAN</glossterm>
+
+      <glossdef>
+        <para>Wide Area Network. A network that spans a large area, typically
+        including routers, gateways, and many different <glossterm
+        linkend="gloss.IP">IP</glossterm> address groups.</para>
+        
+        <para>In the context of firewalls, the WAN interface is the one directly
+        connected to the Internet.  In the context of corporate networks, the WAN
+        generally refers to the network that connects all of the organization's
+        locations onto the corporate network.  Historically this was accomplished
+        with expensive private leased lines like frame relay and similar technologies.
+        With the low cost and widespread availability of broadband Internet connections,
+        many organizations are switching to using VPN in lieu of leased lines.  VPN
+        provides the same functionality, though is not as reliable as leased lines and
+        has higher latency.</para>
+        
+      </glossdef>
+    </glossentry>
+  </glossdiv>
+</glossary>
