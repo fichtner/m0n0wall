@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: image-guide.xml,v 1.1 2005/09/26 00:53:14 chris Exp $ -->
+<!-- $Id$ -->
 <chapter>
   <?dbhtml filename="image-guide.html"?>
 
@@ -264,7 +264,7 @@ ln -s /var/run/htpasswd www/.htpasswd</programlisting>
         <para><filename>/etc/version</filename> holds the version number of
         the image. Create with e.g.</para>
 
-        <programlisting>echo "1.2b8" &gt; $MWROOT/etc/version</programlisting>
+        <programlisting>echo "1.21" &gt; $MWROOT/etc/version</programlisting>
       </section>
 
       <section>
@@ -357,7 +357,7 @@ ln -s /var/run/htpasswd www/.htpasswd</programlisting>
     be applied. Download these patches from <ulink
     url="http://m0n0.ch/wall/downloads/freebsd-4.11/patches.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/patches.tgz</ulink>
     and extract them somewhere (the following commands assume that your
-    patches are in <code>$PATCHDIR</code>).</para>
+    patches are in <code>$MWPATCHDIR</code>).</para>
 
     <section>
       <title>Userland patches</title>
@@ -370,7 +370,7 @@ ln -s /var/run/htpasswd www/.htpasswd</programlisting>
         not good at all is when you have a duplicate rule.</para>
 
         <programlisting>cd /usr/src
-patch &lt; $PATCHDIR/user/ipf.c.patch
+patch &lt; $MWPATCHDIR/user/ipf.c.patch
 cd sbin/ipf
 make
 install -s /usr/obj/usr/src/sbin/ipf/ipf $MWROOT/sbin</programlisting>
@@ -391,9 +391,9 @@ install -s /usr/obj/usr/src/sbin/ipf/ipf $MWROOT/sbin</programlisting>
         logging.</para>
 
         <programlisting>cd /usr/src
-patch &lt; $PATCHDIR/user/syslogd.c.patch
+patch &lt; $MWPATCHDIR/user/syslogd.c.patch
 cd usr.sbin
-tar xfvz $PATCHDIR/user/clog-1.0.1.tar.gz
+tar xfvz $MWPATCHDIR/user/clog-1.0.1.tar.gz
 cd syslogd
 make
 install -s /usr/obj/usr/src/usr.sbin/syslogd/syslogd $MWROOT/usr/sbin
@@ -411,7 +411,7 @@ install -s /usr/obj/usr/src/usr.sbin/clog/clog $MWROOT/usr/sbin</programlisting>
         uninteresting events.</para>
 
         <programlisting>cd $MWROOT/sbin
-patch &lt; $PATCHDIR/user/dhclient-script.patch
+patch &lt; $MWPATCHDIR/user/dhclient-script.patch
 rm dhclient-script.orig</programlisting>
       </section>
     </section>
@@ -560,7 +560,7 @@ rm dhclient-script.orig</programlisting>
       <para>Apply the patches as follows:</para>
 
       <programlisting>cd /usr/src
-patch -p0 &lt; $PATCHDIR/kernel/kernel-411.patch</programlisting>
+patch -p0 &lt; $MWPATCHDIR/kernel/kernel-411.patch</programlisting>
     </section>
   </section>
 
@@ -618,11 +618,26 @@ cp dummynet/dummynet.ko if_tap/if_tap.ko if_vlan/if_vlan.ko ipfw/ipfw.ko $MWROOT
     <section>
       <title>PHP</title>
 
-      <para>Download the latest version of PHP 4.3 from <ulink
-      url="http://www.php.net">http://www.php.net</ulink> and decompress as
-      usual. Build/install as follows:</para>
+      <para>Install autoconf213 from the FreeBSD ports collection and create
+      some links so that PHP's buildconf scripts find autoconf:</para>
 
-      <programlisting>./configure --without-mysql --without-pear --with-openssl --enable-discard-path
+      <programlisting>cd /usr/ports/devel/autoconf213
+make install clean
+ln -s /usr/local/bin/autoconf213 /usr/local/bin/autoconf
+ln -s /usr/local/bin/autoheader213 /usr/local/bin/autoheader</programlisting>
+
+      <para>Download the latest version of PHP 4.4 from <ulink
+      url="http://www.php.net">http://www.php.net</ulink> and decompress as
+      usual. Download the RADIUS PECL extension from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/radius-1.2.5.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/radius-1.2.5.tgz</ulink>.
+      Unpack it in <code>php-4.4.x/ext</code> and rename the resulting
+      directory (whose name includes the version number) to
+      '<code>radius</code>'. Go back into the <code>php-4.4.x</code> directory
+      and build/install as follows:</para>
+
+      <programlisting>rm configure
+./buildconf --force
+./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
 make
 install -s sapi/cgi/php $MWROOT/usr/local/bin</programlisting>
 
@@ -652,12 +667,13 @@ include_path = ".:/etc/inc:/usr/local/www:/usr/local/captiveportal"</code></lite
       <itemizedlist>
         <listitem>
           <para>adds a limit to the number of concurrent connections to
-          prevent DoS attacks (since mini_httpd is a forking web
-          server)</para>
+          prevent DoS attacks (since mini_httpd is a forking web server), and
+          since m0n0wall 1.21: an optional per-client-IP-address limit</para>
         </listitem>
 
         <listitem>
-          <para>adds captive portal mode support</para>
+          <para>adds captive portal mode support (including httpd support for
+          the file manager since m0n0wall 1.21)</para>
         </listitem>
 
         <listitem>
@@ -690,7 +706,7 @@ include_path = ".:/etc/inc:/usr/local/www:/usr/local/captiveportal"</code></lite
 
       <para>Apply the patch, compile and install as follows:</para>
 
-      <programlisting>patch &lt; $PATCHDIR/packages/mini_httpd.c.patch
+      <programlisting>patch &lt; $MWPATCHDIR/packages/mini_httpd.patch
 make
 install -s mini_httpd $MWROOT/usr/local/sbin</programlisting>
     </section>
@@ -774,7 +790,7 @@ install -s src/wol $MWROOT/usr/local/bin</programlisting>
         </listitem>
       </itemizedlist>
 
-      <programlisting>patch &lt; $PATCHDIR/packages/ez-ipupdate.c.patch
+      <programlisting>patch &lt; $MWPATCHDIR/packages/ez-ipupdate.c.patch
 ./configure
 make
 install -s ez-ipupdate $MWROOT/usr/local/bin</programlisting>
@@ -809,7 +825,7 @@ install -s work/mpd-*/src/mpd $MWROOT/usr/local/sbin</programlisting>
       url="http://openvpn.net/download.html">http://openvpn.net/download.html</ulink>.
       Extract, then compile and install as follows:</para>
 
-      <programlisting>setenv CFLAGS &quot;-DLOG_OPENVPN=LOG_LOCAL6 -O2&quot;
+      <programlisting>setenv CFLAGS "-DLOG_OPENVPN=LOG_LOCAL6 -O2"
 ./configure --disable-lzo --disable-plugins --disable-management --disable-socks --disable-http --disable-debug
 make
 install -s openvpn $MWROOT/usr/local/sbin</programlisting>
@@ -818,17 +834,32 @@ install -s openvpn $MWROOT/usr/local/sbin</programlisting>
     <section>
       <title>racoon</title>
 
-      <para>racoon needs a patch to extract IP addresses from the
-      subjectAltName of X509 certificates properly, and one that fixes
-      an issue with the expiration timer of dynamically generated
-      policies (for mobile clients) not being reset upon rekeying.</para>
+      <para>As of version 1.21, m0n0wall uses the ipsec-tools version of
+      racoon, as the KAME racoon version isn't being developed anymore and has
+      been removed from the FreeBSD ports tree.</para>
 
-      <para>Install racoon using the ports system:</para>
+      <para>Install racoon from ipsec-tools using the ports system:</para>
 
-      <programlisting>cd /usr/ports/security/racoon
-cp $PATCHDIR/packages/{patch-crypto_openssl.c.x509,patch-isakmp_quick.c} files
-make
-install -s work/racoon-*/racoon/racoon $MWROOT/usr/local/sbin</programlisting>
+      <programlisting>cd /usr/ports/security/ipsec-tools</programlisting>
+
+      <para>Edit <code>CONFIGURE_ARGS</code> in the
+      <code>Makefile</code>:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>remove the <code>--enable-debug</code> and
+          <code>--enable-ipv6</code> options (saves space)</para>
+        </listitem>
+
+        <listitem>
+          <para>add the <code>--without-readline</code> option (removes the
+          dependency on libreadline)</para>
+        </listitem>
+      </itemizedlist>
+
+      <programlisting>make
+install -s work/ipsec-tools-*/src/racoon/.libs/racoon $MWROOT/usr/local/sbin
+install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MWROOT/usr/local/lib</programlisting>
     </section>
 
     <section>
@@ -961,13 +992,13 @@ install -s verifysig $MWROOT/usr/local/bin</programlisting>
     desired:</para>
 
     <programlisting>cd /usr/src
-patch &lt; $PATCHDIR/boot/boot.patch</programlisting>
+patch &lt; $MWPATCHDIR/boot/boot.patch</programlisting>
 
     <para>When building a boot loader for WRAP boards,
     <filename>boot1.s</filename> needs to be modified not to fiddle with gate
     A20, since the WRAP doesn't have a keyboard controller:</para>
 
-    <programlisting>patch &lt; $PATCHDIR/boot/boot-wrap.patch</programlisting>
+    <programlisting>patch &lt; $MWPATCHDIR/boot/boot-wrap.patch</programlisting>
 
     <para>Compile the boot loader:</para>
 
@@ -1026,15 +1057,22 @@ perl mkmini.pl m0n0wall.libs / $MWROOT</programlisting></para>
     <title>Adding the PHP-based configuration scripts</title>
 
     <para>Now it's time to add the actual guts that make m0n0wall what it is!
-    Get the latest phpconf scripts<footnote id="fn-phprepos">
-        <para>Since there's no official repository for phpconf or webgui files
-        at the time of this writing, you'll need to download the latest rootfs
-        tarball and use <filename>etc/rc.*</filename>,
-        <filename>etc/inc</filename>, <filename>usr/local/www</filename> and
-        <filename>usr/local/captiveportal</filename>.</para>
-      </footnote> and make sure that all <filename>rc.*</filename> files go
-    into <filename>$MWROOT/etc</filename> and all <filename>*.inc</filename>
-    files into <filename>$MWROOT/etc/inc</filename>. Also, make sure that the
+    Get the latest phpconf scripts from the Subversion repository at <ulink
+    url="http://svn.m0n0.ch/wall">http://svn.m0n0.ch/wall</ulink>. If you want
+    the latest development version, use the '<code>trunk</code>' subdirectory,
+    or else if you want to go with a specific branch or a tagged release
+    version, see the '<code>branches</code>' and '<code>tags</code>'
+    subdirectories, respectively. Assuming you want the latest version and
+    have Subversion installed on your machine, just run the following command
+    in a temporary directory:</para>
+
+    <programlisting>svn export http://svn.m0n0.ch/wall/trunk</programlisting>
+
+    <para>Copy the contents of the <code>phpconf</code> subdirectory to
+    <code>$MWROOT/etc</code>. Make sure that all <filename>rc.*</filename>
+    files go into <filename>$MWROOT/etc</filename> and all
+    <filename>*.inc</filename> files into
+    <filename>$MWROOT/etc/inc</filename>. Also, make sure that the
     <filename>rc.*</filename> files have the execute permission bits set
     (chmod 755).</para>
   </section>
@@ -1044,9 +1082,10 @@ perl mkmini.pl m0n0wall.libs / $MWROOT</programlisting></para>
 
     <title>Adding the webGUI</title>
 
-    <para>Get the latest webGUI files<footnoteref linkend="fn-phprepos" /> and
-    copy them to <filename>$MWROOT/usr/local/www</filename>. Copy the captive
-    portal files to <filename>$MWROOT/usr/local/captiveportal</filename>. Make
+    <para>Copy the webGUI files (<code>webgui</code> directory in the
+    repository) to <filename>$MWROOT/usr/local/www</filename>. Copy the
+    captive portal files (<code>captiveportal</code> directory in the
+    repository) to <filename>$MWROOT/usr/local/captiveportal</filename>. Make
     sure that all <filename>*.php</filename> files have the execute permission
     bits set (chmod 755).</para>
   </section>
@@ -1057,12 +1096,11 @@ perl mkmini.pl m0n0wall.libs / $MWROOT</programlisting></para>
     <title>Creating mfsroot</title>
 
     <para>First of all, a zero-filled image file needs to be created. The
-    current size (as of m0n0wall 1.2b8) is 11 MB, which should be enough to
-    fit all the files in the root file system. If you add big components, you
-    may need to increase this. However, don't make it much bigger than
-    necessary, as the MFS will take up as much space as you specify here, even
-    if the file system is not full. Put mfsroot somewhere outside of
-    $MWROOT!</para>
+    current size (as of m0n0wall 1.21) is 11 MB, which should be enough to fit
+    all the files in the root file system. If you add big components, you may
+    need to increase this. However, don't make it much bigger than necessary,
+    as the MFS will take up as much space as you specify here, even if the
+    file system is not full. Put mfsroot somewhere outside of $MWROOT!</para>
 
     <programlisting>dd if=/dev/zero of=mfsroot bs=1k count=11264</programlisting>
 
@@ -1100,10 +1138,10 @@ gzip -9 mfsroot</programlisting>
 
     <para>This is very similar to creating the mfsroot. Again, a zero-filled
     image file needs to be created first. This needs to be big enough to
-    accomodate the kernel, mfsroot, boot loader and config.xml. As of 1.2b8, 6
+    accomodate the kernel, mfsroot, boot loader and config.xml. As of 1.21, 7
     MB is used.</para>
 
-    <programlisting>dd if=/dev/zero of=image.bin bs=1k count=6144
+    <programlisting>dd if=/dev/zero of=image.bin bs=1k count=7168
 vnconfig -s labels -c vn0 image.bin</programlisting>
 
     <para>This time, the first and second stage boot loaders need to be
