@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	diag_dhcp_leases.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2005 Björn Pålsson <bjorn@networksab.com> and Manuel Kasper <mk@neon1.net>.

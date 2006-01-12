@@ -1,7 +1,7 @@
 #!/usr/local/bin/php -f
 <?php
 /*
-	graph.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>

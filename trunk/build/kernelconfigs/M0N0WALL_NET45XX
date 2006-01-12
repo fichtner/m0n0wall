@@ -1,3 +1,4 @@
+# $Id$
 
 machine		i386
 cpu 		I486_CPU

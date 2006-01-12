@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	interfaces_lan.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.

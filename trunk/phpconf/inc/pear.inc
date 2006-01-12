@@ -1,4 +1,6 @@
 <?php
+$Id$
+
 //
 // +--------------------------------------------------------------------+
 // | PEAR, the PHP Extension and Application Repository                 |
@@ -18,7 +20,6 @@
 // |          Tomas V.V.Cox <cox@idecnet.com>                           |
 // +--------------------------------------------------------------------+
 //
-// $Id: PEAR.php,v 1.50.2.19 2005/03/28 16:56:58 cellog Exp $
 //
 
 define('PEAR_ERROR_RETURN',     1);

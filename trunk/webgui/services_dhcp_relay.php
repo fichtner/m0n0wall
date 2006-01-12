@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	services_dhcp.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2004 Justin Ellison <justin@techadvise.com>.

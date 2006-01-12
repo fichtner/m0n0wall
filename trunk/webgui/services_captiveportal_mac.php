@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php
 /*
-	services_captiveportal_mac.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2004 Dinesh Nair <dinesh@alphaque.com>

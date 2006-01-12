@@ -1,6 +1,8 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /*
+$Id$
+
 Copyright (c) 2003, Michael Bretterklieber <michael@bretterklieber.com>
 All rights reserved.
 
@@ -29,8 +31,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This code cannot simply be copied and put under the GNU Public License or 
 any other GPL-like (LGPL, GPL2) License.
-
-    $Id: RADIUS.php,v 1.5 2004/03/25 15:48:40 mbretter Exp $
 
     This version of RADIUS.php has been modified by
     Jonathan De Graeve <jonathan@imelda.be> to integrate with M0n0wall <http://www.m0n0.ch/wall>

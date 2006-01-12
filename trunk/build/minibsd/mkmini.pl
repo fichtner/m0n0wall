@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# $Id$
+
 # arguments: source_tree dest_tree
 
 use File::Copy;

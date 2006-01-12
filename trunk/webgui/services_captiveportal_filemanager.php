@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php
 /*
-	services_captiveportal_filemanager.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2005-2006 Jonathan De Graeve (jonathan.de.graeve@imelda.be)

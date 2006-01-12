@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php
 /*
-	services_dnsmasq.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2003-2005 Bob Zoller <bob@kludgebox.com> and Manuel Kasper <mk@neon1.net>.

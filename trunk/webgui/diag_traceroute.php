@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php
 /*
-	diag_traceroute.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2005-2006 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.

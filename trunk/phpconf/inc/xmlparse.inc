@@ -1,6 +1,6 @@
 <?php
 /*
-	xmlparse.inc
+	$Id$
 	functions to parse/dump configuration files in XML format
 	part of m0n0wall (http://m0n0.ch/wall)
 	

@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php
 /*
-	diag_arp.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2005 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.

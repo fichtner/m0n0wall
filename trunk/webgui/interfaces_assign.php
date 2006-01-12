@@ -1,7 +1,7 @@
 #!/usr/local/bin/php
 <?php 
 /*
-	interfaces_assign.php
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	Written by Jim McBeath based on existing m0n0wall files
 	

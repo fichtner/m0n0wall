@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# $Id$
+
 # arguments: binaries_tree
 
 use File::Find;
