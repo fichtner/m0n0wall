@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+  <?dbhtml filename="bibliography.html"?>
+
+  <title>Bibliography</title>
+  
+  <para>This chapter will list all published writings regarding or
+  mentioning m0n0wall in some fashion.  </para>
+  
+  <para>Know of something that isn't listed here?  Please email &lt;m0n0wall@chrisbuechler.com&gt;.</para>
+  
+  <sect1>
+    <title>Books</title>
+    
+    <para><ulink url="http://www.bookpool.com/.x/hpcpg8taor/sm/193183637X">Wireless Hacking: Projects for Wi-Fi Enthusiasts</ulink></para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="bibliography-newspapers.html"?>
+    <title>Newspapers</title>
+    
+    <para><ulink url="http://www.nytimes.com/2004/10/21/technology/circuits/21spot.html"><emphasis>Where Good Wi-Fi Makes Good Neighbors</emphasis> - The New York Times</ulink></para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="bibliography-magazines.html"?>
+    <title>Magazines</title>
+    
+    <para><ulink url="http://www.computershopper.co.uk/shopper/reviews/59189/m0n0wall-m0n0wall-10.html">Computer Shopper review</ulink></para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="bibliography-television.html"?>
+    <title>Television</title>
+    
+    <para><ulink url="http://www.g4techtv.com/screensavers/features/46497/Build_a_Wireless_Access_Point.html"><emphasis>Build a Wireless Access Point</emphasis> - TechTV </ulink></para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="bibliography-websites.html"?>
+    <title>Popular Websites</title>
+    
+    <para><ulink url="http://software.newsforge.com/article.pl?sid=05/03/15/179223">Newsforge - For network security, build a m0n0wall</ulink></para>
+    
+    <para><ulink url="http://www.tomsnetworking.com/Reviews-161-ProdID-MONOWALL.php">Tom's Networking review</ulink></para>
+    
+    <para><ulink url="http://www.tomsnetworking.com/Reviews-162-ProdID-MONOWALL2-1.php">Tom's Networking review, part 2</ulink></para>
+    
+    <para><ulink url="http://www.thg.ru/network/20041114/index.html">Review on Russian Tom's Hardware Guide site</ulink></para>
+    
+    <para><ulink url="http://www.tomshw.it/network.php?guide=20050119">Review on Italian Tom's Hardware Guide site</ulink></para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="bibliography-conferences.html"?>
+    <title>Conferences</title>
+    
+    <para>There will be a <ulink url="http://radar.oreilly.com/archives/2005/09/eurooscon_m0n0wall.html">
+        session on m0n0wall</ulink>at O'Reilly's EuroOSCON 2005.
+    </para>
+  </sect1>
+
+</chapter>

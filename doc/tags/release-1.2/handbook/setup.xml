@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: setup.xml,v 1.3 2005/10/08 22:56:11 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="setup.html"?>
+
+  <title>Setup</title>
+
+  <para>This chapter acts as a quick reference for those who are familiar 
+  with installing and configuring m0n0wall.  If you need more than a quick
+  reference on what commands to use to write a CD, CF, HD, etc. please see 
+  the Quick Start Guide appropriate to your platform.</para>
+
+  <para><ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick 
+  Start Guide</ulink></para>
+
+  <para><ulink url="http://doc.m0n0.ch/quickstartpc/">PC Quick Start 
+  Guide</ulink></para>
+
+  <para><ulink url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick Start
+  Guide</ulink></para>
+
+  <sect1 id="Setup.Getting">
+    <?dbhtml filename="setup-getting.html"?>
+
+    <title id="Setup.Getting.title">Getting the Software</title>
+
+    <para>There are ready-made binary images for the net45xx/net48xx
+    communication computers from <ulink url="http://www.soekris.com">Soekris Engineering</ulink> and the <ulink url="http://www.pcengines.ch/wrap.htm">
+     Wireless Router Application Platform</ulink> (WRAP) from <ulink url="http://www.pcengines.ch/">PC Engines</ulink>, a CF/IDE HD image for most standard
+    PCs (embedded ones may work, too), a CD-ROM (ISO) image for standard PCs
+    as well as a tarball of the root filesystem.</para>
+
+
+    <para>To download the software for your platform, point your web browser
+    at <ulink
+    url="http://www.m0n0.ch/wall/downloads.php">http://www.m0n0.ch/wall/downloads.php</ulink>
+    and select the appropriate download link from that page. Download the file
+    to your working machine from which you will be writing to either a CD-R or
+    a CompactFlash as described in the <link linkend="Setup.Installing">next
+    section</link>.</para>
+  </sect1>
+
+  <sect1 id="Setup.Installing">
+    <?dbhtml filename="setup-installing.html"?>
+
+    <title id="Setup.Installing.title">Installing the Software</title>
+
+    <para>m0n0wall is designed to boot and run from either a CD image or a
+    CompactFlash (CF) card or IDE hard disk. After downloading the appropriate
+    image file, prepare the CD or CF.</para>
+
+    <sect2>
+      <title>Preparing a bootable CD</title>
+
+      <para>You can run m0n0wall on a standard PC with a CD-ROM drive and a
+      floppy drive. A hard disk is not required. m0n0wall will boot from the
+      CD and run from memory. The floppy is used only to store your m0n0wall
+      configuration. If you want to run m0n0wall on a standard PC with a hard
+      disk rather than a CD, follow the directions in the <link
+      linkend="Setup.Installing.CF">next section</link>.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Download the ISO image as described in <link
+          endterm="Setup.Getting.title"
+          linkend="Setup.Getting"></link>.</para>
+        </listitem>
+
+        <listitem>
+          <para>Burn the ISO image onto a CD-R (or -RW):</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>FreeBSD (ATAPI recorder):</para>
+              <programlisting>burncd -s max -e data cdrom-xxx.iso fixate</programlisting>
+            </listitem>
+            <listitem>
+                <para>Linux (ATAPI w/ SCSI emulation):</para>
+                <para>First, determine your burning device's SCSI ID/LUN with the
+                following command:</para>
+                <programlisting>linuxbox# cdrecord --scanbus
+Cdrecord-Clone 2.01 (i686-pc-linux-gnu) Copyright (C) 1995-2004 Jörg Schilling
+Linux sg driver version: 3.1.25
+Using libscg version 'schily-0.8'.
+scsibus0:
+    0,0,0   100) 'LITE-ON ' 'COMBO LTC-48161H' 'KH0F' Removable CD-ROM
+                 </programlisting>   
+    
+                <para>Note the SCSI ID/LUN is 0,0,0. Burn the image as in the following
+                example (replacing &lt;max speed&gt; with the speed of your burner):</para>
+                <programlisting>cdrecord --dev=0,0,0 --speed=&lt;max speed&gt; cdrom-xxx.iso</programlisting>
+            </listitem>
+    
+            <listitem>
+              <para>Windows: use your favorite burning program (e.g. Nero) to
+              record the ISO image (2048 bytes/sector, Mode-1)</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para>Format a standard 1.44 MB diskette <emphasis role="bold">with
+          MS-DOS/FAT file system</emphasis>.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>FreeBSD:</para>
+
+              <programlisting>fdformat -f 1440 /dev/fd0 &amp;&amp; newfs_msdos -L "m0n0wallcfg" -f 1440 /dev/fd0</programlisting>
+
+              <para>Note: you can omit the fdformat step if the floppy disk is
+              already (low-level) formatted.</para>
+            </listitem>
+
+            <listitem>
+              <para>Windows:</para>
+
+              <programlisting>format A:</programlisting>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+
+      <para>Make sure your m0n0wall PC is set to boot from CD-ROM and
+      <emphasis role="bold">not</emphasis> from floppy.</para>
+    </sect2>
+
+    <sect2 id="Setup.Installing.CF">
+      <title id="Setup.Installing.CF.title">Preparing a CompactFlash or IDE
+      Hard Disk</title>
+
+      <para>You can run m0n0wall on a system which uses a CompactFlash (CF)
+      card as its primary disk, such as the <ulink
+      url="http://www.soekris.com">Soekris</ulink> boxes, or on a standard PC
+      with an IDE hard disk. m0n0wall will load from the CF card or disk and
+      then run from memory. It does not swap to the CF card or disk, nor does
+      it write anything to it except when you change and save your
+      configuration.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Download the appropriate raw CF/IDE image as described in
+          <link endterm="Setup.Getting.title"
+          linkend="Setup.Getting"></link>.</para>
+        </listitem>
+
+        <listitem>
+          <para>Write the image to a sufficiently large CF card or disk (at
+          least 5 MB). Extra space on the CF card or disk is ignored; there is
+          no benefit to using one larger than the image size.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>FreeBSD:</para>
+
+              <programlisting>gzcat net45xx-xxx.img | dd of=/dev/rad[n] bs=16k</programlisting>
+
+              <para>where n = the ad device number of your CF card or IDE disk
+              (check dmesg); use net48xx-xxx.img for net4801, wrap-xxx.img for
+              WRAP, and generic-pc-xxx.img for an IDE disk on a PC instead of
+              net45xx-xxx.img.</para>
+
+              <para><emphasis>Ignore the warning about trailing garbage - it's
+              because of the digital signature.</emphasis></para>
+            </listitem>
+
+            <listitem>
+              <para>Linux:</para>
+
+              <programlisting>gunzip -c net45xx-xxx.img | dd of=/dev/hdX bs=16k</programlisting>
+
+              <para>where X = the IDE device name of your CF card or IDE disk
+              (check with hdparm -i /dev/hdX) - some adapters, particularly
+              USB, may show up under SCSI emulation as /dev/sdX.</para>
+
+              <para><emphasis>Ignore the warning about trailing garbage - it's
+              because of the digital signature.</emphasis></para>
+            </listitem>
+
+            <listitem>
+              <para>Windows:</para>
+
+              <programlisting>physdiskwrite [-u] net45xx-xxx.img</programlisting>
+
+              <para>where physdiskwrite is v0.3 or later of the physdiskwrite
+              program available from the m0n0wall web site <ulink
+              url="http://www.m0n0.ch/wall/physdiskwrite.php">physdiskwrite
+              page</ulink>. Use the -u flag (without the square brackets) if
+              the target disk is &gt; 800 MB - make very sure you've selected
+              the right disk!!</para>
+              
+              <para>To ensure you have selected the appropriate disk, run physdiskwrite prior to inserting the media
+              you're planning to write, and make note of its output.</para>
+              
+              <programlisting>physdiskwrite v0.5 by Manuel Kasper &lt;mk@neon1.net&gt;
+
+Searching for physical drives...
+
+Information for \\.\PhysicalDrive0:
+      Windows:       cyl: 14593
+                     tpc: 255
+                     spt: 63
+      C/H/S:         16383/16/63
+      Model:         ST3120026A
+      Serial number: 3JT1V2FS
+      Firmware rev.: 3.06</programlisting>
+              
+            <para>You now know the drives currently in the system, so you know which
+            you don't want to use.  Make note of the model and serial number.
+            Add the drive or CompactFlash card you wish
+            to write to, and run physdiskwrite again.  You'll now see an additional
+            drive in the output, and by referring back to when you ran the command
+            earlier, you will know by process of elimination which drive is the one
+            you want to write.  </para>
+              
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+    
+    <sect2>
+        <title>Alternative means of installation</title>
+        
+        <para>For alternative means of installing m0n0wall, see the <link linkend="OtherDoc.Installation">
+            Installation section</link> of the Other Documentation chapter.
+        </para>
+            
+    </sect2>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="setup-booting.html"?>
+
+    <title>Booting m0n0wall</title>
+
+    <para>The first time you boot your system to run m0n0wall, you must
+    configure it. Once configured, it will automatically run m0n0wall with
+    your configuration when booted.</para>
+
+    <para>When booting your m0n0wall system for the first time:</para>
+
+    <itemizedlist spacing="compact">
+      <listitem>
+        <para>Insert the m0n0wall CD, CF or disk you prepared according to the
+        instructions <link linkend="Setup.Installing">above</link>. On a CD
+        system, also insert the formatted and blank floppy disk. Make sure the
+        floppy is writable (not write-protected) and formatted with the FAT file
+        system.</para>
+      </listitem>
+
+      <listitem>
+        <para>Ensure that the system boots from the CD, CF or disk. You may
+        need to enter the BIOS on your system to configure this.</para>
+      </listitem>
+
+      <listitem>
+        <para>Ensure that the system console is available. On a PC, make sure
+        keyboard and monitor are connected to the system. On a Soekris box,
+        the serial port is the console; connect it to a terminal, or use a
+        null-modem cable to connect it to a serial port on another computer
+        running a terminal emulator.</para>
+      </listitem>
+
+      <listitem>
+        <para>On a Soekris box or WRAP board, make sure the console speed is
+        set to 9600 bps in the BIOS (set ConSpeed=9600 for Soekris
+        boxes).</para>
+      </listitem>
+
+      <listitem>
+        <para>Connect the system to the network.</para>
+      </listitem>
+
+      <listitem>
+        <para>Boot the system and wait for the console menu to appear. Assign
+        the network interface ports as described in the <link
+        linkend="Config.Console">following chapter</link>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Complete the configuration of your m0n0wall system by using the
+        webGUI as described <link linkend="Config.WebGUI">below</link>. Save
+        your configuration file to your working computer as a backup.</para>
+      </listitem>
+    </itemizedlist>
+
+    <note>
+      <para>It seems that some Soekris net45xx's have a bug where sometimes a
+      character is sent twice over the serial console, but another character
+      is dropped instead. This is solved with a BIOS upgrade from Soekris
+      (version 1.15a or later).</para>
+    </note>
+
+    <para>After you have finished editing your configuration, you are ready to
+    go. You do not need to reboot your m0n0wall box, although you may wish to
+    do so to see that it boots directly into operation.</para>
+  </sect1>
+</chapter>

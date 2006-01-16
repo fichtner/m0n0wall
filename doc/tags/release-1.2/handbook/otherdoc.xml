@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: otherdoc.xml,v 1.1 2005/07/05 00:43:50 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="otherdoc.html"?>
+  <title>Other Documentation</title>
+
+  <para>There are many people who have written additional documentation for
+  m0n0wall which are beyond the scope of this manual, or which have not yet
+  been incorporated into this manual. This chapter provides a reference to
+  some of those sources to help you when you find yourself in a situation not
+  covered in detail in this manual.</para>
+
+  <sect1 id="OtherDoc.Installation">
+    <?dbhtml filename="otherdoc-install.html"?>
+    <title>Installation</title>    
+    
+    <para><ulink url="http://chrisbuechler.com/m0n0wall/liveinstaller/">m0n0wall
+    Live Installer</ulink> - FreeBSD Live CD (built using <ulink url="http://www.freesbie.org">FreeSBIE</ulink>)
+    including all m0n0wall 1.11 and 1.2b3 images and instructions on using it.</para>
+    
+    <para><ulink url="http://www.unixlibre.com.ar/archivos/m0n0wall_network_install.html">
+        Installing m0n0wall over a network</ulink> - Roberto Pereyra</para>
+        
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="otherdoc-vpn.html"?>
+    <title>VPN/IPsec/PPTP</title>
+
+    <para><ulink
+    url="http://www.michael-i.com/files/projects/m0n0ad/">Authenticating
+    m0n0wall's PPTP VPN with an Active Directory Server</ulink> - Michael Iedema</para>
+
+    <para><ulink
+    url="http://www.michael-i.com/files/projects/fiddler/">Configuring a
+    Wireless Network to Network IPSEC bridge using m0n0wall</ulink> - Michael Iedema</para>
+
+    <para><ulink url="http://michael-i.com/?s=Presentations">Wireless
+    inSecurity</ulink> (bottom of page) - Michael Iedema</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="otherdoc-wireless.html"?>
+    <title>Wireless</title>
+    
+    <para><ulink url="http://www.nycwireless.net/hotspot/setting_up_a_community_hotspot.pdf">
+        Setting Up a Community Hotspot with m0n0wall (PDF) - NYCwireless</ulink></para>
+        
+  </sect1>
+  
+</chapter>

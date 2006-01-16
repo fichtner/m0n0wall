@@ -1,0 +1,208 @@
+<html>
+<head>
+ <title>m0n0wall Users Guide Editors Guidelines</title>
+</head>
+<body>
+<h1><font face="Arial">m0n0wall Users Guide Editors Guidelines</font></h1>
+<p>
+<font face="Arial">Contents:
+</font>
+<ul>
+<li><font face="Arial"><a href="#helping">How You Can Help</a>
+</font>
+<li><font face="Arial"><a href="#mail">Discussion Group</a>
+</font>
+<li><font face="Arial"><a href="#wiki">Documentation Test Bed</a>
+</font>
+<li><font face="Arial"><a href="#cvs">CVS</a>
+</font>
+<li><font face="Arial"><a href="#editing">Editing</a>
+</font>
+<li><font face="Arial"><a href="#compiling">Compiling</a>
+</font>
+<li><font face="Arial"><a href="#committing">Committing</a>
+</font>
+<li><font face="Arial"><a href="#results">Results</a>
+</font>
+<li><font face="Arial"><a href="#statcvs">Development Statistics</a>
+</font>
+</ul>
+
+<p>
+<a name="#helping"><h3><font face="Arial">How You Can Help</font></h3></a>
+<p>
+<font face="Arial">Wondering how you can contribute?  Check out the m0n0wall Documentation Project's <a href="wishlist.html"><b>wish list</b></a>.
+
+</font>
+
+<p>
+<a name="mail"><h3><font face="Arial">Discussion Group</font></h3></a>
+<p>
+<font face="Arial">Discussions about the m0n0wall Users Guide take place on the
+m0n0wall-doc email list.
+</font>
+<ul>
+<li><font face="Arial">To subscribe, send an empty message to
+    <a href="mail:m0n0wall-doc-subscribe@lists.m0n0.ch">
+    m0n0wall-doc-subscribe@lists.m0n0.ch</a>
+</font>
+<li><font face="Arial">To unsubscribe, send an empty message to
+    <a href="mail:m0n0wall-doc-unsubscribe@lists.m0n0.ch">
+    m0n0wall-doc-unsubscribe@lists.m0n0.ch</a>
+</font>
+<li><font face="Arial">To post a message, send mail to
+    <a href="mail:m0n0wall-doc@lists.m0n0.ch">
+    m0n0wall-doc@lists.m0n0.ch</a>
+</font>
+</ul>
+
+<p>
+<a name="wiki"><h3><font face="Arial">Documentation Test Bed</font></a></h3>
+<p>
+<font face="Arial">The m0n0wall Documentation Project has made a wiki available as a documentation
+test bed.  The official source of documentation will remain the Users Guide,
+however we encourage people to contribute to the wiki.  Changes on the wiki will
+be incorporated into the DocBook Users Guide after appropriate formatting, review,
+and editing. </font>
+<p>
+<font face="Arial">The official m0n0wall wiki can be found at <a href="http://wiki.m0n0.ch">http://wiki.m0n0.ch</a>.
+
+</font>
+
+<p>
+<a name="cvs"><h3><font face="Arial">CVS</font></h3></a>
+<p>
+<font face="Arial" size="2">The m0n0wall Users Guide is maintained in a CVS repository.
+Write privileges to the CVS repository are granted by Manuel.
+Anonymous access is available at
+</font>
+<blockquote>
+<font face="Courier New" size="2">:pserver:anonymous@m0n0.ch:/m0n0wall
+</font>
+</blockquote>
+<font face="Arial" size="2">with no password.
+
+</font>
+
+<p>
+<font face="Arial" size="2">You can check out a copy of the files to your machine with this sequence
+of commands:
+</font>
+<blockquote>
+<pre>
+<font face="Courier New">mkdir m0n0doc
+cd m0n0doc
+cvs -d :pserver:anonymous@m0n0.ch:/m0n0wall login
+cvs -d :pserver:anonymous@m0n0.ch:/m0n0wall checkout doc</font><font face="Arial">
+</font></pre>
+</blockquote>
+<font face="Arial" size="2">The files of interest will be in m0n0doc/doc/docbook.
+</font>
+<p><font face="Arial" size="2">If you want to see a copy of the documentation 
+DocBook XML sources but do not want to configure CVS, you can
+<a href="http://chrisbuechler.com/m0n0wall/m0n0wall-doc.tgz">download a tgz of 
+the documentation</a>.</font></p>
+
+
+<p>
+<a name="editing"><h3><font face="Arial">Editing</font></h3></a>
+<p>
+<font face="Arial">To edit the XML files, you can either use your favorite text editor to
+directly edit the files, in which case you must be familiar with the
+DocBook XML tags, or you can use an XML editor, such as the
+<a href="http://www.xmlmind.com">XMLmind</a>
+<a href="http://www.xmlmind.com/xmleditor/stdedition.html">
+XML Editor Standard Edition</a>, which is free for personal or corporate
+internal use.
+</font>
+<p>
+<font face="Arial">If you aren't comfortable with editing in docbook format, you can also submit documentation in plain text, HTML,
+or other common formats and the editor will convert to docbook. </font>
+<p>
+<font face="Arial">If you are interested in learning DocBook, check out the following:<br>
+<br>
+<a href="http://www.oasis-open.org/docbook/xml/4.2/index.shtml">DocBook XML 4.2</a>
+<br>
+<a href="http://www.docbook.org/">Official DocBook home page</a>
+<br>
+<a href="http://www.oreilly.com/catalog/docbook/chapter/book/docbook.html"><i>DocBook: The Definitive Guide</i></a>
+
+</font>
+
+<p>
+<a name="compiling"><h3><font face="Arial">Compiling</font></h3></a>
+<p>
+<font face="Arial">After editing any of the XML files, you should compile the HTML files
+to make sure they still look reasonable.
+The Makefile in this directory is set up to create three different
+types of output: </font>
+<ul>
+<li><font face="Arial">A directory (html.d) of html files, one for each chapter and section
+    ("make html_dir" or just "make"). </font>
+<li><font face="Arial">A single html file (m0n0doc.html) containing the entire manual
+    ("make html_file"). </font>
+<li><font face="Arial">A PDF file (m0n0doc.pdf) containing the entire manual
+    ("make pdf_file"). </font>
+</ul>
+<font face="Arial">The default is to compile the directory of html files.
+Running "make all" will compile all three output formats.
+Running "make clean" will remove all generated files.
+
+</font>
+
+<p>
+<font face="Arial">You may need to download and install some additional software
+in order to compile the XML files into HTML or PDF.
+See the Makefile for more information about what tools are required. </font>
+
+<p>
+<a name="committing"><h3><font face="Arial">Committing Changes</font></h3></a>
+<p>
+<font face="Arial">There are a limited number of people with commit privileges to the CVS repository.
+If you do not have commit privileges, email your changes to the editor, <a href="mailto:m0n0wall@chrisbuechler.com">
+Chris Buechler</a>.
+
+</font>
+
+<p>
+<font face="Arial">If you do have commit privileges, please make sure of the following before
+committing your changes:
+</font>
+<ul>
+<li><font face="Arial">Contributor attributions are up to date (if someone sends you a file
+    to commit, make sure they are properly credited in the Contributors
+    section).
+</font>
+<li><font face="Arial">book.xml is up to date (if any chapter files have been added or renamed).
+</font>
+<li><font face="Arial">"make html_dir" produces a correct set of html files (this is the primary
+    output format, used on the m0n0wall web site). </font>
+</ul>
+
+<p>
+<a name="results"><h3><font face="Arial">Results</font></h3></a>
+<p>
+<font face="Arial">There is a nightly script that runs at 02:00 CEST (UTC + 2 hours) to convert the current
+(most recently committed) XML files into a set of HTML files for display
+on the m0n0wall web site at
+<a href="http://m0n0.ch/wall/docbook">http://m0n0.ch/wall/docbook</a>.
+</font>
+<p>
+
+<a name="statcvs"><h3><font face="Arial">Development Statistics</font></h3></a>
+<p>
+<font face="Arial">
+<a href="http://chrisbuechler.com/m0n0wall/m0n0wall-doc/">StatCVS statistics on the m0n0wall
+documentation CVS repository</a>.
+
+
+<br>
+&nbsp;</font><hr>
+<font face="Arial">
+<font size=-1>Edited by <i>Chris Buechler</i> November 1, 2004</font><br>
+<font size=-1>Created by <i>Jim McBeath</i> May 6, 2004</font>
+
+</font>
+
+</body>
+</html>

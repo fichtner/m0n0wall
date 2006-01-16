@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: examples.xml,v 1.1 2005/07/05 00:43:49 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="examples.html"?>
+  <title>Example Configurations</title>
+
+  <para></para>
+  
+  <sect1>
+    <?dbhtml filename="examples-dmz-1to1nat.html"?>
+    <title>Configuring a DMZ Interface Using NAT</title>
+    
+    <para>This section will explain how to add a DMZ interface to the two interface
+    (LAN/WAN) base configuration from the <ulink url="http://m0n0.ch/wall/quickstart/">
+    Quick Start Guide</ulink>.</para>
+    
+    <para>You <emphasis role="bold">must</emphasis> have a functioning two interface
+    setup before starting on configuring your DMZ interface.</para>
+    
+    <para>The 1:1 NAT DMZ setup is most appropriate where you have multiple public
+        IP's and wish to assign a single public IP to each DMZ host.</para>
+    
+    <sect2>
+        <title>Network Diagram</title>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="networkdiagrams/dmz-network.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>This depicts the network layout we will have after configuring our
+            DMZ interface.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Adding the Optional Interface</title>
+        
+        <para>Log into your m0n0wall's webGUI, and click "(assign)" next to Interfaces.</para>
+
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/interfaceassignments.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>Click the <imageobject><imagedata fileref="icons/plus.gif" />
+        </imageobject> on this page to add your third interface.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/interfaceassignments-added.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>Now restart your m0n0wall for the changes to take affect.  </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Configuring the Optional Interface</title>
+        
+        <para>After your m0n0wall restarts, log back into the webGUI.  Under Interfaces,
+        you will see OPT1.  Click on it.  </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/interfaces-opt1.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        
+        <para>Check the box at the top to enable the interface, give it a more descriptive
+        name (I'll call it "DMZ"), and set up the desired IP configuration.  The IP
+        subnet must be different from the LAN subnet.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/interfaces-dmz.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+    </sect2>
+    
+    <sect2>
+        <title>Configuring the DMZ Interface Firewall Rules</title>
+        
+        <para>The main purpose of a DMZ is to protect the LAN from the publicly-accessible
+        Internet hosts on your network.  This way if one of them were to be compromised,
+        your LAN still has protection from the attacker.  So if we don't block traffic
+        from the DMZ to the LAN, the DMZ is basically useless.</para>
+        
+        <para>First we will put in a firewall rule on the DMZ interface denying all
+        traffic to the LAN while still permitting all traffic to the WAN.  Click
+        Firewall -&gt; Rules, and click the <imageobject><imagedata fileref="icons/plus.gif" />
+        </imageobject> at the bottom of the page.  </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/firewall/rules/add.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>Filling out this screen as shown below will permit all traffic out
+        the DMZ interface to the internet, but prohibit all DMZ traffic from entering
+        the LAN.  It also only permits outbound traffic from the DMZ's IP subnet
+        since only traffic from a source IP within your DMZ should come in on the DMZ
+        interface (unless you have a routed DMZ, which would be strange).  This
+        prevents spoofed packets from leaving your DMZ.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/firewall/rules/dmz-rule.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>Click Save after verifying your selections.  Then click Apply Changes.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Permitting select services from DMZ into the LAN</title>
+        
+        <para>You probably have some services on your LAN that your DMZ hosts will
+        need to access.  In our sample network, we need to be able to reach DNS on
+        the two LAN DNS servers, cvsup protocol to our LAN cvsup-mirror server, and
+        NTP for time synchronization to the time server that resides on the cvsup-mirror
+        server.</para>
+        
+        <para>Always use specific protocols, ports, and hosts when permitting traffic
+        from your DMZ to your LAN.  Make sure nothing that isn't required can get
+        through.</para>
+        
+        <note>Don't forget that source ports (TCP and UDP) are randomly selected
+        high ports, and not the same as the destination port.  You'll need to use
+        "any" for source port.</note>
+        
+        <para>My DMZ interface firewall rules now look like the following after
+        permitting the required services from DMZ to LAN.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/dmzfwrules.png" />
+                </imageobject>
+            </mediaobject>
+        </para>        
+        
+        <para>Note that I added a rule to deny any traffic coming in on the DMZ
+        interface destined for the LAN.  This was not required because of the way
+        we configured the allow rule, however I like to put it in there to make it
+        very clear where the traffic from DMZ to LAN is getting dropped.  </para>
+        
+        <para>When entering your rules, remember they are processed in top down
+        order, and rule processing stops at the first match.  So if you had left
+        the rule we added above as the top rule, it would drop packets from DMZ to
+        LAN without getting to the permit rules you added.  I recommend you design
+        your rules similar to how I have, with drop DMZ to LAN as the second last line,
+        and permit DMZ to any except LAN as the last line.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Configuring NAT</title>
+        
+        <para>Now you need to determine whether you'll use inbound or 1:1 NAT.  If
+        you have multiple public IP's, use 1:1 NAT.  If you have only a single public
+        IP, you'll need to use inbound NAT.  If you have multiple public IP's, but more
+        DMZ hosts than public IP's, you can use inbound NAT, or a combination of 1:1
+        and inbound.  </para>
+        
+        <sect3>
+            <title>Using 1:1 NAT</title>
+            
+            <para>For this scenario, we'll say we have a /27 public IP subnet.  We'll say
+            it's 2.0.0.0/27.  m0n0wall's WAN interface has been assigned with IP 2.0.0.2.
+            I will use 1:1 NAT to assign the public IP 2.0.0.3 to the DMZ mail server and
+            2.0.0.4 to the DMZ web server.  </para>
+            
+            <para>Go to the Firewall -&gt; NAT screen and click the 1:1 tab.  Click the
+            <imageobject><imagedata fileref="icons/plus.gif" /></imageobject>.  I will add
+            two entries, one each for the mail server and web server.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/natdmz/nat-edit-1to1-mail.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/natdmz/nat-edit-1to1-www.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+        
+        <para>After adding the rules, click Apply changes.  You'll now see something like the
+        following.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="screens/examples/natdmz/1to1-nat-added.png" />
+                </imageobject>
+            </mediaobject>
+        </para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>Testing the 1:1 NAT Configuration</title>
+            
+            <para>You can test the 1:1 NAT we just configured by going to whatismyip.com
+            on the machine configured for 1:1.  If you don't have a GUI, lynx will work,
+            or you can fetch or wget the URL and cat the resulting file.
+            (fetch http://whatismyip.com &amp;&amp; cat whatismyip.com | grep "IP is").  </para>
+            
+            <para>You should see the IP is the one you just configured in 1:1 NAT.  If you get
+            an IP other than the one you configured in 1:1, there is a problem with your
+            configuration.</para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>Using Inbound NAT</title>
+            
+            <para>If you have only one public IP, or more need more publicly-accessible servers
+            than you have public IP addresses, you'll need to use inbound NAT.  Go to the NAT
+            screen, and on the Inbound tab, click <imageobject><imagedata fileref="icons/plus.gif" />
+            </imageobject>.</para>
+            
+            <para>For this example, we will assume you have only one public IP, and it is the interface
+            address of the WAN interface.  </para>
+            
+            <para>First, anything to the WAN IP to port 25 (SMTP) will go to the mail server in our DMZ.
+            </para>
+            
+            <para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="screens/examples/natdmz/inbound-nat-add-smtp.png" />
+                    </imageobject>
+                </mediaobject>
+            </para>
+            
+            <para>Click Save, and click <imageobject><imagedata fileref="icons/plus.gif" />
+            </imageobject> to add the inbound NAT rule for the HTTP server.</para>
+
+            <para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="screens/examples/natdmz/inbound-nat-add-www.png" />
+                    </imageobject>
+                </mediaobject>
+            </para>
+            
+            <para>Click "Apply changes" and your configuration will be working.  It should look
+            like the following.</para>
+
+            <para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="screens/examples/natdmz/inbound-nat-added.png" />
+                    </imageobject>
+                </mediaobject>
+            </para>
+            
+        </sect3>
+        
+    </sect2>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="examples-dmz-lockdown.html"?>
+        <title>Locking Down DMZ Outbound Internet Access</title>
+        
+        <para>We've limited DMZ hosts' accessibility to the LAN, but we can lock it down a step
+        further using egress filtering.  Many DMZ hosts don't need to be able to talk out to the
+        Internet at all, or possibly only while you are running updates or doing maintenance or
+        need to download software.             
+            </para>
+            
+        <para>If we can keep our DMZ hosts from accessing the Internet, we can make an attacker's
+        job much more difficult.  Many exploits rely on the target being able to pull files from
+        a machine the attacker controls, or in the case of a worm, from the infected host.  I'll
+        use Code Red and Nimda as an example.  Infected hosts exploited the vulnerability, and the remote
+        host pulled the infected admin.dll via TFTP from the already infected host.  If you were
+        running vulnerable web servers, but did not allow TFTP traffic outbound from your webservers,
+        you could not have been infected.
+        (<ulink url="http://securityresponse.symantec.com/avcenter/venc/data/w32.nimda.a@mm.html">reference</ulink>)
+        </para>
+        
+        <para>Attackers most always try to pull in a tool kit or root
+        kit of some sort onto machines they exploit.  <emphasis role="bold">There are ways around this</emphasis>,
+        but it just makes it that much more difficult.  This will merely slow down a knowledgeable
+        attacker (who'll find a way to get in one way or another), but it could stop a
+        script kiddie dead in their tracks and keep some worms from infecting your network.</para>
+        
+        <para><emphasis role="bold">This is not a replacement for proper patching and other security measures, it's just
+        good practice in a defense-in-depth strategy.</emphasis></para>
+        
+        <formalpara>
+            <title>How does this work?</title>
+            
+            <para>You might be wondering how your servers will be able to serve content while not being able
+            to talk out to the Internet.  I'll use web servers as an example.  When packets come in on the
+            WAN interface through firewall rules you have entered to permit HTTP traffic, there is a state
+            entry that permits any return traffic from that connection to traverse the firewall.
+            </para>
+            
+            <para>Remember this only affects the ability to initiate connections outbound, not the ability
+            to respond to incoming traffic requests.</para>
+            
+        </formalpara>
+        
+        <formalpara>
+            <title>Recommended configuration</title>
+            
+            <para>As with all firewall rules, limit the accessibility as much as
+            possible.  Mail servers that must send outbound mail will need to
+            initiate connections to destination TCP port 25 to any host.  If the
+            DNS servers your DMZ hosts use reside outside of the DMZ, you'll need
+            to allow UDP port 53 to the DNS servers being used.  </para>
+            
+            <para>I typically put in rules for upgrade purposes to permit
+            outbound traffic to the ports required.  For FreeBSD, TCP 5999 (cvsup)
+            and TCP 80 (HTTP) will generally suffice.  When I'm not upgrading the
+            system, I use the "disable" checkbox to disable the rule, but leave it
+            in place to easily enable it when needed.  Just always remember to
+            disable it when you're done updating the system.</para>
+            
+        </formalpara>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="examples-filtered-bridge.html"?>
+    <title>Configuring a filtered bridge</title>
+    
+    <para>A filtered bridge is a common way of configuring a DMZ segment.  This can be
+    used as a typical DMZ where you have hosts on the LAN interface, but is probably
+    more frequently used to protect servers at a colocation facility where there are
+    no LAN hosts.</para>
+    
+    <note>Remember <link linkend="FAQ.bridge">you cannot access hosts on a bridged
+    interface from a NAT'ed interface</link>, so if you do have a LAN interface set
+    up, you won't be able to access the hosts on the bridged interface from the LAN.
+    </note>
+    
+    <formalpara>
+        <title>Network Diagram for this Configuration</title>
+        
+        <para>The following diagram depicts the example configuration described in
+        this section.  The colocation facility has assigned you with the subnet
+        111.111.111.8/29, which includes usable IP's .9-.14.  One of those is
+        required for the colo's router, so you end up with 5 usable IP's.</para>
+        
+        <para>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="networkdiagrams/filtering-bridge.png" />
+                </imageobject>
+            </mediaobject>
+        </para>        
+        
+    </formalpara>
+    
+    <sect2>
+        <title>General Configuration</title>
+        
+        <para>After you have your network set up as shown, and the interfaces and
+        LAN IP assigned appropriately, log into the webGUI to begin the initial
+        configuration.</para>
+        
+        <para>First go to System -&gt; General setup, and configure the hostname,
+        domain, DNS servers, change the password, switch the webGUI to HTTPS, and
+        set your time zone.  Click Save, and reboot m0n0wall for the changes to
+        take affect.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>WAN Configuration</title>
+        
+        <para>Log back into the webGUI and go to the Interfaces -&gt; WAN page.
+        For the example network, we'll assign the static IP 111.111.111.10/29,
+        default gateway 111.111.111.9.  Unless your WAN network is private IP's,
+        check the "Block private networks" box.  Click Save.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>OPT Interface Configuration</title>
+        
+        <para>Click Interfaces -&gt; OPT.  Name the interface to your liking
+        (for the example, we'll use Servers for the name).  In the "Bridge
+        with" box, select WAN.  Click Save.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Enable Filtering Bridge</title>
+        
+        <para>Go to the System -&gt; Advanced page and check the "Enable
+        filtering bridge" box.  Click Save. </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Configure Firewall Rules</title>
+        
+        <para>Go to the Firewall -&gt; Rules screen.  </para>
+        
+        <note>Chances are for any configuration, especially if you're restricting
+        outbound connections, you'll need a much more involved ruleset than is
+        depicted here.  Open what you know you need open, and watch for dropped
+        traffic in your logs to see what else you might need to open.  It takes
+        some effort to get your firewall locked down as tightly as it can
+        possibly be, but the long term effect of increased security is well worth
+        the time spent.</note>
+        
+        <sect3>
+            <title>OPT Interface Rules</title>
+            
+            <para>Initially, you may want to configure a rule on the
+            OPT interface permitting traffic to anywhere, then after
+            things are working, tightening that rules as desired.  For
+            this example, we'll go ahead and implement locked
+            down rules from the get go.</para>
+            
+            <para>The mail server on our bridged interface needs to send
+            mail to any host on the Internet.  Both servers need to get
+            to DNS servers at 111.111.110.2 and 111.111.109.2.  We'll add
+            disabled maintenance rules for HTTP and cvsup.</para>   
+            
+        </sect3>
+        
+        <sect3>
+            <title>WAN Interface Rules</title>
+            
+            <para>Since this example portrays a firewall at a colocation
+            facility, we need a remote administration rule to allow
+            traffic from our trusted location's static IP access to
+            administration functions of the servers, as well as the m0n0wall
+            webGUI.  For this example, we'll permit all traffic from
+            the trusted location (IP 11.12.13.30).  You may want to
+            tighten this rule.  If you don't have anything on the LAN
+            segment, remember to allow remote administration from somewhere
+            so you can get into the webGUI without being on site.  </para>
+            
+            <para>We also need to add rules to permit SMTP traffic to the
+            mail server and HTTP and HTTPS traffic to the web server.</para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>LAN Interface Rules</title>
+            
+            <para>You can leave or remove the default LAN to any rule if
+            you don't have hosts on the LAN interface.  In the example, the
+            LAN interface will be unplugged once the onsite configuration is
+            completed.</para>
+            
+        </sect3>
+        
+        <sect3>
+            <title>Firewall Rules Completed</title>
+
+            <para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="screens/examples/filteredbridge/firewallrules.png" />
+                    </imageobject>
+                </mediaobject>
+            </para>
+            
+        </sect3>    
+        
+    </sect2>
+    
+    <sect2>
+        <title>Completing the Configuration</title>
+        
+        <para>Everything should be working as desired now, as long as the servers
+        are configured appropriately.  Test that the configuration works as desired,
+        including all inbound and outbound rules.  Once you're satisfied with the
+        testing results, your setup is complete. </para>
+        
+    </sect2>
+    
+  </sect1>
+    
+  
+</chapter>

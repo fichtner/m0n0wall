@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: book.xml,v 1.4 2005/09/13 00:06:23 chris Exp $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY __intro__quickstart SYSTEM "intro.xml">
+<!ENTITY __setup__quickstart SYSTEM "setup.xml">
+<!ENTITY __configure__quickstart SYSTEM "configure.xml">
+<!ENTITY __clientconfigure__quickstart SYSTEM "clientconfigure.xml">
+<!ENTITY __webgui__quickstart SYSTEM "webgui.xml">
+<!ENTITY __troubleshooting__quickstart SYSTEM "troubleshooting.xml">
+<!ENTITY __glossary__quickstart SYSTEM "glossary.xml">
+]>
+<book>
+  <bookinfo>
+    <title>m0n0wall - WRAP Platform Quick Start Guide</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Chris</firstname>
+
+        <surname>Buechler</surname>
+      </author>
+
+      <othercredit>
+        <othername>m0n0wall written by Manuel Kasper.  Additional Contributors listed in <ulink
+        url="http://m0n0.ch/wall/docbook/intro-credits.html">Users Guide</ulink>.
+        </othername>
+      </othercredit>
+    </authorgroup>
+
+    <copyright>
+      <year>2005</year>
+
+      <holder>m0n0wall Documentation Project</holder>
+    </copyright>
+
+    <pubdate>September 2005</pubdate>
+
+    <abstract>
+      <para>Getting started with m0n0wall, a complete embedded firewall software
+      package.</para>
+
+      <para><mediaobject id="m0n0wall.logo">
+          <imageobject>
+            <imagedata fileref="m0n0icon.png" />
+          </imageobject>
+        </mediaobject></para>
+    </abstract>
+
+    <releaseinfo>m0n0wall Version 1.2, September 2005</releaseinfo>
+
+    <legalnotice>
+      <para>All rights reserved.</para>
+
+      <para>Redistribution and use in any form, with or without modification,
+      are permitted provided that the following conditions are met:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Redistributions must retain the above copyright notice, this
+          list of conditions and the following disclaimer.</para>
+        </listitem>
+
+        <listitem>
+          <para>Neither the name of the m0n0wall Documentation Project nor the
+          names of its contributors may be used to endorse or promote products
+          derived from this documentation without specific prior written
+          permission.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>THIS DOCUMENTATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+      CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+      BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+      FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+      COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+      NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+      USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+      ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+      THIS DOCUMENTATION OR THE ASSOCIATED SOFTWARE, EVEN IF ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGE.</para>
+    </legalnotice>
+  </bookinfo>
+
+  &__intro__quickstart;
+  
+  &__setup__quickstart;
+  
+  &__configure__quickstart;
+  
+  &__clientconfigure__quickstart;
+
+  &__webgui__quickstart;
+  
+  &__troubleshooting__quickstart;
+  
+  &__glossary__quickstart; 
+  
+</book>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="Troubleshooting">
+  <?dbhtml filename="troubleshooting.html"?>
+  <title>Troubleshooting</title>
+  
+  <para>Some of the problems you may run into in the process of following
+  this guide, and their associated troubleshooting steps follow.</para>
+  
+  <para><ulink url="http://doc.m0n0.ch/handbook/troubleshooting.html#id2615323">Network
+  interfaces are not detected</ulink></para>
+  
+  <para><ulink url="http://doc.m0n0.ch/handbook/troubleshooting-nointernetfromlan.html">
+    Cannot access Internet from LAN after configuring WAN Interface</ulink></para>
+    
+  <para><ulink url="http://doc.m0n0.ch/handbook/troubleshooting-nowebgui.html">
+    Cannot access webGUI from LAN</ulink></para>
+    
+  <para><ulink url="http://doc.m0n0.ch/handbook/troubleshooting-nolinklight.html">
+    Cannot get link light on network interface(s).</ulink></para>  
+    
+</chapter>

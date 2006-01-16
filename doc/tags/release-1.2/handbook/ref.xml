@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: ref.xml,v 1.1 2005/07/05 00:43:50 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="ref.html"?>
+
+  <title>Reference</title>
+
+  <sect1 id="Ref.IP">
+    <?dbhtml filename="ref-ip.html"?>
+
+    <title>IP Basics</title>
+
+    <para>You can change the hostname and domain used by your firewall in the
+    <link linkend="Config.System.General">General Setup</link> screen.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="ref-filtering.html"?>
+
+    <title>IP Filtering</title>
+
+    <para></para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="ref-nat.html"?>
+
+    <title>NAT</title>
+    
+    <para>NAT (Network Address Translation) permits you to use private IP address
+        space on your LAN while still being able to access the internet.  </para>
+
+    <para>There are two main types of NAT in m0n0wall, inbound, and 1:1.</para>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="ref-shaping.html"?>
+
+    <title>Traffic Shaping</title>
+
+    <para></para>
+  </sect1>
+
+  <sect1 id="Ref.DNS">
+    <?dbhtml filename="ref-dns.html"?>
+
+    <title>DNS</title>
+
+    <para>You can change the DNS servers used by your firewall in the <link
+    linkend="Config.System.General">General Setup</link> screen.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="ref-encryption.html"?>
+
+    <title>Encryption (PPTP/IPsec)</title>
+
+    <para></para>
+  </sect1>
+
+  <sect1 id="Ref.Logging">
+    <?dbhtml filename="ref-logging.html"?>
+
+    <title>Logging (syslog)</title>
+
+    <para>Log messages include a timestamp of when the event ocurred. The
+    system time on the firewall is synchronized to an NTP (Network Time
+    Protocol) server. You can change the NTP server and related parameters in
+    the <link linkend="Config.System.General">General Setup</link> screen.</para>
+    
+    <para>It is recommended that you log your m0n0wall to a remote syslog server for diagnostics and forensic purposes.
+    There are a number of free tools that do this for you on Windows, Mac, and Unix based systems.</para>
+    
+    <para><emphasis role="bold">Unix-based tools</emphasis></para>
+    
+    <para>The syslog daemon built into virtually every Unix-like system can be configured to accept log messages from
+    remote hosts.  Check documentation specific to your OS on how to configure syslogd to accept messages from remote
+    hosts.</para>
+    
+    <para><emphasis role="bold">Other Unix Tools</emphasis></para>
+    
+    <para><emphasis role="bold"><ulink url="http://www.balabit.com/products/syslog_ng/">syslog-ng</ulink></emphasis></para>
+    
+    <para><emphasis role="bold"><ulink url="http://coombs.anu.edu.au/~avalon/nsyslog.html">nsyslog</ulink></emphasis></para>
+    
+    <para></para>
+    
+    <para><emphasis role="bold">Windows-based tools</emphasis></para>
+    
+    <para>There are several free and commercial tools available on Windows to enable your system to accept syslog
+    messages from hosts on your network.</para>
+    
+    <para><emphasis role="bold">Kiwi Syslog</emphasis></para>
+    <para>One of my favorites on Windows is Kiwi Syslog.  There is a version with "basic" features that is free, and a
+    more advanced version with $49 registration.  Even if you are just looking for a free tool, the basic version has
+    as many if not more features than any other free package on this list.  </para>
+    http://www.kiwi-enterprises.com/        
+
+    <para>3Com offers a couple of free utilities on
+    <ulink url="http://support.3com.com/software/utilities_for_windows_32_bit.htm">this page.</ulink>
+    3CSyslog is a GUI tool best used on a temporary or as-needed basis only.  To collect logs using a
+    service that will be running at all times, whether or not anyone is logged into the machine, try
+    wsyslogd.</para>
+    
+    <para>Several more for Windows and a couple for Mac listed on <ulink url="http://www.practicallynetworked.com/support/syslog.htm">this
+    site.</ulink></para>
+   
+  </sect1>
+</chapter>

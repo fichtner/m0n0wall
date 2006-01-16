@@ -1,0 +1,59 @@
+* {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+pre {
+	font-family: Courier New, Courier, monospaced;
+}
+
+h2.title {
+	/*padding-bottom: 0.3em;
+	border-bottom: 1px solid #aaaaaa;*/
+	color: #004080;
+}
+
+/* spacing for list elements */
+dt {
+	margin: 0.2em 0 0.2em 0;
+}
+
+/* (sub)section indent */
+dd {
+	margin: 0 0 0 2.5em;
+}
+
+/* sub-lists: no top margin */
+dl dd dl {
+	margin: 0 0 1em 0;
+}
+
+dt a {
+	
+}
+
+a {
+	color: #0055BB;
+	text-decoration: none;
+}
+
+hr {
+	color: #999999;
+	background-color: #aaaaaa;
+	height: 1px;
+	border: 0;
+}
+
+h3.title {
+	margin-top: 1.2em;
+	margin-bottom: 0.5em;
+}
+
+div.itemizedlist p {
+	margin: 2px;
+}
+
+pre.programlisting {
+	background: #E8E8E8;
+	padding: 3px;
+	padding-left: 5px;
+}

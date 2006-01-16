@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+  <?dbhtml filename="thirdparty.html"?>
+
+  <title>Using Third Party Software with m0n0wall</title>
+  
+  <sect1>
+    <title>Introduction</title>
+    <para>There are a number of third party software packages that provide functionality that m0n0wall does not include.  These
+    applications are not installed on m0n0wall, but rather on another system on your LAN.  This section of the handbook will
+    document how to use several of these packages.  </para>
+    
+    <para>If you know of other third party applications appropriate for this section of the documentation, please email the editor at
+    m0n0wall@chrisbuechler.com.
+    </para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-firefoxsvg.html"?>
+    <title>Installing SVG Viewer on Mozilla Firefox</title>
+    
+    <para>The SVG viewer doesn't work "out of the box" after an install like it does in Internet
+    Explorer.  See <ulink url="http://plugindoc.mozdev.org/windows1.html#AdobeSVG">this page on
+    mozilla.org</ulink> for instructions on installing it.</para>
+
+  </sect1>
+    
+
+  <sect1 id="ifgraph">
+    <?dbhtml filename="thirdparty-ifgraph.html"?>
+    <title>Collecting and Graphing m0n0wall Interface Statistics with ifgraph</title>
+    
+    <para>ifgraph is a nice utility that you can run on a machine on your LAN to query SNMP on your m0n0wall and graph its
+    interfaces. Note that you may be able to hack m0n0wall to run this locally, but if you have a connection with moderate
+    bandwidth and are running on low end hardware like a Soekris 4501, this could limit the device's throughput.</para>
+
+    <para><ulink url="http://chrisbuechler.com/m0n0wall/ifgraph/sample/m0n0wall-wan.html">Sample of the web page output of
+    ifgraph on a m0n0wall.</ulink></para>
+
+    <para>FreeBSD is used in the demonstrated installation as the OS performing the monitoring and hosting the graphs. This will
+    work on other BSD's, Linux or any other Unix OS, but the installation procedures and configuration file locations may
+    vary.</para>
+
+    <para><emphasis role="bold">Prerequisites:</emphasis></para>
+     <itemizedlist>
+      <listitem>Installed and functioning Apache server</listitem>
+      <listitem>m0n0wall SNMP enabled following the instructions in the <ulink url="http://m0n0.ch/wall/docbook/config-services.html">Users Guide.
+        </ulink></listitem>
+     </itemizedlist>
+
+    <para><emphasis role="bold">1. Install ifgraph.</emphasis></para>
+    
+    <para>We'll install ifgraph from FreeBSD ports using binary packages, unless you want to wait for it to compile (doesn't take
+    horribly long). It'll automatically install all the prerequisites either way you do it.</para>
+
+    <para>From binary packages</para>
+
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# pkg_add -r ifgraph
+    </literallayout></blockquote>
+    
+    <para>Compiling yourself</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# cd /usr/ports/net-mgmt/ifgraph
+    su-2.05b# make install clean
+    </literallayout></blockquote>
+    
+    <para><emphasis role="bold">2. Query for interfaces</emphasis></para>
+    
+    <para>After the successful ifgraph installation, we will use ifgraph's find-if.pl to find the interface numbers on your
+    m0n0wall. Replace 192.168.1.1 with the LAN IP of your m0n0wall, and 'public' with the SNMP community of your firewall.</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# /usr/local/bin/find-if.pl -mi 192.168.1.1 public
+    OK: session created, getting info from 192.168.1.1
+    Showing up interfaces of: 192.168.1.1
+    Interface total: 8
+    OK: Collecting info on each interface, wait...
+    Warn: Could NOT get ifPhysAddress table
+    OK: Data collected
+    System Description: FreeBSD m0n0wall.local 4.10-RELEASE FreeBSD 4.10-RELEASE #0: Fri Au i386
+    System Uptime: 3 days, 06:10:58.33
+    | If #    | Description | Stat | Octets In     | Errors  | Octets Out    | Errors  | IP Address       | MAC Address     |
+    | ------- | ----------- | ---- | ------------- | ------- | ------------- | ------- | ---------------- | --------------- |
+    | (1)     | wi0         | up   | 0             | 0       | 11538828      | 0       | not set          | not set         |
+    | (2)     | sis0        | up   | 3234568017    | 0       | 1783247523    | 0       | 62.22.130.150    | not set         |
+    | (3)     | sis1        | up   | 0             | 0       | 42            | 0       | 10.1.0.1         | not set         |
+    | (4)     | sis2        | up   | 1743313091    | 0       | 3020545424    | 0       | 192.168.1.1      | not set         |
+    | (5)     | lo0         | up   | 732           | 0       | 732           | 0       | 127.0.0.1        | not set         |
+    </literallayout></blockquote>
+    
+    <para>You'll see the names of your interfaces under the description column.
+    Make note of the interface number (first column) for your interfaces.</para>
+    
+    <para><emphasis role="bold">3. Edit ifgraph.conf file.</emphasis></para>
+    
+    <para>Copy the sample ifgraph.conf file (ifgraph.conf.sample) to ifgraph.conf. </para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# cp /usr/local/etc/ifgraph.conf.sample /usr/local/etc/ifgraph.conf
+    </literallayout></blockquote>
+    
+    <para>Use the following ifgraph.conf as a template.  You will need to replace
+    192.168.1.1 with the LAN IP address of your m0n0wall, "public" with the SNMP
+    community configured on your m0n0wall, and the "interface=" line to the number
+    of the interface to be graphed.  </para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    # [global] target
+    # This target is mandatory
+    # The directives of this target are:
+    # rrdtool = /path/to/rrdtool - full path to rrdtool
+    # rrddir = /path/to/rrddir - full path to a writeable dir, where
+    #                     rrd files and logs will be created
+    # graphdir = /path/to/public_html - full path to a writeable dir,
+    #                     where png and html will be created
+    # template = /path/to/template_dir - full path to a directory
+    #                     containing template files
+    # imgformat = the image format. You may choose:
+    #               PNG - Portable Network Graphics
+    #               GIF - Graphics Interchange Format
+    #               iGIF - Interlaced GIF
+    #               GD - Boutell GD
+    # Defaults: You can define default configurations in the global
+    # target, but, for this to work, it must be the first target always.
+    # If [global] is after another target, default configurations
+    # will not work as expected.
+    
+    [global]
+    rrdtool = /usr/local/bin/rrdtool
+    rrddir = /usr/local/var/ifgraph
+    graphdir = /usr/local/ifgraph/htdocs
+    template = /usr/local/ifgraph/templates/en
+    imgformat=PNG
+    # those are the default configurations, should be
+    # overriden in each target
+    
+    host = your.main.router.com
+    community = public
+    port =161
+    max=100M
+    dimension=550x200
+    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+    options=noerror
+    hbeat=600
+    retry=2
+    timeout=5
+    
+
+    [m0n0wall-wan]
+    host=192.168.1.1
+    community=public
+    port=161
+    interface=2
+    max=100M
+    dimension=550x200
+    title=In/Out data for m0n0wall WAN interface
+    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+    options=noerror
+    ylegend=kbits per second
+    legends=kbits entering our network,kbits leaving our network
+    shortlegend=kbits/sec
+    hbeat=600
+    retry=2
+    timeout=5
+    step = 300
+    periods = -1day, -1week, -1month, -1year
+    
+    
+    [m0n0wall-dmz]
+    host=192.168.1.1
+    community=public
+    port=161
+    interface=3
+    max=100M
+    dimension=550x200
+    title=In/Out data for m0n0wall DMZ interface
+    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+    options=noerror
+    ylegend=kbits per second
+    legends=kbits entering DMZ network,kbits leaving DMZ network
+    shortlegend=kbits/sec
+    hbeat=600
+    retry=2
+    timeout=5
+    step = 300
+    periods = -1day, -1week, -1month, -1year
+    
+    
+
+    [m0n0wall-lan]
+    host=192.168.1.1
+    community=public
+    port=161
+    interface=4
+    max=100M
+    dimension=550x200
+    title=In/Out data for m0n0wall LAN interface
+    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+    options=noerror
+    ylegend=kbits per second
+    legends=kbits entering our LAN network,kbits leaving our LAN network
+    shortlegend=kbits/sec
+    hbeat=600
+    retry=2
+    timeout=5
+    step = 300
+    periods = -1day, -1week, -1month, -1year
+    </literallayout></blockquote>
+
+
+    <para><emphasis role="bold">4. Run tests.</emphasis></para>
+
+    <para>First we'll run ifgraph.pl to collect the data.  Run this at least
+    three times, and wait a few seconds in between runs.</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# ifgraph.pl -c /usr/local/etc/ifgraph.conf 
+    </literallayout></blockquote>
+    
+    <para>Now we'll run makegraph.pl to make the html pages and graphs.</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# makegraph.pl -c /usr/local/etc/ifgraph.conf
+    </literallayout></blockquote>
+    
+    <para>Check the ifgraph htdocs directory to make sure it contains the png and html files.</para>
+
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# ls /usr/local/ifgraph/htdocs
+    index.html m0n0wall-lan-1day.png m0n0wall-wan-1month.png
+    m0n0wall-dmz-1day.png m0n0wall-lan-1month.png m0n0wall-wan-1week.png
+    m0n0wall-dmz-1month.png m0n0wall-lan-1week.png m0n0wall-wan-1year.png
+    m0n0wall-dmz-1week.png m0n0wall-lan-1year.png m0n0wall-wan.html
+    m0n0wall-dmz-1year.png m0n0wall-lan.html
+    m0n0wall-dmz.html m0n0wall-wan-1day.png
+    </literallayout></blockquote>
+    
+    <para><emphasis role="bold">5. Edit Apache config</emphasis></para>
+    <para>In the mod_alias section of your httpd.conf file (/usr/local/etc/apache/httpd.conf in FreeBSD)</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    Alias /ifgraph/ "/usr/local/ifgraph/htdocs/"
+    </literallayout></blockquote>
+    
+    <para>Restart Apache for the changes to take effect.</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# apachectl restart
+    </literallayout></blockquote>
+    
+    <para><emphasis role="bold">6. Open web browser to view graphs.</emphasis></para>
+    
+    <para>Open up your web browser and go to http://server/ifgraph/. You should see graphs there, though they probably will not
+    contain any data at this time. If you can't get any web page to appear, you likely have Apache issues. If you see
+    broken images instead of graphs, check step 4 for problems.</para>
+    
+    
+    <para><emphasis role="bold">7. Add to cron to update automatically.</emphasis></para>
+    
+    <para>Open up /etc/crontab in your text editor, and add the following two lines to the bottom of this file.</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    * * * * * root /usr/local/bin/ifgraph.pl -c /usr/local/etc/ifgraph.conf > /dev/null
+    */5 * * * * root /usr/local/bin/makegraph.pl -c /usr/local/etc/ifgraph.conf > /dev/null
+    </literallayout></blockquote>
+    
+    <para>This will run the data collection every minute, and make the graphs every 5 minutes. You can change these if you like,
+    but these values generally work out well.</para>
+    
+    <para>Note that you likely don't have to run this as root. If you want to be cautious, you should create an account
+    with the appropriately limited permissions to run this under.</para>
+    
+    <para>Make cron re-read its configuration files:</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    su-2.05b# killall -HUP cron
+    </literallayout></blockquote>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-ddclient.html"?>
+    <title>Updating more than one Dynamic DNS hostname with ddclient</title>
+    
+    <para>m0n0wall updates the dynamic hostname of the external interface with the program ez-ipupdate which is lightweight and does
+    its job. However, it is not capable of updating more than one hostname (like if you host your domain at DynDNS).  If you want or
+    need to do this, your best bet is using another system (you'll probably have a server running in the background anyway).</para>
+    
+    <para>The ddclient project website can be found <ulink url="http://sourceforge.net/projects/ddclient/">here</ulink>.</para>
+    
+    <para>DynDNS has a <ulink url="http://www.dyndns.org/services/dyndns/clients.html">list of supported clients</ulink>. Most of
+    these will work with any dynamic DNS provider, not only with DynDNS.</para>
+    
+    <para>See what DynDNS offers as services. This is vital in understanding the config file of ddclient.</para>
+    
+    <para>This document describes the setup for updating several hostnames with ddclient. I chose that particular beast because it
+    can read the external address from status pages of several hardware and software firewalls and routers so I thought I might check
+    if it works out of the box with the m0n0wall status_interfaces.php page. It does.</para>
+    
+    <para>The config is pretty easy:</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    # Configuration file for ddclient generated by debconf
+    #
+    # /etc/ddclient.conf
+    
+    pid=/var/run/ddclient.pid 
+    protocol=dyndns2 
+    server=members.dyndns.org 
+    login=YourDynDNSLogin
+    password=YourDynDNSPassword 
+    fw-login=admin 
+    fw-password=Yourm0n0Password
+    use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
+    custom=yes
+    yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
+    </literallayout></blockquote>
+    
+    
+    <para>If you only want to update Dynamic DNS entries with DynDNS, remove the</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    custom=yes
+    </literallayout></blockquote>
+
+    <para>directive. If you want to update a DynDNS
+    <ulink url="http://www.dyndns.org/services/statdns/">Static DNS</ulink> record,
+    replace the</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    custom=yes
+    </literallayout></blockquote>
+    
+    <para>with</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    static=yes
+    </literallayout></blockquote>
+    
+    <para>If you manage your m0n0wall with TLS, the setup is slightly different
+    as you should run an external command to access the status page:</para>
+    
+    <blockquote>
+    <literallayout class="monospaced">
+    # Configuration file for ddclient generated by debconf
+    #
+    # /etc/ddclient.conf
+    
+    pid=/var/run/ddclient.pid 
+    protocol=dyndns2 
+    server=members.dyndns.org 
+    login=YourDynDNSLogin
+    password=YourDynDNSPassword 
+    # fw-login=admin 
+    # fw-password=Password
+    # use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
+    use=cmd
+    cmd='curl -k -s https://admin:Yourm0n0Password@Yourm0n0IPOrPassword/status_interfaces.php'
+    custom=yes
+    yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
+    </literallayout></blockquote>
+
+    <para>Now setup ddclient to run as a daemon. Mine checks the status page every 5 minutes and updates the DynDNS records if
+    necessary.</para>
+    <blockquote>
+    <literallayout class="monospaced">
+    /usr/sbin/ddclient -daemon 300 -syslog
+    </literallayout></blockquote>
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-multitechradius.html"?>
+    <title>Using MultiTech's Free Windows RADIUS Server</title>
+    
+    <para>In this post to the m0n0wall list on September 30, 2004, Barry Mather
+    explains how to set up MultiTech RADIUS server for use with m0n0wall.</para>
+    
+    <literallayout class="monospaced"><blockquote>    
+    Get the software (just google radius200.exe and download from
+    multi-tech)  Install onto you win32 machine, I have it working on both winxp sp2,
+    and win2k3 server.
+    
+    If you installed to a default location, open c:\program files\multi-tech
+    systems\radius server2.00
+    
+    Open the users file with notepad.
+    
+    Remove all the users in there, I have the following line for a user:
+    
+    Username	Auth-Type = Local, Password = "userspassword"
+    
+    The username is the 'username' in the line above is the actual username
+    you want to use.
+    
+    The realms file can be empty.
+    
+    The radius program will create a my-users file based on the users file
+    you just edited, leave this alone.
+    
+    Dictionary file can be left as is.
+    
+    The clients file needs to be edited to include the ip address of the
+    m0n0wall, and the radius access password, my file looks like this :
+    
+    172.16.1.1	password
+    
+    That's it, v simple
+    
+    No more files to edit.
+    It installs itself as a win32 service, just stop the service, restart
+    it, and it loads all the settings / users .. 
+    
+    Now enable the captive portal, telling it to use the ip address of the
+    win32 machine this radius server is installed on, and the password to
+    use, in this case password.
+    
+    Make sure that your local win32 firewall is either not on, or is
+    allowing port 1812 through for radius!
+    </blockquote></literallayout>
+
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-apache-virtualhosts.html"?>
+    <title>Configuring Apache for Multiple Servers on One Public IP</title>
+    
+    <para>If you only have one public IP but run multiple web servers, you
+    can set up the others on other port numbers.  However giving out URL's
+    like http://www.example.com:81 isn't exactly ideal.  You're bound to have
+    people trying to get to http://www.example.com, and since your port 80
+    points to another web server, the person will get the wrong web page.  </para>
+    
+    <para>You can get around this by using name-based virtual hosting on the
+    web server on port 80.  This configuration will work with any web server
+    that supports name-based virtual hosting (most any does), but this section
+    will describe how to configure Apache for this purpose.</para>
+  
+    <para>For this configuration, port 80 is www.example.com, port 81 is
+    www.whatever.com and port 82 is www.example.net.  These are three separate
+    physical web servers.</para>
+    
+    <para>At the bottom of your httpd.conf (in /usr/local/etc/apache/ in FreeBSD,
+    the location of your configuration file may vary) add the following lines.  This
+    is on the server that is accessed via port 80 from the internet.</para>
+    
+    <blockquote>
+      <literallayout class="monospaced">
+    NameVirtualHost 192.168.1.12
+
+    &lt;VirtualHost 192.168.1.12&gt;
+        UseCanonicalName off
+        ServerName www.example.com
+        DocumentRoot /usr/local/www/data/
+    &lt;/VirtualHost&gt;
+
+    &lt;VirtualHost 192.168.1.12&gt;
+        UseCanonicalName off
+        ServerName www.whatever.com
+        Redirect / http://www.whatever.com:81
+    &lt;/VirtualHost&gt;
+    
+    &lt;VirtualHost 192.168.1.12&gt;
+        UseCanonicalName off
+        ServerName www.example.net
+        Redirect / http://www.example.net:82
+    &lt;/VirtualHost&gt;
+    </literallayout></blockquote>
+    
+    <para>That configuration will keep www.example.com local, with the site's files in
+    /usr/local/www/data/, and will redirect any requests to www.whatever.com to
+    www.whatever.com:81 and www.example.net to www.example.net:82.</para>
+    
+    <para>It's not an ideal setup, but if you're stuck with multiple web servers and a
+    single public IP to reference all of them, it's better than people getting the wrong
+    page when forgetting to put the port after the URL.</para>
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-bittorrent.html"?>
+    <title>Opening Ports for BitTorrent in m0n0wall</title>
+    
+    <para>For maximum performance when using BitTorrent behind NAT, you should open
+    ports 6881-6889 to your PC.  As of version 3.2 and later, BitTorrent uses 6881-6999
+    though you should be fine with the smaller range.  </para>
+    
+    <para>To open these ports, create an Inbound NAT rule matching the following, changing
+    192.168.1.22 to the IP address of the system using BitTorrent.</para>
+    
+    <note>If you aren't already using a static IP or static DHCP reservation, you should
+    set one up for that machine now so its IP address will never change.</note>
+    
+      <mediaobject>
+	<imageobject>
+           <imagedata fileref="screens/examples/bittorrent-nat.png" />
+        </imageobject>
+      </mediaobject>
+      
+      <sect2>
+        <title>Opening BitTorrent for Multiple LAN Hosts</title>
+        
+        <para>BitTorrent starts at port 6881 and will sequentially try higher ports if
+        it cannot use that port.  It uses one port for each client session you open.  To
+        use BT on multiple hosts on your LAN, open a few ports in the range of 6881-6999
+        to each host.</para>
+        
+      </sect2>
+      
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="thirdparty-automatedbackups.html"?>
+    <title>Automated config.xml backup solutions</title>
+
+    <para>The following offers two different ways to automatically back up your m0n0wall
+    configuration.  Keep in mind either one requires you saving your firewall password in
+    clear text.  This isn't the best idea from a security standpoint, and may not be a risk
+    you are willing to take, depending on your environment.  Keep this in mind.  At a minimum,
+    make sure you have strong permissions on the .sh file.</para>
+
+    <sect2>
+        <title>Backing up and committing to CVS</title>
+        
+        
+    <para>Jim Gifford posted the following shell script to the list on January 29, 2004
+    that automatically backs up the m0n0wall config.xml file and commits it into a CVS
+    repository.</para>
+    
+    <blockquote>
+      <literallayout class="monospaced">#!/bin/sh
+# m0n0back -- backup up a m0n0wall config and puts it into cvs
+# depends on: sh, curl, cvs, date, rm
+
+CVSROOT=/cvs
+export CVSROOT
+CVSPROJ=backup
+M0N0IP=192.168.1.1
+PROTO=http
+USER=admin
+PASS=XXXXXX
+TMPDIR=/tmp/$$
+
+mkdir $TMPDIR
+cd $TMPDIR
+
+cvs -Q co $CVSPROJ
+cd $CVSPROJ
+
+curl -s -o config.xml -F Submit=download -u ${USER}:${PASS} ${PROTO}://$M0N0IP/diag_backup.php
+
+NOW=`date +%Y-%m-%d@%H:%M:%S`
+cvs -Q commit -m "backup of config.xml [$NOW]"
+
+cd /tmp
+rm -rf $TMPDIR
+    </literallayout></blockquote>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Backing up to the current directory</title>
+
+        <para>Chris Buechler wrote a shell script to just back up the file with the filename
+        DATE-config.xml, without committing it into CVS.</para>
+        
+        <blockquote><literallayout class="monospaced">#!/bin/sh
+USER=admin
+PASS=XXXXXX
+PROTO=http
+M0N0IP=192.168.1.1
+NOW=`date +%Y-%m-%d@%H:%M`
+curl -s -o ${NOW}-config.xml -F Submit=download -u ${USER}:${PASS} ${PROTO}://$M0N0IP/diag_backup.php
+        </literallayout></blockquote>
+
+     </sect2>
+     
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="thirdparty-mrtg-windows.html"?>        
+        <title>Historical Interface Graphing Using MRTG on Windows</title>
+        
+        <para>If you would like historical graphing of your m0n0wall
+        interfaces, but don't have a Unix box of any sort available,
+        MRTG for Windows is a good solution.  There is a <ulink
+        url="http://people.ee.ethz.ch/~oetiker/webtools/mrtg/windows_nt_idiot.htm">howto guide
+        available on the MRTG website</ulink>.</para>
+        
+        <para>Before starting that guide, you must enable SNMP on your m0n0wall on the
+        Services -&gt; SNMP screen.</para>
+        
+    </sect1>
+    
+</chapter>

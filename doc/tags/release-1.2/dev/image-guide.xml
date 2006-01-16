@@ -1,0 +1,1208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<chapter>
+  <?dbhtml filename="image-guide.html"?>
+
+  <title>The complete guide to building a m0n0wall image from scratch</title>
+
+  <para>This guide explains, in detail, all the steps that are required in
+  order to build a complete m0n0wall image from scratch. The primary intention
+  is not that people will use the guide to actually build their own images
+  from scratch, as that is rarely necessary, but to document and preserve all
+  the details so that people who would like to make changes to an existing
+  image can see how m0n0wall and all of its parts are built.</para>
+
+  <para>This guide assumes that FreeBSD 4.11-RELEASE is used. Note that there
+  are other ways of doing this, like keeping a separate copy of the FreeBSD
+  source tree and installing world into a subdirectory to leave the build
+  system itself untouched. However, it is assumed that a separate, dedicated
+  (possibly virtual) machine is going to be used for this task anyway, which
+  is also recommended since many steps need to be done as root (among other
+  things to get the file ownership and permissions right without too much
+  effort).</para>
+
+  <para>Note that this is not "m0n0wall image building for dummies", and
+  readers are expected to know what they're doing. As such, not all necessary
+  commands and full file paths are listed (the obvious ones have been left
+  out), so don't expect it to work if you just run all the commands listed in
+  this guide.</para>
+
+  <para>Finally, many of these tasks can and should be automated (especially
+  the image building part). How this is done is left to the reader - there are
+  no official m0n0wall build scripts.</para>
+
+  <section>
+    <?dbhtml filename="image-guide-freebsdinst.html"?>
+
+    <title>Installing FreeBSD</title>
+
+    <para>Install FreeBSD 4.11-RELEASE as usual, but <emphasis role="bold">use
+    one file system only</emphasis> (i.e. don't create a separate partition
+    for /usr)! See the section about <link linkend="makeworld">make
+    world</link> for an explanation why this is necessary. Make sure that you
+    choose the "Developer" distribution set. Installing the ports collection
+    is also a good idea.</para>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-cvsup.html"?>
+
+    <title>Using cvsup to get the latest FreeBSD patches</title>
+
+    <para>m0n0wall is always based on FreeBSD -RELEASE versions, never -STABLE
+    (since what exactly -STABLE is depends very much on the exact point in
+    time that the sources were checked out). However, in order to get the
+    latest security patches, the release maintenance branches are used. For
+    FreeBSD 4.11-RELEASE, this is RELENG_4_11. You'll have to use cvsup to get
+    the latest patches.</para>
+
+    <section>
+      <title>Installing cvsup</title>
+
+      <para>The easiest way to do this is to use the package:</para>
+
+      <programlisting>pkg_add -r cvsup-without-gui
+rehash</programlisting>
+    </section>
+
+    <section>
+      <title>Configuring the supfile</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>copy the example supfile</para>
+
+          <programlisting>cp /usr/share/examples/cvsup/stable-supfile /etc/supfile</programlisting>
+        </listitem>
+
+        <listitem>
+          <para>modify <filename>/etc/supfile</filename></para>
+
+          <itemizedlist>
+            <listitem>
+              <para>choose a nearby cvsup host (where it says
+              "CHANGE_THIS")</para>
+            </listitem>
+
+            <listitem>
+              <para>set <code>tag=RELENG_4_11</code> (instead of
+              <code>RELENG_4</code>)</para>
+            </listitem>
+
+            <listitem>
+              <para>add the line</para>
+
+              <para><code>ports-all tag=.</code></para>
+
+              <para>to the end of the file to update the ports collection
+              too</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Running cvsup</title>
+
+      <programlisting>cvsup -g -L 2 /etc/supfile</programlisting>
+
+      <note>
+        <para>This can take a while.</para>
+      </note>
+    </section>
+  </section>
+
+  <section id="makeworld">
+    <?dbhtml filename="image-guide-makeworld.html"?>
+
+    <title>make world</title>
+
+    <para>Now that the latest FreeBSD patches have been installed, it's time
+    to recompile the entire operating system. Note that this would be
+    necessary even if there weren't any patches: by default, FreeBSD has all
+    the essential system binaries (mostly those in /bin and /sbin) linked
+    statically so that the system can boot even if /usr (which holds important
+    libraries like libc) is not available (which is often the case when it's
+    on a separate file system). This takes up huge amounts of space though, so
+    we obviously want all the binaries to be linked dynamically for our
+    m0n0wall image.</para>
+
+    <section>
+      <title>Editing /etc/make.conf</title>
+
+      <para>Create <filename>/etc/make.conf</filename> and put the following
+      lines in it:</para>
+
+      <literallayout><code>NOSHARED=no
+IPFW2=TRUE</code></literallayout>
+
+      <para>The last line ensures that IPFW2 is built (instead of the older
+      IPFW1 version, which is the default) when we compile the
+      kernel/modules/ipfw executable later.</para>
+    </section>
+
+    <section>
+      <title>making world</title>
+
+      <para>Execute the following commands to rebuild and install the entire
+      operating system:</para>
+
+      <programlisting>cd /usr/src
+make -j4 buildworld</programlisting>
+
+      <note>
+        <para>This will take a while.</para>
+      </note>
+
+      <programlisting>shutdown now
+cd /usr/src
+make installworld
+make buildkernel
+make installkernel
+reboot</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-rootfs.html"?>
+
+    <title>Building the m0n0wall root file system</title>
+
+    <para>The following steps assume that your m0n0wall root file system will
+    be built in <code>$MWROOT</code>, so create a directory to hold the root
+    file system and set MWROOT to point to it.</para>
+
+    <section>
+      <title>Creating the root directory structure</title>
+
+      <programlisting>cd $MWROOT
+mkdir bin cf conf.default dev etc ftmp mnt modules proc root sbin tmp usr var
+mkdir etc/inc
+ln -s /cf/conf conf
+cd usr
+mkdir bin lib libexec local sbin share
+cd local
+mkdir bin captiveportal lib sbin www
+ln -s /var/run/htpasswd www/.htpasswd</programlisting>
+
+      <itemizedlist>
+        <listitem>
+          <para><filename>/cf</filename> is where the Compact Flash card (or
+          the hard disk, or the floppy disk) is mounted later on</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/conf.default</filename> contains the factory
+          default config.xml</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/conf</filename> (or <filename>/cf/conf</filename>
+          effectively due to the symlink) contains the current
+          config.xml</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/ftmp</filename> is used to mount a temporary memory
+          file system during a firmware upgrade through the webGUI</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/etc/inc</filename> contains PHP include files that
+          are used by both the boot scripts and the webGUI</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/usr/local/www</filename> contains the webGUI
+          pages</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>/usr/local/captiveportal</filename> is the web root
+          directory for the HTTP server process to which HTTP connections are
+          redirected if the captive portal is on and the user hasn't
+          authenticated yet</para>
+        </listitem>
+
+        <listitem>
+          <para>the symbolic link for .htpasswd is required as the boot
+          scripts will write the webGUI user/password to
+          <filename>/var/run/htpasswd</filename></para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Copying required binaries</title>
+
+      <para>To facilitate this, a list of binaries that need to be copied is
+      provided along with a simple perl script to copy them over (taken from
+      the <ulink url="http://neon1.net/misc/minibsd.html">miniBSD
+      tutorial</ulink>). Download the script from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/mkmini.pl">http://m0n0.ch/wall/downloads/freebsd-4.11/mkmini.pl</ulink>
+      and the list of binaries from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/m0n0wall.files">http://m0n0.ch/wall/downloads/freebsd-4.11/m0n0wall.files</ulink>.</para>
+
+      <programlisting>perl mkmini.pl m0n0wall.files / $MWROOT</programlisting>
+    </section>
+
+    <section>
+      <title>Preparing /etc</title>
+
+      <para>Most of the base contents of /etc aren't very interesting, so
+      they're available as a tarball to save the time it would take to put
+      them together from FreeBSD sources. Download from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/etc.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/etc.tgz</ulink>
+      and extract as follows:</para>
+
+      <programlisting>tar -xzf etc.tgz -C $MWROOT</programlisting>
+
+      <section>
+        <title>Adding /etc/version</title>
+
+        <para><filename>/etc/version</filename> holds the version number of
+        the image. Create with e.g.</para>
+
+        <programlisting>echo "1.21" &gt; $MWROOT/etc/version</programlisting>
+      </section>
+
+      <section>
+        <title>Adding /etc/version.buildtime</title>
+
+        <para><filename>/etc/version.buildtime</filename> is displayed in the
+        webGUI. Create as follows:</para>
+
+        <programlisting>date &gt; $MWROOT/etc/version.buildtime</programlisting>
+      </section>
+
+      <section>
+        <title>Adding /etc/platform</title>
+
+        <para><filename>/etc/platform</filename> identifies the platform for
+        which the image is built and is very important, as the PHP scripts use
+        it to determine e.g. how the configuration is to be stored or which
+        options should be available in the webGUI. Possible values are:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>net45xx</para>
+          </listitem>
+
+          <listitem>
+            <para>net48xx</para>
+          </listitem>
+
+          <listitem>
+            <para>wrap</para>
+          </listitem>
+
+          <listitem>
+            <para>generic-pc</para>
+          </listitem>
+
+          <listitem>
+            <para>generic-pc-cdrom</para>
+          </listitem>
+        </itemizedlist>
+
+        <programlisting>echo "net45xx" &gt; $MWROOT/etc/platform</programlisting>
+      </section>
+    </section>
+
+    <section>
+      <title>Preparing /dev</title>
+
+      <para>FreeBSD 4.x doesn't have devfs yet, so we need to add a few
+      essential device files. You could copy the contents of /dev on your
+      FreeBSD box or use MAKEDEV; however, that would result in many device
+      files that aren't necessary. A tarball of all the devices that are
+      typically needed in m0n0wall is provided at <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/dev.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/dev.tgz</ulink>.
+      Extract as follows:</para>
+
+      <programlisting>tar -xzf dev.tgz -C $MWROOT</programlisting>
+    </section>
+
+    <section>
+      <title>Adding the default config.xml</title>
+
+      <para>Download the latest default <filename>config.xml</filename> from
+      <ulink
+      url="http://m0n0.ch/wall/downloads/config.xml">http://m0n0.ch/wall/downloads/config.xml</ulink>
+      and put it in
+      <filename>$MWROOT/conf.default/config.xml</filename>.</para>
+    </section>
+
+    <section>
+      <title>Adding zoneinfo.tgz</title>
+
+      <para>FreeBSD keeps time zone information files in
+      <filename>/usr/share/zoneinfo</filename>. In order to save space,
+      m0n0wall uses a stripped down version of the contents of that directory
+      and keeps them in a tarball. Download zoneinfo.tgz from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/zoneinfo.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/zoneinfo.tgz</ulink>
+      and place it in
+      <filename>$MWROOT/usr/share/zoneinfo.tgz</filename>.</para>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-patches.html"?>
+
+    <title>Applying m0n0wall patches for FreeBSD</title>
+
+    <para>In order to build a m0n0wall image where all the features work as in
+    the official releases, various patches to the kernel and userland have to
+    be applied. Download these patches from <ulink
+    url="http://m0n0.ch/wall/downloads/freebsd-4.11/patches.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/patches.tgz</ulink>
+    and extract them somewhere (the following commands assume that your
+    patches are in <code>$MWPATCHDIR</code>).</para>
+
+    <section>
+      <title>Userland patches</title>
+
+      <section>
+        <title>ipfilter: ipf.c</title>
+
+        <para>This needs to be patched so it doesn't exit when it encounters
+        an error while adding a rule. The most common example where this is
+        not good at all is when you have a duplicate rule.</para>
+
+        <programlisting>cd /usr/src
+patch &lt; $MWPATCHDIR/user/ipf.c.patch
+cd sbin/ipf
+make
+install -s /usr/obj/usr/src/sbin/ipf/ipf $MWROOT/sbin</programlisting>
+      </section>
+
+      <section>
+        <title>syslogd circular logging support</title>
+
+        <para>Since m0n0wall keeps everything in a memory file system for
+        reliability, disk space is scarce. On the other hand, even the biggest
+        disk can eventually become full with logs, so it's better to solve
+        this problem in another way. m0n0wall uses circular logging, which
+        means that the oldest log entries are overwritten by new ones when
+        there's not enough space. The syslogd that comes with FreeBSD needs to
+        be patched with clog (<ulink
+        url="http://software.wwwi.com/syslogd/">http://software.wwwi.com/syslogd/</ulink>,
+        modified to work with 4.11's syslogd) to support this kind of
+        logging.</para>
+
+        <programlisting>cd /usr/src
+patch &lt; $MWPATCHDIR/user/syslogd.c.patch
+cd usr.sbin
+tar xfvz $MWPATCHDIR/user/clog-1.0.1.tar.gz
+cd syslogd
+make
+install -s /usr/obj/usr/src/usr.sbin/syslogd/syslogd $MWROOT/usr/sbin
+cd ../clog
+make obj &amp;&amp; make
+install -s /usr/obj/usr/src/usr.sbin/clog/clog $MWROOT/usr/sbin</programlisting>
+      </section>
+
+      <section>
+        <title>dhclient-script</title>
+
+        <para>The <filename>/sbin/dhclient-script</filename> that comes with
+        FreeBSD needs to be modified to write out DNS server information for
+        the PHP scripts to use, and also not to invoke the hooks upon
+        uninteresting events.</para>
+
+        <programlisting>cd $MWROOT/sbin
+patch &lt; $MWPATCHDIR/user/dhclient-script.patch
+rm dhclient-script.orig</programlisting>
+      </section>
+    </section>
+
+    <section>
+      <title>Kernel patches</title>
+
+      <para>Numerous patches to the FreeBSD kernel need to be applied for
+      m0n0wall to make everything work as desired; here's the list of changes
+      (paths relative to <filename>/usr/src/sys</filename>):</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><filename>conf/options</filename></para>
+
+          <para>add new kernel config options for ipfilter state table size
+          and to enable the forced MSS clamping feature (see below)</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>contrib/ipfilter/netinet/fil.c,
+          contrib/ipfilter/netinet/ip_compat.h,
+          contrib/ipfilter/netinet/ip_fil.h</filename></para>
+
+          <para>moving includes around and change some #ifs to make it compile
+          properly</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>contrib/ipfilter/netinet/ip_nat.c,
+          contrib/ipfilter/netinet/ip_nat.h,
+          contrib/ipfilter/netinet/mlfk_ipl.c</filename></para>
+
+          <para>checksum calculation fixes by Fred Wright and forced MSS
+          clamping feature patch by Manuel Kasper</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>contrib/ipfilter/netinet/ip_state.c</filename></para>
+
+          <para>window scaling-related fixes by Fred Wright</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>i386/isa/clock.c</filename></para>
+
+          <para>write back weekday properly to CMOS to avoid date/time reset
+          on Soekris machines</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>kern/subr_diskslice.c</filename></para>
+
+          <para>comment out a warning about raw partition size != slice size
+          since we don't care and everybody uses different CF cards or hard
+          drives</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>net/if_ethersubr.c</filename></para>
+
+          <para>comment out a warning about dropping multicast packets when
+          bridging</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>netgraph/ng_ppp.c</filename></para>
+
+          <para>protocol-field compression fix by Fred Wright</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>netinet/ip_input.c</filename></para>
+
+          <para>prevent packets from being passed through ipfilter twice when
+          they come out of a dummynet pipe</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>netinet/ip_output.c</filename></para>
+
+          <para>reverse ipfw/ipfilter processing order to be symmetric with
+          the input side</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>netipsec/key.c, netipsec/key_var.h</filename></para>
+
+          <para>new SA preferral patch by Fred Wright</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>pci/if_sis.c, pci/if_sisreg.h</filename></para>
+
+          <para>improve handling of stopped sis devices where IRQ sharing is
+          present (such as on the net4801); improved DP83815 short cable bug
+          fixes by Fred Wright</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>i386/i386/identcpu.c</filename></para>
+
+          <para>identify NS Geode CPUs properly (net4801, WRAP)</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>i386/i386/vm_machdep.c</filename></para>
+
+          <para>add reset code for NS Geode (for keyboard controller-less
+          WRAP)</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>dev/ata/ata-pci.c</filename></para>
+
+          <para>add kernel option to disable probing of ATA slave devices
+          (causes ~30 second hang on boot with WRAP)</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>dev/ata/ata-disk.c</filename></para>
+
+          <para>patch ATA standby support to allow changes at runtime</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>modules/ipfw/Makefile</filename></para>
+
+          <para>build with IPFIREWALL_DEFAULT_TO_ACCEPT</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>dev/wi/if_wi.c</filename></para>
+
+          <para>add DELAY(1) in wi_cmd as a workaround for timeouts with some
+          PRISM-based cards</para>
+        </listitem>
+
+        <listitem>
+          <para><filename>pci/if_xl.c, pci/if_xlreg.h</filename></para>
+
+          <para>add definitions for 3C920B-EMB-WNM</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Apply the patches as follows:</para>
+
+      <programlisting>cd /usr/src
+patch -p0 &lt; $MWPATCHDIR/kernel/kernel-411.patch</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-kernel.html"?>
+
+    <title>Building the kernel</title>
+
+    <section>
+      <title>Compiling and compressing the kernel</title>
+
+      <para>Download the kernel configuration file for the platform that you
+      want to build for from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11">http://m0n0.ch/wall/downloads/freebsd-4.11</ulink>
+      and copy it to <code>/sys/i386/conf</code>, then execute the following
+      commands to compile the kernel and modules:</para>
+
+      <programlisting>cd /sys/i386/conf
+config M0N0WALL_[PLATFORM]
+cd /sys/compile/M0N0WALL_[PLATFORM]
+make depend &amp;&amp; make</programlisting>
+
+      <para>Compress the kernel using gzip:</para>
+
+      <programlisting>gzip -9 kernel</programlisting>
+
+      <para>The kernel will be installed later, as it doesn't go directly into
+      the root file system.</para>
+    </section>
+
+    <section>
+      <title>Installing the modules</title>
+
+      <para>The dummynet, if_tap, if_vlan and ipfw modules are needed for
+      m0n0wall:</para>
+
+      <programlisting>cd modules/usr/src/sys/modules
+cp dummynet/dummynet.ko if_tap/if_tap.ko if_vlan/if_vlan.ko ipfw/ipfw.ko $MWROOT/modules</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-packages.html"?>
+
+    <title>Building the software packages</title>
+
+    <para>This section deals with properly compiling all the third-party
+    software packages that are used in some way in m0n0wall. Where useful, the
+    FreeBSD ports system is used (especially if a package requires
+    FreeBSD-relevant patches). For some packages, the standard "./configure
+    &amp;&amp; make &amp;&amp; make install" procedure can be used; others
+    need a few extra configure options to produce a small binary, while still
+    others need patches to work properly on m0n0wall.</para>
+
+    <section>
+      <title>PHP</title>
+
+      <para>Install autoconf213 from the FreeBSD ports collection and create
+      some links so that PHP's buildconf scripts find autoconf:</para>
+
+      <programlisting>cd /usr/ports/devel/autoconf213
+make install clean
+ln -s /usr/local/bin/autoconf213 /usr/local/bin/autoconf
+ln -s /usr/local/bin/autoheader213 /usr/local/bin/autoheader</programlisting>
+
+      <para>Download the latest version of PHP 4.4 from <ulink
+      url="http://www.php.net">http://www.php.net</ulink> and decompress as
+      usual. Download the RADIUS PECL extension from <ulink
+      url="http://m0n0.ch/wall/downloads/freebsd-4.11/radius-1.2.5.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/radius-1.2.5.tgz</ulink>.
+      Unpack it in <code>php-4.4.x/ext</code> and rename the resulting
+      directory (whose name includes the version number) to
+      '<code>radius</code>'. Go back into the <code>php-4.4.x</code> directory
+      and build/install as follows:</para>
+
+      <programlisting>rm configure
+./buildconf --force
+./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
+make
+install -s sapi/cgi/php $MWROOT/usr/local/bin</programlisting>
+
+      <para>Put the following in
+      <filename>$MWROOT/usr/local/lib/php.ini</filename>:</para>
+
+      <literallayout><code>magic_quotes_gpc = Off
+magic_quotes_runtime = Off
+max_execution_time = 0
+max_input_time = 180
+register_argc_argv = Off
+file_uploads = On
+upload_tmp_dir = /ftmp
+upload_max_filesize = 8M
+post_max_size = 10M
+html_errors = Off
+include_path = ".:/etc/inc:/usr/local/www:/usr/local/captiveportal"</code></literallayout>
+    </section>
+
+    <section>
+      <title>mini_httpd</title>
+
+      <para>Download mini_httpd 1.19 from <ulink
+      url="http://www.acme.com/software/mini_httpd/mini_httpd-1.19.tar.gz">http://www.acme.com/software/mini_httpd/mini_httpd-1.19.tar.gz</ulink>
+      and extract. A custom patch needs to be applied that:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>adds a limit to the number of concurrent connections to
+          prevent DoS attacks (since mini_httpd is a forking web server), and
+          since m0n0wall 1.21: an optional per-client-IP-address limit</para>
+        </listitem>
+
+        <listitem>
+          <para>adds captive portal mode support (including httpd support for
+          the file manager since m0n0wall 1.21)</para>
+        </listitem>
+
+        <listitem>
+          <para>sets SCRIPT_FILENAME (for php)</para>
+        </listitem>
+
+        <listitem>
+          <para>fixes a bug where mini_httpd would exit if a TCP connection
+          was closed before mini_httpd had a chance to handle it
+          (ECONNABORTED)</para>
+        </listitem>
+
+        <listitem>
+          <para>adds "index.php" to the list of index file names</para>
+        </listitem>
+
+        <listitem>
+          <para>makes the error pages much more plain</para>
+        </listitem>
+
+        <listitem>
+          <para>doesn't add a Server: header</para>
+        </listitem>
+
+        <listitem>
+          <para>patches the Makefile to build mini_httpd with SSL
+          support</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Apply the patch, compile and install as follows:</para>
+
+      <programlisting>patch &lt; $MWPATCHDIR/packages/mini_httpd.patch
+make
+install -s mini_httpd $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>ISC DHCP server and relay</title>
+
+      <para>The FreeBSD ports system will be used to compile these.</para>
+
+      <section>
+        <title>DHCP server</title>
+
+        <programlisting>cd /usr/ports/net/isc-dhcp3-server
+make</programlisting>
+
+        <para>Don't choose any options in the dialog box (i.e. deselect them
+        all). When it's compiled, install as follows:</para>
+
+        <programlisting>install -s work/dhcp-*/work.freebsd/server/dhcpd $MWROOT/usr/local/sbin</programlisting>
+      </section>
+
+      <section>
+        <title>DHCP relay</title>
+
+        <programlisting>cd /usr/ports/net/isc-dhcp3-relay
+make
+install -s work/dhcp-*/work.freebsd/relay/dhcrelay $MWROOT/usr/local/sbin</programlisting>
+      </section>
+    </section>
+
+    <section>
+      <title>Dnsmasq</title>
+
+      <para>This requires GNU getopt, so it's easier to use the port:</para>
+
+      <programlisting>cd /usr/ports/dns/dnsmasq
+make
+install -s work/dnsmasq-*/src/dnsmasq $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>MSNTP</title>
+
+      <programlisting>cd /usr/ports/net/msntp
+make
+install -s work/msntp-*/msntp $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>wol</title>
+
+      <para>Get the latest version of wol from <ulink
+      url="http://sourceforge.net/project/showfiles.php?group_id=8895">http://sourceforge.net/project/showfiles.php?group_id=8895</ulink>.
+      Extract, then compile and install as follows:</para>
+
+      <programlisting>./configure --disable-nls
+make
+install -s src/wol $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>ez-ipupdate</title>
+
+      <para>Get ez-ipupdate 3.0.11b8 from <ulink
+      url="http://dyn.pl/client/UNIX/ez-ipupdate/ez-ipupdate-3.0.11b8.tar.gz">http://dyn.pl/client/UNIX/ez-ipupdate/ez-ipupdate-3.0.11b8.tar.gz</ulink>.
+      A patch needs to be applied that:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>fixes interface IP address determination under FreeBSD</para>
+        </listitem>
+
+        <listitem>
+          <para>writes out the cache file before running the post-update
+          command (instead of after) so that the command can use the
+          information from the cache file</para>
+        </listitem>
+
+        <listitem>
+          <para>fixes a security issue (syslog() call)</para>
+        </listitem>
+      </itemizedlist>
+
+      <programlisting>patch &lt; $MWPATCHDIR/packages/ez-ipupdate.c.patch
+./configure
+make
+install -s ez-ipupdate $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>bpalogin</title>
+
+      <para>Get the latest source code version of bpalogin from <ulink
+      url="http://bpalogin.sourceforge.net/index.php?page=download#source">http://bpalogin.sourceforge.net/index.php?page=download#source</ulink>.
+      Extract, then compile and install as follows:</para>
+
+      <programlisting>./configure
+make
+install -s bpalogin $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>MPD</title>
+
+      <para>Install MPD 3.x using the ports system:</para>
+
+      <programlisting>cd /usr/ports/net/mpd
+make
+install -s work/mpd-*/src/mpd $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>OpenVPN</title>
+
+      <para>Get the latest release version of OpenVPN from <ulink
+      url="http://openvpn.net/download.html">http://openvpn.net/download.html</ulink>.
+      Extract, then compile and install as follows:</para>
+
+      <programlisting>setenv CFLAGS "-DLOG_OPENVPN=LOG_LOCAL6 -O2"
+./configure --disable-lzo --disable-plugins --disable-management --disable-socks --disable-http --disable-debug
+make
+install -s openvpn $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>racoon</title>
+
+      <para>As of version 1.21, m0n0wall uses the ipsec-tools version of
+      racoon, as the KAME racoon version isn't being developed anymore and has
+      been removed from the FreeBSD ports tree.</para>
+
+      <para>Install racoon from ipsec-tools using the ports system:</para>
+
+      <programlisting>cd /usr/ports/security/ipsec-tools</programlisting>
+
+      <para>Edit <code>CONFIGURE_ARGS</code> in the
+      <code>Makefile</code>:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>remove the <code>--enable-debug</code> and
+          <code>--enable-ipv6</code> options (saves space)</para>
+        </listitem>
+
+        <listitem>
+          <para>add the <code>--without-readline</code> option (removes the
+          dependency on libreadline)</para>
+        </listitem>
+      </itemizedlist>
+
+      <programlisting>make
+install -s work/ipsec-tools-*/src/racoon/.libs/racoon $MWROOT/usr/local/sbin
+install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MWROOT/usr/local/lib</programlisting>
+    </section>
+
+    <section>
+      <title>ucd-snmp</title>
+
+      <para>Get ucd-snmp 4.2.x (not net-snmp as it's much bigger) from <ulink
+      url="http://sourceforge.net/project/showfiles.php?group_id=12694">http://sourceforge.net/project/showfiles.php?group_id=12694</ulink>.
+      Extract, then compile and install as follows:</para>
+
+      <programlisting>./configure  --without-openssl --disable-debugging --enable-static \
+--enable-mini-agent --disable-privacy --disable-testing-code \
+--disable-shared-version --disable-shared --disable-ipv6 \
+'--with-out-transports=TCP Unix' \
+'--with-mib-modules=mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2'</programlisting>
+
+      <para>Just press enter at all questions.</para>
+
+      <programlisting>make
+install -s agent/snmpd $MWROOT/usr/local/sbin</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-tools.html"?>
+
+    <title>Installing supplementary tools</title>
+
+    <para>Apart from the various (relatively) big software packages like PHP
+    or isc-dhcp that make m0n0wall what it is, there's a range of small helper
+    tools, usually written in C by one of the m0n0wall developers, that need
+    to be compiled. These tools handle things that either can't be done in PHP
+    at all, or only inefficiently. This section explains how to compile and
+    install them.</para>
+
+    <para>Download the supplementary tools from <ulink
+    url="http://m0n0.ch/wall/downloads/freebsd-4.11/tools.tgz">http://m0n0.ch/wall/downloads/freebsd-4.11/tools.tgz</ulink>.</para>
+
+    <section>
+      <title>choparp</title>
+
+      <para>choparp is an ARP proxy daemon. m0n0wall uses a customized version
+      that supports address ranges, rather than just single addresses and
+      subnets. Install as follows:</para>
+
+      <programlisting>gcc -o choparp choparp.c
+install -s choparp $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>atareinit</title>
+
+      <para>This simple tool reinitializes ATA drive controllers and is
+      required for the IDE HD standby feature.</para>
+
+      <programlisting>gcc -o atareinit atareinit.c
+install -s atareinit $MWROOT/usr/local/sbin</programlisting>
+    </section>
+
+    <section>
+      <title>stats.cgi</title>
+
+      <para>The SVG-based traffic and CPU load graphs in the webGUI call a CGI
+      through the web server to get the information. For efficiency, this CGI
+      is written in C rather than PHP since it's invoked once every second
+      while the graph is being displayed. Install as follows:</para>
+
+      <programlisting>gcc -o stats.cgi stats.c
+install -s stats.cgi $MWROOT/usr/local/www</programlisting>
+    </section>
+
+    <section>
+      <title>minicron</title>
+
+      <para>minicron is a very simple daemon that invokes a command at regular
+      intervals. The captive portal uses this to prune expired user sessions.
+      Install as follows:</para>
+
+      <programlisting>gcc -o minicron minicron.c
+install -s minicron $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>verifysig</title>
+
+      <para>This tool uses the OpenSSL libraries to check the digital
+      signature of an uploaded firmware image using
+      <filename>/etc/pubkey.pem</filename>. Install as follows:</para>
+
+      <programlisting>gcc -o verifysig -lcrypto verifysig.c
+install -s verifysig $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>runmsntp.sh</title>
+
+      <para>MSNTP has the bad habit of exiting sometimes (e.g. when it can't
+      contact a time server for awhile), so we need a simple shell script to
+      restart it if it dies. Install as follows:</para>
+
+      <programlisting>install runmsntp.sh $MWROOT/usr/local/bin</programlisting>
+    </section>
+
+    <section>
+      <title>linkup scripts</title>
+
+      <para>A few shell scripts need to be provided for MPD to invoke when a
+      PP(T)P connection is established or torn down:</para>
+
+      <programlisting>install ppp-linkup vpn-linkdown vpn-linkup $MWROOT/usr/local/sbin</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-bootloader.html"?>
+
+    <title>Building the boot loader</title>
+
+    <para>The boot loader in official m0n0wall images is configured to read
+    only one block at a time to work around incompatibilities between certain
+    brands of CF cards and BIOSes. Also, it's compiled not to use fancy
+    terminal emulation, as that usually messes up the output on a serial
+    console. If you're going to build an image for a generic PC, you may be
+    able to do without these modifications and just use the boot loader from
+    <filename>/boot</filename> that was installed with FreeBSD. Otherwise,
+    read on.</para>
+
+    <para>Edit <filename>/sys/boot/i386/libi386/Makefile</filename> and
+    <emphasis>comment out</emphasis> the line that says <code>CFLAGS+=
+    -DTERM_EMU</code>. Now apply the single-sector-read patch, if
+    desired:</para>
+
+    <programlisting>cd /usr/src
+patch &lt; $MWPATCHDIR/boot/boot.patch</programlisting>
+
+    <para>When building a boot loader for WRAP boards,
+    <filename>boot1.s</filename> needs to be modified not to fiddle with gate
+    A20, since the WRAP doesn't have a keyboard controller:</para>
+
+    <programlisting>patch &lt; $MWPATCHDIR/boot/boot-wrap.patch</programlisting>
+
+    <para>Compile the boot loader:</para>
+
+    <programlisting>cd /sys/boot
+make clean &amp;&amp; make obj &amp;&amp; make</programlisting>
+
+    <para>Make a directory somewhere to hold the boot files until you're ready
+    to create the image, and copy the necessary files to it:</para>
+
+    <programlisting>mkdir $BOOTDIR
+cp /usr/obj/usr/src/sys/boot/i386/loader/loader $BOOTDIR
+cp /usr/obj/usr/src/sys/boot/i386/boot2/{boot1,boot2} $BOOTDIR
+cp /usr/obj/usr/src/sys/boot/i386/cdboot/cdboot $BOOTDIR</programlisting>
+
+    <section>
+      <title>Preparing loader.rc</title>
+
+      <para><filename>loader.rc</filename> is the file that the loader reads
+      and interprets. For m0n0wall, it is used to disable ATA DMA (to increase
+      compatibility with odd hardware, especially since CF/HD performance
+      isn't very important in m0n0wall) and load the kernel and the MFS root
+      file system.</para>
+
+      <para>Create the file <filename>$BOOTDIR/loader.rc</filename> with the
+      following contents:</para>
+
+      <para><literallayout><code>set hw.ata.atapi_dma="0"
+set hw.ata.ata_dma="0"
+load /kernel
+load -t mfs_root /mfsroot
+boot</code></literallayout></para>
+
+      <para>If you're building for a platform that only has a serial console,
+      add the flag "-h" (without the quotes) to the "boot" command on the last
+      line.</para>
+    </section>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-libraries.html"?>
+
+    <title>Adding the libraries</title>
+
+    <para>None of the dynamically linked libraries that are needed have been
+    added yet. This is because a Perl script, mklibs.pl, can be run on the
+    root file system to create a list of libraries that are actually needed
+    (mklibs.pl does this by running ldd on each binary).</para>
+
+    <para><programlisting>perl mklibs.pl $MWROOT &gt; m0n0wall.libs
+perl mkmini.pl m0n0wall.libs / $MWROOT</programlisting></para>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-phpconf.html"?>
+
+    <title>Adding the PHP-based configuration scripts</title>
+
+    <para>Now it's time to add the actual guts that make m0n0wall what it is!
+    Get the latest phpconf scripts from the Subversion repository at <ulink
+    url="http://svn.m0n0.ch/wall">http://svn.m0n0.ch/wall</ulink>. If you want
+    the latest development version, use the '<code>trunk</code>' subdirectory,
+    or else if you want to go with a specific branch or a tagged release
+    version, see the '<code>branches</code>' and '<code>tags</code>'
+    subdirectories, respectively. Assuming you want the latest version and
+    have Subversion installed on your machine, just run the following command
+    in a temporary directory:</para>
+
+    <programlisting>svn export http://svn.m0n0.ch/wall/trunk</programlisting>
+
+    <para>Copy the contents of the <code>phpconf</code> subdirectory to
+    <code>$MWROOT/etc</code>. Make sure that all <filename>rc.*</filename>
+    files go into <filename>$MWROOT/etc</filename> and all
+    <filename>*.inc</filename> files into
+    <filename>$MWROOT/etc/inc</filename>. Also, make sure that the
+    <filename>rc.*</filename> files have the execute permission bits set
+    (chmod 755).</para>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-webgui.html"?>
+
+    <title>Adding the webGUI</title>
+
+    <para>Copy the webGUI files (<code>webgui</code> directory in the
+    repository) to <filename>$MWROOT/usr/local/www</filename>. Copy the
+    captive portal files (<code>captiveportal</code> directory in the
+    repository) to <filename>$MWROOT/usr/local/captiveportal</filename>. Make
+    sure that all <filename>*.php</filename> files have the execute permission
+    bits set (chmod 755).</para>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-mfsroot.html"?>
+
+    <title>Creating mfsroot</title>
+
+    <para>First of all, a zero-filled image file needs to be created. The
+    current size (as of m0n0wall 1.21) is 11 MB, which should be enough to fit
+    all the files in the root file system. If you add big components, you may
+    need to increase this. However, don't make it much bigger than necessary,
+    as the MFS will take up as much space as you specify here, even if the
+    file system is not full. Put mfsroot somewhere outside of $MWROOT!</para>
+
+    <programlisting>dd if=/dev/zero of=mfsroot bs=1k count=11264</programlisting>
+
+    <para>Now we'll use vnconfig to attach the file to /dev/vn0:</para>
+
+    <programlisting>vnconfig -s labels -c vn0 mfsroot</programlisting>
+
+    <para>After that, it's possible to use disklabel and newfs to create an
+    UFS file system, and mount it:</para>
+
+    <programlisting>disklabel -rw vn0 auto
+newfs -b 8192 -f 1024 -o space -m 0 /dev/vn0c
+mount /dev/vn0c /mnt</programlisting>
+
+    <para>The root file system that you prepared in $MWROOT can now be
+    transferred into /mnt.</para>
+
+    <para>tar should be used for this task, as it correctly preserves hard
+    links (unlike cp) and thereby saves space:</para>
+
+    <programlisting>cd /mnt
+tar -cf - -C $MWROOT ./ | tar -xvpf -</programlisting>
+
+    <para>Cleaning up and gzipping the image (step out of /mnt first):</para>
+
+    <programlisting>umount /mnt
+vnconfig -u vn0
+gzip -9 mfsroot</programlisting>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-image.html"?>
+
+    <title>Putting it all together: creating the image</title>
+
+    <para>This is very similar to creating the mfsroot. Again, a zero-filled
+    image file needs to be created first. This needs to be big enough to
+    accomodate the kernel, mfsroot, boot loader and config.xml. As of 1.21, 7
+    MB is used.</para>
+
+    <programlisting>dd if=/dev/zero of=image.bin bs=1k count=7168
+vnconfig -s labels -c vn0 image.bin</programlisting>
+
+    <para>This time, the first and second stage boot loaders need to be
+    written into the special reserved area at the beginning of the image
+    too.</para>
+
+    <programlisting>disklabel -Brw -b $BOOTDIR/boot1 -s $BOOTDIR/boot2 vn0 auto
+disklabel -e vn0</programlisting>
+
+    <para>You will be dropped into your favorite text editor. Duplicate the
+    line that starts with <code>c:</code>, and change the <code>c:</code> to
+    <code>a:</code> and the fstype from <code>unused</code> to
+    <code>4.2BSD</code>. Now create and mount the root file system:</para>
+
+    <programlisting>newfs -b 8192 -f 1024 -o space -m 0 /dev/vn0a
+mount /dev/vn0a /mnt</programlisting>
+
+    <para>Copy kernel.gz, mfsroot.gz, the boot loader and the default config
+    file (which is going to be the initial configuration of your new
+    image):</para>
+
+    <programlisting>cp /sys/compile/M0N0WALL_[PLATFORM]/kernel.gz /mnt
+cp mfsroot.gz /mnt
+mkdir /mnt/boot
+cp $BOOTDIR/{loader,loader.rc} /mnt/boot
+mkdir /mnt/conf
+cp $MWROOT/conf.default/config.xml /mnt/conf</programlisting>
+
+    <para>Time to finalize the image (step out of /mnt first):</para>
+
+    <programlisting>umount /mnt
+vnconfig -u vn0
+gzip -9 image.bin</programlisting>
+
+    <para>Et voilà! Rename the image as per standard m0n0wall conventions to
+    make sure that the webGUI firmware upgrade works (which insists that the
+    filename starts with the platform name followed by a dash):</para>
+
+    <programlisting>mv image.bin.gz [platform]-[version].img</programlisting>
+  </section>
+
+  <section>
+    <?dbhtml filename="image-guide-cdrom.html"?>
+
+    <title>Creating a bootable CD-ROM version</title>
+
+    <para>mkisofs needs to be installed first (use
+    <filename>/usr/ports/sysutils/cdrtools</filename>).</para>
+
+    <para>Create a new directory to hold the contents of the CD-ROM in
+    $CDROOT. Copy your kernel.gz and mfsroot.gz to it. Add the boot loader as
+    follows:</para>
+
+    <programlisting>mkdir $CDROOT/boot
+cp $BOOTDIR/{cdboot,loader,loader.rc} $CDROOT/boot</programlisting>
+
+    <para>Now use mkisofs to create the bootable ISO image:</para>
+
+    <programlisting>mkisofs -b "boot/cdboot" -no-emul-boot -A "m0n0wall CD-ROM image" \
+        -c "boot/boot.catalog" -d -r -publisher "foo.com" \
+        -p "Your Name" -V "m0n0wall_cd" -o "m0n0wall.iso" \
+        $CDROOT</programlisting>
+  </section>
+</chapter>

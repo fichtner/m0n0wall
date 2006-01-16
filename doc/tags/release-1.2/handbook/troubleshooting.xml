@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+  <?dbhtml filename="troubleshooting.html"?>
+  <title>Troubleshooting</title>
+  
+  <para>This chapter outlines some of the more common problems you may experience when using m0n0wall,
+  and how to troubleshoot and resolve them.  </para>
+  
+  <sect1>
+    <title>Interfaces are not detected</title>
+   
+    <para>First check your BIOS settings for a "Plug and Play OS" or "OS" setting.  For
+    "Plug and Play OS", set it to "no" or "disable".  If there is an "OS" setting, typically
+    you can and should set it to "other".  This most always fixes the problem.  </para>
+    
+    <para>If that doesn't resolve it, try to upgrade your system BIOS. </para>
+    
+    <para>Resetting the BIOS to default settings might help.  There have been instances
+    in the past where this has resolved this problem, likely due to some strange BIOS setup
+    from past use of the hardware.</para>
+    
+    <para>Occasionally other hardware like sound cards, and similar, can prevent some or all of
+    your cards from being detected.  Try removing any cards in the system that aren't required,
+    and disabling any unused hardware (USB, parallel port, serial ports, any onboard sound, etc.) in
+    the system BIOS. </para>
+    
+    <para>Most all Ethernet cards are supported by m0n0wall, but if you still cannot see the
+    network cards, ensure they are supported.</para>
+    
+  </sect1>
+    
+  <sect1>
+    <?dbhtml filename="troubleshooting-immediate-replacement.html"?>
+    <title>After replacing my current firewall with m0n0wall using the same public IP,
+    m0n0wall cannot get an Internet connection.</title>
+    
+    <para>This same problem can affect new 1:1 and Server NAT configurations.</para>
+    
+    <formalpara>
+        <title>Cause</title>
+    
+        <para>This is typically caused by the router outside of your m0n0wall
+        having the MAC address of your previous firewall still in its ARP table.
+        Cisco routers, for example, will cache this for four hours by default.
+        Many other routers are similar.  </para>
+        
+    </formalpara>
+    
+    <formalpara>
+        <title>Solution</title>
+        
+        <para>Clear the ARP cache on your router.  If you don't have access to
+        the command interface of the router, or don't know how to clear the ARP
+        cache, power cycling the router should achieve the same result. </para>
+        
+        <para>Alternatively, you could fill in the MAC address of the WAN interface
+        of your previous firewall in m0n0wall's WAN interface screen.  </para>
+        
+    </formalpara>
+    
+  </sect1>
+  
+    <sect1 id="Troubleshooting.no.link.light">
+    <?dbhtml filename="troubleshooting-nolinklight.html"?>
+    <title>No Link Light</title>
+    
+    <para>If you do not have a link light on your network interfaces, 
+        they are not up and will not be able to communicate with the
+        network.  Your LAN and WAN interfaces both must have link
+        lights.  
+    </para>
+    
+    <para>
+        If you do not have a link light on one of your network
+        interfaces, there are a few potential causes and things
+        to check.
+        
+        <itemizedlist>
+            <listitem>Ensure the network cable is snugly plugged
+            in on both ends.  Unplug and replug the cable to
+            ensure it is properly seated.</listitem>
+            
+            <listitem>Try a different cable.</listitem>
+            
+            <listitem>
+                <para>Make sure you are using the appropriate
+                type of cable. </para>
+
+                <para>There are two types of standard Ethernet
+                patch cables, straight and crossover.</para>
+                
+                <formalpara><title>Straight
+                cables</title> are used to attach devices like computers,
+                routers (ones like Cisco, not counting most DSL and
+                cable routers/modems), servers, printers, firewalls, and other
+                devices with Ethernet cards into a hub or switch.
+                </formalpara>
+                
+                <formalpara><title>Crossover cables</title> are used
+                to connect one hub or switch to another hub or switch,
+                or connect a PC directly to another PC, or a firewall
+                directly to a PC, etc.</formalpara>
+                
+                <para>Make sure you are using the appropriate cable
+                type for your situation.  If you are unsure of which
+                cable is required and do not get a link light with a
+                straight cable, try a crossover cable.  
+                </para>
+            </listitem>
+        </itemizedlist>
+    </para>
+    
+    <para>If none of the above apply and you still are not getting a
+    link light, verify functionality of both pieces of equipment by
+    trying other devices.  If you cannot get a link light on a network
+    device no matter what you plug it into with any kind of cable, the
+    device has a bad Ethernet port.  </para>
+    
+  </sect1>
+  
+  <sect1 id="Cannot.Access.webGUI">
+    <?dbhtml filename="troubleshooting-nowebgui.html"?>
+    <title>Cannot Access webGUI</title>
+    
+    <para>If you cannot access the webGUI after following this guide, verify the
+        following.</para>
+    
+    <orderedlist>
+            <listitem>Check the link lights on the network ports on the WRAP.
+                Connected interfaces must have a link light or they will not work.
+                If you do not have a link light, check the "no link light"
+                troubleshooting section of this guide.
+            </listitem>
+            <listitem>
+                Check to make sure you have the interfaces plugged in properly.
+                Remember on the WRAP the NIC closest to the power supply must
+                be connected to your LAN hub or switch.  On the three NIC
+                models, the middle interface is WAN, and on the two NIC
+                models, the interface closest to the serial port is WAN.  The
+                WAN port must be plugged into your Internet connection (cable
+                or DSL modem, router, etc.).
+            </listitem>
+            <listitem>
+                Try to ping the LAN IP of m0n0wall.  
+            </listitem>
+            <listitem>Check the IP configuration of the machine you are
+                using.  Its IP address must be within the same subnet as
+                your m0n0wall's LAN interface, and must be using the same
+                subnet mask.
+            </listitem>
+    </orderedlist>
+    
+    
+  </sect1>
+  
+  <sect1>
+    <?dbhtml filename="troubleshooting-nointernetfromlan.html"?>
+    <title>Cannot Access Internet from LAN after WAN Configuration</title>
+    
+    <para>The following diagram provides an overview of troubleshooting
+    this issue.  Each step is numbered with the section of this document
+    that addresses troubleshooting this particular issue.  </para>
+    
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="flowcharts/no-internet-from-LAN.png" />
+        </imageobject>
+    </mediaobject>
+    
+    <sect2>
+        <title>Ping m0n0wall LAN IP</title>
+        
+        <para>Bring up a command prompt on your machine, type in
+        'ping 192.168.1.1' and press Enter.</para>
+        
+        <para>A successful ping will look like the following.</para>
+        
+        <literallayout class="monospaced">
+C:\>ping 192.168.1.1
+
+Pinging 192.168.1.1 with 32 bytes of data:
+
+Reply from 192.168.1.1: bytes=32 time&lt;1ms TTL=64
+Reply from 192.168.1.1: bytes=32 time&lt;1ms TTL=64
+Reply from 192.168.1.1: bytes=32 time&lt;1ms TTL=64
+Reply from 192.168.1.1: bytes=32 time&lt;1ms TTL=64
+
+Ping statistics for 192.168.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+        </literallayout>
+        
+        <para>An unsuccessful ping will look like this.</para>
+        
+        <literallayout class="monospaced">
+C:\>ping 192.168.1.1
+
+Pinging 192.168.1.1 with 32 bytes of data:
+
+Request timed out.
+Request timed out.
+Request timed out.
+Request timed out.
+
+Ping statistics for 192.168.1.1:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
+        </literallayout>
+        
+        <para>See <link linkend="Cannot.Access.webGUI">Cannot Access webGUI</link>
+        as if you cannot ping, you won't be able to get into the webGUI either.
+        </para>
+        
+    </sect2>
+    
+    <sect2 id="check.WAN.IP">
+        <title>Check m0n0wall's WAN IP</title>
+        
+        <para>Go to the Status -&gt; Interfaces page and look under the WAN
+        interface.  It must show status as up, and have a valid IP address,
+        subnet mask, and gateway.</para>
+        
+        <para>If the status shows as "down", check for a link light.  See
+        <link linkend="no.link.light">No Link Light</link> if you do not
+        have a link light on your WAN NIC.</para>
+        
+        <para>If you have a dynamic IP connection like DHCP, PPPoE, or anything
+        but static, and show a 0.0.0.0 IP, you are not getting a lease from
+        your ISP.  Check your WAN configuration page to make sure the appropriate
+        settings are entered correctly (like username/password if applicable, etc.).
+        </para>
+        
+        <para>If you see a WAN IP address on the Status -&gt; Interfaces page,
+        make note of it as you will use it in the next step.</para>
+        
+        <sect3>
+            <title>Cannot get IP address on dynamic IP connection</title>
+            
+            <para>If all settings are correct and you still cannot get a lease and
+            have a DSL or cable modem, try powering off the modem for several
+            seconds and powering it back on.  Then go to the WAN interface page,
+            and without saving any changes, click the Save button (or just power cycle
+            m0n0wall if you prefer).  Then check the Status -&gt; Interfaces page
+            again to see if you now have an IP address.</para>
+            
+            <para>If you still don't have an IP and previously had some other router,
+            firewall, or PC connected to this Internet connection, your ISP may be
+            restricting you to only using the MAC address of the previous device.  The
+            easiest thing to do in these situations is to get the MAC address off the
+            device that was formerly connected and enter it in the "MAC address" box
+            under "General configuration" on the WAN page in the m0n0wall webGUI.  On
+            most routers, you can find the MAC address on a sticker on the device.  On
+            Windows PC's, you can get the MAC address by running "ipconfig/all" from a
+            command prompt.  On BSD and Linux machines, you can get the MAC address by
+            running 'ifconfig'.  </para>
+            
+        </sect3>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Ping m0n0wall's WAN IP</title>
+        
+        <para>On the Status -&gt; Interfaces page, make note of the WAN IP address.
+        On the client machine you are using, try to ping that IP address.</para>
+        
+        <para>If the ping is not successful, check the default gateway IP address
+        on the client machine.  Run 'ipconfig/all' from a command prompt if using
+        Windows to check this.  It must be set to m0n0wall's LAN IP (192.168.1.1
+        by default).  
+        </para>
+            
+    </sect2>
+    
+    <sect2>
+        <title>Ping m0n0wall's WAN's gateway IP</title>
+        
+        <para>On the Status -&gt; Interfaces page, make note of m0n0wall's WAN
+        default gateway IP.  Try to ping it from your client machine.  </para>
+        
+        <para>If the pings time out, double check your WAN setup.  If things
+        fail at this stage, you most likely failed the earlier <link linkend="check.WAN.IP">
+        Check WAN IP</link> step as well.</para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Ping an IP address on the Internet</title>
+        
+        <para>From the client machine, ping something on the Internet that
+        responds to pings, like 216.135.66.19.</para>
+        
+        <para>If this fails but all previous steps were successful, your ISP
+        is not letting you out onto the Internet for some reason.  At this point,
+        you will need to contact your ISP's technical support.  Your ISP could
+        potentially be blocking pings though (not likely), so your pings could time out while
+        your Internet connection still functions (mostly) properly. </para>
+        
+    </sect2>
+    
+    <sect2>
+        <title>Ping a DNS name that responds to pings</title>
+        
+        <para>Ping a DNS name that responds to pings from the client machine,
+        like google.com.  </para>
+        
+        <para>You should see responses to your pings.  If you receive a
+        "could not find host" message, you have a DNS issue.  See the
+        Troubleshooting DNS section.</para>
+        
+    </sect2>
+    
+  </sect1>
+  
+    
+  <sect1>
+    <?dbhtml filename="troubleshooting-firewall-rules.html"?>
+    <title>Troubleshooting Firewall Rules</title>
+        
+        <para>First remember rules are processed top down, and the first match
+        is the only rule that applies. </para>
+        
+        <para>Secondly, remember to check your logs on the Diagnostics -&gt;
+        Logs, Firewall tab.  This will show you what is getting dropped due
+        to the default deny all rule.  When troubleshooting rules, it can be
+        helpful to enable logging on the rules in question at least temporarily.
+        Remember m0n0wall has limited local logging space, so don't enable too
+        much on a long term basis.</para>
+        
+        <para>Remember if you need to permit services from the Internet into
+        any private IP space, you need to configure NAT as well as firewall
+        rules, and we recommend using the "auto add firewall rule" when adding
+        NAT entries.</para>
+        
+        <sect2>
+            <title>Reading raw IPFilter logs</title>
+            
+            <para>If all else fails and you need to determine exactly which rule is
+            dropping the traffic, go to status.php on your m0n0wall to the "last 50
+            filter log entries" section.  Find the log line applying to the traffic
+            in question, and make note of the rule number.  The rule number is
+            denoted by an @ followed by a number, then a colon, then another number,
+            for example @0:18.  The 0 indicates the first group, and the 18 indicates
+            rule number 18 in group 0.  </para>
+        
+            <para>Then go up to the output of "ipfstat -nio" and find the rule in
+            question.  Anything without a group number at the end of the rule is
+            the 0 group.  @1:1 would indicate the first rule with "group 100" at the
+            end of the rule.  @2:1 would be the first rule with "group 200" at the end
+            of the rule, and so on.  Finding the exact rule, since some rules are added
+            by the back end of m0n0wall and not visible on the rules page, may make
+            troubleshooting easier.</para>
+        
+        </sect2>
+        
+   </sect1>
+   
+   <sect1>
+    <?dbhtml filename="troubleshooting-bridging.html"?>
+    <title>Troubleshooting Bridging</title>
+    
+        <para>In order to support bridging, the network cards you are using must
+        support promiscuous mode.  Not all do.  Some people have reported problems
+        with Realtek chipsets not supporting promiscuous mode.  To determine if your
+        NIC does, see its documentation.  
+        </para>
+        
+    </sect1>
+    
+    <sect1>
+        <?dbhtml filename="troubleshooting-bridging.html"?>
+        <title>Troubleshooting IPsec Site to Site VPN</title>
+
+        <formalpara>
+            <title>Check the SAD</title>
+            
+            <para>Check the Security Association Database (SAD) under
+            Diagnostics.  You need to have an entry here for the
+            connection.  If you do not, you don't have something
+            configured properly.  </para>
+            
+        </formalpara>
+        
+        <formalpara>
+            <title>Verify Suitable IP Subnets</title>
+            
+            <para>First make sure the two subnets you are trying to
+            connect don't lie within the same address space.  i.e. if
+            both sides are 192.168.1.0/24, the connection will not work.
+            Same goes if one side is 192.168.0.0/16 and the other is
+            192.168.1.0/24, or similar, the latter lies in the subnet of
+            the former.</para>
+            
+            <para>If they do lie within the same address space, you'll need
+            to change one side or the other.  There is no way to set up a
+            site to site IPsec VPN with any product when this is the case.
+            </para>
+            
+        </formalpara>
+
+        
+    </sect1>
+    
+    
+   <sect1>
+    <?dbhtml filename="troubleshooting-freeze.html"?>
+    <title>Troubleshooting Solid Freezes</title>
+    
+        <para>Certain conditions can cause your m0n0wall to freeze
+        solid periodically.  The amount of time between freezes
+        typically varies, and can be anywhere from a few hours to a
+        few days. 
+        </para>
+        
+        <sect2>
+            <title>Shared IRQ's</title>
+            
+            <para>The first thing to check is whether you have any shared
+            IRQ's.  This seems to be the most common cause.  If you have
+            recently rebooted your m0n0wall, you should
+            be able to see the boot messages under Diagnostics -&gt; Logs, on
+            the System tab.  Otherwise you can go to /exec.php on your m0n0wall
+            and run 'dmesg'.  Look through the boot messages and make note of
+            everything you see being shown with an IRQ.  This includes your
+            NIC's as well as other devices like serial and parallel ports, etc.
+            An example of some dmesg output follows.
+            </para>
+        
+            <literallayout class="monospaced">
+sis0: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe000-0xe0ff mem 0xa0001000-0xa0001fff irq 11 at device 18.0 on pci0
+sis1: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe100-0xe1ff mem 0xa0002000-0xa0002fff irq 5 at device 19.0 on pci0
+sis2: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe200-0xe2ff mem 0xa0003000-0xa0003fff irq 9 at device 20.0 on pci0
+            </literallayout>
+        
+            <para>The above example shows three NIC's with IRQ's 11, 5, and 9.  
+            </para>
+        
+            <para>If you note any two devices using a single IRQ, you may need
+            to try other PCI slots, if possible, remove unused cards (like
+            sound cards), and disable unused devices in the BIOS (serial ports,
+            parallel ports, etc.).  
+            </para>
+        
+        </sect2>
+        
+        <sect2>
+            <title>BIOS Version and Settings</title>
+            
+            <para>You might want to try resetting your BIOS configuration to
+            factory defaults, and then disabling any Plug and Play OS
+            settings.  Also check that your BIOS is updated to the latest
+            revision.  
+            </para>
+            
+        </sect2>
+        
+        <sect2>
+            <title>Hardware Issues</title>
+            
+            <para>Use hardware diagnostic utilities to ensure your RAM and
+            system in general are functioning properly.  The <ulink
+            url="http://ultimatebootcd.com/">Ultimate Boot CD</ulink> has
+            several utilities for testing CPU and memory.  </para>
+            
+            <para>Hardware overheating is another common cause.  This issue
+            has been noted on WRAP hardware especially when using miniPCI
+            cards.  It's also possible and has happened with any type of
+            hardware.
+            </para>
+            
+            <para>If nothing else, it may just be hardware or a combination
+            of hardware that doesn't play nicely with FreeBSD.  You may want
+            to try different NIC's or a different system.  This especially
+            seems to be a problem with some old AMD K5 and K6 systems, though
+            some work fine.  </para>
+            
+        </sect2>
+        
+   </sect1>
+
+</chapter>
+

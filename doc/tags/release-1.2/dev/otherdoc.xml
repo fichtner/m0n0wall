@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: otherdoc.xml,v 1.3 2005/09/26 00:48:46 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="otherdoc.html"?>
+  <title>Other Documentation</title>
+
+  <para>There are several people who have written additional documentation for
+  m0n0wall development which are beyond the scope of this manual, or which
+  have not yet been incorporated into this manual.
+  This chapter provides a reference to
+  some of those sources to help you when you find yourself in a situation not
+  covered in detail in this manual.</para>
+
+   <para><ulink
+    url="http://michael-i.com/files/presentations/getting_started_m0n0wall_development_v0.1.0_050604.pdf">An
+    Introduction to m0n0wall Development</ulink> - Michael Iedema</para>
+    <para><ulink
+    url="http://jief.theroux.ca/docs/custom-m0n0wall-howto.txt">Custom m0n0wall images howto</ulink> - Jean-Francois
+    Theroux</para>
+    
+    <para>If you have written something on m0n0wall development,
+    please <ulink url="mailto:cbuechler@gmail.com">email Chris Buechler</ulink>
+    to have it listed here.</para>
+      
+</chapter>

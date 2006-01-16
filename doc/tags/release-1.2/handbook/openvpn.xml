@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+  <?dbhtml filename="openvpn.html"?>
+
+  <title>OpenVPN</title>
+  
+  <para>OpenVPN is a new addition to m0n0wall in the 1.2 beta versions.  Currently there
+  is little documentation available.  </para>
+  
+    <para><ulink url="http://www.closeconsultants.com/~peter/m0n0-ovpn-rw.html">Road warrior scenario</ulink> - Peter Curran</para>
+    
+    <para><ulink url="http://www.closeconsultants.com/~peter/m0n0-ovpn-wifi.html">Wireless network scenario</ulink> - Peter Curran</para>
+    
+    <para>For more information, see the
+  <ulink url="http://openvpn.sf.net">OpenVPN project website</ulink>.</para>
+  
+</chapter>

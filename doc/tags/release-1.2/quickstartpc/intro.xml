@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: intro.xml,v 1.5 2005/09/25 23:32:37 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="intro.html"?>
+
+  <title>Introduction</title>
+
+  <sect1>
+    <title>TO DO</title>
+
+    <para>Add hardware chapter</para>
+    
+    <para>List of things to fix once 1.2 is released (for my own
+    reference).</para>
+    
+    <para>Finish tutorials that rely on current website
+    (need m0n0.ch to show 1.2 release first).</para>
+    
+    <para>Change out screenshots where applicable with
+    final 1.2 release.</para>
+    
+    <para>Change console output to that of final 1.2 release.</para>
+    
+  </sect1>
+
+  <sect1>
+    
+    <title>Getting Started with m0n0wall on the PC</title>
+
+    <para>The m0n0wall Quick Start Guide is intended to get you up 
+    and running with m0n0wall on a two interface (LAN and WAN) setup.  
+    The <ulink url="http://doc.m0n0.ch/handbook/">
+    m0n0wall Handbook</ulink> contains the information you need to 
+    further configure your m0n0wall installation after completing 
+    this guide.  </para>
+    
+    <para>This version of the Quick Start Guide is specifically tailored to the
+    PC platform.  If you are using Soekris hardware, please see the 
+    <ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick Start 
+	Guide</ulink> and for WRAP hardware, please see the <ulink 
+    url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick 
+    Start Guide</ulink>.</para>
+    
+    <para>I am currently working on adding a number of example configurations in
+    <ulink url="http://doc.m0n0.ch/handbook/examples.html">Chapter 9</ulink> of the
+    <ulink url="http://doc.m0n0.ch/handbook/">m0n0wall Handbook</ulink>.  
+    These configurations
+    will describe how to configure several things such as multiple LAN 
+    interfaces, setting up DMZ interfaces, wireless interfaces, etc.  
+    The base for adding those
+    additional features will be the basic LAN/WAN setup this guide 
+    describes.</para>
+    
+  </sect1>
+  
+<sect1>
+  <?dbhtml filename="intro-prerequisites.html"?>
+
+  <title>Prerequisites</title>
+
+  <para>This chapter will go through the hardware and network
+  information you need to gather to proceed through in this guide.
+  </para>
+
+  <sect2>
+    <title>Required Hardware</title>
+    
+    <para>First, you need to make sure you have the
+    following hardware.
+    </para>
+    
+    <itemizedlist>
+        <listitem>
+            <para>Destination PC</para>
+        </listitem>
+        <listitem>
+            <para>storage medium</para>
+        </listitem>    
+        <listitem>
+            <para>Two network cables</para>
+        </listitem>
+    </itemizedlist>
+    
+   </sect2>
+   
+   <sect2>
+    <title>Required Network Information</title>
+    
+      <para>You'll need some information about your
+      Internet connection.  You'll need to know which
+      category of the below list your Internet connection
+      falls into, and the appropriate details.  You can
+      usually find these details on your ISP's website,
+      and/or in paperwork you receive when you sign up
+      for service.  You can also call your ISP's technical
+      support to get this information.
+      </para>
+        
+      <itemizedlist>
+        <listitem>
+            <formalpara><title>Static IP</title> - If you
+            have a connection with a static IP, you will
+            need to make note of your IP address, subnet
+            mask, default gateway, and DNS server IP's.
+            </formalpara>
+        </listitem>
+        <listitem>
+            <formalpara><title>DHCP</title> - If you have
+            an Internet connection that uses DHCP, you need
+            not gather any more information unless your ISP
+            requires you to pass a certain DHCP hostname
+            value (this is uncommon).  If this is the case,
+            you will need to
+            check with your ISP to determine this hostname.
+            </formalpara>
+        </listitem>
+        <listitem>
+            <formalpara><title>PPPoE</title> - Many DSL providers
+            provide PPPoE or PPPoA service.  Either of these is
+            supported with the PPPoE WAN option.  You will need
+            to know your PPPoE username and password and possibly
+            your service name (though this can usually be left
+            blank).  
+            </formalpara>
+        </listitem>
+        <listitem>
+            <formalpara><title>PPTP</title> - A few ISP's require
+            you to connect to them via PPTP.  If your ISP requires
+            this, you will need a username, password, local IP address,
+            and remote IP address from your ISP.  </formalpara>
+        </listitem>
+        <listitem>
+            <formalpara><title>BigPond</title> - This setting is for
+            BigPond cable connections.  You will need your username,
+            password, and possibly authentication server and domain.
+            </formalpara>
+        </listitem>
+        
+    </itemizedlist>
+    
+    <para>Make note of the appropriate information for your connection
+    type for later use.</para>
+        
+    </sect2>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-CIDR.html"?>
+    <title>Understanding CIDR Subnet Mask Notation</title>
+    
+    <para>m0n0wall uses a subnet mask format that you may not be familiar with.
+        Rather than the common 255.x.x.x, it uses CIDR (Classless InterDomain Routing)
+        notation.  
+    </para>
+    
+    <sect2>
+        <title>CIDR Table</title>
+    
+    <para>You can refer to the following table to find the CIDR equivalent of your
+        subnet mask.</para>
+    
+    <para>
+        <table>
+            <title>CIDR Subnet Table</title>
+            <tgroup cols="2">
+            <thead>
+            <row>
+            <entry>Subnet Mask</entry>
+            <entry>CIDR Prefix</entry>
+            <entry>Total IP's</entry>
+            <entry>Usable IP's</entry>
+            <entry>Number of Class C networks</entry>
+            </row>
+            </thead>
+            <tbody>
+            <row>
+                <entry>255.255.255.255</entry>
+                <entry>/32</entry>
+                <entry>1</entry>
+                <entry>1</entry>
+                <entry>1/256th</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.255.254</entry>
+                <entry>/31</entry>
+                <entry>2</entry>
+                <entry>0</entry>
+                <entry>1/128th</entry>
+            </row>
+            </tbody>
+                        <tbody>
+            <row>
+                <entry>255.255.255.252</entry>
+                <entry>/30</entry>
+                <entry>4</entry>
+                <entry>2</entry>
+                <entry>1/64th</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.255.248</entry>
+                <entry>/29</entry>
+                <entry>8</entry>
+                <entry>6</entry>
+                <entry>1/32nd</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.255.240</entry>
+                <entry>/28</entry>
+                <entry>16</entry>
+                <entry>14</entry>
+                <entry>1/16th</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.255.224</entry>
+                <entry>/27</entry>
+                <entry>32</entry>
+                <entry>30</entry>
+                <entry>1/8th</entry>
+            </row>
+            </tbody>
+                        <tbody>
+            <row>
+                <entry>255.255.255.192</entry>
+                <entry>/26</entry>
+                <entry>64</entry>
+                <entry>62</entry>
+                <entry>1/4th</entry>
+            </row>
+            </tbody>
+                        <tbody>
+            <row>
+                <entry>255.255.255.128</entry>
+                <entry>/25</entry>
+                <entry>128</entry>
+                <entry>126</entry>
+                <entry>1 half</entry>
+            </row>
+            </tbody>
+                        <tbody>
+            <row>
+                <entry>255.255.255.0</entry>
+                <entry>/24</entry>
+                <entry>256</entry>
+                <entry>254</entry>
+                <entry>1</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.254.0</entry>
+                <entry>/23</entry>
+                <entry>512</entry>
+                <entry>510</entry>
+                <entry>2</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.252.0</entry>
+                <entry>/22</entry>
+                <entry>1024</entry>
+                <entry>1022</entry>
+                <entry>4</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.248.0</entry>
+                <entry>/21</entry>
+                <entry>2048</entry>
+                <entry>2046</entry>
+                <entry>8</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.240.0</entry>
+                <entry>/20</entry>
+                <entry>4096</entry>
+                <entry>4094</entry>
+                <entry>16</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.224.0</entry>
+                <entry>/19</entry>
+                <entry>8192</entry>
+                <entry>8190</entry>
+                <entry>32</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.192.0</entry>
+                <entry>/18</entry>
+                <entry>16,384</entry>
+                <entry>16,382</entry>
+                <entry>64</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.128.0</entry>
+                <entry>/17</entry>
+                <entry>32,768</entry>
+                <entry>32,766</entry>
+                <entry>128</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.255.0.0</entry>
+                <entry>/16</entry>
+                <entry>65,536</entry>
+                <entry>65,534</entry>
+                <entry>256</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.254.0.0</entry>
+                <entry>/15</entry>
+                <entry>131,072</entry>
+                <entry>131,070</entry>
+                <entry>512</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.252.0.0</entry>
+                <entry>/14</entry>
+                <entry>262,144</entry>
+                <entry>262,142</entry>
+                <entry>1024</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.248.0.0</entry>
+                <entry>/13</entry>
+                <entry>524,288</entry>
+                <entry>524,286</entry>
+                <entry>2048</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>255.240.0.0</entry>
+                <entry>/12</entry>
+                <entry>1,048,576</entry>
+                <entry>1,048,574</entry>
+                <entry>4096</entry>
+            </row>
+            </tbody>            
+            <tbody>
+            <row>
+                <entry>255.224.0.0</entry>
+                <entry>/11</entry>
+                <entry>2,097,152</entry>
+                <entry>2,097,150</entry>
+                <entry>8192</entry>
+            </row>
+            </tbody>            
+            <tbody>
+            <row>
+                <entry>255.192.0.0</entry>
+                <entry>/10</entry>
+                <entry>4,194,304</entry>
+                <entry>4,194,302</entry>
+                <entry>16,384</entry>
+            </row>
+            </tbody>            
+            <tbody>
+            <row>
+                <entry>255.128.0.0</entry>
+                <entry>/9</entry>
+                <entry>8,388,608</entry>
+                <entry>8,388,606</entry>
+                <entry>32,768</entry>
+            </row>
+            </tbody>            
+            <tbody>
+            <row>
+                <entry>255.0.0.0</entry>
+                <entry>/8</entry>
+                <entry>16,777,216</entry>
+                <entry>16,777,214</entry>
+                <entry>65,536</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>254.0.0.0</entry>
+                <entry>/7</entry>
+                <entry>33,554,432</entry>
+                <entry>33,554,430</entry>
+                <entry>131,072</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>252.0.0.0</entry>
+                <entry>/6</entry>
+                <entry>67,108,864</entry>
+                <entry>67,108,862</entry>
+                <entry>262,144</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>248.0.0.0</entry>
+                <entry>/5</entry>
+                <entry>134,217,728</entry>
+                <entry>134,217,726</entry>
+                <entry>1,048,576</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>240.0.0.0</entry>
+                <entry>/4</entry>
+                <entry>268,435,456</entry>
+                <entry>268,435,454</entry>
+                <entry>2,097,152</entry>
+            </row>
+            </tbody>
+            <tbody>
+            <row>
+                <entry>224.0.0.0</entry>
+                <entry>/3</entry>
+                <entry>536,870,912</entry>
+                <entry>536,870,910</entry>
+                <entry>4,194,304</entry>
+            </row>
+            </tbody>
+            
+            <tbody>
+            <row>
+                <entry>192.0.0.0</entry>
+                <entry>/2</entry>
+                <entry>1,073,741,824</entry>
+                <entry>1,073,741,822</entry>
+                <entry>8,388,608</entry>
+            </row>
+            </tbody>            
+
+            <tbody>
+            <row>
+                <entry>128.0.0.0</entry>
+                <entry>/1</entry>
+                <entry>2,147,483,648</entry>
+                <entry>2,147,483,646</entry>
+                <entry>16,777,216</entry>
+            </row>
+            </tbody>
+            
+            <tbody>
+            <row>
+                <entry>0.0.0.0</entry>
+                <entry>/0</entry>
+                <entry>4,294,967,296</entry>
+                <entry>4,294,967,294</entry>
+                <entry>33,554,432</entry>
+            </row>
+            </tbody>            
+            
+        </tgroup>
+        </table>
+                
+    </para>
+    
+    </sect2>
+    
+    <sect2>
+        <title>So where do these CIDR numbers come from anyway?</title>
+        
+        <para>The CIDR number comes from the number of 1's in the subnet mask when
+            converted to binary.  </para>
+        
+        <para>The common subnet mask 255.255.255.0 is 11111111.11111111.11111111.00000000
+            in binary.  This adds up to 24 1's, or /24 (pronounced 'slash twenty four').  </para>
+        
+        <para>A subnet mask of 255.255.255.192
+            is 11111111.11111111.11111111.11000000 in binary, or 26 1's, hence a /26.  </para>
+        
+        <para>And so on...</para>
+        
+    </sect2>
+    
+  </sect1>
+  
+    
+</chapter>

@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: intro.xml,v 1.4 2005/10/04 02:53:27 chris Exp $ -->
+<chapter>
+  <?dbhtml filename="intro.html"?>
+
+  <title>Introduction</title>
+
+  <sect1>
+    <?dbhtml filename="intro-is.html"?>
+
+    <title>What m0n0wall is</title>
+
+    <para>m0n0wall is a complete embedded firewall software package that, when
+    used together with an embedded PC, provides all the important features of
+    commercial firewall boxes (including ease of use) at a fraction of the
+    price (free software). m0n0wall is based on a bare-bones version of
+    FreeBSD, along with a web server (thttpd), PHP and a few other utilities.
+    The entire system configuration is stored in one single XML text file to
+    keep things transparent.</para>
+
+    <para>m0n0wall is probably the first UNIX system that has its boot-time
+    configuration done with PHP, rather than the usual shell scripts, and that
+    has the entire system configuration stored in XML format.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-not.html"?>
+
+    <title>What m0n0wall is not</title>
+
+    <para>m0n0wall is a firewall, and the purpose of a firewall is to provide
+    security. The more functionality is added, the greater the chance that a
+    vulnerability in that additional functionality will compromise the
+    security of the firewall.  It is the opinion of the m0n0wall founder and core
+    contributors that anything outside the base services of a layer 3 and 4 firewall
+    do not belong in m0n0wall.  Some services that may be appropriate are very CPU-intensive and
+    memory hungry, and m0n0wall is focused towards embedded devices with limited CPU and
+    memory resources.  The non-persistant filesystem due to our focus on Compact Flash
+    installations is another limiting factor.  Lastly, image size constraints eliminate
+    other possibilities.</para>
+    
+    <para>We feel these services should be run on another server, and are intentionally not part of m0n0wall:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Intrusion Detection/Prevention System</para>
+      </listitem>
+
+      <listitem>
+        <para>Proxy Server</para>
+      </listitem>
+
+      <listitem>
+        <para>Packet inspection at any layers other than 3 and 4</para>
+      </listitem>
+
+      <listitem>
+        <para>A general purpose web server</para>
+      </listitem>
+
+      <listitem>
+        <para>An FTP server</para>
+      </listitem>
+
+      <listitem>
+        <para>A network time server</para>
+      </listitem>
+
+      <listitem>
+        <para>A log file analyzer</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>For the same reason, m0n0wall does not allow logins: there is no
+    login prompt at the console (it displays a <link
+    linkend="Config.Console">menu</link> instead), and no telnet or ssh
+    daemon.</para>
+    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-history.html"?>
+
+    <title>History</title>
+
+    <para>Manuel Kasper, m0n0wall's author, says:</para>
+
+    <blockquote>
+      <para>Ever since I started playing with packet filters on embedded PCs,
+      I wanted to have a nice web-based GUI to control all aspects of my
+      firewall without having to type a single shell command. There are
+      numerous efforts to create nice firewall packages with web interfaces on
+      the Internet (most of them Linux based), but none met all my
+      requirements (free, fast, simple, clean and with all the features I
+      need). So, I eventually started writing my own web GUI. But soon I
+      figured that I didn't want to create another incarnation of webmin ? I
+      wanted to create a complete, new embedded firewall software package. It
+      all evolved to the point where one could plug in the box, set the LAN IP
+      address via the serial console, log into the web interface and set it
+      up. Then I decided that I didn't like the usual bootup system
+      configuration with shell scripts (I already had to write a C program to
+      generate the filter rules since that's almost impossible in a shell
+      script), and since my web interface was based on PHP, it didn't take me
+      long to figure out that I might use PHP for the system configuration as
+      well. That way, the configuration data would no longer have to be stored
+      in text files that can be parsed in a shell script ? It could now be
+      stored in an XML file. So I completely rewrote the whole system again,
+      not changing much in the look-and-feel, but quite a lot "under the
+      hood".</para>
+    </blockquote>
+
+    <para>The first public beta release of m0n0wall was on February 15, 2003.
+    Version 1.0 was released exactly one year later, on February 15, 2004.  
+    Between those two were an additional 26 public beta releases, an average
+    of one release every two weeks.  Version 1.1 was released in August 2004, 
+    with 1.11 released with a security update for m0n0wall's dynamic DNS 
+    component ez-ipupdate on November 11, 2004.  Version 1.2 has been in beta 
+    since, with a final release in October 2005.  A complete list of changes for each
+    version can be found on the m0n0wall web site under <ulink
+    url="http://www.m0n0.ch/wall/changelog.php">Change Log</ulink>.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-features.html"?>
+
+    <title>Features</title>
+
+    <para>m0n0wall provides many of the features of expensive commercial
+    firewalls, and some you won't find in any commercial firewalls, including:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>web interface (supports SSL)</para>
+      </listitem>
+
+      <listitem>
+        <para>serial console interface for recovery</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>set LAN IP address</para>
+          </listitem>
+
+          <listitem>
+            <para>reset password</para>
+          </listitem>
+
+          <listitem>
+            <para>restore factory defaults</para>
+          </listitem>
+
+          <listitem>
+            <para>reboot system</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>wireless support (access point with PRISM-II/2.5 cards, BSS/IBSS
+        with other cards including Cisco)</para>
+      </listitem>
+
+      <listitem>
+        <para>stateful packet filtering</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>block/pass rules</para>
+          </listitem>
+
+          <listitem>
+            <para>logging</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>NAT/PAT (including 1:1)</para>
+      </listitem>
+
+      <listitem>
+        <para>DHCP client, PPPoE and PPTP support on the WAN interface</para>
+      </listitem>
+
+      <listitem>
+        <para>IPsec VPN tunnels (IKE; with support for hardware crypto cards
+        and mobile clients)</para>
+      </listitem>
+
+      <listitem>
+        <para>PPTP VPN (with RADIUS server support)</para>
+      </listitem>
+
+      <listitem>
+        <para>static routes</para>
+      </listitem>
+
+      <listitem>
+        <para>DHCP server</para>
+      </listitem>
+
+      <listitem>
+        <para>caching DNS forwarder</para>
+      </listitem>
+
+      <listitem>
+        <para>DynDNS client</para>
+      </listitem>
+
+      <listitem>
+        <para>SNMP agent</para>
+      </listitem>
+
+      <listitem>
+        <para>traffic shaper</para>
+      </listitem>
+
+      <listitem>
+        <para>firmware upgrade through the web browser</para>
+      </listitem>
+
+      <listitem>
+        <para>configuration backup/restore</para>
+      </listitem>
+
+      <listitem>
+        <para>host/network aliases</para>
+      </listitem>
+    </itemizedlist>
+
+    <sect2>
+      <title>Components</title>
+
+      <para>m0n0wall contains the following software components:<itemizedlist>
+          <listitem>
+            <para>FreeBSD components (kernel, user programs)</para>
+          </listitem>
+
+          <listitem>
+            <para>ipfilter</para>
+          </listitem>
+
+          <listitem>
+            <para>PHP (CGI version)</para>
+          </listitem>
+
+          <listitem>
+            <para>thttpd</para>
+          </listitem>
+
+          <listitem>
+            <para>MPD</para>
+          </listitem>
+
+          <listitem>
+            <para>ISC DHCP server</para>
+          </listitem>
+
+          <listitem>
+            <para>ez-ipupdate (for DynDNS updates)</para>
+          </listitem>
+
+          <listitem>
+            <para>Dnsmasq (for the caching DNS forwarder)</para>
+          </listitem>
+
+          <listitem>
+            <para>racoon (for IPsec IKE)</para>
+          </listitem>
+        </itemizedlist></para>
+    </sect2>
+
+    <sect2>
+      <title>Specifications</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>The m0n0wall system currently takes up <emphasis
+          role="bold">less than 5 MB</emphasis> on a Compact Flash card or
+          CD-ROM.</para>
+        </listitem>
+
+        <listitem>
+          <para>On a net4501, m0n0wall provides a WAN &lt;-&gt; LAN TCP
+          throughput of about <emphasis role="bold">17 Mbps</emphasis>,
+          including NAT, when run with the default configuration. On faster
+          platforms (like net4801 or WRAP), throughput in excess of 50 Mbps is
+          possible (and up to gigabit speeds with newer standard PCs).</para>
+        </listitem>
+
+        <listitem>
+          <para>On a net4501, m0n0wall boots to a fully working state in less
+          than <emphasis role="bold">40 seconds</emphasis> after power-up,
+          including POST (with a properly configured BIOS).</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-license.html"?>
+
+    <title>Software Copyright and Distribution (Licenses)</title>
+
+    <para><emphasis role="bold">m0n0wall is Copyright © 2002-2004 by Manuel
+    Kasper. All rights reserved.</emphasis></para>
+
+    <para>Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:</para>
+
+    <para>1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.</para>
+
+    <para>2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the
+    distribution.</para>
+
+    <para><emphasis role="bold">THIS SOFTWARE IS PROVIDED "AS IS'' AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.</emphasis></para>
+
+    <sect2>
+      <title>Other Software Packages</title>
+
+      <para>m0n0wall is based upon/includes various free software packages,
+      listed below. The author of m0n0wall would like to thank the authors of
+      these software packages for their efforts.</para>
+
+      <para>FreeBSD (http://www.freebsd.org) Copyright © 1994-2003 FreeBSD,
+      Inc. All rights reserved.</para>
+
+      <para>This product includes PHP, freely available from
+      http://www.php.net. Copyright © 1999 - 2003 The PHP Group. All rights
+      reserved.</para>
+
+      <para>mini_httpd (http://www.acme.com/software/mini_httpd) Copyright ©
+      1999, 2000 by Jef Poskanzer &lt;jef@acme.com&gt;. All rights
+      reserved.</para>
+
+      <para>ISC DHCP server (http://www.isc.org/products/DHCP) Copyright ©
+      1996-2003 Internet Software Consortium. All rights reserved.</para>
+
+      <para>ipfilter (http://www.ipfilter.org) Copyright © 1993-2002 by Darren
+      Reed.</para>
+
+      <para>MPD - Multi-link PPP daemon for FreeBSD
+      (http://www.dellroad.org/mpd) Copyright © 1995-1999 Whistle
+      Communications, Inc. All rights reserved.</para>
+
+      <para>ez-ipupdate (http://www.gusnet.cx/proj/ez-ipupdate) Copyright ©
+      1998-2001 Angus Mackay. All rights reserved.</para>
+
+      <para>Circular log support for FreeBSD syslogd
+      (http://software.wwwi.com/syslogd) Copyright © 2001 Jeff Wheelhouse
+      (jdw@wwwi.com)</para>
+
+      <para>Dnsmasq - a DNS forwarder for NAT firewalls
+      (http://www.thekelleys.org.uk) Copyright © 2000-2003 Simon Kelley</para>
+
+      <para>Racoon (http://www.kame.net/racoon) Copyright © 1995-2002 WIDE
+      Project. All rights reserved.</para>
+
+      <para>before version pb23: watchdogd (watchdog) Copyright © 2002-2003
+      Dirk-Willem van Gulik. All rights reserved. This product includes
+      software developed by the Stichting Wireless Leiden
+      (http://www.wirelessleiden.nl). See LICENSE for more licensing
+      information.</para>
+
+      <para>msntp (http://www.hpcf.cam.ac.uk/export) Copyright © 1996, 1997,
+      2000 N.M. Maclaren, University of Cambridge. All rights reserved.</para>
+
+      <para>UCD-SNMP (http://www.ece.ucdavis.edu/ucd-snmp) Copyright © 1989,
+      1991, 1992 by Carnegie Mellon University. Copyright © 1996, 1998-2000
+      The Regents of the University of California. All rights reserved.
+      Copyright © 2001-2002, Network Associates Technology, Inc. All rights
+      reserved. Portions of this code are copyright © 2001-2002, Cambridge
+      Broadband Ltd. All rights reserved.</para>
+
+      <para>choparp (http://choparp.sourceforge.net) Copyright © 1997
+      Takamichi Tateoka (tree@mma.club.uec.ac.jp) Copyright © 2002 Thomas
+      Quinot (thomas@cuivre.fr.eu.org)</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="Intro.Credits">
+    <?dbhtml filename="intro-credits.html"?>
+
+    <title id="Intro.Credits.title">Contributors and Credits</title>
+
+    <sect2>
+      <title>Code</title>
+
+      <para>m0n0wall was written by Manuel Kasper.</para>
+
+      <para>The following persons have contributed code to m0n0wall:</para>
+
+      <para>Bob Zoller (bob at kludgebox dot com): Diagnostics: Ping function;
+      WLAN channel auto-select; DNS forwarder</para>
+
+      <para>Michael Mee (m0n0wall at mikemee dot com): Timezone and NTP client
+      support</para>
+
+      <para>Magne Andreassen (magne dot andreassen at bluezone dot no): Remote
+      syslog'ing; some code bits for DHCP server on optional interfaces</para>
+
+      <para>Rob Whyte (rob at g-labs dot com): Idea/code bits for encrypted
+      webGUI passwords; minimalized SNMP agent</para>
+
+      <para>Petr Verner (verner at ipps dot cz): Advanced outbound NAT:
+      destination selection</para>
+
+      <para>Bruce A. Mah (bmah at acm dot org): Filtering bridge
+      patches</para>
+
+      <para>Jim McBeath (monowall at j dot jimmc dot org): Filter rule patches
+      (ordering, block/pass, disabled); better status page; webGUI assign
+      network ports page</para>
+
+      <para>Chris Olive (chris at technologEase dot com): enhanced "execute
+      command" page</para>
+
+      <para>Pauline Middelink (middelink at polyware dot nl): DHCP client:
+      send hostname patch</para>
+
+      <para>Björn Pålsson (bjorn at networksab dot com): DHCP lease list
+      page</para>
+
+      <para>Peter Allgeyer (allgeyer at web dot de): "reject" type filter
+      rules</para>
+      
+      <para>Thierry Lechat (dev at lechat dot org): SVG-based traffic grapher</para>
+
+      <para>Steven Honson (steven at honson dot org): per-user IP address assignments for PPTP VPN</para>
+
+      <para>Kurt Inge Smådal (kurt at emsp dot no): NAT on optional interfaces</para>
+
+      <para>Dinesh Nair (dinesh at alphaque dot com): captive portal: pass-through MAC/IP addresses, RADIUS authentication
+      HTTP server concurrency limit</para>
+
+      <para>Justin Ellison (justin at techadvise dot com): traffic shaper TOS matching; magic shaper; DHCP deny unknown clients;
+      IPsec user FQDNs</para>
+
+      <para>Fred Wright (fw at well dot com): ipfilter window scaling fix; ipnat ICMP checksum adjustment fix </para>
+      
+    </sect2>
+
+    <sect2>
+      <title>Documentation</title>
+
+      <para>m0n0wall was written by Manuel Kasper.</para>
+
+      <para>The following persons have contributed documentation to
+      m0n0wall:</para>
+
+      <para>Chris Buechler (m0n0wall at chrisbuechler.com):  Editor, numerous contributions throughout.</para>
+
+      <para>Jim McBeath (monowall at j dot jimmc dot org): Users Guide
+      outline, editing</para>
+
+      <para>Rudi van Drunen (r.van.drunen at xs4all dot nl) with thanks to
+      Manuel Kasper, Edwin Kremer, PicoBSD, Matt Simerson and John Voight:
+      m0n0wall Hackers Guide, used as the basis for the <link
+      linkend="Dev">Development</link> chapter.</para>
+
+      <para>Francisco Artes (falcor at netassassin.com): <link
+      linkend="IPsec">IPsec</link> and <link linkend="PPTP">PPTP</link>
+      chapters.</para>
+
+      <para>Fred Wright (fw at well dot com):  Suggestions and review.</para>
+      
+      <para>Axel Eble (axel+m0n0-0001 at balrog dot de): Help with the wiki, ddclient howto contribution.</para>
+      
+      <para>Brian Zushi (brian at ricerage dot org): Linux CD burning instructions, documentation review and suggestions.</para>
+
+      <para>Dino Bijedic (dino.bijedic at eracom-tech dot com): Sonicwall example VPN contribution.</para>
+      
+    </sect2>
+  </sect1>
+</chapter>
