@@ -1,5 +1,5 @@
---- dhclient-script.orig	Wed Mar 24 19:48:49 2004
-+++ dhclient-script	Sat Mar 27 09:42:38 2004
+--- dhclient-script.orig	Sat Nov 26 11:48:17 2005
++++ dhclient-script	Wed Jan 18 18:00:17 2006
 @@ -13,12 +13,13 @@
  make_resolv_conf() {
    if [ x"$new_domain_name_servers" != x ]; then
@@ -40,3 +40,15 @@
  fi
    
  if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
+@@ -140,6 +141,11 @@
+ 	shift; shift
+       done
+     fi
++    if [ x"$new_ip_address" = x"$new_routers" ]; then
++        route delete default >/dev/null 2>&1
++        route add default -interface -link $interface >/dev/null 2>&1
++    fi
++
+   fi
+   if [ x$new_ip_address != x$alias_ip_address ] && [ x$alias_ip_address != x ];
+    then
