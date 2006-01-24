@@ -71,18 +71,20 @@ if ($_POST['redirurl'])
 
 $macfilter = !isset($config['captiveportal']['nomacfilter']);
 
-if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
-	$radius_enable = TRUE;
-	if ($radius_enable && isset($config['captiveportal']['radmac_enable']))
-		$radmac_enable = TRUE;
-}
-
 /* find MAC address for client */
 $clientmac = arp_get_mac_by_ip($clientip);
 if (!$clientmac && $macfilter) {
 	/* unable to find MAC address - shouldn't happen! - bail out */
 	captiveportal_logportalauth("unauthenticated","noclientmac",$clientip,"ERROR");
+	/* We should return an error page to the client explaining what went wrong instead of exiting */
 	exit;
+}
+
+/* find out if we need RADIUS + RADIUSMAC or not */
+if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
+	$radius_enable = TRUE;
+	if ($radius_enable && isset($config['captiveportal']['radmac_enable']))
+		$radmac_enable = TRUE;
 }
 
 if ($_POST['logout_id']) {
