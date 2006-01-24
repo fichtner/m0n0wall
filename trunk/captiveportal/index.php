@@ -73,7 +73,7 @@ $macfilter = !isset($config['captiveportal']['nomacfilter']);
 
 if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
 	$radius_enable = TRUE;
-	if ($radius_enable && $macfilter && isset($config['captiveportal']['radmac_enable']))
+	if ($radius_enable && isset($config['captiveportal']['radmac_enable']))
 		$radmac_enable = TRUE;
 }
 
@@ -103,7 +103,8 @@ setTimeout('window.close();',5000) ;
 </HTML>
 
 EOD;
-} else if ($clientmac && $macfilter && portal_mac_fixed($clientmac)) {
+/* The $macfilter can be removed safely since we first check if the $clientmac is present, if not we fail */
+} else if ($clientmac && portal_mac_fixed($clientmac)) {
 	/* punch hole in ipfw for pass thru mac addresses */
 	portal_allow($clientip, $clientmac, "unauthenticated");
 	exit;
