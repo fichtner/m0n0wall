@@ -180,9 +180,9 @@ if ($_POST) {
                       <input name="dns1" type="text" class="formfld" id="dns1" size="20" value="<?=htmlspecialchars($pconfig['dns1']);?>">
                       <br>
                       <input name="dns2" type="text" class="formfld" id="dns2" size="20" value="<?=htmlspecialchars($pconfig['dns2']);?>">
-		      <br>
-		      <input name="dns3" type="text" class="formfld" id="dns3" size="20" value="<?=htmlspecialchars($pconfig['dns3']);?>">
                       <br>
+                      <input name="dns3" type="text" class="formfld" id="dns3" size="20" value="<?=htmlspecialchars($pconfig['dns3']);?>">
+		      <br>
                       <span class="vexpl">IP addresses; these are also used for 
                       the DHCP service, DNS forwarder and for PPTP VPN clients<br>
                       <br>
