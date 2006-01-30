@@ -34,7 +34,7 @@ require("guiconfig.inc");
 
 $pconfig['hostname'] = $config['system']['hostname'];
 $pconfig['domain'] = $config['system']['domain'];
-list($pconfig['dns1'],$pconfig['dns2']) = $config['system']['dnsserver'];
+list($pconfig['dns1'],$pconfig['dns2'],$pconfig['dns3']) = $config['system']['dnsserver'];
 $pconfig['dnsallowoverride'] = isset($config['system']['dnsallowoverride']);
 $pconfig['username'] = $config['system']['username'];
 if (!$pconfig['username'])
@@ -79,8 +79,8 @@ if ($_POST) {
 	if ($_POST['domain'] && !is_domain($_POST['domain'])) {
 		$input_errors[] = "The domain may only contain the characters a-z, 0-9, '-' and '.'.";
 	}
-	if (($_POST['dns1'] && !is_ipaddr($_POST['dns1'])) || ($_POST['dns2'] && !is_ipaddr($_POST['dns2']))) {
-		$input_errors[] = "A valid IP address must be specified for the primary/secondary DNS server.";
+	if (($_POST['dns1'] && !is_ipaddr($_POST['dns1'])) || ($_POST['dns2'] && !is_ipaddr($_POST['dns2'])) || ($_POST['dns3'] && !is_ipaddr($_POST['dns3']))) {
+		$input_errors[] = "A valid IP address must be specified for the primary/secondary/tertiary DNS server.";
 	}
 	if ($_POST['username'] && !preg_match("/^[a-zA-Z0-9]*$/", $_POST['username'])) {
 		$input_errors[] = "The username may only contain the characters a-z, A-Z and 0-9.";
@@ -120,6 +120,8 @@ if ($_POST) {
 			$config['system']['dnsserver'][] = $_POST['dns1'];
 		if ($_POST['dns2'])
 			$config['system']['dnsserver'][] = $_POST['dns2'];
+		if ($_POST['dns3'])
+			$config['system']['dnsserver'][] = $_POST['dns3'];
 		
 		$olddnsallowoverride = $config['system']['dnsallowoverride'];
 		$config['system']['dnsallowoverride'] = $_POST['dnsallowoverride'] ? true : false;
@@ -177,7 +179,9 @@ if ($_POST) {
                   <td width="78%" class="vtable">
                       <input name="dns1" type="text" class="formfld" id="dns1" size="20" value="<?=htmlspecialchars($pconfig['dns1']);?>">
                       <br>
-                      <input name="dns2" type="text" class="formfld" id="dns22" size="20" value="<?=htmlspecialchars($pconfig['dns2']);?>">
+                      <input name="dns2" type="text" class="formfld" id="dns2" size="20" value="<?=htmlspecialchars($pconfig['dns2']);?>">
+		      <br>
+		      <input name="dns3" type="text" class="formfld" id="dns3" size="20" value="<?=htmlspecialchars($pconfig['dns3']);?>">
                       <br>
                       <span class="vexpl">IP addresses; these are also used for 
                       the DHCP service, DNS forwarder and for PPTP VPN clients<br>
