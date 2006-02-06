@@ -119,12 +119,15 @@ function enable_change(enable_over) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="diag_logs.php">System</a></li>
-    <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
-    <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
-    <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
-    <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
-    <li class="tabact">Settings</li>
+<?php 
+   	$tabs = array('System' => 'diag_logs.php',
+           		  'Firewall' => 'diag_logs_filter.php',
+           		  'DHCP' => 'diag_logs_dhcp.php',
+           		  'Captive portal' => 'diag_logs_portal.php',
+           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'Settings' => 'diag_logs_settings.php');
+	dynamic_tab_menu($tabs);
+?> 
   </ul>
   </td></tr>
   <tr> 

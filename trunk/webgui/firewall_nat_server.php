@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Firewall", "NAT");
+$pgtitle = array("Firewall", "NAT", "Server NAT");
 require("guiconfig.inc");
 
 if (!is_array($config['nat']['servernat'])) {
@@ -93,10 +93,13 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="firewall_nat.php">Inbound</a></li>
-    <li class="tabact">Server NAT</li>
-    <li class="tabinact"><a href="firewall_nat_1to1.php">1:1</a></li>
-    <li class="tabinact"><a href="firewall_nat_out.php">Outbound</a></li>
+<?php
+   	$tabs = array('Inbound' => 'firewall_nat.php',
+           		  'Server NAT' => 'firewall_nat_server.php',
+           		  '1:1' => 'firewall_nat_1to1.php',
+           		  'Outbound' => 'firewall_nat_out.php');
+	dynamic_tab_menu($tabs);
+?>    
   </ul>
   </td></tr>
   <tr> 

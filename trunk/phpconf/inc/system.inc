@@ -385,6 +385,14 @@ function system_password_configure() {
 		$username = "admin";
 	
 	fwrite($fd, $username . ":" . $config['system']['password'] . "\n");
+
+	if (is_array($config['system']['users'])) {
+		foreach ($config['system']['users'] as $user => $userdata) {
+			    fwrite($fd, $user . ":" 
+		              . $userdata['password'] . "\n");
+		}
+	}
+	
 	fclose($fd);
 	chmod("{$g['varrun_path']}/htpasswd", 0600);
 	

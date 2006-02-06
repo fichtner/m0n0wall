@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "Ping/Traceroute");
+$pgtitle = array("Diagnostics", "Traceroute");
 require("guiconfig.inc");
 
 
@@ -67,8 +67,11 @@ if (!isset($do_traceroute)) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabinact"><a href="diag_ping.php">Ping</a></li>
-	<li class="tabact">Traceroute</li>
+<?php 
+   	$tabs = array('Ping' => 'diag_ping.php',
+           		  'Traceroute' => 'diag_traceroute.php');
+	dynamic_tab_menu($tabs);
+?> 
   </ul>
   </td></tr>
   <tr> 

@@ -37,8 +37,11 @@ require("guiconfig.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabinact1"><a href="diag_ipsec_sad.php">SAD</a></li>
-	<li class="tabact">SPD</li>
+<?php 
+    	$tabs = array('SAD' => 'diag_ipsec_sad.php',
+            		  'SPD' => 'diag_ipsec_spd.php');
+		dynamic_tab_menu($tabs);
+?>
   </ul>
   </td></tr>
   <tr> 

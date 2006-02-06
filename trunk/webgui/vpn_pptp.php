@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("VPN", "PPTP");
+$pgtitle = array("VPN", "PPTP", "Configuration");
 require("guiconfig.inc");
 
 if (!is_array($config['pptpd']['radius'])) {
@@ -173,8 +173,11 @@ function enable_change(enable_over) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabact">Configuration</li>
-    <li class="tabinact"><a href="vpn_pptp_users.php">Users</a></li>
+<?php 
+   	$tabs = array('Configuration' => 'vpn_pptp.php',
+           		  'Users' => 'vpn_pptp_users.php');
+	dynamic_tab_menu($tabs);
+?>
   </ul>
   </td></tr>
   <tr> 

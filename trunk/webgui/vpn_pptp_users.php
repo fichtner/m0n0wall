@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("VPN", "PPTP");
+$pgtitle = array("VPN", "PPTP", "Users");
 require("guiconfig.inc");
 
 if (!is_array($config['pptpd']['user'])) {
@@ -79,8 +79,11 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="vpn_pptp.php">Configuration</a></li>
-    <li class="tabact">Users</li>
+<?php 
+   	$tabs = array('Configuration' => 'vpn_pptp.php',
+           		  'Users' => 'vpn_pptp_users.php');
+	dynamic_tab_menu($tabs);
+?>
   </ul>
   </td></tr>
   <tr> 

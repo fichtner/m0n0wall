@@ -31,7 +31,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Firewall", "Traffic shaper");
+$pgtitle = array("Firewall", "Traffic shaper", "Magic shaper wizard");
 require("guiconfig.inc");
 
 function wipe_magic () {
@@ -355,10 +355,13 @@ if ($_POST) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="firewall_shaper.php">Rules</a></li>
-    <li class="tabinact"><a href="firewall_shaper_pipes.php">Pipes</a></li>
-    <li class="tabinact"><a href="firewall_shaper_queues.php">Queues</a></li>
-    <li class="tabact">Magic shaper wizard</li>
+<?php 
+   	$tabs = array('Rules' => 'firewall_shaper.php',
+           		  'Pipes' => 'firewall_shaper_pipes.php',
+           		  'Queues' => 'firewall_shaper_queues.php',
+           		  'Magic shaper wizard' => 'firewall_shaper_magic.php');
+	dynamic_tab_menu($tabs);
+?>       
   </ul>
   </td></tr>
   <tr> 

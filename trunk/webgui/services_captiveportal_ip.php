@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Services", "Captive portal");
+$pgtitle = array("Services", "Captive portal", "Allowed IP Addresses");
 require("guiconfig.inc");
 
 if (!is_array($config['captiveportal']['allowedip']))
@@ -78,11 +78,14 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabinact1"><a href="services_captiveportal.php">Captive portal</a></li>
-	<li class="tabinact"><a href="services_captiveportal_mac.php">Pass-through MAC</a></li>
-	<li class="tabact">Allowed IP addresses</li>
-	<li class="tabinact"><a href="services_captiveportal_users.php">Users</a></li>
-	<li class="tabinact"><a href="services_captiveportal_filemanager.php">File manager</a></li>
+<?php 
+   	$tabs = array('Captive Portal' => 'services_captiveportal.php',
+           		  'Pass-through MAC' => 'services_captiveportal_mac.php',
+           		  'Allowed IP addresses' => 'services_captiveportal_ip.php',
+           		  'Users' => 'services_captiveportal_users.php',
+           		  'File Manager' => 'services_captiveportal_filemanager.php');
+	dynamic_tab_menu($tabs);
+?> 
   </ul>
   </td></tr>
   <tr>

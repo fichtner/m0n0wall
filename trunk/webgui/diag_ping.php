@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "Ping/Traceroute");
+$pgtitle = array("Diagnostics", "Ping");
 require("guiconfig.inc");
 
 define('MAX_COUNT', 10);
@@ -88,8 +88,11 @@ function get_interface_addr($ifdescr) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabact">Ping</li>
-	<li class="tabinact"><a href="diag_traceroute.php">Traceroute</a></li>
+<?php 
+   	$tabs = array('Ping' => 'diag_ping.php',
+           		  'Traceroute' => 'diag_traceroute.php');
+	dynamic_tab_menu($tabs);
+?> 
   </ul>
   </td></tr>
   <tr> 

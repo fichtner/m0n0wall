@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("VPN", "IPsec");
+$pgtitle = array("VPN", "IPsec", "Mobile clients");
 require("guiconfig.inc");
 
 if (!is_array($config['ipsec']['mobileclients'])) {
@@ -190,10 +190,13 @@ function methodsel_change() {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="vpn_ipsec.php">Tunnels</a></li>
-    <li class="tabact">Mobile clients</li>
-    <li class="tabinact"><a href="vpn_ipsec_keys.php">Pre-shared keys</a></li>
-    <li class="tabinact"><a href="vpn_ipsec_ca.php">CAs</a></li>
+<?php 
+   	$tabs = array('Tunnels' => 'vpn_ipsec.php',
+           		  'Mobile clients' => 'vpn_ipsec_mobile.php',
+           		  'Pre-shared keys' => 'vpn_ipsec_keys.php',
+           		  'CAs' => 'vpn_ipsec_ca.php');
+	dynamic_tab_menu($tabs);
+?>       
   </ul>
   </td></tr>
   <tr> 

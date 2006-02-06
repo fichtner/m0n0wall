@@ -69,12 +69,15 @@ function dump_clog($logfile, $tail, $withorig = true) {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-	<li class="tabact"><a href="diag_logs.php" style="color:black" title="reload page">System</a></li>
-    <li class="tabinact"><a href="diag_logs_filter.php">Firewall</a></li>
-    <li class="tabinact"><a href="diag_logs_dhcp.php">DHCP</a></li>
-    <li class="tabinact"><a href="diag_logs_portal.php">Captive portal</a></li>
-    <li class="tabinact"><a href="diag_logs_vpn.php">PPTP VPN</a></li>
-    <li class="tabinact"><a href="diag_logs_settings.php">Settings</a></li>
+<?php 
+   	$tabs = array('System' => 'diag_logs.php',
+           		  'Firewall' => 'diag_logs_filter.php',
+           		  'DHCP' => 'diag_logs_dhcp.php',
+           		  'Captive portal' => 'diag_logs_portal.php',
+           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'Settings' => 'diag_logs_settings.php');
+	dynamic_tab_menu($tabs);
+?> 
   </ul>
   </td></tr>
   <tr> 

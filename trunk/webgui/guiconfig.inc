@@ -41,6 +41,9 @@ if (!$omit_nocacheheaders) {
 require_once("config.inc");
 require_once("functions.inc");
 
+/* ensure the user is authorized to view the current page */
+require_once("auth.inc");
+
 $d_natconfdirty_path = $g['varrun_path'] . "/nat.conf.dirty";
 $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
 $d_ipsecconfdirty_path = $g['varrun_path'] . "/ipsec.conf.dirty";
@@ -476,5 +479,41 @@ function ipsec_ca_sort() {
 
 	usort($config['ipsec']['cacert'], "ipseccacmp");
 }
+
+function dynamic_tab_menu(&$tabs) {
+	global $allowed, $config;
+	
+	if ($_SERVER['REMOTE_USER'] == $config['system']['username']) {
+		$authorized = &$tabs;
+	} else {
+		$authorized = &$allowed;
+	}
+	
+	// Below needed to add the "1" onto the end of the class name for the first tab, if it is inactive.
+    $linkStyle = '1';
+   	foreach ($tabs as $desc => $link) {
+   		if (in_array($link,$authorized)) {
+   			if ($link == str_replace('/','',$_SERVER['PHP_SELF'])) {
+   				// special handling for diagnostic Logs tabs.
+   				if ((strpos($link,'diag_logs') > -1) && ($link != 'diag_logs_settings.php')) {
+	   				if ($desc == "Firewall") {
+	       				echo '<li class="tabact"><a href="diag_logs_filter.php" style="color:black" title="reset filter and reload firewall logs page">Firewall</a></li>';
+	   				}
+	   				else {
+	   					echo '<li class="tabact"><a href="'.$link.'" style="color:black" title="reload page">'.$desc.'</a></li>';
+	   				}
+	   			}
+       			else {
+       				echo '<li class="tabact">'.$desc.'</li>';
+       			}
+   				$linkStyle = '';
+   			}
+   			else {
+   				echo '<li class="tabinact'.$linkStyle.'"><a href="'.$link.'">'.$desc.'</a></li>';
+   				$linkStyle = '';
+   			}
+   		}
+    }	
+ }
 
 ?>

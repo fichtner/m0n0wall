@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("VPN", "IPsec");
+$pgtitle = array("VPN", "IPsec", "CAs");
 require("guiconfig.inc");
 
 if (!is_array($config['ipsec']['cacert'])) {
@@ -59,10 +59,13 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
   <ul id="tabnav">
-    <li class="tabinact"><a href="vpn_ipsec.php">Tunnels</a></li>
-    <li class="tabinact"><a href="vpn_ipsec_mobile.php">Mobile clients</a></li>
-    <li class="tabinact"><a href="vpn_ipsec_keys.php">Pre-shared keys</a></li>
-    <li class="tabact">CAs</li>
+<?php 
+   	$tabs = array('Tunnels' => 'vpn_ipsec.php',
+           		  'Mobile clients' => 'vpn_ipsec_mobile.php',
+           		  'Pre-shared keys' => 'vpn_ipsec_keys.php',
+           		  'CAs' => 'vpn_ipsec_ca.php');
+	dynamic_tab_menu($tabs);
+?>       
   </ul>
   </td></tr>
   <tr> 
