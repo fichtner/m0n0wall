@@ -91,7 +91,7 @@ if (!$rauth->start()) {
 }
 else {
 
-    	// 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
+	// 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
 	// 2 -> Access-Accept
 	// 3 -> Access-Reject
 	// See RFC2865 for this.
