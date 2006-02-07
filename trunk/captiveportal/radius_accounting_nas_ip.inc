@@ -170,10 +170,11 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 	// See RFC2866 for this.
 }
 
-function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$clientmac,$interimupdate=false, $radius_term_cause = 1) {
+function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$clientmac, $term_cause = 1, $interimupdate=false,$stop_time = null) {
 	# $debug = 1 ;
 	global $config;
 
+	$stop_time = (empty($stop_time)) ? time() : $stop_time;
 	exec("/bin/hostname", $nasHostname) ;
 	if(!$nasHostname[0])
 		$nasHostname[0] = "quewall" ;
@@ -204,6 +205,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 	$nas_port = $ruleno - 10000;
 	$nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
 	$ip_exp=explode(".",$clientip);
+	$session_time = $stop_time - $start_time;
 	$radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
 
         switch($radiusvendor) {
@@ -268,8 +270,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
-		49,6,$radius_term_cause,		// Acct Terminate = User Request
-		46,6,time() - $start_time,			// Session Time
+		49,6,$term_cause,		// Acct Terminate
+		46,6,$session_time,			// Session Time
 		42,6,$input_bytes,	// Input Octets
 		47,6,$input_pkts,	// Input Packets
 		52,6,$input_gigawords,	// Input Gigawords
@@ -298,8 +300,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
-		49,6,$radius_term_cause,		// Acct Terminate = User Request
-		46,6,time() - $start_time,			// Session Time
+		49,6,$term_cause,		// Acct Terminate = User Request
+		46,6,$session_time,			// Session Time
 		42,6,$input_bytes,	// Input Octets
 		47,6,$input_pkts,	// Input Packets
 		52,6,$input_gigawords,	// Input Gigawords
