@@ -77,7 +77,6 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
         default:
 	$calledstationid = $nas_mac;
         $callingstationid = $clientmac;
-        break;
 	}
 
 	if ($debug)
@@ -218,7 +217,6 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
         default:
         $calledstationid = $nas_mac;
         $callingstationid = $clientmac;
-        break;
 	}
 
 	if ($debug)
@@ -300,7 +298,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 		40,6,0,0,0,$acctstatustype,			// Acct Status Type
 		45,6,0,0,0,1,						// Acct RADIUS Authenticated
 		44,2+strlen($sessionid),$sessionid,	// Acct Session ID
-		49,6,$term_cause,		// Acct Terminate = User Request
+		49,6,$term_cause,		// Acct Terminate
 		46,6,$session_time,			// Session Time
 		42,6,$input_bytes,	// Input Octets
 		47,6,$input_pkts,	// Input Packets
