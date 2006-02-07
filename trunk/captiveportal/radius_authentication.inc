@@ -108,7 +108,7 @@ else {
         break;
 
         default:
-	$rauth->putAttribute(RADIUS_CALLED_STATION_ID, $nas_mac);
+        $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $nas_mac);
         $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientmac);
 	}
 
