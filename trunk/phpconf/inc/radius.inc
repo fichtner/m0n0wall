@@ -107,13 +107,13 @@ class Auth_RADIUS extends PEAR {
      * NAS-IP-Address
      * @var string
      */
-    var $nas_ip = null;
+    var $nasIp = null;
     
     /**
      * NAS-Identifier
      * @var array (note: RFC specifies string and PECL specifies integer)
      */
-    var $nas_id = array();
+    var $nasId = array();
 
     /**
      * List of known attributes.
@@ -175,10 +175,10 @@ class Auth_RADIUS extends PEAR {
      */
     function getNasID()
     {
-        exec("/bin/hostname", $nas_id);
-        if(!$nas_id[0])
-        $nas_id[0] = "m0n0wall";
-        return $nas_id[0];
+        exec("/bin/hostname", $_nasId);
+        if(!$_nasId[0])
+            $_nasId[0] = "m0n0wall";
+        return $_nasId[0];
     }
 
     /**
@@ -189,8 +189,10 @@ class Auth_RADIUS extends PEAR {
      */
     function getNasIP()
     {
-        $nas_ip = get_current_wan_address();
-        return $nas_ip;
+        $_nasIp = get_current_wan_address();
+        if(!$_nasIp)
+            $_nasIp = "0.0.0.0";
+        return $_nasIp;
     }
 
     /**
@@ -1069,7 +1071,9 @@ class Auth_RADIUS_Acct extends Auth_RADIUS
      */ 
     function putAuthAttributes()
     {
+        /* Remove the internal ACCT_SESSION_ID function since we are going to set it manually
         $this->putAttribute(RADIUS_ACCT_SESSION_ID, $this->session_id);
+        */
         $this->putAttribute(RADIUS_ACCT_STATUS_TYPE, $this->status_type);
         if (isset($this->session_time) && $this->status_type == RADIUS_STOP) {
             $this->putAttribute(RADIUS_ACCT_SESSION_TIME, $this->session_time);

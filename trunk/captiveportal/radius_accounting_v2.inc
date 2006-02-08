@@ -55,18 +55,6 @@ RADIUS ACCOUNTING START
 function RADIUS_ACCOUNTING_START($username,$sessionid,$radiusip,$radiusport,$radiuskey,$clientip) {
     global $debug;
 
-    exec("/bin/hostname", $nasHostname) ;
-    if(!$nasHostname[0])
-            $nasHostname[0] = "m0n0wall" ;
-
-    $nas_ip_address = get_nas_ip();
-
-    if(!isset($clientip)) {
-            //if there's no client ip, we'll need to use the NAS ip
-            $clientip=$nas_ip_address;
-    }
-
-
 $racct = new Auth_RADIUS_Acct_Start;
 $racct->addServer($radiusip, $radiusport, $radiuskey);
 /* Different Authentication options
@@ -86,14 +74,13 @@ if(PEAR::isError($status)) {
 
 /*
 NAS_PORT_TYPE, int => RADIUS_ETHERNET (15), RADIUS_WIRELESS_OTHER (18), RADIUS_WIRELESS_IEEE_802_11 (19)
-NAS_IDENTIFIER, int => should be int but nasHostname[0] returns string
 */
 
+
+// Other options
 $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_LOGIN);
 $racct->putAttribute(RADIUS_NAS_PORT, 0); 
 $racct->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
-//$racct->putAttribute(RADIUS_NAS_IDENTIFIER, $nasHostname[0]);
-$racct->putAttribute(RADIUS_NAS_IP_ADDRESS, $nas_ip_address); 
 $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid); 
 $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip); 
 $result = $racct->send();
@@ -144,12 +131,14 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $output_bytes = remainder($matches[3]);
     $output_gigawords = gigawords($matches[3]);
 
-    $nas_ip_address = get_nas_ip();
 
-    if(!isset($clientip)) {
-            //if there's no client ip, we'll need to use the NAS ip
-            $clientip=$nas_ip_address;
-    }
+    $nas_ip = get_current_wan_address();
+    $nas_ip_exp = explode(".",$nas_ip);
+    $nas_port = $ruleno - 10000;
+    $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
+    $ip_exp=explode(".",$clientip);
+    $session_time = $stop_time - $start_time;
+    $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null
 
     if ($debug)
         echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
@@ -164,7 +153,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 // Construct data package
 $racct->addServer($radiusip, $radiusport, $radiuskey);
 $racct->username = $username;
-$racct->session_time = time() - $start_time;
+
+
 $status = $racct->start();
 if(PEAR::isError($status)) {
     if ($debug)
@@ -173,9 +163,31 @@ if(PEAR::isError($status)) {
 }
 // you can put any additional attributes here
 //$racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_LOGIN);
-//$racct->putAttribute(RADIUS_NAS_IDENTIFIER, $nasHostname[0]);
-$racct->putAttribute(RADIUS_NAS_IP_ADDRESS, $nas_ip_address);
+
+// Do the accounting style as configured in GUI
+	switch($radiusvendor) {
+
+        case 'cisco':
+        $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $clientmac);
+        $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientip);
+        break;
+
+        default:
+        $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $nas_mac);
+        $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientmac);
+	}
+
+	// Default attributes
+	$rauth->putAttribute(RADIUS_NAS_PORT, $nas_port)
+
+$session_time = $stop_time - $start_time;
+// We have 2 ways to set the session-time, we will see which one to use in a later version
+$racct->session_time = $session_time;
+$racct->putAttribute(RADIUS_ACCT_SESSION_TIME, $session_time);
+
+// Set the session_id here since we removed it into the radius.inc removing the possibility to overwrite it by $racct->session_id
 $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
+
 $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip);
 $racct->putAttribute(RADIUS_CALLING_STATION_ID, $clientip);
 $racct->putAttribute(RADIUS_CALLED_STATION_ID, $nas_ip_address);
