@@ -1,12 +1,12 @@
 <?php
 /*
 
-$Id$
+    $Id$
 
     radius_accounting.inc
     part of m0n0wall (http://m0n0.ch/wall)
     
-    Copyright (C) 2004 Dinesh Nair <dinesh@alphaque.com>
+    Copyright (C) M0n0wall Project
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -30,19 +30,6 @@ $Id$
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-    // This version of radius_accounting.inc has been modified by
-    // Rob Parker <rob.parker@keycom.co.uk>. Changes made include:
-    // * now sends Framed-IP-Address (client IP)
-    // * now sends Called-Station-ID (NAS IP)
-    // * now sends Calling-Station-ID (client IP)
-
-    // This version of radius_accounting.inc has been modified by
-    // Jonathan De Graeve <jonathan@imelda.be>. Changes made include:
-    // - RFC2869 (Radius Extensions)
-    // * now sends Acct-Input-Gigawords
-    // * now sends Acct-Output-Gigawords
-    // * full implementation of nas-ip/nas_mac and called/calling-station ids
-
 */
 
 function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusport,$radiuskey,$clientip,$clientmac) {
@@ -60,7 +47,7 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
     /* set 5 second timeout on socket i/o */
     stream_set_timeout($fd, 5) ;
 
-    $nas_ip = get_nas_ip();
+    $nas_ip = get_current_wan_address();
     $nas_ip_exp = explode(".",$nas_ip);
     $nas_mac = get_interface_mac($config['interfaces']['wan']['if']); // This function is defined in radius_authentication.inc
     $nas_port = $ruleno - 10000;
@@ -199,7 +186,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     /* set 5 second timeout on socket i/o */
     stream_set_timeout($fd, 5) ;
 
-    $nas_ip = get_nas_ip();
+    $nas_ip = get_current_wan_address();
     $nas_ip_exp = explode(".",$nas_ip);
     $nas_port = $ruleno - 10000;
     $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);

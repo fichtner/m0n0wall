@@ -35,8 +35,6 @@ any other GPL-like (LGPL, GPL2) License.
     This version of RADIUS.php has been modified by
     Jonathan De Graeve <jonathan@imelda.be> to integrate with M0n0wall <http://www.m0n0.ch/wall>
 
-    $Id_jdg: 2005/12/22 14:22:42
-
     Changes made include:
     * StandardAttributes for M0n0wall use
     * Removed internal Session-Id creation
@@ -106,6 +104,18 @@ class Auth_RADIUS extends PEAR {
     var $password = null;
 
     /**
+     * NAS-IP-Address
+     * @var string
+     */
+    var $nas_ip = null;
+    
+    /**
+     * NAS-Identifier
+     * @var array (note: RFC specifies string and PECL specifies integer)
+     */
+    var $nas_id = array();
+
+    /**
      * List of known attributes.
      * @var  array
      * @see  dumpAttributes(), getAttributes()
@@ -157,7 +167,32 @@ class Auth_RADIUS extends PEAR {
     {
         $this->_servers[] = array($servername, $port, $sharedSecret, $timeout, $maxtries);    
     }
-    
+
+    /**
+     * Get the NAS-Identifier
+     *
+     * We will use our local hostname to make up the nas_id
+     */
+    function getNasID()
+    {
+        exec("/bin/hostname", $nas_id);
+        if(!$nas_id[0])
+        $nas_id[0] = "m0n0wall";
+        return $nas_id[0];
+    }
+
+    /**
+     * Get the NAS-IP-Address based on the current wan address
+     *
+     * Use functions in interfaces.inc to find this out
+     *
+     */
+    function getNasIP()
+    {
+        $nas_ip = get_current_wan_address();
+        return $nas_ip;
+    }
+
     /**
      * Returns an error message, if an error occurred.
      *
@@ -284,12 +319,22 @@ class Auth_RADIUS extends PEAR {
     /**
      * Puts standard attributes.
      *
+     * These attributes will always be present in a radius request
+     *
      * @access public
      */ 
     function putStandardAttributes()
     {
+        // Not sure if these need to be in here but for the moment its ok
         $this->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
         $this->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_LOGIN);
+
+        // Add support for sending NAS-IP-Address, set this explicitly as an ip_addr
+        $this->putAttribute(RADIUS_NAS_IP_ADDRESS, $this->getNasIP(), addr);
+
+        // Add support for sending NAS-Identifier
+        $this->putAttribute(RADIUS_NAS_IDENTIFIER, $this->getNasID());
+
     }
     
     /**
@@ -365,7 +410,7 @@ class Auth_RADIUS extends PEAR {
         }
         
         $this->createRequest();
-	$this->putStandardAttributes();
+        $this->putStandardAttributes();
         $this->putAuthAttributes();
         return true;
     }
