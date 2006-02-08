@@ -30,12 +30,41 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+function index_groups() {
+    global $g, $config;
+    
+    if (isset($config['system']['group'])) {
+        $i = 0; 
+	    foreach($config['system']['group'] as $groupent) {
+	        $groupindex[$groupent['name']] = $i;
+	        $i++;
+	    }
+	}
+	return ($groupindex);
+}
+
+function index_users() {
+    global $g, $config;
+    
+    if (isset($config['system']['user'])) {
+        $i = 0; 
+    	foreach($config['system']['user'] as $userent) {
+	       $userindex[$userent['name']] = $i;
+	       $i++;
+	   }
+    }
+    return ($userindex);
+}
+
+$groupindex = index_groups();
+$userindex = index_users();
+
 // Once here, the user has authenticated with the web server.  
 // Now, we give them access only to the appropriate pages for their group.
 if (!($_SERVER['REMOTE_USER'] === $config['system']['username'])) {
 	$allowed[] = '';
-	if (isset($config['system']['groups'][$config['system']['users'][$_SERVER['REMOTE_USER']]['group']]['pages'])) {
-		$allowed = &$config['system']['groups'][$config['system']['users'][$_SERVER['REMOTE_USER']]['group']]['pages'];
+	if (isset($config['system']['group'][$groupindex[$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['groupname']]]['pages'])) {
+		$allowed = &$config['system']['group'][$groupindex[$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['groupname']]]['pages'];
 	} 
 
 	// If the user is attempting to hit the default page, set it to specifically look for /index.php.

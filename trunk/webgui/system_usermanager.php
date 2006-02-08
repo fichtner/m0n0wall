@@ -36,113 +36,100 @@ require("guiconfig.inc");
 
 // The page title for non-admins
 $pgtitle = array("System", "User password");
-if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
-	$pgtitle = array("System", "User manager");
-}
+
+if ($_SERVER['REMOTE_USER'] === $config['system']['username']) { 
+    
+    // Page title for main admin
+    $pgtitle = array("System", "User manager");
+
+    $id = $_GET['id'];
+    if (isset($_POST['id']))
+	   $id = $_POST['id'];
+       
+    if (!is_array($config['system']['user'])) {
+    	$config['system']['user'] = array();
+    }
+    admin_users_sort();
+    $a_user = &$config['system']['user'];
+    
+    if ($_GET['act'] == "del") {
+    	if ($a_user[$_GET['id']]) {
+    	    $userdeleted = $a_user[$_GET['id']]['name'];
+    		unset($a_user[$_GET['id']]);
+    		write_config();
+			$retval = system_password_configure();
+			$savemsg = get_std_save_message($retval);
+			$savemsg = "User ".$userdeleted." successfully deleted<br>";    		
+    	}
+    }
+	
+    if ($_POST) {
+    	
+    	unset($input_errors);
+    	$pconfig = $_POST;
+    
+    	/* input validation */
+    	if (isset($id) && ($a_user[$id])) {
+    		$reqdfields = explode(" ", "username");
+    		$reqdfieldsn = explode(",", "Username");
+    	} else {
+    		$reqdfields = explode(" ", "username password");
+    		$reqdfieldsn = explode(",", "Username,Password");
+    	}
+    	
+    	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+    	
+    	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['username']))
+    		$input_errors[] = "The username contains invalid characters.";
+
+		if($_POST['username']==$config['system']['username']) {
+			$input_errors[] = "username can not match the administrator username!";
+		}   		
+    		
+    	if (($_POST['password']) && ($_POST['password'] != $_POST['password2']))
+    		$input_errors[] = "The passwords do not match.";
+    		
+       	if (!$input_errors && !(isset($id) && $a_user[$id])) {
+    		/* make sure there are no dupes */
+    		foreach ($a_user as $userent) {
+    			if ($userent['name'] == $_POST['username']) {
+    				$input_errors[] = "Another entry with the same username already exists.";
+    				break;
+    			}
+    		}
+    	}
+
+		if(!isset($groupindex[$_POST['groupname']])) {
+			$input_errors[] = "group does not exist, please define the group before assigning users.";
+		}
+    	
+    	if (!$input_errors) {
+    	
+    		if (isset($id) && $a_user[$id])
+    			$userent = $a_user[$id];
+    		
+    		$userent['name'] = $_POST['username'];
+    		$userent['fullname'] = $_POST['fullname'];
+    		$userent['groupname'] = $_POST['groupname'];
+    		
+    		if ($_POST['password'])
+    			$userent['password'] = crypt($_POST['password']);
+    		
+    		if (isset($id) && $a_user[$id])
+    			$a_user[$id] = $userent;
+    		else
+    			$a_user[] = $userent;
+    		
+    		write_config();
+			$retval = system_password_configure();
+			$savemsg = get_std_save_message($retval);
+			
+			header("Location: system_usermanager.php");
+    	}
+    }
 
 ?>
 <?php include("fbegin.inc"); ?>
-<?php 
-if ($_SERVER['REMOTE_USER'] === $config['system']['username']) { 
-	
-	if ($_GET['act']=="new" || $_GET['act']=="edit") {
-		if (isset($_GET['username'])) {
-			$user=$config['system']['users'][$_GET['username']];
-		}
-	}	
-	
-	if (($_GET['act']=='delete') && (isset($_GET['username']))) {
-		unset($config['system']['users'][$_GET['username']]);
-		write_config();
-		$retval = system_password_configure();
-		$savemsg = get_std_save_message($retval);
-		$savemsg="User ".$_GET['username']." successfully deleted<br>";		
-	}
-	
-	if(isset($_POST['save'])) {
-		//value-checking
-		if(trim($_POST['password1'])!="********" && 
-		   trim($_POST['password1'])!="" && 
-		   trim($_POST['password1'])!=trim($_POST['password2'])){
-		   	//passwords are to be changed but don't match
-		   	$input_errors[]="passwords don't match";
-		}
-		if((trim($_POST['password1'])=="" || trim($_POST['password1'])=="********") && 
-		   (trim($_POST['password2'])=="" || trim($_POST['password2'])=="********")){
-		   	//assume password should be left as is if a password is set already.
-			if(!empty($config['system']['users'][$_POST['old_username']]['password'])){
-				$_POST['password1']="********";
-				$_POST['password2']="********";
-			} else {
-				$input_errors[]="password must not be empty";
-			}
-		} else {
-			if(trim($_POST['password1'])!=trim($_POST['password2'])){
-			   	//passwords are to be changed or set but don't match
-			   	$input_errors[]="passwords don't match";
-			} else {
-				//check password for invalid characters
-				if(!preg_match('/^[a-zA-Z0-9_\-\.@\~\(\)\&\*\+§?!\$£°\%;:]*$/',$_POST['username'])){
-					$input_errors[] = "password contains illegal characters, only  letters from A-Z and a-z, _, -, .,@,~,(,),&,*,+,§,?,!,$,£,°,%,;,: and numbers are allowed";
-					//test pw: AZaz_-.@~()&*+§?!$£°%;:
-				}
-			}
-		}
-		if($_POST['username']==""){
-			$input_errors[] = "username must not be empty!";
-		}
-		if($_POST['username']==$config['system']['username']) {
-			$input_errors[] = "username can not match the administrator username!";
-		}
-		if($_POST['old_username'] != $_POST['username']) {
-			// Either a new user, or one with a username change
-			if (isset($config['system']['users'][$_POST['username']])) {
-				$input_errors[] = "username can not match an existing user!";
-			}
-		}
-		if(!isset($config['system']['groups'][$_POST['group']])) {
-			$input_errors[] = "group does not exist, please define the group before assigning users.";
-		}
-		
-		//check username: only allow letters from A-Z and a-z, _, -, . and numbers from 0-9 (note: username can
-		//not contain characters which are not allowed in an xml-token. i.e. if you'd use @ in a username, config.xml
-		//could not be parsed anymore!
-		if(!preg_match('/^[a-zA-Z0-9_\-\.]*$/',$_POST['username'])){
-			$input_errors[] = "username contains illegal characters, only letters from A-Z and a-z, _, -, . and numbers are allowed";
-		}
-		if(!empty($input_errors)){
-			//there are illegal inputs --> print out error message and show formula again 
-			//and fill in all recently entered values except passwords
-			$_GET['act']="new";
-			$_POST['old_username']=($_POST['old_username'] ? $_POST['old_username'] : $_POST['username']);
-			$_GET['username']=$_POST['old_username'];
-
-			$user['fullname']=$_POST['fullname'];
-
-		} else {
-			//all values are okay --> saving changes
-			$_POST['username']=trim($_POST['username']);
-			if($_POST['old_username']!="" && $_POST['old_username']!=$_POST['username']){
-				//change the username (which is used as array-index)
-				$config['system']['users'][$_POST['username']]=$config['system']['users'][$_POST['old_username']];
-				unset($config['system']['users'][$_POST['old_username']]);
-			}
-			$config['system']['users'][$_POST['username']]['fullname']=trim($_POST['fullname']);
-			if(trim($_POST['password1'])!="********" && trim($_POST['password1'])!=""){
-				$config['system']['users'][$_POST['username']]['password']=crypt(trim($_POST['password1']));
-			}
-			$config['system']['users'][$_POST['username']]['group']=trim($_POST['group']);
-			// Remove config information from old way of handling sub-admin users.
-			if (isset($config['system']['users'][$_POST['username']]['pages'])) 
-			  unset($config['system']['users'][$_POST['username']]['pages']);
-			write_config();
-			$retval = system_password_configure();
-			$savemsg = get_std_save_message($retval);
-			$savemsg="User ".$_POST['username']." successfully saved<br>";
-		}
-	}
-
-?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -158,41 +145,44 @@ if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
 <tr>
   <td class="tabcont">
 <?php
-if($_GET['act']=="new" || $_GET['act']=="edit"){
-	if($_GET['act']=="edit" && isset($_GET['username'])){
-		$user=$config['system']['users'][$_GET['username']];
-	}
+if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
+	if($_GET['act']=="edit"){
+		if (isset($id) && $a_user[$id]) {
+	       $pconfig['username'] = $a_user[$id]['name'];
+	       $pconfig['fullname'] = $a_user[$id]['fullname'];
+	       $pconfig['groupname'] = $a_group[$id]['groupname'];
+        }
+	}	
 ?>
 	<form action="system_usermanager.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Username</td>
                   <td width="78%" class="vtable"> 
-                    <input name="username" type="text" class="formfld" id="username" size="20" value="<?=$_GET['username'];?>"> 
+                    <input name="username" type="text" class="formfld" id="username" size="20" value="<?=htmlspecialchars($pconfig['username']);?>"> 
                     </td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Password</td>
                   <td width="78%" class="vtable"> 
-                    <input name="password1" type="password" class="formfld" id="password1" size="20" value="<?php echo ($_GET['act']=='edit' ? "********" : "" ); ?>"> <br>
-					<input name="password2" type="password" class="formfld" id="password2" size="20" value="<?php echo ($_GET['act']=='edit' ? "********" : "" ); ?>">
+                    <input name="password" type="password" class="formfld" id="password" size="20" value=""> <br>
+					<input name="password2" type="password" class="formfld" id="password2" size="20" value="">
 &nbsp;(confirmation)					</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Full name</td>
                   <td width="78%" class="vtable"> 
-                    <input name="fullname" type="text" class="formfld" id="fullname" size="20" value="<?=htmlspecialchars($user['fullname']);?>">
+                    <input name="fullname" type="text" class="formfld" id="fullname" size="20" value="<?=htmlspecialchars($pconfig['fullname']);?>">
                     <br>
                     User's full name, for your own information only</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Group Name</td>
                   <td width="78%" class="vtable">
-				  <select name="group" class="formfld" id="group">
-                      <?php foreach ($config['system']['groups'] as $gname => $group): ?>
-                      	
-                      <option value="<?=$gname;?>" <?php if ($gname == $user['group']) echo "selected"; ?>>
-                      <?=htmlspecialchars($gname);?>
+				  <select name="groupname" class="formfld" id="groupname">
+                      <?php foreach ($config['system']['group'] as $group): ?>
+                      <option value="<?=$group['name'];?>" <?php if ($group['name'] == $pconfig['groupname']) echo "selected"; ?>>
+                      <?=htmlspecialchars($group['name']);?>
                       </option>
                       <?php endforeach; ?>
                     </select>                   
@@ -203,7 +193,9 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
                     <input name="save" type="submit" class="formbtn" value="Save"> 
-                    <input name="old_username" type="hidden" value="<?=$_GET['username'];?>">
+            		<?php if (isset($id) && $a_user[$id]): ?>
+                    <input name="id" type="hidden" value="<?=$id;?>">
+		            <?php endif; ?>
                   </td>
                 </tr>
               </table>
@@ -218,26 +210,21 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
            <td width="20%" class="listhdrr">Group</td>                  
            <td width="10%" class="list"></td>
 		</tr>
-<?php
-	if(is_array($config['system']['users'])){
-		foreach($config['system']['users'] as $username => $user){
-?>
+	<?php $i = 0; foreach($a_user as $userent): ?>
 		<tr>
-           <td class="listlr">
-              <?=$username; ?>&nbsp;
-           </td>
-           <td class="listr">
-              <?=htmlspecialchars($user['fullname']);?>&nbsp;
-           </td>
-              <td class="listr">
-              <?=$user['group'];?>
-              </td>
-           <td valign="middle" nowrap class="list"> <a href="system_usermanager.php?act=edit&username=<?=$username; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
-              &nbsp;<a href="system_usermanager.php?act=delete&username=<?=$username; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
+                  <td class="listlr">
+                    <?=htmlspecialchars($userent['name']); ?>&nbsp;
+                  </td>
+                  <td class="listr">
+                    <?=htmlspecialchars($userent['fullname']);?>&nbsp;
+                  </td>
+                  <td class="listbg">
+                    <?=htmlspecialchars($userent['groupname']); ?>&nbsp;
+                  </td>
+                  <td valign="middle" nowrap class="list"> <a href="system_usermanager.php?act=edit&id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
+                     &nbsp;<a href="system_usermanager.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
 		</tr>
-<?php
-		}
-	} ?>
+	<?php $i++; endforeach; ?>
 	    <tr> 
 			<td class="list" colspan="3"></td>
 			<td class="list"> <a href="system_usermanager.php?act=new"><img src="plus.gif" title="add user" width="17" height="17" border="0"></a></td>
@@ -255,40 +242,23 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
   </table>
 <?php 
 } else { // end of admin user code, start of normal user code
-	if(isset($_POST['save'])) {
-		//value-checking
-		if(trim($_POST['password1'])!="********" && 
-		   trim($_POST['password1'])!="" && 
-		   trim($_POST['password1'])!=trim($_POST['password2'])){
-		   	//passwords are to be changed but don't match
-		   	$input_errors[]="passwords don't match";
-		}
-		if((trim($_POST['password1'])=="" || trim($_POST['password1'])=="********") && 
-		   (trim($_POST['password2'])=="" || trim($_POST['password2'])=="********")){
-		   	//assume password should be left as is if a password is set already.
-			if(!empty($config['system']['users'][$_POST['old_username']]['password'])){
-				$_POST['password1']="********";
-				$_POST['password2']="********";
-			} else {
-				$input_errors[]="password must not be empty";
-			}
-		} else {
-			if(trim($_POST['password1'])!=trim($_POST['password2'])){
-			   	//passwords are to be changed or set but don't match
-			   	$input_errors[]="passwords don't match";
-			} else {
-				//check password for invalid characters
-				if(!preg_match('/^[a-zA-Z0-9_\-\.@\~\(\)\&\*\+§?!\$£°\%;:]*$/',$_POST['username'])){
-					$input_errors[] = "password contains illegal characters, only  letters from A-Z and a-z, _, -, .,@,~,(,),&,*,+,§,?,!,$,£,°,%,;,: and numbers are allowed";
-					//test pw: AZaz_-.@~()&*+§?!$£°%;:
-				}
-			}
-		}
+	if (isset($_POST['save'])) {
+
+	    unset($input_errors);
+    
+    	/* input validation */
+   		$reqdfields = explode(" ", "password");
+   		$reqdfieldsn = explode(",", "Password");
+    	
+    	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+    	
+    	if ($_POST['password'] != $_POST['password2'])
+      		$input_errors[] = "The passwords do not match.";
+    	
 		if (!$input_errors) {
 			//all values are okay --> saving changes
-			if(trim($_POST['password1'])!="********" && trim($_POST['password1'])!=""){
-				$config['system']['users'][$_SERVER['REMOTE_USER']]['password']=crypt(trim($_POST['password1']));
-			}
+			$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['password']=crypt(trim($_POST['password']));
+
 			write_config();
 			$retval = system_password_configure();
 			$savemsg = get_std_save_message($retval);
@@ -298,6 +268,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
 
 	
 ?>
+<?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
       <form action="system_usermanager.php" method="post" name="iform" id="iform">
@@ -307,7 +278,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
             </tr>
 		    <tr> 
 		      <td width="22%" valign="top" class="vncell">Password</td>
-		      <td width="78%" class="vtable"> <input name="password1" type="password" class="formfld" id="password1" size="20"> 
+		      <td width="78%" class="vtable"> <input name="password" type="password" class="formfld" id="password" size="20"> 
 		        <br> <input name="password2" type="password" class="formfld" id="password2" size="20"> 
 		        &nbsp;(confirmation) <br> <span class="vexpl">Select a new password</span></td>
 		    </tr>

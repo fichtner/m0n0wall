@@ -342,6 +342,26 @@ function captiveportal_users_sort() {
 	usort($config['captiveportal']['user'], "cpusercmp");
 }
 
+function admin_groups_sort() {
+	global $g, $config;
+	
+	function cpusercmp($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
+	usort($config['system']['group'], "cpusercmp");
+}
+
+function admin_users_sort() {
+	global $g, $config;
+	
+	function cpusercmp($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
+	usort($config['system']['user'], "cpusercmp");
+}
+
 function staticroutes_sort() {
 	global $g, $config;
 

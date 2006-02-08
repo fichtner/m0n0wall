@@ -386,10 +386,10 @@ function system_password_configure() {
 	
 	fwrite($fd, $username . ":" . $config['system']['password'] . "\n");
 
-	if (is_array($config['system']['users'])) {
-		foreach ($config['system']['users'] as $user => $userdata) {
-			    fwrite($fd, $user . ":" 
-		              . $userdata['password'] . "\n");
+	if (is_array($config['system']['user'])) {
+		foreach ($config['system']['user'] as $userent) {
+			    fwrite($fd, $userent['name'] . ":" 
+		              . $userent['password'] . "\n");
 		}
 	}
 	

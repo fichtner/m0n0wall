@@ -160,8 +160,6 @@ $menu['Diagnostics']['IPsec'] 			= array('diag_ipsec_sad.php',
 $menu['Diagnostics']['Ping/Traceroute'] = array('diag_ping.php',
 												'diag_traceroute.php');
 $menu['Diagnostics']['ARP Table'] 		= array('diag_arp.php');
-$menu['Diagnostics']['NS Lookup'] 		= array('diag_nslookup.php');
-$menu['Diagnostics']['Whois'] 			= array('diag_whois.php');
 $menu['Diagnostics']['Firewall states'] = array('diag_ipfstat.php');
 $menu['Diagnostics']['Reset state'] 	= array('diag_resetstate.php');
 $menu['Diagnostics']['Backup/Restore'] 	= array('diag_backup.php');
