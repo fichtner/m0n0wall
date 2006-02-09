@@ -43,73 +43,76 @@ RADIUS AUTHENTICATION
 */
 
 function RADIUS_AUTHENTICATION($username,$password,$radiusservers,$clientip,$clientmac,$ruleno) {
+
     global $config;
 
-    /* Initialisation of variables - Constructor */
     $retvalue = array();
-    $retvalue['error'] = $retvalue['reply_message'] = $retvalue['url_redirection'] = $retvalue['session_timeout'] = $retvalue['idle_timeout'] = $retvalue['session_terminate_time'] = null;
     $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
     $nas_port = $ruleno - 10000;
     $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
-
-    exec("/bin/hostname", $nasHostname) ;
-    if(!$nasHostname[0])
-    $nasHostname[0] = "m0n0wall" ;
-    
-$rauth = new Auth_RADIUS_PAP($username, $password);
-
-/*
-Add support for more then one radiusserver. 
-At most 10 servers may be specified. 
-When multiple servers are given, they are tried in round-robin fashion until a valid response is received 
-*/
-
-foreach ($radiusservers as $radsrv) {
-
-    // Add a new server to our instance
-    $rauth->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
-    
-}
-
-$rauth->username = $username;
-$rauth->password = $password;
-
-
-if (!$rauth->start()) {
-    $retvalue['auth_val'] = 1;
-    $retvalue['error'] = $rauth->getError(); 
-    if ($debug)
-        printf("Radius start: %s<br>\n", $retvalue['error']);
-}
-else {
-
-    // 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
-    // 2 -> Access-Accept
-    // 3 -> Access-Reject
-    // See RFC2865 for this.
-
-    /*
-     * We put our attributes in here
-     */
+    // Do we even need to set it to NULL?
+    $retvalue['error'] = $retvalue['reply_message'] = $retvalue['url_redirection'] = $retvalue['session_timeout'] = $retvalue['idle_timeout'] = $retvalue['session_terminate_time'] = null;
 
     switch($radiusvendor) {
 
         case 'cisco':
-        $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $clientmac);
-        $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientip);
+        $calledstationid = $clientmac;
+        $callingstationid = $clientip;
         break;
 
         default:
-        $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $nas_mac);
-        $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientmac);
+        $calledstationid = $nas_mac;
+        $callingstationid = $clientmac;
+    }
+
+    // Create our instance
+    $rauth = new Auth_RADIUS_PAP($username, $password);
+
+    /*
+    Add support for more then one radiusserver. 
+    At most 10 servers may be specified. 
+    When multiple servers are given, they are tried in round-robin fashion until a valid response is received 
+    */
+
+    foreach ($radiusservers as $radsrv) {
+
+        // Add a new server to our instance
+        $rauth->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
+
+    }
+
+    // Construct data package
+    $rauth->username = $username;
+    $rauth->password = $password;
+
+    if (PEAR::isError($rauth->start())) {
+        $retvalue['auth_val'] = 1;
+        $retvalue['error'] = $rauth->getError(); 
+        if ($debug)
+            printf("Radius start: %s<br>\n", $retvalue['error']);
+        // If we encounter an error immediately stop this function and go back
+        $rauth->close();
+        return $retvalue;
     }
 
     // Default attributes
+    $rauth->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
+    $rauth->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
     $rauth->putAttribute(RADIUS_NAS_PORT, $nas_port);
 
-    // Send request
+    // Extra data to identify the client and nas
+    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip);
+    $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
+    $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
+    // Send request
     $result = $rauth->send();
+
+    // Evaluation of the response
+    // 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
+    // 2 -> Access-Accept
+    // 3 -> Access-Reject
+    // See RFC2865 for this.
     if (PEAR::isError($result)) {
         $retvalue['auth_val'] = 1;
         $retvalue['error'] = $result->getMessage();
@@ -145,12 +148,11 @@ else {
         $stt = strtotime(preg_replace("/\+(\d+):(\d+)$/", " +\${1}\${2}", preg_replace("/(\d+)T(\d+)/", "\${1} \${2}",$stt)));
          }
     }
-     }
 
-     // close OO RADIUS_AUTHENTICATION
-     $rauth->close();
+    // close OO RADIUS_AUTHENTICATION
+    $rauth->close();
 
-     return $retvalue;
+    return $retvalue;
 
 }
 

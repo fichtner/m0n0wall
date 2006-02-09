@@ -47,6 +47,7 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 
     global $config;
 
+    $retvalue = array();
     $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
     $nas_port = $ruleno - 10000;
     $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
@@ -63,9 +64,6 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
         $callingstationid = $clientmac;
     }
 
-    if ($debug)
-        echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
-
     // Create our instance
     $racct = new Auth_RADIUS_Acct_Start;
 
@@ -78,17 +76,20 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
      * RADIUS_AUTH_REMOTE => authenticated remote
      *
      */
-
     $racct->authentic = RADIUS_AUTH_RADIUS;
 
     // Construct data package
-    $racct->addServer($radiusip, $radiusport, $radiuskey);
     $racct->username = $username;
+    $racct->addServer($radiusip, $radiusport, $radiuskey);
+
     if (PEAR::isError($racct->start())) {
         $retvalue['acct_val'] = 1;
         $retvalue['error'] = $racct->getMessage();
         if ($debug)
             printf("Radius start: %s<br>\n", $retvalue['error']);
+        // If we encounter an error immediately stop this function and go back
+        $racct->close();
+        return $retvalue;
 
         /* Old code:
          * $status = $racct->start();
@@ -105,10 +106,10 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
      */
 
     // Default attributes
+    $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
     $racct->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
     $racct->putAttribute(RADIUS_NAS_PORT, $nas_port);
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
-    $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
 
     // Extra data to identify the client and nas
     $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip);
@@ -117,6 +118,10 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 
     // Send request
     $result = $racct->send();
+
+    // Evaluation of the response
+    // 5 -> Accounting-Response
+    // See RFC2866 for this.
     if (PEAR::isError($result)) {
         $retvalue['acct_val'] = 1;
         $retvalue['error'] = $result->getMessage();
@@ -136,8 +141,6 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
     $racct->close();
 
     return $retvalue ;
-    // 5 -> Accounting-Response
-    // See RFC2866 for this.
 
 }
 
@@ -150,6 +153,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
     global $config;
 
+    $retvalue = array();
     $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
     $nas_port = $ruleno - 10000;
     $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
@@ -173,10 +177,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
         $callingstationid = $clientmac;
     }
 
-    if ($debug)
-        echo "<br>radius-port: $radiusport<br>radius-host: $radiusip<br>username: $username<hr>\n";
-
-    // See if we should use Accounting Interim Updates or Accounting STOP messages
+    // Create our instance, see if we should use Accounting Interim Updates or Accounting STOP messages
     if ($interimupdate)
         $racct = new_Auth_RADIUS_Acct_Update;
     else
@@ -200,23 +201,24 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->authentic = RADIUS_AUTH_RADIUS;
 
     // Construct data package
-    $racct->addServer($radiusip, $radiusport, $radiuskey);
     $racct->username = $username;
+    $racct->addServer($radiusip, $radiusport, $radiuskey);
+
     if (PEAR::isError($racct->start())) {
         $retvalue['acct_val'] = 1;
         $retvalue['error'] = $racct->getMessage();
         if ($debug)
             printf("Radius start: %s<br>\n", $retvalue['error']);
+        // If we encounter an error immediately stop this function and go back
+        $racct->close();
+        return $retvalue;
     }
 
-    // you can put any additional attributes here
-    //$racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_LOGIN);
-
     // Default attributes
+    $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
     $racct->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
     $racct->putAttribute(RADIUS_NAS_PORT, $nas_port);
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
-    $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
 
     // We have 2 ways to set the session-time, we will see which one to use in a later version
     // $racct->session_time = $session_time;
@@ -241,6 +243,10 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
     // Send request
     $result = $racct->send();
+
+    // Evaluation of the response
+    // 5 -> Accounting-Response
+    // See RFC2866 for this.
     if (PEAR::isError($result)) {
         $retvalue['acct_val'] = 1;
         $retvalue['error'] = $result->getMessage();
@@ -259,22 +265,21 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     // close OO RADIUS_ACCOUNTING
     $racct->close();
 
-    return $retvalue ;
-    // 5 -> Accounting-Response
-    // See RFC2866 for this.
+    return $retvalue;
+    // Construct data package
+    $racct->addServer($radiusip, $radiusport, $radiuskey);
+    $racct->username = $username;
 
-}
+    if (PEAR::isError($racct->start())) {
+        $retvalue['acct_val'] = 1;
+        $retvalue['error'] = $racct->getMessage();
+        if ($debug)
+            printf("Radius start: %s<br>\n", $retvalue['error']);
+        // If we encounter an error immediately stop this function and go back
+        $racct->close();
+        return $retvalue;
+    }
 
-/**
- * Deprecated function that shouldn't be used anymore if get_current_wan_address() works
- *
- */
-
-function get_nas_ip() {
-        global $config;
-
-        /* static WAN IP address */
-        return $config['interfaces']['wan']['ipaddr'];   
 }
 
 
@@ -289,6 +294,7 @@ function gigawords($bytes) {
     $gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 2147483647) ;
 
     return $gigawords;
+
 }
 
 function remainder($bytes) {
@@ -297,6 +303,7 @@ function remainder($bytes) {
     $bytes = bcmod($bytes, 2147483647);
 
     return $bytes;
+
 }
 
 ?>

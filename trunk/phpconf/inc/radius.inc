@@ -238,7 +238,20 @@ class Auth_RADIUS extends PEAR {
             return radius_put_int($this->res, $attrib, $value);
         
         case 'addr':
-            return radius_put_addr($this->res, $attrib, $value);
+            return radius_put_addr($this->res, $attrib, $value);    // Construct data package
+    $racct->addServer($radiusip, $radiusport, $radiuskey);
+    $racct->username = $username;
+
+    if (PEAR::isError($racct->start())) {
+        $retvalue['acct_val'] = 1;
+        $retvalue['error'] = $racct->getMessage();
+        if ($debug)
+            printf("Radius start: %s<br>\n", $retvalue['error']);
+        // If we encounter an error immediately stop this function and go back
+        $racct->close();
+        return $retvalue;
+    }
+
             
         case 'string':
         default:
@@ -448,7 +461,7 @@ class Auth_RADIUS extends PEAR {
 
         default:
             return $this->raiseError("Unexpected return value: $req");
-        }    
+        }
         
     }
 
