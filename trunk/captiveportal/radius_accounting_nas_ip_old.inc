@@ -49,7 +49,7 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 
     $nas_ip = get_current_wan_address();
     $nas_ip_exp = explode(".",$nas_ip);
-    $nas_mac = get_interface_mac($config['interfaces']['wan']['if']); // This function is defined in radius_authentication.inc
+    $nas_mac = get_interface_mac($config['interfaces']['wan']['if']); // This function is defined in interfaces.inc
     $nas_port = $ruleno - 10000;
     $ip_exp=explode(".",$clientip);
     $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
