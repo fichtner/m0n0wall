@@ -51,14 +51,14 @@ RADIUS AUTHENTICATION
 */
 
 function RADIUS_AUTHENTICATION($username,$password,$radiusservers,$clientip,$clientmac,$ruleno) {
-	global $config;
+    global $config;
 
-	/* Initialisation of variables - Constructor */
-	$retvalue = array();
-	$retvalue['error'] = $retvalue['reply_message'] = $retvalue['url_redirection'] = $retvalue['session_timeout'] = $retvalue['idle_timeout'] = $retvalue['session_terminate_time'] = null;
-	$nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
-	$nas_port = $ruleno - 10000;
-	$radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
+    /* Initialisation of variables - Constructor */
+    $retvalue = array();
+    $retvalue['error'] = $retvalue['reply_message'] = $retvalue['url_redirection'] = $retvalue['session_timeout'] = $retvalue['idle_timeout'] = $retvalue['session_terminate_time'] = null;
+    $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
+    $nas_port = $ruleno - 10000;
+    $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
 
     exec("/bin/hostname", $nasHostname) ;
     if(!$nasHostname[0])
@@ -74,9 +74,9 @@ When multiple servers are given, they are tried in round-robin fashion until a v
 
 foreach ($radiusservers as $radsrv) {
 
-	// Add a new server to our instance
-	$rauth->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
-	
+    // Add a new server to our instance
+    $rauth->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
+    
 }
 
 $rauth->username = $username;
@@ -87,20 +87,20 @@ if (!$rauth->start()) {
     $retvalue['auth_val'] = 1;
     $retvalue['error'] = $rauth->getError(); 
     if ($debug)
-    printf("Radius start: %s<br>\n", $retvalue['error']);
+        printf("Radius start: %s<br>\n", $retvalue['error']);
 }
 else {
 
-	// 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
-	// 2 -> Access-Accept
-	// 3 -> Access-Reject
-	// See RFC2865 for this.
+    // 1 -> Access-Request => We will use this value as an error indicator since we can't get a 1 back from the radius
+    // 2 -> Access-Accept
+    // 3 -> Access-Reject
+    // See RFC2865 for this.
 
-	/*
-	 * We put our attributes in here
-	 */
+    /*
+     * We put our attributes in here
+     */
 
-	switch($radiusvendor) {
+    switch($radiusvendor) {
 
         case 'cisco':
         $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $clientmac);
@@ -110,49 +110,49 @@ else {
         default:
         $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $nas_mac);
         $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $clientmac);
-	}
+    }
 
-	// Default attributes
-	$rauth->putAttribute(RADIUS_NAS_PORT, $nas_port);
+    // Default attributes
+    $rauth->putAttribute(RADIUS_NAS_PORT, $nas_port);
 
-	// Send request
+    // Send request
 
-	$result = $rauth->send();
-	if (PEAR::isError($result)) {
-	    $retvalue['auth_val'] = 1;
-	    $retvalue['error'] = $result->getMessage();
-	    if ($debug)
-	    printf("Radius send failed: %s<br>\n", $retvalue['error']);
-	} else if ($result === true) {
-	    $retvalue['auth_val'] = 2;
-	    if ($debug)
-	    printf("Radius Auth succeeded<br>\n");
-	} else {
-	    $retvalue['auth_val'] = 3;
-	    if ($debug)
-	    printf("Radius Auth rejected<br>\n");
-	}
+    $result = $rauth->send();
+    if (PEAR::isError($result)) {
+        $retvalue['auth_val'] = 1;
+        $retvalue['error'] = $result->getMessage();
+        if ($debug)
+            printf("Radius send failed: %s<br>\n", $retvalue['error']);
+    } else if ($result === true) {
+        $retvalue['auth_val'] = 2;
+        if ($debug)
+            printf("Radius Auth succeeded<br>\n");
+    } else {
+        $retvalue['auth_val'] = 3;
+        if ($debug)
+            printf("Radius Auth rejected<br>\n");
+    }
 
-	// Get attributes, even if auth failed.
-	// We will push the results in the retvalue array
-	if (!$rauth->getAttributes()) {
-	    $retvalue['error'] = $rauth->getError();
-	    if ($debug)
-	    printf("Radius getAttributes: No attributes<br>\n", $retvalue['error']);
-	} else {
-	    $retvalue = array_merge($retvalue,$rauth->listAttributes());
-	    if ($debug) {
-	        if (!$rauth->listAttributes())
-	            printf("No Attributes<br>\n");
-	        else
-	        print_r($rauth->listAttributes());
-	    }
-	    // We convert the session_terminate_time to unixtimestamp if its set before returning the whole array to our caller
-	    if (!empty($retvalue['session_terminate_time'])) {
-		$stt = &$retvalue['session_terminate_time'];
-		$stt = strtotime(preg_replace("/\+(\d+):(\d+)$/", " +\${1}\${2}", preg_replace("/(\d+)T(\d+)/", "\${1} \${2}",$stt)));
- 	    }
-	}
+    // Get attributes, even if auth failed.
+    // We will push the results in the retvalue array
+    if (!$rauth->getAttributes()) {
+        $retvalue['error'] = $rauth->getError();
+        if ($debug)
+            printf("Radius getAttributes: No attributes<br>\n", $retvalue['error']);
+    } else {
+        $retvalue = array_merge($retvalue,$rauth->listAttributes());
+        if ($debug) {
+            if (!$rauth->listAttributes())
+                printf("No Attributes<br>\n");
+            else
+            print_r($rauth->listAttributes());
+        }
+        // We convert the session_terminate_time to unixtimestamp if its set before returning the whole array to our caller
+        if (!empty($retvalue['session_terminate_time'])) {
+        $stt = &$retvalue['session_terminate_time'];
+        $stt = strtotime(preg_replace("/\+(\d+):(\d+)$/", " +\${1}\${2}", preg_replace("/(\d+)T(\d+)/", "\${1} \${2}",$stt)));
+         }
+    }
      }
 
      // close OO RADIUS_AUTHENTICATION
