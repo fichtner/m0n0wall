@@ -38,7 +38,7 @@
 
 */
 
-/*tm0664rr
+/*
 RADIUS ACCOUNTING START 
 -----------------------
 */
@@ -265,19 +265,6 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->close();
 
     return $retvalue;
-    // Construct data package
-    $racct->addServer($radiusip, $radiusport, $radiuskey);
-    $racct->username = $username;
-
-    if (PEAR::isError($racct->start())) {
-        $retvalue['acct_val'] = 1;
-        $retvalue['error'] = $racct->getMessage();
-        if ($debug)
-            printf("Radius start: %s<br>\n", $retvalue['error']);
-        // If we encounter an error immediately stop this function and go back
-        $racct->close();
-        return $retvalue;
-    }
 
 }
 
