@@ -292,7 +292,7 @@ class Auth_RADIUS extends PEAR {
     {
 
         // Add support for sending NAS-IP-Address, set this explicitly as an ip_addr
-        $this->putAttribute(RADIUS_NAS_IP_ADDRESS, getNasIP(), addr);
+        $this->putAttribute(RADIUS_NAS_IP_ADDRESS, getNasIP(), "addr");
 
         // Add support for sending NAS-Identifier
         $this->putAttribute(RADIUS_NAS_IDENTIFIER, getNasID());
