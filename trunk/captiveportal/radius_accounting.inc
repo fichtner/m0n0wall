@@ -179,9 +179,9 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
     // Create our instance, see if we should use Accounting Interim Updates or Accounting STOP messages
     if ($interimupdate)
-        $racct = new_Auth_RADIUS_Acct_Update;
+        $racct = new Auth_RADIUS_Acct_Update;
     else
-        $racct = new_Auth_RADIUS_Acct_Stop;
+        $racct = new Auth_RADIUS_Acct_Stop;
 
     /*
      * Currently disabled
@@ -238,7 +238,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $volume['output_gigawords']);
 
     if (!$interimupdate)
-        $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $radius_term_cause);
+        $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $term_cause);
 
     // Send request
     $result = $racct->send();
