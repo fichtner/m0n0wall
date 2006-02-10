@@ -169,7 +169,7 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     // Working with an array to hold the data gives problems so we change them to normal vars
     foreach ($volume as $var => $value) {
         $var = $value;
-        settype($var, "integer");
+        settype($var, "int");
     }
 
     switch($radiusvendor) {
