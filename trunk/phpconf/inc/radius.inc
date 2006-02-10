@@ -104,18 +104,6 @@ class Auth_RADIUS extends PEAR {
     var $password = null;
 
     /**
-     * NAS-IP-Address
-     * @var string
-     */
-    var $nasIp = null;
-    
-    /**
-     * NAS-Identifier
-     * @var array (note: RFC specifies string and PECL specifies integer)
-     */
-    var $nasId = array();
-
-    /**
      * List of known attributes.
      * @var  array
      * @see  dumpAttributes(), getAttributes()
@@ -169,33 +157,6 @@ class Auth_RADIUS extends PEAR {
     }
 
     /**
-     * Get the NAS-Identifier
-     *
-     * We will use our local hostname to make up the nas_id
-     */
-    function getNasID()
-    {
-        exec("/bin/hostname", $_nasId);
-        if(!$_nasId[0])
-            $_nasId[0] = "m0n0wall";
-        return $_nasId[0];
-    }
-
-    /**
-     * Get the NAS-IP-Address based on the current wan address
-     *
-     * Use functions in interfaces.inc to find this out
-     *
-     */
-    function getNasIP()
-    {
-        $_nasIp = get_current_wan_address();
-        if(!$_nasIp)
-            $_nasIp = "0.0.0.0";
-        return $_nasIp;
-    }
-
-    /**
      * Returns an error message, if an error occurred.
      *
      * @access public
@@ -205,7 +166,7 @@ class Auth_RADIUS extends PEAR {
     {
         return radius_strerror($this->res);
     }
-    
+
     /**
      * Sets the configuration-file.
      *
@@ -332,10 +293,10 @@ class Auth_RADIUS extends PEAR {
         $this->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_LOGIN);
 
         // Add support for sending NAS-IP-Address, set this explicitly as an ip_addr
-        $this->putAttribute(RADIUS_NAS_IP_ADDRESS, $this->getNasIP(), addr);
+        $this->putAttribute(RADIUS_NAS_IP_ADDRESS, getNasIP(), addr);
 
         // Add support for sending NAS-Identifier
-        $this->putAttribute(RADIUS_NAS_IDENTIFIER, $this->getNasID());
+        $this->putAttribute(RADIUS_NAS_IDENTIFIER, getNasID());
 
     }
     

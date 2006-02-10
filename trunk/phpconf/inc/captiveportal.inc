@@ -928,5 +928,33 @@ function getVolume($ruleno) {
     return $volume;
 }
 
+/**
+ * Get the NAS-Identifier
+ *
+ * We will use our local hostname to make up the nas_id
+ */
+
+function getNasID()
+{
+    exec("/bin/hostname", $_nasId);
+    if(!$nasId[0])
+        $nasId[0] = "m0n0wall";
+    return $nasId[0];
+}
+
+/**
+ * Get the NAS-IP-Address based on the current wan address
+ *
+ * Use functions in interfaces.inc to find this out
+ *
+ */
+
+function getNasIP()
+{
+    $nasIp = get_current_wan_address();
+    if(!$nasIp)
+        $nasIp = "0.0.0.0";
+    return $nasIp;
+}
 
 ?>
