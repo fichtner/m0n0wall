@@ -30,8 +30,6 @@
 */
 
 require_once("functions.inc");
-require_once("radius_authentication.inc");
-require_once("radius_accounting.inc");
 
 header("Expires: 0");
 header("Cache-Control: no-store, no-cache, must-revalidate");

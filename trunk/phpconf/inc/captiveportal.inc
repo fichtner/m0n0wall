@@ -37,8 +37,6 @@
 /* include all configuration functions */
 require_once("functions.inc");
 require_once("radius.inc");
-require_once("radius_authentication.inc");
-require_once("radius_accounting.inc");
 
 $lockfile = "{$g['varrun_path']}/captiveportal.lock";
 
@@ -936,7 +934,7 @@ function getVolume($ruleno) {
 
 function getNasID()
 {
-    exec("/bin/hostname", $_nasId);
+    exec("/bin/hostname", $nasId);
     if(!$nasId[0])
         $nasId[0] = "m0n0wall";
     return $nasId[0];

@@ -38,7 +38,7 @@
 
 */
 
-/*
+/*tm0664rr
 RADIUS ACCOUNTING START 
 -----------------------
 */
@@ -112,7 +112,7 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
 
     // Extra data to identify the client and nas
-    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip);
+    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, addr);
     $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
@@ -220,12 +220,11 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->putAttribute(RADIUS_NAS_PORT, $nas_port);
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
 
-    // We have 2 ways to set the session-time, we will see which one to use in a later version
-    // $racct->session_time = $session_time;
-    $racct->putAttribute(RADIUS_ACCT_SESSION_TIME, $session_time);
+    // We have 2 ways to set the session-time, We are setting it through a var, reason see method putAuthAttributes()
+    $racct->session_time = $session_time;
 
     // Extra data to identify the client and nas
-    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip);
+    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, addr);
     $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
