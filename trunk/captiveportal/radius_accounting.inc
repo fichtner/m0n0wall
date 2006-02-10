@@ -32,7 +32,7 @@
 
     This code cannot simply be copied and put under the GNU Public License or 
     any other GPL-like (LGPL, GPL2) License.
-
+settype($foo, "integer")
         This code is made possible thx to samples made by Michael Bretterklieber <michael@bretterklieber.com>
         author of the PHP PECL Radius package
 
@@ -164,6 +164,14 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $volume['input_gigawords'] = gigawords($volume['input_bytes']);
     $volume['output_bytes_radius'] = remainder($volume['output_bytes']);
     $volume['output_gigawords'] = gigawords($volume['output_bytes']);
+
+    // Make the volume data safe for our radius.inc functions (It really needs to be integer or we get an error)
+    settype($volume['input_pkts'], "integer");
+    settype($volume['input_bytes_radius'], "integer");
+    settype($volume['input_gigawords'], "integer");
+    settype($volume['output_pkts'], "integer");
+    settype($volume['output_bytes_radius'], "integer");
+    settype($volume['output_gigawords'], "integer");
 
     switch($radiusvendor) {
 
