@@ -199,7 +199,7 @@ class Auth_RADIUS extends PEAR {
             return radius_put_int($this->res, $attrib, $value);
 
         case 'addr':
-            return radius_put_addr($this->res, $attrib, $value);}
+            return radius_put_addr($this->res, $attrib, $value);
 
         case 'string':
         default:
