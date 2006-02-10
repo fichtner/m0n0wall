@@ -112,7 +112,7 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
 
     // Extra data to identify the client and nas
-    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, addr);
+    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, "addr");
     $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
@@ -231,18 +231,20 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->session_time = $session_time;
 
     // Extra data to identify the client and nas
-    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, addr);
+    $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, "addr");
     $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
+    /* Make this temporarly disabled to see if we still get errors
     // Volume stuff: Ingress (Note: remove the explicit integer if the type conversion works like we expect)
-    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $input_pkts, integer);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $input_bytes_radius, integer);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $input_gigawords, integer);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $input_pkts, "integer");
+    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $input_bytes_radius, "integer");
+    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $input_gigawords, "integer");
     // Volume stuff: Outgress
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $output_pkts, integer);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $output_bytes_radius, integer);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $output_gigawords, integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $output_pkts, "integer");
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $output_bytes_radius, "integer");
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $output_gigawords, "integer");
+    */
 
     if (!$interimupdate)
         $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $term_cause);
