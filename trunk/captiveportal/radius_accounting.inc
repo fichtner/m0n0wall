@@ -229,13 +229,13 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
     // Volume stuff: Ingress
-    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $volume['input_pkts']);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $volume['input_bytes_radius']);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $volume['input_gigawords']);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $volume['input_pkts'], integer);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $volume['input_bytes_radius'], integer);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $volume['input_gigawords'], integer);
     // Volume stuff: Outgress
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $volume['output_pkts']);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $volume['output_bytes_radius']);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $volume['output_gigawords']);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $volume['output_pkts'], integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $volume['output_bytes_radius'], integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $volume['output_gigawords'], integer);
 
     if (!$interimupdate)
         $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $term_cause);
