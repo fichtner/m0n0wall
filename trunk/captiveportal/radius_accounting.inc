@@ -32,7 +32,7 @@
 
     This code cannot simply be copied and put under the GNU Public License or 
     any other GPL-like (LGPL, GPL2) License.
-settype($foo, "integer")
+
         This code is made possible thx to samples made by Michael Bretterklieber <michael@bretterklieber.com>
         author of the PHP PECL Radius package
 
@@ -166,12 +166,11 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $volume['output_gigawords'] = gigawords($volume['output_bytes']);
 
     // Make the volume data safe for our radius.inc functions (It really needs to be integer or we get an error)
-    settype($volume['input_pkts'], "integer");
-    settype($volume['input_bytes_radius'], "integer");
-    settype($volume['input_gigawords'], "integer");
-    settype($volume['output_pkts'], "integer");
-    settype($volume['output_bytes_radius'], "integer");
-    settype($volume['output_gigawords'], "integer");
+    // Working with an array to hold the data gives problems so we change them to normal vars
+    foreach ($volume as $var => $value) {
+        $var = $value;
+        settype($var, "integer");
+    }
 
     switch($radiusvendor) {
 
@@ -236,14 +235,14 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
 
-    // Volume stuff: Ingress
-    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $volume['input_pkts'], integer);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $volume['input_bytes_radius'], integer);
-    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $volume['input_gigawords'], integer);
+    // Volume stuff: Ingress (Note: remove the explicit integer if the type conversion works like we expect)
+    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $input_pkts, integer);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $input_bytes_radius, integer);
+    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $input_gigawords, integer);
     // Volume stuff: Outgress
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $volume['output_pkts'], integer);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $volume['output_bytes_radius'], integer);
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $volume['output_gigawords'], integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $output_pkts, integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $output_bytes_radius, integer);
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $output_gigawords, integer);
 
     if (!$interimupdate)
         $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $term_cause);
