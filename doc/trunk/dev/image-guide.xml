@@ -1045,7 +1045,9 @@ boot</code></literallayout></para>
     <para>None of the dynamically linked libraries that are needed have been
     added yet. This is because a Perl script, mklibs.pl, can be run on the
     root file system to create a list of libraries that are actually needed
-    (mklibs.pl does this by running ldd on each binary).</para>
+    (mklibs.pl does this by running ldd on each binary). Get the script from
+    <ulink url="http://m0n0.ch/wall/downloads/freebsd-4.11/mklibs.pl">http://m0n0.ch/wall/downloads/freebsd-4.11/mklibs.pl</ulink>
+    and run it as follows:</para>
 
     <para><programlisting>perl mklibs.pl $MWROOT &gt; m0n0wall.libs
 perl mkmini.pl m0n0wall.libs / $MWROOT</programlisting></para>
