@@ -478,8 +478,8 @@ to access after they've authenticated.</td>
 						echo "<option value=\"$radiusvendor\">$radiusvendor</option>\n";
 				}
 				?></select><br>
-				If RADIUS type is set to Cisco, in Access-Requests the value of Calling-Station-Id will be set to the client's IP address and
-				the Called-Station-Id to the client's MAC address. Default behaviour is Calling-Station-Id = client's MAC address and Called-Station-Id = m0n0wall's WAN IP address.</td>
+				If RADIUS type is set to Cisco, in RADIUS-Requests (Authentication/Accounting) the value of Calling-Station-Id will be set to the client's IP address and
+				the Called-Station-Id to the client's MAC address. Default behaviour is Calling-Station-Id = client's MAC address and Called-Station-Id = m0n0wall's WAN MAC address.</td>
 			</tr>
 		</table>
 	</tr>
