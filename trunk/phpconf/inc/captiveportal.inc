@@ -890,10 +890,10 @@ function captiveportal_write_elements() {
  * This function will calculate the traffic produced by a client
  * based on its firewall rule
  *
- * Point of view: Client
+ * Point of view: NAS
  *
- * Input on the FW will be viewed as Output for the Client
- * Output on the FW will be viewed as Input for the Client
+ * Input means: from the client
+ * Output means: to the client
  *
  */
 

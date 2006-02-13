@@ -543,7 +543,8 @@ Example code for the form:<br>
 		  <br>
 		<?php endif; ?>
 The contents of the HTML file that you upload here are displayed when an authentication error occurs.
-You may include &quot;$PORTAL_MESSAGE$&quot;, which will be replaced by the error or reply messages from the RADIUS server, if any.</td>
+You may include &quot;$PORTAL_MESSAGE$&quot;, which will be replaced by the error or reply messages from the RADIUS server, if any.
+Its also possible to include a new login form in the error page for a direct user relogin possibility</td>
 	</tr>
 	<tr> 
 	  <td width="22%" valign="top">&nbsp;</td>
