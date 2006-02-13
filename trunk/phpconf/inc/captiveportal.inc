@@ -901,15 +901,14 @@ function getVolume($ruleno) {
 
     $volume = array();
 
+    // Initialize vars properly, since we don't want NULL vars
+    $volume['input_pkts'] = $volume['input_bytes'] = $volume['output_pkts'] = $volume['output_bytes'] = 0 ;
+
     // Ingress
     exec("/sbin/ipfw show {$ruleno}", $ipfw);
     preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[0], $matches);
     $volume['input_pkts'] = $matches[2];
     $volume['input_bytes'] = $matches[3];
-    /* These functions are moved to the accounting part
-    $volume['input_bytes_radius'] = remainder($matches[3]);
-    $volume['input_gigawords'] = gigawords($matches[3]);
-    */
 
     // Flush internal buffer
     unset($matches);
@@ -918,10 +917,6 @@ function getVolume($ruleno) {
     preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[1], $matches);
     $volume['output_pkts'] = $matches[2];
     $volume['output_bytes'] = $matches[3];
-    /* These functions are moved to the accounting part
-    $volume['output_bytes_radius'] = remainder($matches[3]);
-    $volume['output_gigawords'] = gigawords($matches[3]);
-    */
 
     return $volume;
 }

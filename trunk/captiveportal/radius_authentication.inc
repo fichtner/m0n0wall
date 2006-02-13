@@ -102,8 +102,8 @@ function RADIUS_AUTHENTICATION($username,$password,$radiusservers,$clientip,$cli
 
     // Extra data to identify the client and nas
     $rauth->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, addr);
-    $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $rauth->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
+    $rauth->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
 
     // Send request
     $result = $rauth->send();

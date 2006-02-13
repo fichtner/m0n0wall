@@ -113,8 +113,8 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 
     // Extra data to identify the client and nas
     $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, "addr");
-    $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
+    $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
 
     // Send request
     $result = $racct->send();
@@ -165,13 +165,6 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     $volume['output_bytes_radius'] = remainder($volume['output_bytes']);
     $volume['output_gigawords'] = gigawords($volume['output_bytes']);
 
-    // Make the volume data safe for our radius.inc functions (It really needs to be integer or we get an error)
-    // Working with an array to hold the data gives problems so we change them to normal vars
-    foreach ($volume as $var => $value) {
-        $var = $value;
-        settype($var, "int");
-    }
-
     switch($radiusvendor) {
 
         case 'cisco':
@@ -210,6 +203,8 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     // Construct data package
     $racct->username = $username;
     $racct->addServer($radiusip, $radiusport, $radiuskey);
+    // Set session_time
+    $racct->session_time = $session_time;
 
     if (PEAR::isError($racct->start())) {
         $retvalue['acct_val'] = 1;
@@ -221,28 +216,29 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
         return $retvalue;
     }
 
+    // The RADIUS PECL Package doesn't have this vars so we create them ourself
+    define("RADIUS_ACCT_INPUT_GIGAWORDS", "52");
+    define("RADIUS_ACCT_OUTPUT_GIGAWORDS", "53");
+
     // Default attributes
     $racct->putAttribute(RADIUS_SERVICE_TYPE, RADIUS_OUTBOUND);
     $racct->putAttribute(RADIUS_NAS_PORT_TYPE, RADIUS_ETHERNET);
     $racct->putAttribute(RADIUS_NAS_PORT, $nas_port);
     $racct->putAttribute(RADIUS_ACCT_SESSION_ID, $sessionid);
 
-    // We have 2 ways to set the session-time, We are setting it through a var, reason see method putAuthAttributes()
-    $racct->session_time = $session_time;
-
     // Extra data to identify the client and nas
     $racct->putAttribute(RADIUS_FRAMED_IP_ADDRESS, $clientip, "addr");
-    $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
     $racct->putAttribute(RADIUS_CALLED_STATION_ID, $calledstationid);
+    $racct->putAttribute(RADIUS_CALLING_STATION_ID, $callingstationid);
 
-    // Volume stuff: Ingress (Note: remove the explicit integer if the type conversion works like we expect)
-    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $input_pkts, "integer");
-    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $input_bytes_radius, "integer");
-    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $input_gigawords, "integer");
+    // Volume stuff: Ingress
+    $racct->putAttribute(RADIUS_ACCT_INPUT_PACKETS, $volume['input_pkts'], "integer");
+    $racct->putAttribute(RADIUS_ACCT_INPUT_OCTETS, $volume['input_bytes_radius'], "integer");
+    $racct->putAttribute(RADIUS_ACCT_INPUT_GIGAWORDS, $volume['input_gigawords'], "integer");
     // Volume stuff: Outgress
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $output_pkts, "integer");
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $output_bytes_radius, "integer");
-    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $output_gigawords, "integer");
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_PACKETS, $volume['output_pkts'], "integer");
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_OCTETS, $volume['output_bytes_radius'], "integer");
+    $racct->putAttribute(RADIUS_ACCT_OUTPUT_GIGAWORDS, $volume['output_gigawords'], "integer");
 
     if (!$interimupdate)
         $racct->putAttribute(RADIUS_ACCT_TERMINATE_CAUSE, $term_cause);
@@ -286,6 +282,11 @@ function gigawords($bytes) {
     // We use BCMath functions since normal integers don't work with so large numbers
     $gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 2147483647) ;
 
+    // We need to manually set this to a zero instead of NULL for put_int() safety
+    if (is_null($gigawords)) {
+        $gigawords = 0;
+    }
+
     return $gigawords;
 
 }
@@ -294,6 +295,11 @@ function remainder($bytes) {
 
     // Calculate the bytes we are going to send to the radius
     $bytes = bcmod($bytes, 2147483647);
+
+    if (is_null($bytes)) {
+        $bytes = 0;
+    }
+
 
     return $bytes;
 
