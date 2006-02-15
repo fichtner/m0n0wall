@@ -39,6 +39,7 @@ $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
 $pconfig['disablefirmwarecheck'] = isset($config['system']['disablefirmwarecheck']);
+$pconfig['allowipsecfrags'] = isset($config['filter']['allowipsecfrags']);
 $pconfig['expanddiags'] = isset($config['system']['webgui']['expanddiags']);
 if ($g['platform'] == "generic-pc")
 	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
@@ -83,6 +84,7 @@ if ($_POST) {
 		$config['system']['webgui']['private-key'] = base64_encode($_POST['key']);
 		$config['system']['disableconsolemenu'] = $_POST['disableconsolemenu'] ? true : false;
 		$config['system']['disablefirmwarecheck'] = $_POST['disablefirmwarecheck'] ? true : false;
+		$config['filter']['allowipsecfrags'] = $_POST['allowipsecfrags'] ? true : false;
 		$config['system']['webgui']['expanddiags'] = $_POST['expanddiags'] ? true : false;
 		if ($g['platform'] == "generic-pc") {
 			$oldharddiskstandby = $config['system']['harddiskstandby'];
@@ -235,6 +237,13 @@ function enable_change(enable_over) {
                     <input name="disablefirmwarecheck" type="checkbox" id="disablefirmwarecheck" value="yes" <?php if ($pconfig['disablefirmwarecheck']) echo "checked"; ?>>
                     <strong>Disable firmware version check</strong><span class="vexpl"><br>
     This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
+			    </tr>
+				<tr>
+                  <td valign="top" class="vncell">IPsec fragmented packets</td>
+                  <td class="vtable">
+                    <input name="allowipsecfrags" type="checkbox" id="allowipsecfrags" value="yes" <?php if ($pconfig['allowipsecfrags']) echo "checked"; ?>>
+                    <strong>Allow fragmented IPsec packets</strong><span class="vexpl"><br>
+    This will cause m0n0wall to allow fragmented IP packets that are encapsulated in IPsec ESP packets.</span></td>
 			    </tr>
 				<tr>
                   <td valign="top" class="vncell">TCP idle timeout </td>

@@ -491,6 +491,10 @@ EOD;
 		}
 	}
 
+	$out_kf = "";
+	if (isset($config['filter']['allowipsecfrags']))
+		$out_kf = "keep frags";
+
 	/* XXX - the first section is only needed because ipf refuses to
 		parse rules that have "flags S/SAFR" and proto "tcp/udp" set because
 		UDP does not have flags, but we still want to offer the TCP/UDP protocol
@@ -508,7 +512,7 @@ block in $log quick proto tcp all
 block in $log quick on $lanif all head 100
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on $lanif all keep state
+pass out quick on $lanif all keep state $out_kf
 
 #---------------------------------------------------------------------------
 # group head 200 - WAN interface
@@ -516,7 +520,7 @@ pass out quick on $lanif all keep state
 block in $log quick on $wanif all head 200
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on $wanif all keep state
+pass out quick on $wanif all keep state $out_kf
 
 EOD;
 
@@ -533,7 +537,7 @@ EOD;
 block in $log quick on {$oc['if']} all head {$ingroup}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on {$oc['if']} all keep state
+pass out quick on {$oc['if']} all keep state $out_kf
 
 EOD;
 	

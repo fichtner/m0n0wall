@@ -344,6 +344,7 @@
 	<filter>
 		<!-- <tcpidletimeout></tcpidletimeout> -->
 		<!-- <bypassstaticroutes/> -->
+		<!-- <allowipsecfrags/> -->
 		<rule>
 			<type>pass</type>
 			<descr>Default LAN -&gt; any</descr>
