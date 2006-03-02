@@ -232,9 +232,13 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $session_timeout = null, $idle_timeout = null, $url_redirection = null, $session_terminate_time = null)  {
+function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes)  {
 
     global $redirurl, $g, $config;
+
+    // Ensure we create an array if we are missing attributes
+    if (!is_array($attributes))
+        $attributes = array();
 
     if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($clientuser != 'unauthenticated'))
         kick_concurrent_logins($clientuser);
@@ -286,7 +290,7 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $sessio
 
     /* encode password in Base64 just in case it contains commas */
     $bpassword = base64_encode($password);
-    $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $clientuser, $sessionid, $bpassword, $session_timeout, $idle_timeout, $session_terminate_time);
+    $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $clientuser, $sessionid, $bpassword, $attributes['session_timeout'], $attributes['idle_timeout'], $attributes['session_terminate_time']);
 
     /* rewrite information to database */
     captiveportal_write_db($cpdb);

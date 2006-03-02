@@ -798,10 +798,7 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                     $clientmac,
                     $username,
                     $password,
-                    $auth_list['session_timeout'],
-                    $auth_list['idle_timeout'],
-                    $auth_list['url_redirection'],
-                    $auth_list['session_terminate_time']);
+                    $auth_list);
 
         if ($radacct_enable) {
             $auth_list['acct_val'] = RADIUS_ACCOUNTING_START($next_ruleno,
