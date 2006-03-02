@@ -232,7 +232,7 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes)  {
+function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null)  {
 
     global $redirurl, $g, $config;
 
