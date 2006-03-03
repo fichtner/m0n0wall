@@ -542,10 +542,10 @@ class Auth_RADIUS extends PEAR {
                     }
                 }
 
-                if ($vendor == RADIUS_VENDOR_BAY) {
+                if ($vendor == 1584) {
 
                     switch ($attrv) {
-                    case RADIUS_BAY_CES_GROUP:
+                    case 102:
                         $this->attributes['ces_group'] = radius_cvt_string($datav);
                         break;
                     }

@@ -290,7 +290,10 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
 
     /* encode password in Base64 just in case it contains commas */
     $bpassword = base64_encode($password);
-    $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $clientuser, $sessionid, $bpassword, $attributes['session_timeout'], $attributes['idle_timeout'], $attributes['session_terminate_time']);
+    $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $clientuser, $sessionid, $bpassword,
+            $attributes['session_timeout'],
+            $attributes['idle_timeout'],
+            $attributes['session_terminate_time']);
 
     /* rewrite information to database */
     captiveportal_write_db($cpdb);

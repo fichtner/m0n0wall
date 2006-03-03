@@ -279,6 +279,13 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
 
 function gigawords($bytes) {
 
+
+    /*
+     * RFC2866 Specifies a 32bit unsigned integer, so it should be 4294967295
+     * Note that most NAS actually wrap @ 32bit signed which means 2GB.
+     * The put_int function also is 32bit signed so we are forced to wrap @2GB
+     */
+
     // We use BCMath functions since normal integers don't work with so large numbers
     $gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 2147483647) ;
 
