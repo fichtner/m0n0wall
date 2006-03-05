@@ -281,13 +281,12 @@ function gigawords($bytes) {
 
 
     /*
-     * RFC2866 Specifies a 32bit unsigned integer, so it should be 4294967295
-     * Note that most NAS actually wrap @ 32bit signed which means 2GB.
-     * The put_int function also is 32bit signed so we are forced to wrap @2GB
+     * RFC2866 Specifies a 32bit unsigned integer, which is a max of 4294967295
+     * Currently there is a fault in the PECL radius_put_int function which can handle only 32bit signed integer.
      */
 
     // We use BCMath functions since normal integers don't work with so large numbers
-    $gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 2147483647) ;
+    $gigawords = bcdiv( bcsub( $bytes, remainder($bytes) ) , 4294967295) ;
 
     // We need to manually set this to a zero instead of NULL for put_int() safety
     if (is_null($gigawords)) {
@@ -301,7 +300,7 @@ function gigawords($bytes) {
 function remainder($bytes) {
 
     // Calculate the bytes we are going to send to the radius
-    $bytes = bcmod($bytes, 2147483647);
+    $bytes = bcmod($bytes, 4294967295);
 
     if (is_null($bytes)) {
         $bytes = 0;
