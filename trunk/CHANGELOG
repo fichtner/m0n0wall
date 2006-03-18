@@ -3,6 +3,17 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added "support for 3rd DNS server" (jdegraeve)
+
+- updated radius_accounting.inc to PECL (jdegraeve)
+  - Now sends NAS-IP-Address (based on actual WAN-address) and NAS-Identifier cleanly
+  - Each gigawords value now counts as 4GB instead of 2GB
+
+- changes in Captive portal (jdegraeve):
+  - Cleanup and code added to allow FUTURE stuff like volume limits etc. to be implemented
+  - Added User Volume Stats in captive portal status page
+  - RADIUS mac authentication now works on local subnet even if "Disable MAC filtering" is activated
+
 - added "disable port mapping" option to advanced outbound NAT (helps with certain IPsec
   VPN gateways that insist on the IKE source port being 500) (mkasper)
 
