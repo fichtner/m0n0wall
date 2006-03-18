@@ -113,20 +113,20 @@ function filter_flush_state_table() {
 	return mwexec("/sbin/ipf -FS");
 }
 
-function filter_nat_rules_generate_if($if, $src, $dst, $target) {
+function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true) {
 
 	if ($target)
 		$tgt = $target . "/32";
 	else
 		$tgt = "0/32";
-
-	$natrule = <<<EOD
-map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp
-map $if $src $dst -> {$tgt} portmap tcp/udp auto
-map $if $src $dst -> {$tgt}
-
-EOD;
-
+	
+	$natrule = "map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp\n";
+	
+	if ($portmap)
+		$natrule .= "map $if $src $dst -> {$tgt} portmap tcp/udp auto\n";
+	
+	$natrule .= "map $if $src $dst -> {$tgt}\n";
+	
 	return $natrule;
 }
 
@@ -183,7 +183,7 @@ function filter_nat_rules_generate() {
 					$natif = $config['interfaces'][$obent['interface']]['if'];
 				
 				$natrules .= filter_nat_rules_generate_if($natif, $src, $dst,
-					$obent['target']);
+					$obent['target'], !isset($obent['noportmap']));
 			}
 		}	
 	} else {

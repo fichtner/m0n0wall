@@ -331,6 +331,7 @@
 				</destination>
 				<target>xxx.xxx.xxx.xxx</target>
 				<descr></descr>
+				<noportmap/>
 			</rule>
 		</advancedoutbound>
 		-->

@@ -3,6 +3,13 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added "disable port mapping" option to advanced outbound NAT (helps with certain IPsec
+  VPN gateways that insist on the IKE source port being 500) (mkasper)
+
+- updated PHP to 4.4.2 (mkasper)
+
+- updated ipsec-tools to 0.6.5 (fixes problem with /32 subnets) (mkasper)
+
 - added option to System: Advanced page to allow IPsec/ESP-encrypted IP fragments to be passed (mkasper)
 
 - added DHCP/interface route fix for UK ADSL half-bridge modems (DSL-300T, X-modem) (mkasper)

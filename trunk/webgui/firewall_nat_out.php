@@ -128,7 +128,7 @@ if ($_GET['act'] == "del") {
                   <td width="5%" class="list"></td>
                 </tr>
               <?php $i = 0; foreach ($a_out as $natent): ?>
-                <tr> 
+                <tr valign="top"> 
                   <td class="listlr">
                     <?php
 					if (!$natent['interface'] || ($natent['interface'] == "wan"))
@@ -157,6 +157,9 @@ if ($_GET['act'] == "del") {
                           echo "*";
                       else
                           echo $natent['target'];
+                         
+                      if (isset($natent['noportmap']))
+                          echo "<br>(no portmap)";
                     ?>
                   </td>
                   <td class="listbg"> 

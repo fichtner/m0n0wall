@@ -67,11 +67,13 @@ if (isset($id) && $a_out[$id]) {
 	if (!$pconfig['interface'])
 		$pconfig['interface'] = "wan";
     $pconfig['descr'] = $a_out[$id]['descr'];
+    $pconfig['noportmap'] = isset($a_out[$id]['noportmap']);
 } else {
     $pconfig['source_subnet'] = 24;
     $pconfig['destination'] = "any";
     $pconfig['destination_subnet'] = 24;
 	$pconfig['interface'] = "wan";
+    $pconfig['noportmap'] = false;
 }
 
 if ($_POST) {
@@ -152,6 +154,7 @@ if ($_POST) {
         $natent['descr'] = $_POST['descr'];
         $natent['target'] = $_POST['target'];
         $natent['interface'] = $_POST['interface'];
+        $natent['noportmap'] = $_POST['noportmap'] ? true : false;
         
         if ($ext == "any")
             $natent['destination']['any'] = true;
@@ -276,6 +279,16 @@ function typesel_change() {
 <input name="target" type="text" class="formfld" id="target" size="20" value="<?=htmlspecialchars($pconfig['target']);?>">
                     <br>
                      <span class="vexpl">Packets matching this rule will be mapped to the IP address given here. Leave blank to use the selected interface's IP address.</span></td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Portmap</td>
+                  <td width="78%" class="vtable">
+					<input name="noportmap" type="checkbox" id="noportmap" value="1" <?php if ($pconfig['noportmap']) echo "checked"; ?>> <strong>Disable port mapping</strong>
+                    <br>
+                     <span class="vexpl">This option disables remapping of the source port number for outbound packets. This may help with software
+                     	that insists on the source ports being left unchanged when applying NAT (such as some IPsec VPN gateways). However,
+                     	with this option enabled, two clients behind NAT cannot communicate with the same server at the same time using the
+                     	same source ports.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>
