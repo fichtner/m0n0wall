@@ -163,9 +163,10 @@ require("guiconfig.inc");
               Paul Taylor (<a href="mailto:paultaylor@winn-dixie.com">paultaylor@winn-dixie.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">ARP table, Traceroute and Filter state pages</font></em><br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: disable concurrent logins, file manager</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Webgui users/groups</font></em><br>
 			  <br>
               Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">complete captive portal RADIUS overhaul; file manager</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">complete captive portal RADIUS overhaul, file manager</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -224,10 +225,6 @@ All rights reserved.<br>
               <br>
               BPALogin (<a href="http://bpalogin.sourceforge.net/" target="_blank">http://bpalogin.sourceforge.net</a>) - lightweight portable BIDS2 login client<br>
               Copyright &copy; 2001-3 Shane Hyde, and others.<br>
-              <br>
-              php-radius (<a href="http://www.mavetju.org/programming/php.php" target="_blank">http://www.mavetju.org/programming/php.php</a>)<br>
-              Copyright 2000, 2001, 2002 by Edwin Groothuis. All rights reserved.<br>
-			  This product includes software developed by Edwin Groothuis.<br>
 			  <br>
 			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
 			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;<br>
