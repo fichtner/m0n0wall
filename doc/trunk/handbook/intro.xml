@@ -469,8 +469,9 @@
 
       <para>Rudi van Drunen (r.van.drunen at xs4all dot nl) with thanks to
       Manuel Kasper, Edwin Kremer, PicoBSD, Matt Simerson and John Voight:
-      m0n0wall Hackers Guide, used as the basis for the <link
-      linkend="Dev">Development</link> chapter.</para>
+      m0n0wall Hackers Guide, used as the basis for the old Development
+      chapter, now part of the <ulink url="http://doc.m0n0.ch/dev/">m0n0wall
+      Developers' Handbook</ulink>.</para>
 
       <para>Francisco Artes (falcor at netassassin.com): <link
       linkend="IPsec">IPsec</link> and <link linkend="PPTP">PPTP</link>
