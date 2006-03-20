@@ -194,11 +194,9 @@
         high end than the WRAP and Soekris platforms, and hence are much
         more costly.  There are a number of different configurations
         available, with prices starting over $500 USD for the most
-        basic model.  Contact NexCom for pricing.  </para>
-        
+        basic model.  Contact NexCom for pricing.  </para>    
     </sect2>
-    
-    
+
   </sect1>
   
   <sect1>
@@ -217,7 +215,7 @@
     
     <para>If you plan to use m0n0wall in VMware for testing purposes, we suggest
     using Chris Buechler's pre-configured <ulink
-    url="http://chrisbuechler.com/index.php?id=18">m0n0wall VMware images</ulink>.
+    url="http://chrisbuechler.com/m0n0wall/vmware/">m0n0wall VMware images</ulink>.
     </para>
     
     <para>For using m0n0wall in MS VPC or VS, you may want to check out the
@@ -393,7 +391,7 @@
         
         <para><emphasis role="bold">Currently all g, b/g, and a/b/g wireless cards are incompatible
         with m0n0wall.</emphasis>  These require drivers that are only found in FreeBSD 5.x and 6.x,
-        while m0n0wall is on 4.11.  They will be supported when m0n0wall is <link linkend="FAQ.FBSD5">
+        while m0n0wall is on 4.11.  They will be supported when m0n0wall is <link linkend="FAQ.FreeBSDversion">
         on a newer version of FreeBSD</link>.</para>
         
     </sect2>
