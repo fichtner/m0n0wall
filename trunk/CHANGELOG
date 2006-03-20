@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added Role-based Access to WebGUI (ptaylor)
+  - added Group and User Manager pages
+  - updated menu system to be dynamic depending upon permissions of active user 
+
 - added "support for 3rd DNS server" (jdegraeve)
 
 - updated radius_accounting.inc to PECL (jdegraeve)
