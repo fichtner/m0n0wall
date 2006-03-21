@@ -555,7 +555,7 @@ EOD;
 					$mpdconf .= " " . $syscfg['dnsserver'][0];
 				$mpdconf .= "\n";
 			} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-				$mpdconf .= "	set ipcp dns " . join(" ", $syscfg['dnsserver']) . "\n";
+				$mpdconf .= "	set ipcp dns " . join(" ", array_slice($syscfg['dnsserver'], 0, 2)) . "\n";
 			}
 			
 			if (isset($pptpdcfg['radius']['enable'])) {

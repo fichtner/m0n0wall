@@ -57,7 +57,7 @@ if (isset($_GET['dup'])) {
 function is_specialnet($net) {
 	global $specialsrcdst;
 	
-	if (in_array($net, $specialsrcdst) || strstr($net, "opt"))
+	if (in_array($net, $specialsrcdst) || (strstr($net, "opt") && !is_alias($net)))
 		return true;
 	else
 		return false;
