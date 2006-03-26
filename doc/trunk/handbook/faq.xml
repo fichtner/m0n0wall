@@ -1401,5 +1401,36 @@ that issue is settled as far as I'm concerned.
 	and enhancements.</para>
 
     </sect1>
+
+  
+  <sect1>
+    <?dbhtml filename="faq-state-table-size.html"?>
+    <title>How can I increase the size of the state table?</title>
+    
+    <para>m0n0wall's default firewall state table is limited to 30,000 states.
+    This is sufficient for the vast majority of firewalls, and extra states
+    may require more RAM than exists in some m0n0wall installations.  
+    </para>
+    
+    <para>Unfortunately, to increase the size of the state table you have to recompile
+    the kernel.  See <ulink url="http://doc.m0n0.ch/dev/image-guide.html">The complete
+    guide to building a m0n0wall image from scratch</ulink> in the <ulink url="http://doc.m0n0.ch/dev/">
+    m0n0wall Developers' Handbook</ulink>.</para>
+    
+    <note>
+        This is <emphasis>rarely</emphasis> necessary.  Unless you have a very fast and
+        heavily loaded Internet connection, or 10+ Mb of certain types of peer to peer
+        traffic, chances are you will never exceed 30,000 states.  The number of states
+        required by a given environment will vary dramatically.  50 Mbps of HTTP, SMTP,
+        POP3, and IMAP traffic might only take 20,000 states, but 50 Mbps of peer to
+        peer traffic from dozens of machines might take more than a million states.  
+    </note>
+    
+    <para>If you find you cannot create new connections to the Internet from any machine,
+    but existing connections all work properly, you may have exhausted your state table.
+    </para>
+
+  </sect1>
+
    
 </chapter>
