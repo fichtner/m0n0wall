@@ -1238,8 +1238,8 @@ freebsd-small), and every better MUA has got a "Reply All" function, so
 that issue is settled as far as I'm concerned.
     </literallayout></blockquote>
     
-    <para>Also see <ulink url="http://www.unicom.com/pw/reply-to-harmful.html">
-        http://www.unicom.com/pw/reply-to-harmful.html</ulink>.</para>
+    <para>Also see <ulink url="http://producingoss.com/html-chunk/mailing-lists.html#reply-to">The Great Reply-to Debate</ulink>
+    in the book <ulink url="http://producingoss.com/">Producing Open Source Software</ulink>.  </para>
     
   </sect1>
   
