@@ -11,7 +11,7 @@ $Id$
 
 - updated radius_accounting.inc to PECL (jdegraeve)
   - Now sends NAS-IP-Address (based on actual WAN-address) and NAS-Identifier cleanly
-  - Each gigawords value now counts as 4GB instead of 2GB
+  - Each gigawords value now counts as 4GB instead of 2GB (See RFC 2866 section 5)
 
 - changes in Captive portal (jdegraeve):
   - Cleanup and code added to allow FUTURE stuff like volume limits etc. to be implemented
