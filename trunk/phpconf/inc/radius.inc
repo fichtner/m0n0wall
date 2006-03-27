@@ -198,7 +198,8 @@ class Auth_RADIUS extends PEAR {
 
         switch ($type) {
         case 'integer':
-            return radius_put_int($this->res, $attrib, $value);
+            // Fix a conversion error so we should be able to handle 4GB values
+            return radius_put_int($this->res, $attrib, (float)$value);
 
         case 'addr':
             return radius_put_addr($this->res, $attrib, $value);
