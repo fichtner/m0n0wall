@@ -298,12 +298,15 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
     /* rewrite information to database */
     captiveportal_write_db($cpdb);
 
+    /* Builtin wrap safety for allowedip */
+    $allowedipno = (is_array($config['captiveportal']['allowedip'])) ? count($config['captiveportal']['allowedip']) : 0;
+
     /* write next rule number */
     $fd = @fopen("{$g['vardb_path']}/captiveportal.nextrule", "w");
     if ($fd) {
         $ruleno++;
         if ($ruleno > 19899)
-            $ruleno = 10000;    /* wrap around */
+            $ruleno = 10000 + $allowedipno;    /* wrap around */
         fwrite($fd, $ruleno);
         fclose($fd);
     }
