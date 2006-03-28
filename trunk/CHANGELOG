@@ -17,6 +17,8 @@ $Id$
   - Cleanup and code added to allow FUTURE stuff like volume limits etc. to be implemented
   - Added User Volume Stats in captive portal status page
   - RADIUS mac authentication now works on local subnet even if "Disable MAC filtering" is activated
+  - Firewall ruleno should now wrap more cleanly when having lots of sessions, REBOOT after you change CP Allowed-ip-addresses
+  - fixed bug in RADIUS Session-Timeout handling so it'll also work even if reauthentication is disabled
 
 - added "disable port mapping" option to advanced outbound NAT (helps with certain IPsec
   VPN gateways that insist on the IKE source port being 500) (mkasper)
@@ -30,9 +32,6 @@ $Id$
 - added DHCP/interface route fix for UK ADSL half-bridge modems (DSL-300T, X-modem) (mkasper)
 
 - fixed check for overlapping external port ranges when editing inbound NAT entries (mkasper)
-
-- fixed captive portal RADIUS Session-Timeout so that it'll also work even
-  if reauthentication is disabled (jdegraeve)
 
 - log captive portal logins even when authentication is disabled (mkasper)
 
