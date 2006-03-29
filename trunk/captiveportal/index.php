@@ -74,7 +74,6 @@ $clientmac = arp_get_mac_by_ip($clientip);
 if (!$clientmac && $macfilter) {
     /* unable to find MAC address - shouldn't happen! - bail out */
     captiveportal_logportalauth("unauthenticated","noclientmac",$clientip,"ERROR");
-    /* We should return an error page to the client explaining what went wrong instead of exiting */
     exit;
 }
 
@@ -147,7 +146,7 @@ EOD;
                 $moddb = true;
             }
         }
-        if ($moddb)
+        if ($moddb)portal_reply_page($redirurl, "error", $auth_list['error']);
             write_config();
             
         $userdb = &$config['captiveportal']['user'];
@@ -232,7 +231,7 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null)  {
+function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null, $ruleno = null)  {
 
     global $redirurl, $g, $config;
 
@@ -244,27 +243,35 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
         kick_concurrent_logins($clientuser);
 
     captiveportal_lock();
-    
-    $ruleno = get_next_ipfw_ruleno();
+
+    /* if no ruleno is passed to this function we will look one up in the pool */
+    $ruleno = (!is_null($ruleno)) ? $ruleno : captiveportal_get_next_ipfw_ruleno();
+
+    /* if the pool is empty, return appropriate message and exit */
+    if (is_null($ruleno)) {
+        portal_reply_page($redirurl, "error", "System reached maximum login capacity");
+        captiveportal_unlock();
+        exit;
+    }
 
     /* generate unique session ID */
     $tod = gettimeofday();
     $sessionid = substr(md5(mt_rand() . $tod['sec'] . $tod['usec'] . $clientip . $clientmac), 0, 16);
-    
+
     /* add ipfw rules for layer 3 */
     exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
     exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to $clientip out");
-    
+
     /* add ipfw rules for layer 2 */
     if (!isset($config['captiveportal']['nomacfilter'])) {
         $l2ruleno = $ruleno + 10000;
         exec("/sbin/ipfw add $l2ruleno set 3 deny all from $clientip to any not MAC any $clientmac layer2 in");
         exec("/sbin/ipfw add $l2ruleno set 3 deny all from any to $clientip not MAC $clientmac any layer2 out");
     }
-    
+
     /* read in client database */
     $cpdb = captiveportal_read_db();
-    
+
     $radiusservers = captiveportal_get_radius_servers();
 
     /* find an existing entry and delete it */
@@ -286,7 +293,7 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
             unset($cpdb[$i]);
             break;
         }
-    }    
+    }
 
     /* encode password in Base64 just in case it contains commas */
     $bpassword = base64_encode($password);
@@ -298,21 +305,8 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
     /* rewrite information to database */
     captiveportal_write_db($cpdb);
 
-    /* Builtin wrap safety for allowedip */
-    $allowedipno = (is_array($config['captiveportal']['allowedip'])) ? count($config['captiveportal']['allowedip']) : 0;
-
-    /* write next rule number */
-    $fd = @fopen("{$g['vardb_path']}/captiveportal.nextrule", "w");
-    if ($fd) {
-        $ruleno++;
-        if ($ruleno > 19899)
-            $ruleno = 10000 + $allowedipno;    /* wrap around */
-        fwrite($fd, $ruleno);
-        fclose($fd);
-    }
-    
     captiveportal_unlock();
-    
+
     /* redirect user to desired destination */
     if ($url_redirection)
         $my_redirurl = $url_redirection;
@@ -320,14 +314,14 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
         $my_redirurl = $config['captiveportal']['redirurl'];
     else
         $my_redirurl = $redirurl;
-    
+
     if(isset($config['captiveportal']['logoutwin_enable'])) {
-        
+
         if (isset($config['captiveportal']['httpslogin']))
             $logouturl = "https://{$config['captiveportal']['httpsname']}:8001/";
         else
             $logouturl = "http://{$config['interfaces'][$config['captiveportal']['interface']]['ipaddr']}:8000/";
-        
+
         echo <<<EOD
 <HTML>
 <HEAD><TITLE>Redirecting...</TITLE></HEAD>
@@ -433,17 +427,5 @@ function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1
     captiveportal_unlock();
 }
 
-function get_next_ipfw_ruleno() {
-
-    global $g;
-
-    /* get next ipfw rule number */
-    if (file_exists("{$g['vardb_path']}/captiveportal.nextrule"))
-        $ruleno = trim(file_get_contents("{$g['vardb_path']}/captiveportal.nextrule"));
-    if (!$ruleno)
-        $ruleno = 10000;    /* first rule number */
-
-    return $ruleno;
-}
 
 ?>

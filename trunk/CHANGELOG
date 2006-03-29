@@ -17,8 +17,8 @@ $Id$
   - Cleanup and code added to allow FUTURE stuff like volume limits etc. to be implemented
   - Added User Volume Stats in captive portal status page
   - RADIUS mac authentication now works on local subnet even if "Disable MAC filtering" is activated
-  - Firewall ruleno should now wrap more cleanly when having lots of sessions, REBOOT after you change CP Allowed-ip-addresses
-  - fixed bug in RADIUS Session-Timeout handling so it'll also work even if reauthentication is disabled
+  - Firewall ruleno now uses a more intelligent pool, this fixes a bug where a ruleno could be used even if it is already been assigned
+  - Fixed bug in RADIUS Session-Timeout handling so it'll also work even if reauthentication is disabled
 
 - added "disable port mapping" option to advanced outbound NAT (helps with certain IPsec
   VPN gateways that insist on the IKE source port being 500) (mkasper)
