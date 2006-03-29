@@ -166,7 +166,8 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Webgui users/groups</font></em><br>
 			  <br>
               Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">complete captive portal RADIUS overhaul, file manager</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Complete captive portal RADIUS overhaul, cleanup</font></em></p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: file manager, volume stats, FW rulepool (virtual port pool)</font></em></p>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
