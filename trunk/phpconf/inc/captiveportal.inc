@@ -892,7 +892,7 @@ function captiveportal_write_elements() {
  *
  */
 
-function captiveportal_get_next_ipfw_ruleno($rulenos_start = 10000) {
+function captiveportal_get_next_ipfw_ruleno($rulenos_start = 10000, $rulenos_range_max = 9899) {
 
     exec("/sbin/ipfw show", $fwrules);
     foreach ($fwrules as $fwrule) {
@@ -900,7 +900,11 @@ function captiveportal_get_next_ipfw_ruleno($rulenos_start = 10000) {
         $rulenos_used[] = $matches[1];
     }
     $rulenos_used = array_unique($rulenos_used);
-    $rulenos_pool = range($rulenos_start, ($rulenos_start + count($rulenos_used)));
+    $rulenos_range = count($rulenos_used);
+    if ($rulenos_range > $rulenos_range_max) {
+        return NULL;
+    }
+    $rulenos_pool = range($rulenos_start, ($rulenos_start + $rulenos_range));
     $rulenos_free = array_diff($rulenos_pool, $rulenos_used);
     $ruleno = array_shift($rulenos_free);
 
