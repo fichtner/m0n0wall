@@ -892,15 +892,15 @@ function captiveportal_write_elements() {
  *
  */
 
-function captiveportal_get_next_ipfw_ruleno() {
+function captiveportal_get_next_ipfw_ruleno($rulenos_start = 10000) {
 
     exec("/sbin/ipfw show", $fwrules);
     foreach ($fwrules as $fwrule) {
         preg_match("/^(\d+)\s+/", $fwrule, $matches);
         $rulenos_used[] = $matches[1];
     }
-    $rulenos_pool = range(10000, 19899);
     $rulenos_used = array_unique($rulenos_used);
+    $rulenos_pool = range($rulenos_start, ($rulenos_start + count($rulenos_used)));
     $rulenos_free = array_diff($rulenos_pool, $rulenos_used);
     $ruleno = array_shift($rulenos_free);
 
