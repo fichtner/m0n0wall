@@ -231,7 +231,7 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null, $ruleno = null)  {
+function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null)  {
 
     global $redirurl, $g, $config;
 
@@ -244,8 +244,7 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
 
     captiveportal_lock();
 
-    /* if no ruleno is passed to this function we will look one up in the pool */
-    $ruleno = (!is_null($ruleno)) ? $ruleno : captiveportal_get_next_ipfw_ruleno();
+    $ruleno = captiveportal_get_next_ipfw_ruleno();
 
     /* if the pool is empty, return appropriate message and exit */
     if (is_null($ruleno)) {

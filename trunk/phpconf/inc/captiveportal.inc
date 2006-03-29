@@ -801,8 +801,7 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                     $clientmac,
                     $username,
                     $password,
-                    $auth_list,
-                    $ruleno);
+                    $auth_list);
 
         if ($radacct_enable) {
             $auth_list['acct_val'] = RADIUS_ACCOUNTING_START($ruleno,
