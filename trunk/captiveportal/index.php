@@ -129,7 +129,7 @@ EOD;
         captiveportal_logportalauth($_POST['auth_user'],$clientmac,$clientip,"ERROR");
         portal_reply_page($redirurl, "error");
     }
-    
+
 } else if ($_POST['accept'] && $config['captiveportal']['auth_method'] == "local") {
 
     //check against local usermanager
@@ -146,11 +146,11 @@ EOD;
                 $moddb = true;
             }
         }
-        if ($moddb)portal_reply_page($redirurl, "error", $auth_list['error']);
+        if ($moddb)
             write_config();
-            
+
         $userdb = &$config['captiveportal']['user'];
-        
+
         for ($i = 0; $i < count($userdb); $i++) {
             if (($userdb[$i]['name'] == $_POST['auth_user']) && ($userdb[$i]['password'] == md5($_POST['auth_pass']))) {
                 $loginok = true;
