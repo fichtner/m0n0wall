@@ -281,7 +281,9 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
                                        $cpdb[$i][4], // username
                                        $cpdb[$i][5], // sessionid
                                        $cpdb[$i][0], // start time
-                                       $radiusservers,
+                                       $radiusservers[0]['ipaddr'],
+                                       $radiusservers[0]['acctport'],
+                                       $radiusservers[0]['key'],
                                        $cpdb[$i][2], // clientip
                                        $cpdb[$i][3], // clientmac
                                        13); // Port Preempted
@@ -404,7 +406,9 @@ function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1
                                        $cpdb[$i][4], // username
                                        $cpdb[$i][5], // sessionid
                                        $cpdb[$i][0], // start time
-                                       $radiusservers,
+                                       $radiusservers[0]['ipaddr'],
+                                       $radiusservers[0]['acctport'],
+                                       $radiusservers[0]['key'],
                                        $cpdb[$i][2], // clientip
                                        $cpdb[$i][3], // clientmac
                                        $term_cause);

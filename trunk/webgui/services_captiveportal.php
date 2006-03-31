@@ -409,7 +409,7 @@ to access after they've authenticated.</td>
 				<td class="vncell">&nbsp;</td>
 				<td class="vtable"><input name="radacct_enable" type="checkbox" id="radacct_enable" value="yes" onClick="enable_change(false)" <?php if($pconfig['radacct_enable']) echo "checked"; ?>>
 				<strong>send RADIUS accounting packets</strong><br>
-				If this is enabled, RADIUS accounting packets will be sent to the RADIUS server(s).</td>
+				If this is enabled, RADIUS accounting packets will be sent to the primary RADIUS server.</td>
 			</tr>
 			<tr>
 			  <td class="vncell" valign="top">Accounting port</td>
