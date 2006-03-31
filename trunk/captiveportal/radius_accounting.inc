@@ -43,7 +43,7 @@ RADIUS ACCOUNTING START
 -----------------------
 */
 
-function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusport,$radiuskey,$clientip,$clientmac) {
+function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusservers,$clientip,$clientmac) {
 
     global $config;
 
@@ -67,6 +67,14 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
     // Create our instance
     $racct = new Auth_RADIUS_Acct_Start;
 
+    // Initialise our server
+    foreach ($radiusservers as $radsrv) {
+
+        // Add a new server to our instance
+        $racct->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
+
+    }
+
     /* Different Authentication options
      *
      * Its possible todo other authentication methods but still do radius accounting
@@ -80,7 +88,6 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
 
     // Construct data package
     $racct->username = $username;
-    $racct->addServer($radiusip, $radiusport, $radiuskey);
 
     if (PEAR::isError($racct->start())) {
         $retvalue['acct_val'] = 1;
@@ -91,14 +98,6 @@ function RADIUS_ACCOUNTING_START($ruleno,$username,$sessionid,$radiusip,$radiusp
         $racct->close();
         return $retvalue;
 
-        /* Old code:
-         * $status = $racct->start();
-         * if(PEAR::isError($status)) {
-         *    if ($debug)
-         *        printf("Radius start: %s<br>\n", $status->getMessage());
-         *        exit;
-         * }
-         */
     }
 
     /*
@@ -149,7 +148,7 @@ RADIUS ACCOUNTING STOP/UPDATE
 -----------------------------
 */
 
-function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusip,$radiusport,$radiuskey,$clientip,$clientmac, $term_cause = 1, $interimupdate=false,$stop_time = null) {
+function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radiusservers,$clientip,$clientmac, $term_cause = 1, $interimupdate=false,$stop_time = null) {
 
     global $config;
 
@@ -183,26 +182,19 @@ function RADIUS_ACCOUNTING_STOP($ruleno,$username,$sessionid,$start_time,$radius
     else
         $racct = new Auth_RADIUS_Acct_Stop;
 
-    /*
-     * Currently disabled
-    Add support for more then one radiusserver. 
-    At most 10 servers may be specified. 
-    When multiple servers are given, they are tried in round-robin fashion until a valid response is received 
-
+    // Initialise our server
     foreach ($radiusservers as $radsrv) {
 
         // Add a new server to our instance
         $racct->addServer($radsrv['ipaddr'], $radsrv['port'], $radsrv['key']);
 
     }
-    */
 
     // See RADIUS_ACCOUNTING_START for info
     $racct->authentic = RADIUS_AUTH_RADIUS;
 
     // Construct data package
     $racct->username = $username;
-    $racct->addServer($radiusip, $radiusport, $radiuskey);
     // Set session_time
     $racct->session_time = $session_time;
 
