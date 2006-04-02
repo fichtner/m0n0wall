@@ -1,0 +1,29 @@
+diff -u -r sys/boot.orig/i386/boot2/boot1.s sys/boot/i386/boot2/boot1.s
+--- sys/boot.orig/i386/boot2/boot1.s	Wed Aug 15 00:55:29 2001
++++ sys/boot/i386/boot2/boot1.s	Sat Apr 30 10:14:27 2005
+@@ -297,8 +297,11 @@
+ 		subb %ah,%al			# Sectors this track
+ 		mov 0x2(%bp),%ah		# Blocks to read
+ 		cmpb %ah,%al			# To read
+-		jb read.2			#  this
+-		movb %ah,%al			#  track
++#		jb read.2			#  this
++#		movb %ah,%al			#  track
++		movb $1,%al
++		nop
++		nop
+ read.2: 	mov $0x5,%di	 		# Try count
+ read.3: 	les 0x4(%bp),%bx		# Transfer buffer
+ 		push %ax			# Save
+diff -u -r sys/boot.orig/i386/libi386/biosdisk.c sys/boot/i386/libi386/biosdisk.c
+--- sys/boot.orig/i386/libi386/biosdisk.c	Wed Jan 28 17:28:50 2004
++++ sys/boot/i386/libi386/biosdisk.c	Sat Apr 30 10:13:31 2005
+@@ -846,6 +846,8 @@
+ 	maxfer = 0;
+     }
+     
++    maxfer = 1;
++    
+     while (resid > 0) {
+ 	x = dblk;
+ 	cyl = x / bpc;			/* block # / blocks per cylinder */
