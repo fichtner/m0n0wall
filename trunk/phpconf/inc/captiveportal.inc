@@ -793,7 +793,7 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                     $radiusservers,
                     $clientip,
                     $clientmac,
-                    $next_ruleno);
+                    $ruleno);
 
     if ($auth_list['auth_val'] == 2) {
         captiveportal_logportalauth($username,$clientmac,$clientip,$type);
