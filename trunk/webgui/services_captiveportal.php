@@ -478,7 +478,7 @@ to access after they've authenticated.</td>
 						echo "<option value=\"$radiusvendor\">$radiusvendor</option>\n";
 				}
 				?></select><br>
-				If RADIUS type is set to Cisco, in RADIUS-Requests (Authentication/Accounting) the value of Calling-Station-Id will be set to the client's IP address and
+				If RADIUS type is set to Cisco, in RADIUS requests (Authentication/Accounting) the value of Calling-Station-Id will be set to the client's IP address and
 				the Called-Station-Id to the client's MAC address. Default behaviour is Calling-Station-Id = client's MAC address and Called-Station-Id = m0n0wall's WAN MAC address.</td>
 			</tr>
 		</table>
@@ -544,7 +544,7 @@ Example code for the form:<br>
 		<?php endif; ?>
 The contents of the HTML file that you upload here are displayed when an authentication error occurs.
 You may include &quot;$PORTAL_MESSAGE$&quot;, which will be replaced by the error or reply messages from the RADIUS server, if any.
-Its also possible to include a new login form in the error page for a direct user relogin possibility</td>
+You may also include a new login form in the error page to allow the user to attempt another login directly.</td>
 	</tr>
 	<tr> 
 	  <td width="22%" valign="top">&nbsp;</td>
