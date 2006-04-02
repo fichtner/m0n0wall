@@ -25,6 +25,21 @@
 			<noantilockout></noantilockout>
 			-->
 		</webgui>
+		<!--
+		<user>
+			<name></name>
+			<fullname></fullname>
+			<groupname></groupname>
+			<password></password>
+		</user>
+		-->
+		<!--
+		<group>
+			<name></name>
+			<description></description>
+			<pages></pages>
+		</group>
+		-->
 		<!-- <disableconsolemenu/> -->
 		<!-- <disablefirmwarecheck/> -->
 		<!-- <shellcmd></shellcmd> -->
