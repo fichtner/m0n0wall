@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- updated base system to FreeBSD 4.11-RELEASE-p16 (mkasper)
+
+- updated Dnsmasq to 2.27
+
 - added Role-based Access to WebGUI (ptaylor)
   - added Group and User Manager pages
   - updated menu system to be dynamic depending upon permissions of active user 
