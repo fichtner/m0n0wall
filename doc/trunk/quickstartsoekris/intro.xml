@@ -77,7 +77,19 @@
             <para>Soekris power adapter</para>
         </listitem>
         <listitem>
-            <para>Compact Flash card at least 8 MB in size</para>
+          <para>Compact Flash card at least 8 MB in size</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>for best reliability, use a recognized brand, such as
+              SanDisk</para>
+            </listitem>
+
+            <listitem>
+              <para>one user also reported that Dane-Elec Compact Flash cards
+              fail to work properly in net45xx systems</para>
+            </listitem>
+          </itemizedlist>
         </listitem>
         <listitem>
             <para>Compact Flash card reader/writer for another
