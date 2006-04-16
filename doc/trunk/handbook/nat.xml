@@ -120,7 +120,7 @@
     
     <sect1>
       <?dbhtml filename="nat-choosing.html"?>
-      <title>Choosing the approprate NAT for your network</title>
+      <title>Choosing the appropriate NAT for your network</title>
       
       <para>So by now you may be thinking "so what kind of NAT do I need?", to which
       the answer is "it depends."  </para>
