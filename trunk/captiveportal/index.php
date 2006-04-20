@@ -231,20 +231,15 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null)  {
+function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null, $ruleno = null)  {
 
     global $redirurl, $g, $config;
 
-    // Ensure we create an array if we are missing attributes
-    if (!is_array($attributes))
-        $attributes = array();
-
-    if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($clientuser != 'unauthenticated'))
-        kick_concurrent_logins($clientuser);
-
-    captiveportal_lock();
-
-    $ruleno = captiveportal_get_next_ipfw_ruleno();
+    /* See if a ruleno is passed, if not start locking the sessions because this means there isn't one atm */
+    if ($ruleno == null) {
+        captiveportal_lock();
+        $ruleno = captiveportal_get_next_ipfw_ruleno();
+    }
 
     /* if the pool is empty, return appropriate message and exit */
     if (is_null($ruleno)) {
@@ -252,6 +247,29 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
         captiveportal_unlock();
         exit;
     }
+
+    // Ensure we create an array if we are missing attributes
+    if (!is_array($attributes))
+        $attributes = array();
+
+    /* read in client database */
+    $cpdb = captiveportal_read_db();
+
+    if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($clientuser != 'unauthenticated')) {
+        /* Ensure that only one username is used by one client at a time
+         * by Paul Taylor
+         */
+        if (isset($cpdb)) {
+            /* find duplicate entry */
+            for ($i = 0; $i < count($cpdb); $i++) {
+                if ($cpdb[$i][4] == $user) {
+                    /* This user was already logged in */
+                    $cpdb = disconnect_client($cpdb[$i][5],"CONCURRENT LOGIN - TERMINATING OLD SESSION",13,$cpdb);
+                }
+            }
+        }
+    }
+
 
     /* generate unique session ID */
     $tod = gettimeofday();
@@ -268,12 +286,10 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
         exec("/sbin/ipfw add $l2ruleno set 3 deny all from any to $clientip not MAC $clientmac any layer2 out");
     }
 
-    /* read in client database */
-    $cpdb = captiveportal_read_db();
-
     $radiusservers = captiveportal_get_radius_servers();
 
-    /* find an existing entry and delete it */
+    /* WHY DO WE DO THIS? WE ARE ALREADY KICKING OUT USERS WITH kick_concurrent_logins
+    find an existing entry and delete it
     for ($i = 0; $i < count($cpdb); $i++) {
         if(!strcasecmp($cpdb[$i][2],$clientip)) {
             if(isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
@@ -293,6 +309,7 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
             break;
         }
     }
+    */
 
     /* encode password in Base64 just in case it contains commas */
     $bpassword = base64_encode($password);
@@ -303,8 +320,6 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
 
     /* rewrite information to database */
     captiveportal_write_db($cpdb);
-
-    captiveportal_unlock();
 
     /* redirect user to desired destination */
     if ($url_redirection)
@@ -356,48 +371,31 @@ EOD;
     } else {
         header("Location: " . $my_redirurl); 
     }
-    
+
+    captiveportal_unlock();
     return $sessionid;
 }
 
-/* Ensure that only one username is used by one client at a time
- * by Paul Taylor
- */
-function kick_concurrent_logins($user) {
 
-    captiveportal_lock();
-
-    /* read database */
-    $cpdb = captiveportal_read_db();
-
-    captiveportal_unlock();
-
-    if (isset($cpdb)) {
-        /* find duplicate entry */
-        for ($i = 0; $i < count($cpdb); $i++) {
-            if ($cpdb[$i][4] == $user) {
-                /* This user was already logged in */
-                disconnect_client($cpdb[$i][5],"CONCURRENT LOGIN - TERMINATING OLD SESSION",13);
-            }
-        }
-    }
-}
 
 /* remove a single client by session ID
    by Dinesh Nair
  */
-function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1) {
-    
+function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1, $cpdb = null) {
+
     global $g, $config;
-    
-    captiveportal_lock();
-    
-    /* read database */
-    $cpdb = captiveportal_read_db();
-    
+
+    /* Retrieve the user database if it isn't passed through */
+    if (is_null($cpdb)) {
+        captiveportal_lock();
+        /* read database */
+        $cpdb = captiveportal_read_db();
+        $cp_unlock = true;
+    }
+
     $radiusservers = captiveportal_get_radius_servers();
-    
-    /* find entry */    
+
+    /* find entry */
     for ($i = 0; $i < count($cpdb); $i++) {
         if ($cpdb[$i][5] == $sessionid) {
             /* this client needs to be deleted - remove ipfw rules */
@@ -419,11 +417,16 @@ function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1
             break;
         }
     }
-    
-    /* rewrite information to database */
-    captiveportal_write_db($cpdb);
-    
-    captiveportal_unlock();
+
+    if ($cp_unlock) {
+        /* rewrite information to database */
+        captiveportal_write_db($cpdb);
+
+        captiveportal_unlock();
+    }
+    else {
+        return $cpdb;
+    }
 }
 
 

@@ -775,6 +775,9 @@ function captiveportal_logportalauth($user,$mac,$ip,$status, $message = null) {
 function radius($username,$password,$clientip,$clientmac,$type) {
     global $g, $config;
 
+    /* Start locking from the beginning of an authentication session */
+    captiveportal_lock();
+
     $ruleno = captiveportal_get_next_ipfw_ruleno();
 
     /* if the pool is empty, return apprioriate message and fail authentication */
@@ -782,6 +785,7 @@ function radius($username,$password,$clientip,$clientmac,$type) {
         $auth_list = array();
         $auth_list['auth_val'] = 1;
         $auth_list['error'] = "System reached maximum login capacity";
+        captiveportal_unlock();
         return $auth_list;
     }
 
@@ -801,7 +805,8 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                     $clientmac,
                     $username,
                     $password,
-                    $auth_list);
+                    $auth_list,
+                    $ruleno);
 
         if ($radacct_enable) {
             $auth_list['acct_val'] = RADIUS_ACCOUNTING_START($ruleno,
