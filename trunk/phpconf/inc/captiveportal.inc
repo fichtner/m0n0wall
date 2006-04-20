@@ -821,6 +821,9 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                 captiveportal_logportalauth($username,$clientmac,$clientip,$type,"RADIUS ACCOUNTING FAILED");
         }
     }
+    else {
+        captiveportal_unlock();
+    }
 
     return $auth_list;
 
