@@ -199,7 +199,7 @@ function portal_reply_page($redirurl, $type = null, $message = null) {
 
 function portal_mac_fixed($clientmac) {
     global $g ;
-    
+
     /* open captive portal mac db */
     if (file_exists("{$g['vardb_path']}/captiveportal_mac.db")) {
         $fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db","r") ;
@@ -216,7 +216,7 @@ function portal_mac_fixed($clientmac) {
         fclose($fd) ;
     }
     return FALSE ;
-}    
+}
 
 function portal_mac_radius($clientmac,$clientip) {
     global $config ;
@@ -231,7 +231,7 @@ function portal_mac_radius($clientmac,$clientip) {
     return FALSE;
 }
 
-function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attributes = null, $ruleno = null)  {
+function portal_allow($clientip,$clientmac,$username,$password = null, $attributes = null, $ruleno = null)  {
 
     global $redirurl, $g, $config;
 
@@ -255,68 +255,71 @@ function portal_allow($clientip,$clientmac,$clientuser,$password = null, $attrib
     /* read in client database */
     $cpdb = captiveportal_read_db();
 
-    if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($clientuser != 'unauthenticated')) {
-        /* Ensure that only one username is used by one client at a time
-         * by Paul Taylor
-         */
-        if (isset($cpdb)) {
-            /* find duplicate entry */
-            for ($i = 0; $i < count($cpdb); $i++) {
-                if ($cpdb[$i][4] == $user) {
-                    /* This user was already logged in */
-                    $cpdb = disconnect_client($cpdb[$i][5],"CONCURRENT LOGIN - TERMINATING OLD SESSION",13,$cpdb);
-                }
+    $radiusservers = captiveportal_get_radius_servers();
+
+    /* Find an existing session on a different ip with the same username */
+
+    if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($username != 'unauthenticated')) {
+       /* find duplicate entry */
+        for ($i = 0; $i < count($cpdb); $i++) {
+            if (($cpdb[$i][2] != $clientip) && ($cpdb[$i][4] == $username)) {
+                /* This user was already logged in so we disconnect the old one */
+                captiveportal_disconnect($cpdb[$i],$radiusservers, 13);
+                captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - TERMINATING OLD SESSION");
+                unset($cpdb[$i]);
+                break;
             }
         }
     }
 
-
-    /* generate unique session ID */
-    $tod = gettimeofday();
-    $sessionid = substr(md5(mt_rand() . $tod['sec'] . $tod['usec'] . $clientip . $clientmac), 0, 16);
-
-    /* add ipfw rules for layer 3 */
-    exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
-    exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to $clientip out");
-
-    /* add ipfw rules for layer 2 */
-    if (!isset($config['captiveportal']['nomacfilter'])) {
-        $l2ruleno = $ruleno + 10000;
-        exec("/sbin/ipfw add $l2ruleno set 3 deny all from $clientip to any not MAC any $clientmac layer2 in");
-        exec("/sbin/ipfw add $l2ruleno set 3 deny all from any to $clientip not MAC $clientmac any layer2 out");
-    }
-
-    $radiusservers = captiveportal_get_radius_servers();
-
-    /* WHY DO WE DO THIS? WE ARE ALREADY KICKING OUT USERS WITH kick_concurrent_logins
-    find an existing entry and delete it
+    /* Find an existing session on the same ip and reuse it */
     for ($i = 0; $i < count($cpdb); $i++) {
-        if(!strcasecmp($cpdb[$i][2],$clientip)) {
-            if(isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
-                RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
-                                       $cpdb[$i][4], // username
-                                       $cpdb[$i][5], // sessionid
-                                       $cpdb[$i][0], // start time
-                                       $radiusservers[0]['ipaddr'],
-                                       $radiusservers[0]['acctport'],
-                                       $radiusservers[0]['key'],
-                                       $cpdb[$i][2], // clientip
-                                       $cpdb[$i][3], // clientmac
-                                       13); // Port Preempted
-            }
-            mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
-            unset($cpdb[$i]);
+        if($cpdb[$i][2] == $clientip) {
+            captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - REUSING OLD SESSION");
+            $sessionid = $cpdb[$i][5];
             break;
         }
     }
-    */
 
-    /* encode password in Base64 just in case it contains commas */
-    $bpassword = base64_encode($password);
-    $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $clientuser, $sessionid, $bpassword,
-            $attributes['session_timeout'],
-            $attributes['idle_timeout'],
-            $attributes['session_terminate_time']);
+    if (!isset($sessionid)) {
+
+        /* generate unique session ID */
+        $tod = gettimeofday();
+        $sessionid = substr(md5(mt_rand() . $tod['sec'] . $tod['usec'] . $clientip . $clientmac), 0, 16);
+
+        /* add ipfw rules for layer 3 */
+        exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
+        exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to $clientip out");
+
+        /* add ipfw rules for layer 2 */
+        if (!isset($config['captiveportal']['nomacfilter'])) {
+            $l2ruleno = $ruleno + 10000;
+            exec("/sbin/ipfw add $l2ruleno set 3 deny all from $clientip to any not MAC any $clientmac layer2 in");
+            exec("/sbin/ipfw add $l2ruleno set 3 deny all from any to $clientip not MAC $clientmac any layer2 out");
+        }
+
+        /* encode password in Base64 just in case it contains commas */
+        $bpassword = base64_encode($password);
+        $cpdb[] = array(time(), $ruleno, $clientip, $clientmac, $username, $sessionid, $bpassword,
+                $attributes['session_timeout'],
+                $attributes['idle_timeout'],
+                $attributes['session_terminate_time']);
+
+        if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
+            $acct_val = RADIUS_ACCOUNTING_START($ruleno,
+                                                            $username,
+                                                            $sessionid,
+                                                            $radiusservers[0]['ipaddr'],
+                                                            $radiusservers[0]['acctport'],
+                                                            $radiusservers[0]['key'],
+                                                            $clientip,
+                                                            $clientmac);
+            if ($acct_val == 1) 
+                captiveportal_logportalauth($username,$clientmac,$clientip,$type,"RADIUS ACCOUNTING FAILED");
+        }
+
+
+    }
 
     /* rewrite information to database */
     captiveportal_write_db($cpdb);
@@ -381,52 +384,30 @@ EOD;
 /* remove a single client by session ID
    by Dinesh Nair
  */
-function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1, $cpdb = null) {
+function disconnect_client($sessionid, $logoutReason = "LOGOUT", $term_cause = 1) {
 
     global $g, $config;
 
-    /* Retrieve the user database if it isn't passed through */
-    if (is_null($cpdb)) {
-        captiveportal_lock();
-        /* read database */
-        $cpdb = captiveportal_read_db();
-        $cp_unlock = true;
-    }
+    captiveportal_lock();
+    /* read database */
+    $cpdb = captiveportal_read_db();
 
     $radiusservers = captiveportal_get_radius_servers();
 
     /* find entry */
     for ($i = 0; $i < count($cpdb); $i++) {
         if ($cpdb[$i][5] == $sessionid) {
-            /* this client needs to be deleted - remove ipfw rules */
-            if(isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
-                RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
-                                       $cpdb[$i][4], // username
-                                       $cpdb[$i][5], // sessionid
-                                       $cpdb[$i][0], // start time
-                                       $radiusservers[0]['ipaddr'],
-                                       $radiusservers[0]['acctport'],
-                                       $radiusservers[0]['key'],
-                                       $cpdb[$i][2], // clientip
-                                       $cpdb[$i][3], // clientmac
-                                       $term_cause);
-            }
-            mwexec("/sbin/ipfw delete " . $cpdb[$i][1] . " " . ($cpdb[$i][1]+10000));
+            captiveportal_disconnect($cpdb[$i],$radiusservers, $term_cause);
             captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],$logoutReason);
             unset($cpdb[$i]);
             break;
         }
     }
 
-    if ($cp_unlock) {
-        /* rewrite information to database */
-        captiveportal_write_db($cpdb);
+    /* write database */
+    captiveportal_write_db($cpdb);
 
-        captiveportal_unlock();
-    }
-    else {
-        return $cpdb;
-    }
+    captiveportal_unlock();
 }
 
 

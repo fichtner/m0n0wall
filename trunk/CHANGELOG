@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- changes in Captive portal (jdegraeve):
+  - Fixes a bug in the way we handle authentication mechanism. (Potentially allowing double logins and faulty locking)
+
+1.22
+----
+
 - updated base system to FreeBSD 4.11-RELEASE-p16 (mkasper)
 
 - updated Dnsmasq to 2.27

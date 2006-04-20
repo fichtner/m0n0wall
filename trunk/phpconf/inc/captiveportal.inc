@@ -341,7 +341,7 @@ add 1305 set 1 pass tcp from $cpip 8001 to any out
 
 EOD;
     }
-    
+
     $cprules .= <<<EOD
 
 # ... 10000-19899: rules per authenticated client go here...
@@ -369,7 +369,7 @@ timestamp,ipfw_rule_no,clientip,clientmac,username,sessionid,password,session_ti
 
 /* (password is in Base64 and only saved when reauthentication is enabled) */
 function captiveportal_prune_old() {
-    
+
     global $g, $config;
 
     /* check for expired entries */
@@ -377,27 +377,27 @@ function captiveportal_prune_old() {
         $timeout = $config['captiveportal']['timeout'] * 60;
     else
         $timeout = 0;
-        
+
     if ($config['captiveportal']['idletimeout'])
         $idletimeout = $config['captiveportal']['idletimeout'] * 60;
     else
         $idletimeout = 0;
-    
+
     if (!$timeout && !$idletimeout && !isset($config['captiveportal']['reauthenticate']) && !isset($config['captiveportal']['radiussession_timeout']))
         return;
-    
+
     captiveportal_lock();
-    
+
     /* read database */
     $cpdb = captiveportal_read_db();
-    
+
     $radiusservers = captiveportal_get_radius_servers();
-    
+
     for ($i = 0; $i < count($cpdb); $i++) {
-        
+
         $timedout = false;
         $term_cause = 1;
-        
+
         /* hard timeout? */
         if ($timeout) {
             if ((time() - $cpdb[$i][0]) >= $timeout) {
@@ -413,7 +413,7 @@ function captiveportal_prune_old() {
                 $term_cause = 5; // Session-Timeout
             }
         }
-        
+
         /* check if the radius idle_timeout attribute has been set and if its set change the idletimeout to this value */
         $idletimeout = (is_numeric($cpdb[$i][8])) ? $cpdb[$i][8] : $idletimeout;
         /* if an idle timeout is specified, get last activity timestamp from ipfw */
@@ -433,17 +433,17 @@ function captiveportal_prune_old() {
                 $term_cause = 5; // Session-Timeout
             }
         }
-        
+
         if ($timedout) {
             captiveportal_disconnect($cpdb[$i], $radiusservers,$term_cause,$stop_time);
             captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "TIMEOUT");
             unset($cpdb[$i]);
         }
-        
+
         /* do periodic RADIUS reauthentication? */
         if (!$timedout && isset($config['captiveportal']['reauthenticate']) &&
             ($radiusservers !== false)) {
-        
+
             if (isset($config['captiveportal']['radacct_enable'])) {
                 if ($config['captiveportal']['reauthenticateacct'] == "stopstart") {
                     /* stop and restart accounting */
@@ -480,7 +480,7 @@ function captiveportal_prune_old() {
                                            true); // Interim Updates
                 }
             }
-        
+
             /* check this user against RADIUS again */
             $auth_list = RADIUS_AUTHENTICATION($cpdb[$i][4], // username
                                           base64_decode($cpdb[$i][6]), // password
@@ -488,7 +488,7 @@ function captiveportal_prune_old() {
                                           $cpdb[$i][2], // clientip
                                           $cpdb[$i][3], // clientmac
                                           $cpdb[$i][1]); // ruleno
-            
+
             if ($auth_list['auth_val'] == 3) {
                 captiveportal_disconnect($cpdb[$i], $radiusservers, 17);
                 captiveportal_logportalauth($cpdb[$i][4], $cpdb[$i][3], $cpdb[$i][2], "RADIUS_DISCONNECT", $auth_list['reply_message']);
@@ -496,20 +496,20 @@ function captiveportal_prune_old() {
             }
         }
     }
-    
+
     /* write database */
     captiveportal_write_db($cpdb);
-    
+
     captiveportal_unlock();
 }
 
 /* remove a single client according to the DB entry */
 function captiveportal_disconnect($dbent, $radiusservers,$term_cause = 1,$stop_time = null) {
-    
+
     global $g, $config;
 
     $stop_time = (empty($stop_time)) ? time() : $stop_time;
-    
+
     /* this client needs to be deleted - remove ipfw rules */
     if (isset($config['captiveportal']['radacct_enable']) && isset($radiusservers[0])) {
         RADIUS_ACCOUNTING_STOP($dbent[1], // ruleno
@@ -525,9 +525,9 @@ function captiveportal_disconnect($dbent, $radiusservers,$term_cause = 1,$stop_t
                                false,
                                $stop_time);
     }
-    
+
     mwexec("/sbin/ipfw delete " . $dbent[1] . " " . ($dbent[1]+10000));
-    
+
     //KEYCOM: we need to delete +40500 and +45500 as well...
     //these are the rule numbers we use to control traffic shaping for each logged in user via captive portal
     //we only need to remove our rules if peruserbw is turned on.
@@ -539,16 +539,16 @@ function captiveportal_disconnect($dbent, $radiusservers,$term_cause = 1,$stop_t
 
 /* remove a single client by ipfw rule number */
 function captiveportal_disconnect_client($id,$term_cause = 1) {
-    
+
     global $g, $config;
-    
+
     captiveportal_lock();
-    
+
     /* read database */
     $cpdb = captiveportal_read_db();
     $radiusservers = captiveportal_get_radius_servers();
-    
-    /* find entry */    
+
+    /* find entry */
     for ($i = 0; $i < count($cpdb); $i++) {
         if ($cpdb[$i][1] == $id) {
             captiveportal_disconnect($cpdb[$i], $radiusservers, $term_cause);
@@ -557,25 +557,25 @@ function captiveportal_disconnect_client($id,$term_cause = 1) {
             break;
         }
     }
-    
+
     /* write database */
     captiveportal_write_db($cpdb);
-    
+
     captiveportal_unlock();
 }
 
 /* send RADIUS acct stop for all current clients */
 function captiveportal_radius_stop_all() {
     global $g, $config;
-    
+
     if (!isset($config['captiveportal']['radacct_enable']))
         return;
 
     captiveportal_lock();
     $cpdb = captiveportal_read_db();
-    
+
     $radiusservers = captiveportal_get_radius_servers();
-    
+
     if (isset($radiusservers[0])) {
         for ($i = 0; $i < count($cpdb); $i++) {
             RADIUS_ACCOUNTING_STOP($cpdb[$i][1], // ruleno
@@ -595,31 +595,31 @@ function captiveportal_radius_stop_all() {
 
 function captiveportal_passthrumac_configure() {
     global $config, $g;
-    
+
     captiveportal_lock();
-    
+
     /* clear out passthru macs, if necessary */
     unlink_if_exists("{$g['vardb_path']}/captiveportal_mac.db");
-    
+
     if (is_array($config['captiveportal']['passthrumac'])) {
-        
+
         $fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db", "w");
         if (!$fd) {
             printf("Error: cannot open passthru mac DB file in captiveportal_passthrumac_configure().\n");
             captiveportal_unlock();
-            return 1;        
+            return 1;
         }
-        
+
         foreach ($config['captiveportal']['passthrumac'] as $macent) {
             /* record passthru mac so it can be recognized and let thru */
             fwrite($fd, $macent['mac'] . "\n");
         }
-        
+
         fclose($fd); 
     }
-    
+
     captiveportal_unlock();
-    
+
     return 0;
 }
 
@@ -790,7 +790,6 @@ function radius($username,$password,$clientip,$clientmac,$type) {
     }
 
     $radiusservers = captiveportal_get_radius_servers();
-    $radacct_enable = isset($config['captiveportal']['radacct_enable']);
 
     $auth_list = RADIUS_AUTHENTICATION($username,
                     $password,
@@ -807,19 +806,6 @@ function radius($username,$password,$clientip,$clientmac,$type) {
                     $password,
                     $auth_list,
                     $ruleno);
-
-        if ($radacct_enable) {
-            $auth_list['acct_val'] = RADIUS_ACCOUNTING_START($ruleno,
-                                    $username,
-                                    $sessionid,
-                                    $radiusservers[0]['ipaddr'],
-                                    $radiusservers[0]['acctport'],
-                                    $radiusservers[0]['key'],
-                                    $clientip,
-                                    $clientmac);
-            if ($auth_list['acct_val'] == 1) 
-                captiveportal_logportalauth($username,$clientmac,$clientip,$type,"RADIUS ACCOUNTING FAILED");
-        }
     }
     else {
         captiveportal_unlock();
