@@ -257,27 +257,23 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
 
     $radiusservers = captiveportal_get_radius_servers();
 
-    /* Find an existing session on a different ip with the same username */
-
-    if ((isset($config['captiveportal']['noconcurrentlogins'])) && ($username != 'unauthenticated')) {
-       /* find duplicate entry */
-        for ($i = 0; $i < count($cpdb); $i++) {
-            if (($cpdb[$i][2] != $clientip) && ($cpdb[$i][4] == $username)) {
-                /* This user was already logged in so we disconnect the old one */
-                captiveportal_disconnect($cpdb[$i],$radiusservers, 13);
-                captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - TERMINATING OLD SESSION");
-                unset($cpdb[$i]);
-                break;
-            }
-        }
-    }
-
-    /* Find an existing session on the same ip and reuse it */
+    /* Find an existing session */
     for ($i = 0; $i < count($cpdb); $i++) {
+        /* on the same ip */
         if($cpdb[$i][2] == $clientip) {
             captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - REUSING OLD SESSION");
             $sessionid = $cpdb[$i][5];
             break;
+        }
+        elseif ((isset($config['captiveportal']['noconcurrentlogins'])) && ($username != 'unauthenticated')) {
+            /* on the same username */
+            if ($cpdb[$i][4] == $username) {
+                /* This user was already logged in so we disconnect the old one */
+                captiveportal_disconnect($cpdb[$i],$radiusservers,13);
+                captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - TERMINATING OLD SESSION");
+                unset($cpdb[$i]);
+                break;
+            }
         }
     }
 
