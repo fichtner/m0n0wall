@@ -64,7 +64,7 @@ $userindex = index_users();
 if (!($_SERVER['REMOTE_USER'] === $config['system']['username'])) {
 	$allowed[] = '';
 	if (isset($config['system']['group'][$groupindex[$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['groupname']]]['pages'])) {
-		$allowed = &$config['system']['group'][$groupindex[$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['groupname']]]['pages'];
+        $allowed = &$config['system']['group'][$groupindex[$config['system']['user'][$userindex[$_SERVER['REMOTE_USER']]]['groupname']]]['pages'];
 	} 
 
 	// If the user is attempting to hit the default page, set it to specifically look for /index.php.
@@ -73,7 +73,8 @@ if (!($_SERVER['REMOTE_USER'] === $config['system']['username'])) {
 		$_SERVER['PHP_SELF'] = '/index.php';
 	
 	// Strip the leading / from the currently requested PHP page
-	if (!in_array(basename($_SERVER['PHP_SELF']),$allowed)) {
+	// With extensions there also is a path to be concerned with
+    if ( !in_array(ltrim($_SERVER['PHP_SELF'],"/"),$allowed) ) {
 		// The currently logged in user is not allowed to access the page
 		// they are attempting to go to.  Redirect them to an allowed page.
 
@@ -90,7 +91,6 @@ if (!($_SERVER['REMOTE_USER'] === $config['system']['username'])) {
 		}
 	}
 }
-
 
 
 ?>

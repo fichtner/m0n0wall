@@ -506,6 +506,26 @@ function system_do_extensions($early = false) {
 		}
 		closedir($dh);
 	}
+	
+	// Create the symbolic links for .htpasswd and gui.css
+	// in each www/ext directory.
+	if (!$early) {
+    	$dh = @opendir("{$g['www_path']}/ext");
+    	if ($dh) {
+    		while (($extd = readdir($dh)) !== false) {
+    			if (($extd === ".") || ($extd === ".."))
+    				continue;
+    			if (is_dir("{$g['www_path']}/ext/$extd")) {
+    			    // Create links
+    			    symlink("{$g['www_path']}/.htpasswd",".htpasswd");
+    			    symlink("{$g['www_path']}/gui.css","gui.css");
+    			}
+    		}
+    		closedir($dh);
+    	}
+	}
+	
+	
 }
 
 function system_console_configure() {

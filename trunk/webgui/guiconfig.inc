@@ -513,7 +513,7 @@ function dynamic_tab_menu(&$tabs) {
     $linkStyle = '1';
    	foreach ($tabs as $desc => $link) {
    		if (in_array($link,$authorized)) {
-   			if ($link == str_replace('/','',$_SERVER['PHP_SELF'])) {
+            if ($link == basename($_SERVER['PHP_SELF'])) {
    				// special handling for diagnostic Logs tabs.
    				if ((strpos($link,'diag_logs') > -1) && ($link != 'diag_logs_settings.php')) {
 	   				if ($desc == "Firewall") {

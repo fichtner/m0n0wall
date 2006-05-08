@@ -44,12 +44,12 @@ function genhtmltitle($title) {
 
 function dynamic_menu(&$menu, $menu_title) {
 	global $allowed, $config;
-	
+
 	// Make sure the admin can see everything
 	if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
 		unset($allowed);
-		foreach ($menu as $item) {
-			$allowed[] = $item[0];
+   		foreach ($menu as $item) {
+        			$allowed[] = $item[0];
 		}
 	}
 	
@@ -85,7 +85,7 @@ function dynamic_menu(&$menu, $menu_title) {
 		}
 	}
 }
-
+        
 // Check for issues when changing the web admin username
 // $allowed is set in auth.inc *IF* the user is not the webGUI admin
 // so, if it's not set here, they were the admin user when they submited the admin username change.
@@ -94,7 +94,8 @@ if ((!is_array($allowed)) and
     ($_SERVER['REMOTE_USER'] != $config['system']['username'])) {
 	// webGUI username was just changed, let us change what PHP sees the remote user as so
 	// the menu will build properly.  When user hits next link, they will be prompted to reauthenticate.
-	$_SERVER['REMOTE_USER'] = $config['system']['username'];		
+	$_SERVER['REMOTE_USER'] = $config['system']['username'];	
+   
 }
 
 $menu['System']['General setup'] = array('system.php');
@@ -146,6 +147,20 @@ $menu['Status']['Traffic graph']	= array('status_graph.php');
 $menu['Status']['Wireless']			= array('status_wireless.php');
 if (isset($config['captiveportal']['enable'])) {
 	$menu['Status']['Captive portal']	= array('status_captiveportal.php');
+}
+
+// Add Extensions, if they exist
+if (is_dir("{$g['www_path']}/ext")){
+      $dh = @opendir("{$g['www_path']}/ext");
+      if ($dh) {
+        while (($extd = readdir($dh)) !== false) {
+          if (($extd === ".") || ($extd === ".."))
+            continue;
+          $extfiles=explode("\n",trim(file_get_contents("{$g['www_path']}/ext/" . $extd . "/menu2.inc")));
+          $menu['Extensions'][array_shift($extfiles)]=$extfiles;
+         }
+        closedir($dh);
+      }
 }
 
 $menu['Diagnostics']['Logs']			= array('diag_logs.php',
@@ -261,27 +276,9 @@ dynamic_menu($menu['Firewall'], 'Firewall');
 dynamic_menu($menu['Services'], 'Services');
 dynamic_menu($menu['VPN'], 'VPN');
 dynamic_menu($menu['Status'], 'Status');
-?>
-			  
-<?php
-/* extensions section */
-if (is_dir("{$g['www_path']}/ext")):
-?>
-              <strong>Extensions</strong><br>
-<?php
-$dh = @opendir("{$g['www_path']}/ext");
-if ($dh) {
-	while (($extd = readdir($dh)) !== false) {
-		if (($extd === ".") || ($extd === ".."))
-			continue;
-		@include("{$g['www_path']}/ext/" . $extd . "/menu.inc");
-	}
-	closedir($dh);
-}
-endif;
-?>
-
-<?php 
+// If Extensions exist, add them to the menu
+if (isset($menu['Extensions'])) 
+    dynamic_menu($menu['Extensions'], 'Extensions');
 dynamic_menu($menu['Diagnostics'], 'Diagnostics');
 ?>
 			  </span>
@@ -293,3 +290,4 @@ dynamic_menu($menu['Diagnostics'], 'Diagnostics');
 <?php if (!$pgtitle_omit): ?>
       <p class="pgtitle"><?=gentitle($pgtitle);?></p>
 <?php endif; ?>
+

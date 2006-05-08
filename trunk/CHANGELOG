@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added support for 3rd party extensions in the group management and dynamic menu system. (ptaylor)
+  - Thanks to Leo Fante for code modifications
+
 - changes in Captive portal (jdegraeve):
   - Fixes a bug in the way we handle authentication mechanism. (Potentially allowing double logins and faulty locking)
 
