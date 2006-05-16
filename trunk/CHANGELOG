@@ -8,6 +8,7 @@ $Id$
 
 - changes in Captive portal (jdegraeve):
   - Fixes a bug in the way we handle authentication mechanism. (Potentially allowing double logins and faulty locking)
+  - Add support for different MAC formatting styles.
 
 1.22
 ----

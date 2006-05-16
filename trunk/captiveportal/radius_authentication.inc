@@ -47,7 +47,8 @@ function RADIUS_AUTHENTICATION($username,$password,$radiusservers,$clientip,$cli
     global $config;
 
     $retvalue = array();
-    $nas_mac = get_interface_mac($config['interfaces']['wan']['if']);
+    $nas_mac = mac_format(get_interface_mac($config['interfaces']['wan']['if']));
+    $clientmac = mac_format($clientmac);
     $nas_port = $ruleno - 10000;
     $radiusvendor = $config['captiveportal']['radiusvendor'] ? $config['captiveportal']['radiusvendor'] : null;
     // Do we even need to set it to NULL?
