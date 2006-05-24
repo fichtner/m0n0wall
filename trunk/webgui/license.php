@@ -142,9 +142,6 @@ require("guiconfig.inc");
               Pavel A. Grodek (<a href="mailto:pg@abletools.com">pg@abletools.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Traffic shaper packet loss rate/queue size</font></em><br>
 			  <br>
-              Rob Parker, Keycom PLC (<a href="mailto:rob.parker@keycom.co.uk">rob.parker@keycom.co.uk</a>)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal per-user bandwidth restrictions</font></em><br>
-			  <br>
               Pascal Suter (<a href="mailto:d-monodev@psuter.ch">d-monodev@psuter.ch</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal local user database</font></em><br>
 			  <br>
@@ -167,7 +164,7 @@ require("guiconfig.inc");
 			  <br>
               Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Complete captive portal RADIUS overhaul, cleanup</font></em><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: file manager, volume stats, FW rulepool (virtual port pool), MAC formatting</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: file manager, volume stats, FW rulepool (virtual port pool), MAC formatting, per user bandwidth limitation</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

@@ -595,16 +595,16 @@ class Auth_RADIUS extends PEAR {
             $this->attributes['url_redirection'] = radius_cvt_string($datav);
             break;
             case 5: /* WISPr-Bandwidth-Min-Up */
-            $this->attributes['bw_minbytesup'] = radius_cvt_int($datav);
+            $this->attributes['bw_up_min'] = radius_cvt_int($datav);
             break;
             case 6: /* WISPr-Bandwidth-Min-Down */
-            $this->attributes['bw_minbytesdown'] = radius_cvt_int($datav);
+            $this->attributes['bw_down_min'] = radius_cvt_int($datav);
             break;
             case 7: /* WIPSr-Bandwidth-Max-Up */
-            $this->attributes['bw_maxbytesup'] = radius_cvt_int($datav);
+            $this->attributes['bw_up'] = radius_cvt_int($datav);
             break;
             case 8: /* WISPr-Bandwidth-Max-Down */
-            $this->attributes['bw_maxbytesdown'] = radius_cvt_int($datav);
+            $this->attributes['bw_down'] = radius_cvt_int($datav);
             break;
             case 9: /* WISPr-Session-Terminate-Time */
             $this->attributes['session_terminate_time'] = radius_cvt_string($datav);

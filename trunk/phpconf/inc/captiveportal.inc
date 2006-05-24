@@ -528,12 +528,13 @@ function captiveportal_disconnect($dbent, $radiusservers,$term_cause = 1,$stop_t
 
     mwexec("/sbin/ipfw delete " . $dbent[1] . " " . ($dbent[1]+10000));
 
-    //KEYCOM: we need to delete +40500 and +45500 as well...
-    //these are the rule numbers we use to control traffic shaping for each logged in user via captive portal
-    //we only need to remove our rules if peruserbw is turned on.
+    /* We need to delete +40500 and +45500 as well...
+     * these are the pipe numbers we use to control traffic shaping for each logged in user via captive portal
+     * We could get an error if the pipe doesn't exist but everything should still be fine
+     */
     if (isset($config['captiveportal']['peruserbw'])) {
-        mwexec("/sbin/ipfw delete " . ($dbent[1]+40500));
-        mwexec("/sbin/ipfw delete " . ($dbent[1]+45500));
+        mwexec("/sbin/ipfw pipe delete " . ($dbent[1]+40500));
+        mwexec("/sbin/ipfw pipe delete " . ($dbent[1]+45500));
     }
 }
 
@@ -926,7 +927,7 @@ function getVolume($ruleno) {
 
     // Ingress
     exec("/sbin/ipfw show {$ruleno}", $ipfw);
-    preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[0], $matches);
+    preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+.*/", $ipfw[0], $matches);
     $volume['input_pkts'] = $matches[2];
     $volume['input_bytes'] = $matches[3];
 
@@ -934,7 +935,7 @@ function getVolume($ruleno) {
     unset($matches);
 
     // Outgress
-    preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+skipto/", $ipfw[1], $matches);
+    preg_match("/(\d+)\s+(\d+)\s+(\d+)\s+.*/", $ipfw[1], $matches);
     $volume['output_pkts'] = $matches[2];
     $volume['output_bytes'] = $matches[3];
 

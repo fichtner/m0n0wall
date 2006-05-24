@@ -284,9 +284,29 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
         $tod = gettimeofday();
         $sessionid = substr(md5(mt_rand() . $tod['sec'] . $tod['usec'] . $clientip . $clientmac), 0, 16);
 
-        /* add ipfw rules for layer 3 */
-        exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
-        exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to $clientip out");
+        /* Add rules for traffic shaping
+         * We don't need to add extra l3 allow rules since traffic will pass due to the following kernel option
+         * net.inet.ip.fw.one_pass: 1
+         */
+        $peruserbw = isset($config['captiveportal']['peruserbw']);
+
+        $bw_up = !empty($attributes['bw_up']) ? trim($attributes['bw_up']) : $config['captiveportal']['bwdefaultup'];
+        $bw_down = !empty($attributes['bw_down']) ? trim($attributes['bw_down']) : $config['captiveportal']['bwdefaultdn'];
+
+        if ($peruserbw && !empty($bw_up)) {
+            $bw_up_pipeno = $ruleno + 40500;
+            exec("/sbin/ipfw add $ruleno set 2 pipe $bw_up_pipeno ip from $clientip to any in");
+            exec("/sbin/ipfw pipe $bw_up_pipeno config bw {$bw_up}Kbit/s queue 100");
+        } else {
+            exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
+        }
+        if ($peruserbw && !empty($bw_down)) {
+            $bw_down_pipeno = $ruleno + 45500;
+            exec("/sbin/ipfw add $ruleno set 2 pipe $bw_down_pipeno ip from any to $clientip out");
+            exec("/sbin/ipfw pipe $bw_down_pipeno config bw {$bw_down}Kbit/s queue 100");
+        } else {
+            exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from any to $clientip out");
+        }
 
         /* add ipfw rules for layer 2 */
         if (!isset($config['captiveportal']['nomacfilter'])) {

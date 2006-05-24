@@ -63,6 +63,9 @@ $pconfig['httpsname'] = $config['captiveportal']['httpsname'];
 $pconfig['cert'] = base64_decode($config['captiveportal']['certificate']);
 $pconfig['key'] = base64_decode($config['captiveportal']['private-key']);
 $pconfig['logoutwin_enable'] = isset($config['captiveportal']['logoutwin_enable']);
+$pconfig['peruserbw'] = isset($config['captiveportal']['peruserbw']);
+$pconfig['bwdefaultdn'] = $config['captiveportal']['bwdefaultdn'];
+$pconfig['bwdefaultup'] = $config['captiveportal']['bwdefaultup'];
 $pconfig['nomacfilter'] = isset($config['captiveportal']['nomacfilter']);
 $pconfig['noconcurrentlogins'] = isset($config['captiveportal']['noconcurrentlogins']);
 $pconfig['redirurl'] = $config['captiveportal']['redirurl'];
@@ -161,6 +164,9 @@ if ($_POST) {
 		$config['captiveportal']['certificate'] = base64_encode($_POST['cert']);
 		$config['captiveportal']['private-key'] = base64_encode($_POST['key']);
 		$config['captiveportal']['logoutwin_enable'] = $_POST['logoutwin_enable'] ? true : false;
+		$config['captiveportal']['peruserbw'] = $_POST['peruserbw'] ? true : false;
+		$config['captiveportal']['bwdefaultdn'] = $_POST['bwdefaultdn'];
+		$config['captiveportal']['bwdefaultup'] = $_POST['bwdefaultup'];
 		$config['captiveportal']['nomacfilter'] = $_POST['nomacfilter'] ? true : false;
 		$config['captiveportal']['noconcurrentlogins'] = $_POST['noconcurrentlogins'] ? true : false;
 		$config['captiveportal']['redirurl'] = $_POST['redirurl'];
@@ -218,6 +224,9 @@ function enable_change(enable_change) {
 	document.iform.auth_method[0].disabled = endis;
 	document.iform.auth_method[1].disabled = endis;
 	document.iform.auth_method[2].disabled = endis;
+	document.iform.peruserbw.disabled = endis;
+	document.iform.bwdefaultdn.disabled = endis;
+	document.iform.bwdefaultup.disabled = endis;
 	document.iform.radmac_enable.disabled = radius_endis;
 	document.iform.radmac_format.disabled = radius_endis;
 	document.iform.httpslogin_enable.disabled = endis;
@@ -343,7 +352,24 @@ to access after they've authenticated.</td>
         <strong>Disable MAC filtering</strong><br>
     If this option is set, no attempts will be made to ensure that the MAC address of clients stays the same while they're logged in.
     This is required when the MAC address of the client cannot be determined (usually because there are routers between m0n0wall and the clients).</td>
-	  </tr>
+	</tr>
+    <tr>
+      <td valign="top" class="vncell">Per-user bandwidth restriction</td>
+      <td class="vtable">
+        <input name="peruserbw" type="checkbox" class="formfld" id="peruserbw" value="yes" <?php if ($pconfig['peruserbw']) echo "checked"; ?>>
+        <strong>Enable per-user bandwidth restriction</strong><br><br>
+        <table cellpadding="0" cellspacing="0">
+        <tr>
+        <td>Default download</td>
+        <td><input type="text" class="formfld" name="bwdefaultdn" id="bwdefaultdn" size="10" value"<?=htmlspecialchars($pconfig['bwdefaultdn']);?>"> Kbit/s</td>
+        </tr>
+        <tr>
+        <td>Default upload</td>
+        <td><input type="text" class="formfld" name="bwdefaultup" id="bwdefaultup" size="10" value"<?=htmlspecialchars($pconfig['bwdefaultup']);?>"> Kbit/s</td>
+        </tr></table>
+        <br>
+        If this option is set, the captive portal will restrict each user who logs in to the specified default bandwidth. RADIUS can override the default settings. Leave empty or set to 0 for no limit. You will <strong>need</strong> to enable the traffic shaper for this to be effective.</td>
+        </tr>
 	<tr> 
 	  <td width="22%" valign="top" class="vncell">Authentication</td>
 	  <td width="78%" class="vtable"> 
