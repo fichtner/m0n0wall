@@ -533,8 +533,8 @@ function captiveportal_disconnect($dbent, $radiusservers,$term_cause = 1,$stop_t
      * We could get an error if the pipe doesn't exist but everything should still be fine
      */
     if (isset($config['captiveportal']['peruserbw'])) {
-        mwexec("/sbin/ipfw pipe delete " . ($dbent[1]+40500));
-        mwexec("/sbin/ipfw pipe delete " . ($dbent[1]+45500));
+        mwexec("/sbin/ipfw pipe " . ($dbent[1]+40500) . " delete");
+        mwexec("/sbin/ipfw pipe " . ($dbent[1]+45500) . " delete");
     }
 }
 
