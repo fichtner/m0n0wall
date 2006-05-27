@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- do not generate anti-spoof rules for optional interfaces that have other interfaces
+  bridged to them (as opposed to being bridged to another interface, which was already
+  handled properly) when the filtering bridge is on (mkasper)
+
 - added support for 3rd party extensions in the group management and dynamic menu system. (ptaylor)
   - Thanks to Leo Fante for code modifications
 
