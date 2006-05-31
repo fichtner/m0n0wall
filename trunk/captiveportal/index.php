@@ -290,17 +290,17 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
          */
         $peruserbw = isset($config['captiveportal']['peruserbw']);
 
-        $bw_up = !empty($attributes['bw_up']) ? trim($attributes['bw_up']) : $config['captiveportal']['bwdefaultup'];
-        $bw_down = !empty($attributes['bw_down']) ? trim($attributes['bw_down']) : $config['captiveportal']['bwdefaultdn'];
+        $bw_up = isset($attributes['bw_up']) ? trim($attributes['bw_up']) : $config['captiveportal']['bwdefaultup'];
+        $bw_down = isset($attributes['bw_down']) ? trim($attributes['bw_down']) : $config['captiveportal']['bwdefaultdn'];
 
-        if ($peruserbw && !empty($bw_up)) {
+        if ($peruserbw && !empty($bw_up) && is_numeric($bw_up)) {
             $bw_up_pipeno = $ruleno + 40500;
             exec("/sbin/ipfw add $ruleno set 2 pipe $bw_up_pipeno ip from $clientip to any in");
             exec("/sbin/ipfw pipe $bw_up_pipeno config bw {$bw_up}Kbit/s queue 100");
         } else {
             exec("/sbin/ipfw add $ruleno set 2 skipto 50000 ip from $clientip to any in");
         }
-        if ($peruserbw && !empty($bw_down)) {
+        if ($peruserbw && !empty($bw_down) && is_numeric($bw_down)) {
             $bw_down_pipeno = $ruleno + 45500;
             exec("/sbin/ipfw add $ruleno set 2 pipe $bw_down_pipeno ip from any to $clientip out");
             exec("/sbin/ipfw pipe $bw_down_pipeno config bw {$bw_down}Kbit/s queue 100");
