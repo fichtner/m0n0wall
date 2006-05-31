@@ -367,11 +367,11 @@ to access after they've authenticated.</td>
         <table cellpadding="0" cellspacing="0">
         <tr>
         <td>Default download</td>
-        <td><input type="text" class="formfld" name="bwdefaultdn" id="bwdefaultdn" size="10" value"<?=htmlspecialchars($pconfig['bwdefaultdn']);?>"> Kbit/s</td>
+        <td><input type="text" class="formfld" name="bwdefaultdn" id="bwdefaultdn" size="10" value="<?=htmlspecialchars($pconfig['bwdefaultdn']);?>"> Kbit/s</td>
         </tr>
         <tr>
         <td>Default upload</td>
-        <td><input type="text" class="formfld" name="bwdefaultup" id="bwdefaultup" size="10" value"<?=htmlspecialchars($pconfig['bwdefaultup']);?>"> Kbit/s</td>
+        <td><input type="text" class="formfld" name="bwdefaultup" id="bwdefaultup" size="10" value="<?=htmlspecialchars($pconfig['bwdefaultup']);?>"> Kbit/s</td>
         </tr></table>
         <br>
         If this option is set, the captive portal will restrict each user who logs in to the specified default bandwidth. RADIUS can override the default settings. Leave empty or set to 0 for no limit. You will <strong>need</strong> to enable the traffic shaper for this to be effective.</td>
