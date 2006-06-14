@@ -3,6 +3,14 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+1.23b2
+------
+
+- changes in Captive portal (jdegraeve):
+  - add PfSense ideas (slighty different implemented):
+  * Import CP SSL idea from PfSense: Redirect both HTTP and HTTPS to the Captive Portal keeping in mind a SSL error (cert mismatch)
+  * Add preliminary support for WPA and PPPoE pass-through
+
 1.23b1
 ------
 

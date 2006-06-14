@@ -85,7 +85,7 @@ for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 	
 $medias = array("auto" => "autoselect", "100full" => "100BASE-TX full-duplex",
 	"100half" => "100BASE-TX half-duplex", "10full" => "10BASE-T full-duplex",
-	"10half" => "10BASE-T half-duplex");
+	"10half" => "10BASE-T half-duplex", "1000full" => "1000BASE-TX full-duplex");
 	
 /* platforms that support firmware updating */
 $fwupplatforms = array('net45xx', 'net48xx', 'generic-pc', 'wrap');
