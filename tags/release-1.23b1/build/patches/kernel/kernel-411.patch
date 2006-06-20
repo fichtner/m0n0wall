@@ -1,0 +1,1593 @@
+diff -u -r sys.orig/conf/options sys/conf/options
+--- sys.orig/conf/options	Mon Apr 19 08:02:17 2004
++++ sys/conf/options	Sun Apr 24 10:02:07 2005
+@@ -252,6 +252,7 @@
+ 
+ # Options used in the 'ata' ATA/ATAPI driver
+ ATA_STATIC_ID		opt_ata.h
++ATA_DISABLE_SLAVE	opt_ata.h
+ 
+ # Net stuff.
+ ACCEPT_FILTER_DATA
+@@ -280,6 +281,12 @@
+ IPFILTER		opt_ipfilter.h
+ IPFILTER_LOG		opt_ipfilter.h
+ IPFILTER_DEFAULT_BLOCK	opt_ipfilter.h
++# Existing options made configurable for m0n0wall
++IPSTATE_SIZE	opt_ipfilter.h
++IPSTATE_MAX 	opt_ipfilter.h
++# New options for m0n0wall
++IPFILTER_MSSCLAMP_FORCE 	opt_ipfilter.h
++# End of m0n0wall additions
+ IPFIREWALL		opt_ipfw.h
+ IPFW2			opt_ipfw.h
+ IPFIREWALL_VERBOSE	opt_ipfw.h
+diff -u -r sys.orig/contrib/ipfilter/netinet/fil.c sys/contrib/ipfilter/netinet/fil.c
+--- sys.orig/contrib/ipfilter/netinet/fil.c	Thu Dec 16 21:43:51 2004
++++ sys/contrib/ipfilter/netinet/fil.c	Sun Apr 24 08:51:20 2005
+@@ -68,6 +68,12 @@
+ # include <sys/hashing.h>
+ # include <netinet/in_var.h>
+ #endif
++# if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
++#  include <sys/malloc.h>
++#  if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#   include "opt_ipfilter.h"
++#  endif
++# endif
+ #include <netinet/tcp.h>
+ #include <netinet/udp.h>
+ #include <netinet/ip_icmp.h>
+@@ -85,12 +91,6 @@
+ #include "netinet/ip_state.h"
+ #include "netinet/ip_proxy.h"
+ #include "netinet/ip_auth.h"
+-# if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
+-#  include <sys/malloc.h>
+-#  if defined(_KERNEL) && !defined(IPFILTER_LKM)
+-#   include "opt_ipfilter.h"
+-#  endif
+-# endif
+ #ifndef	MIN
+ # define	MIN(a,b)	(((a)<(b))?(a):(b))
+ #endif
+diff -u -r sys.orig/contrib/ipfilter/netinet/ip_compat.h sys/contrib/ipfilter/netinet/ip_compat.h
+--- sys.orig/contrib/ipfilter/netinet/ip_compat.h	Sun Jul  4 11:24:38 2004
++++ sys/contrib/ipfilter/netinet/ip_compat.h	Sun Apr 24 08:51:20 2005
+@@ -545,7 +545,8 @@
+ #  ifndef	linux
+ #   define	GETUNIT(n, v)	ifunit(n)
+ #   if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+-        (defined(OpenBSD) && (OpenBSD >= 199603))
++        (defined(OpenBSD) && (OpenBSD >= 199603)) || \
++        (defined(__FreeBSD_version) && (__FreeBSD_version >= 501113))
+ #    define	IFNAME(x)	((struct ifnet *)x)->if_xname
+ #   else
+ #    define	USE_GETIFNAME	1
+diff -u -r sys.orig/contrib/ipfilter/netinet/ip_fil.h sys/contrib/ipfilter/netinet/ip_fil.h
+--- sys.orig/contrib/ipfilter/netinet/ip_fil.h	Mon Jul  5 08:02:35 2004
++++ sys/contrib/ipfilter/netinet/ip_fil.h	Sun Apr 24 08:51:20 2005
+@@ -430,7 +430,8 @@
+ 
+ typedef	struct	ipflog	{
+ #if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199603)) || \
+-        (defined(OpenBSD) && (OpenBSD >= 199603))
++        (defined(OpenBSD) && (OpenBSD >= 199603)) || \
++        (defined(__FreeBSD_version) && (__FreeBSD_version >= 501113))
+ 	char	fl_ifname[LIFNAMSIZ];
+ #else
+ 	u_int	fl_unit;
+diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet/ip_nat.c
+--- sys.orig/contrib/ipfilter/netinet/ip_nat.c	Fri Dec 17 03:24:30 2004
++++ sys/contrib/ipfilter/netinet/ip_nat.c	Mon May  9 01:38:17 2005
+@@ -127,6 +127,11 @@
+ ipnat_t	**rdr_rules = NULL;
+ hostmap_t	**maptable  = NULL;
+ 
++#if IPFILTER_MSSCLAMP_FORCE
++int	fr_mssclamp = 0;
++char fr_mssif[IFNAMSIZ] = "";
++#endif /* IPFILTER_MSSCLAMP_FORCE */
++
+ u_long	fr_defnatage = DEF_NAT_AGE,
+ 	fr_defnaticmpage = 6;		/* 3 seconds */
+ natstat_t nat_stats;
+@@ -321,12 +326,13 @@
+ 		*sp = n & 0xffff;
+ 		return;
+ 	}
+-	sum1 = (~ntohs(*sp)) & 0xffff;
+-	sum1 += (n);
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	/* Again */
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	sumshort = ~(u_short)sum1;
++	/* Perform the adjustment in noninverted form
++	 * in order to prefer the -0 result over the +0 result.
++	 * Otherwise a UDP checksum could be "adjusted" to nonexistent.
++	 */
++	sum1 = ntohs(*sp) + (~n & 0xFFFF);
++	/* One folding step is sufficient for a sum of two 16-bit operands */
++	sumshort = (u_short)((sum1 >> 16) + (sum1 & 0xffff));
+ 	*(sp) = htons(sumshort);
+ }
+ 
+@@ -348,16 +354,17 @@
+ 		*sp = n & 0xffff;
+ 		return;
+ 	}
++	/* Perform the adjustment in noninverted form
++	 * in order to prefer the -0 result over the +0 result
++	 * Otherwise a UDP checksum could be "adjusted" to nonexistent.
++	 */
+ #ifdef sparc
+-	sum1 = (~(*sp)) & 0xffff;
++	sum1 = *sp + n;
+ #else
+-	sum1 = (~ntohs(*sp)) & 0xffff;
++	sum1 = ntohs(*sp) + n;
+ #endif
+-	sum1 += ~(n) & 0xffff;
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	/* Again */
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	sumshort = ~(u_short)sum1;
++	/* One folding step is sufficient for a sum of two 16-bit operands */
++	sumshort = (u_short)((sum1 >> 16) + (sum1 & 0xffff));
+ 	*(sp) = htons(sumshort);
+ }
+ 
+@@ -385,12 +392,13 @@
+ 	if (!n)
+ 		return;
+ 
+-	sum1 = (~ntohs(*sp)) & 0xffff;
+-	sum1 += (n);
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	/* Again */
+-	sum1 = (sum1 >> 16) + (sum1 & 0xffff);
+-	sumshort = ~(u_short)sum1;
++	/* Perform the adjustment in noninverted form
++	 * in order to prefer the -0 result over the +0 result
++	 * Otherwise a UDP checksum could be "adjusted" to nonexistent.
++	 */
++	sum1 = ntohs(*sp) + (~n & 0xFFFF);
++	/* One folding step is sufficient for a sum of two 16-bit operands */
++	sumshort = (u_short)((sum1 >> 16) + (sum1 & 0xffff));
+ 	*(sp) = htons(sumshort);
+ }
+ 
+@@ -1757,7 +1765,8 @@
+ 
+ 	sum2 = LONG_SUM(ntohl(in.s_addr));
+ 
+-	CALC_SUMD(sum1, sum2, sumd);
++	CALC_SUMD(sum1, sum2, sumd);		/* CKS of new-old IP */
++	sumd = (sumd & 0xFFFF) + (sumd >> 16);	/* Finish folding */
+ 
+ 	/*
+ 	 * Fix IP checksum of the offending IP packet to adjust for
+@@ -1788,17 +1797,14 @@
+ 		 * The UDP checksum is optional, only adjust it 
+ 		 * if it has been set.
+ 		 */
+-		sum1 = ntohs(udp->uh_sum);
+ 		fix_datacksum(&udp->uh_sum, sumd);
+-		sum2 = ntohs(udp->uh_sum);
+ 
+ 		/*
+ 		 * Fix ICMP checksum to compensate the UDP 
+ 		 * checksum adjustment.
++		 * Since CKS adjustment was negative, this one is positive.
+ 		 */
+-		sumd2 = sumd << 1;
+-		CALC_SUMD(sum1, sum2, sumd);
+-		sumd2 += sumd;
++		sumd2 = sumd;
+ 	}
+ 
+ 	/*
+@@ -1808,23 +1814,14 @@
+ 	 * the TCP checksum (normally it does not!).
+ 	 */
+ 	else if ((oip->ip_p == IPPROTO_TCP) && (dlen >= 18)) {
+-		sum1 = ntohs(tcp->th_sum);
+ 		fix_datacksum(&tcp->th_sum, sumd);
+-		sum2 = ntohs(tcp->th_sum);
+ 
+ 		/*
+ 		 * Fix ICMP checksum to compensate the TCP 
+ 		 * checksum adjustment.
++		 * Since CKS adjustment was negative, this one is positive.
+ 		 */
+-		sumd2 = sumd << 1;
+-		CALC_SUMD(sum1, sum2, sumd);
+-		sumd2 += sumd;
+-	} else {
+-		sumd2 = (sumd >> 16); 
+-		if (nat->nat_dir == NAT_OUTBOUND)
+-			sumd2 = ~sumd2;
+-		else
+-			sumd2 = ~sumd2 + 1;
++		sumd2 = sumd;
+ 	}
+ 
+ 	if (((flags & IPN_TCPUDP) != 0) && (dlen >= 4)) {
+@@ -1847,103 +1844,46 @@
+ 		 * include the TCP checksum. So we have to check if the
+ 		 * ip->ip_len actually holds the TCP checksum of the oip!
+ 		 */
++
++		sumd = 0;	/* Assume no port adjustment & no CKS change */
+ 		if (nat->nat_oport == tcp->th_dport) {
+ 			if (tcp->th_sport != nat->nat_inport) {
+-				/*
+-				 * Fix ICMP checksum to compensate port
+-				 * adjustment.
+-				 */
+-				sum1 = ntohs(nat->nat_inport);
+-				sum2 = ntohs(tcp->th_sport);
++				sumd = ntohs(nat->nat_inport)
++					+ (ntohs(tcp->th_sport) ^ 0xFFFF);
+ 				tcp->th_sport = nat->nat_inport;
+-
+-				/*
+-				 * Fix udp checksum to compensate port
+-				 * adjustment.  NOTE : the offending IP packet
+-				 * flows the other direction compared to the
+-				 * ICMP message.
+-				 *
+-				 * The UDP checksum is optional, only adjust
+-				 * it if it has been set.
+-				 */
+-				if ((oip->ip_p == IPPROTO_UDP) &&
+-				    (dlen >= 8) && udp->uh_sum) {
+-					sumd = sum1 - sum2;
+-					sumd2 += sumd;
+-
+-					sum1 = ntohs(udp->uh_sum);
+-					fix_datacksum(&udp->uh_sum, sumd);
+-					sum2 = ntohs(udp->uh_sum);
+-
+-					/*
+-					 * Fix ICMP checksum to compensate
+-					 * UDP checksum adjustment.
+-					 */
+-					CALC_SUMD(sum1, sum2, sumd);
+-					sumd2 += sumd;
+-				}
+-
+-				/*
+-				 * Fix tcp checksum (if present) to compensate
+-				 * port adjustment. NOTE : the offending IP
+-				 * packet flows the other direction compared to
+-				 * the ICMP message.
+-				 */
+-				if (oip->ip_p == IPPROTO_TCP) {
+-					if (dlen >= 18) {
+-						sumd = sum1 - sum2;
+-						sumd2 += sumd;
+-
+-						sum1 = ntohs(tcp->th_sum);
+-						fix_datacksum(&tcp->th_sum,
+-							      sumd);
+-						sum2 = ntohs(tcp->th_sum);
+-
+-						/*
+-						 * Fix ICMP checksum to 
+-						 * compensate TCP checksum 
+-						 * adjustment.
+-						 */
+-						CALC_SUMD(sum1, sum2, sumd);
+-						sumd2 += sumd;
+-					} else {
+-						sumd = sum2 - sum1 + 1;
+-						sumd2 += sumd;
+-					}
+-				}
++			} else if (tcp->th_dport != nat->nat_outport) {
++				sumd = ntohs(nat->nat_outport)
++					+ (ntohs(tcp->th_dport) ^ 0xFFFF);
++				tcp->th_dport = nat->nat_outport;
+ 			}
+-		} else if (tcp->th_dport != nat->nat_outport) {
++		}
++
++		if ( sumd ) {
++			sumd = (sumd >> 16) + (sumd & 0xFFFF);
+ 			/*
+ 			 * Fix ICMP checksum to compensate port
+ 			 * adjustment.
++			 * Since sumd has new-old, CKS adjustment is negative.
+ 			 */
+-			sum1 = ntohs(nat->nat_outport);
+-			sum2 = ntohs(tcp->th_dport);
+-			tcp->th_dport = nat->nat_outport;
++			sumd2 += sumd ^ 0xFFFF;
+ 
+ 			/*
+ 			 * Fix udp checksum to compensate port
+-			 * adjustment.   NOTE : the offending IP
+-			 * packet flows the other direction compared
+-			 * to the ICMP message.
++			 * adjustment.  NOTE : the offending IP packet
++			 * flows the other direction compared to the
++			 * ICMP message.
+ 			 *
+ 			 * The UDP checksum is optional, only adjust
+ 			 * it if it has been set.
+ 			 */
+-			if ((oip->ip_p == IPPROTO_UDP) &&
+-			    (dlen >= 8) && udp->uh_sum) {
+-				sumd = sum1 - sum2;
+-				sumd2 += sumd;
+-
+-				sum1 = ntohs(udp->uh_sum);
++			if ((oip->ip_p == IPPROTO_UDP) && (dlen >= 8) && udp->uh_sum) {
+ 				fix_datacksum(&udp->uh_sum, sumd);
+-				sum2 = ntohs(udp->uh_sum);
+-
+ 				/*
+ 				 * Fix ICMP checksum to compensate
+ 				 * UDP checksum adjustment.
++				 * Since UDP CKS adjustment was negative, this one is positive.
+ 				 */
+-				CALC_SUMD(sum1, sum2, sumd);
++				sumd2 += sumd;
+ 			}
+ 
+ 			/*
+@@ -1952,27 +1892,15 @@
+ 			 * packet flows the other direction compared to
+ 			 * the ICMP message.
+ 			 */
+-			if (oip->ip_p == IPPROTO_TCP) {
+-				if (dlen >= 18) {
+-					sumd = sum1 - sum2;
+-					sumd2 += sumd;
+-
+-					sum1 = ntohs(tcp->th_sum);
+-					fix_datacksum(&tcp->th_sum, sumd);
+-					sum2 = ntohs(tcp->th_sum);
+-
+-					/*
+-					 * Fix ICMP checksum to compensate
+-					 * UDP checksum adjustment.
+-					 */
+-					CALC_SUMD(sum1, sum2, sumd);
+-				} else {
+-					sumd = sum2 - sum1;
+-					if (nat->nat_dir == NAT_OUTBOUND)
+-						sumd++;
+-				}
++			if ((oip->ip_p == IPPROTO_TCP) && (dlen >= 18)) {
++				fix_datacksum(&tcp->th_sum, sumd);
++				/*
++				 * Fix ICMP checksum to compensate
++				 * TCP checksum adjustment.
++				 * Since TCP CKS adjustment was negative, this one is positive.
++				 */
++				sumd2 += sumd;
+ 			}
+-			sumd2 += sumd;
+ 		}
+ 		if (sumd2) {
+ 			sumd2 = (sumd2 & 0xffff) + (sumd2 >> 16);
+@@ -2319,8 +2247,15 @@
+ 	void *sifp;
+ 	u_32_t iph;
+ 	nat_t *nat;
++#if IPFILTER_MSSCLAMP_FORCE
++	int clamped = 0;
++	int retval = 0;
++
++	if (fr_nat_lock)
++#else /* !IPFILTER_MSSCLAMP_FORCE */
+ 
+ 	if (nat_list == NULL || (fr_nat_lock))
++#endif /* !IPFILTER_MSSCLAMP_FORCE */
+ 		return 0;
+ 
+ 	if ((fr = fin->fin_fr) && !(fr->fr_flags & FR_DUP) &&
+@@ -2344,6 +2279,11 @@
+ 	}
+ 
+ 	ipa = fin->fin_saddr;
++	
++#if IPFILTER_MSSCLAMP_FORCE
++	if (nat_list == NULL)
++		goto ip_natout_mss;
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ 
+ 	READ_ENTER(&ipf_nat);
+ 
+@@ -2495,9 +2435,13 @@
+                                  * only deal IPv4 for now.
+                                  */
+                                 if (nat->nat_mssclamp &&
+-                                    (tcp->th_flags & TH_SYN) != 0)
++                                    (tcp->th_flags & TH_SYN) != 0) {
+                                         nat_mssclamp(tcp, nat->nat_mssclamp,
+ 						     fin, csump);
++						     #if IPFILTER_MSSCLAMP_FORCE
++						     			clamped = 1;
++						     #endif /* IPFILTER_MSSCLAMP_FORCE */
++						 }
+ 
+ 				MUTEX_EXIT(&nat->nat_lock);
+ 			} else if (fin->fin_p == IPPROTO_UDP) {
+@@ -2527,6 +2471,7 @@
+ 		} else
+ 			i = 1;
+ 		ATOMIC_INCL(nat_stats.ns_mapped[1]);
++#if !IPFILTER_MSSCLAMP_FORCE
+ 		RWLOCK_EXIT(&ipf_nat);	/* READ */
+ 		fin->fin_ifp = sifp;
+ 		return i;
+@@ -2534,6 +2479,28 @@
+ 	RWLOCK_EXIT(&ipf_nat);			/* READ/WRITE */
+ 	fin->fin_ifp = sifp;
+ 	return 0;
++#else /* IPFILTER_MSSCLAMP_FORCE */
++		retval = i;
++	}
++	RWLOCK_EXIT(&ipf_nat);			/* READ/WRITE */
++
++ip_natout_mss:
++	/* Handle MSS clamping, if necessary */
++	if (!clamped && (fr_mssclamp > 0) && (fr_mssif[0] != 0) &&
++		(fin->fin_off == 0) && !(fin->fin_fl & FI_SHORT) &&
++		(fin->fin_p == IPPROTO_TCP)) {
++		
++		if ((tcp->th_flags & TH_SYN) != 0) {
++		
++			/* Does the interface name match? */
++			if (strncmp(IFNAME(ifp), fr_mssif, IFNAMSIZ) == 0)
++				nat_mssclamp(tcp, fr_mssclamp, fin, &tcp->th_sum);
++		}
++	}
++	
++	fin->fin_ifp = sifp;
++	return retval;
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ }
+ 
+ 
+@@ -2555,8 +2522,14 @@
+ 	int i, icmpset = 0;
+ 	nat_t *nat;
+ 	u_32_t iph;
++#if IPFILTER_MSSCLAMP_FORCE
++	int clamped = 0;
++	int retval = 0;
+ 
++	if ((ip->ip_v != 4) || (fr_nat_lock))
++#else /* !IPFILTER_MSSCLAMP_FORCE */
+ 	if ((nat_list == NULL) || (ip->ip_v != 4) || (fr_nat_lock))
++#endif /* !IPFILTER_MSSCLAMP_FORCE */
+ 		return 0;
+ 
+ 	if ((fin->fin_off == 0) && !(fin->fin_fl & FI_SHORT)) {
+@@ -2574,6 +2547,11 @@
+ 	in = fin->fin_dst;
+ 	/* make sure the source address is to be redirected */
+ 	src = fin->fin_src;
++	
++#if IPFILTER_MSSCLAMP_FORCE
++	if (nat_list == NULL)
++		goto ip_natin_mss;
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ 
+ 	READ_ENTER(&ipf_nat);
+ 
+@@ -2718,9 +2696,13 @@
+                                  * only deal IPv4 for now.
+                                  */
+                                 if (nat->nat_mssclamp &&
+-                                    (tcp->th_flags & TH_SYN) != 0)
++                                    (tcp->th_flags & TH_SYN) != 0) {
+                                         nat_mssclamp(tcp, nat->nat_mssclamp,
+ 						     fin, csump);
++						     #if IPFILTER_MSSCLAMP_FORCE
++						     			clamped = 1;
++						     #endif /* IPFILTER_MSSCLAMP_FORCE */
++						 }
+ 
+ 				MUTEX_EXIT(&nat->nat_lock);
+ 			} else if (fin->fin_p == IPPROTO_UDP) {
+@@ -2740,11 +2722,33 @@
+ 			}
+ 		}
+ 		ATOMIC_INCL(nat_stats.ns_mapped[0]);
++#if !IPFILTER_MSSCLAMP_FORCE
+ 		RWLOCK_EXIT(&ipf_nat);			/* READ */
+ 		return 1;
+ 	}
+ 	RWLOCK_EXIT(&ipf_nat);			/* READ/WRITE */
+ 	return 0;
++#else /* IPFILTER_MSSCLAMP_FORCE */
++		retval = 1;
++	}
++	RWLOCK_EXIT(&ipf_nat);			/* READ/WRITE */
++	
++ip_natin_mss:
++	/* Handle MSS clamping, if necessary */
++	if (!clamped && (fr_mssclamp > 0) && (fr_mssif[0] != 0) &&
++		(fin->fin_off == 0) && !(fin->fin_fl & FI_SHORT) &&
++		(fin->fin_p == IPPROTO_TCP)) {
++		
++		if ((tcp->th_flags & TH_SYN) != 0) {
++		
++			/* Does the interface name match? */
++			if (strncmp(IFNAME(ifp), fr_mssif, IFNAMSIZ) == 0)
++				nat_mssclamp(tcp, fr_mssclamp, fin, &tcp->th_sum);
++		}
++	}
++	
++	return retval;
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ }
+ 
+ 
+@@ -2966,6 +2970,7 @@
+ 					v = htons(maxmss);
+ 					bcopy(&v, &cp[2], sizeof(v));
+ 					CALC_SUMD(mss, maxmss, sumd);
++					sumd = (sumd & 0xFFFF) + (sumd >> 16);
+ 					fix_outcksum(fin, csump, sumd);
+ 				}
+ 				break;
+diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.h sys/contrib/ipfilter/netinet/ip_nat.h
+--- sys.orig/contrib/ipfilter/netinet/ip_nat.h	Sun Jul  4 11:24:39 2004
++++ sys/contrib/ipfilter/netinet/ip_nat.h	Fri Mar 25 04:25:14 2005
+@@ -76,6 +76,11 @@
+ 
+ #define	DEF_NAT_AGE	1200     /* 10 minutes (600 seconds) */
+ 
++/* Define this NZ to enable special sysctl to force MSS clamping */
++#ifndef IPFILTER_MSSCLAMP_FORCE
++#define IPFILTER_MSSCLAMP_FORCE 0
++#endif
++
+ struct ap_session;
+ 
+ typedef	struct	nat	{
+@@ -303,6 +308,10 @@
+ extern	void	ip_natsync __P((void *));
+ extern	u_long	fr_defnatage;
+ extern	u_long	fr_defnaticmpage;
++#if IPFILTER_MSSCLAMP_FORCE
++extern	int		fr_mssclamp;
++extern	char	fr_mssif[];
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ extern	nat_t	**nat_table[2];
+ extern	nat_t	*nat_instances;
+ extern	ipnat_t	**nat_rules;
+diff -u -r sys.orig/contrib/ipfilter/netinet/ip_state.c sys/contrib/ipfilter/netinet/ip_state.c
+--- sys.orig/contrib/ipfilter/netinet/ip_state.c	Sun Jul  4 11:24:39 2004
++++ sys/contrib/ipfilter/netinet/ip_state.c	Sun Apr 24 08:51:20 2005
+@@ -143,7 +143,7 @@
+ 	fr_udptimeout = 240,
+ 	fr_udpacktimeout = 24,
+ 	fr_icmptimeout = 120,
+-	fr_icmpacktimeout = 12;
++	fr_icmpacktimeout = 120;	/* Longer now that it matches multiple seqs */
+ int	fr_statemax = IPSTATE_MAX,
+ 	fr_statesize = IPSTATE_SIZE;
+ int	fr_state_doflush = 0,
+@@ -172,6 +172,11 @@
+ 	icmpreplytype4[ICMP_TSTAMP] = ICMP_TSTAMPREPLY;
+ 	icmpreplytype4[ICMP_IREQ] = ICMP_IREQREPLY;
+ 	icmpreplytype4[ICMP_MASKREQ] = ICMP_MASKREPLY;
++
++#define ICMP_REPLY_MASK ((1<<ICMP_ECHOREPLY)|(1<<ICMP_TSTAMPREPLY) \
++			|(1<<ICMP_IREQREPLY)|(1<<ICMP_MASKREPLY))
++#define ICMP_IS_REPLY_TYPE(type) ((1<<(type)) & ICMP_REPLY_MASK)
++
+ #ifdef	USE_INET6
+ 	/* fill icmp reply type table */
+ 	for (i = 0; i <= ICMP6_MAXTYPE; i++)
+@@ -653,7 +658,8 @@
+ 		case ICMP6_ECHO_REQUEST :
+ 			is->is_icmp.ics_type = ic->icmp_type;
+ 			hv += (is->is_icmp.ics_id = ic->icmp_id);
+-			hv += (is->is_icmp.ics_seq = ic->icmp_seq);
++			/* Don't include the sequence # in the key, but record it */
++			is->is_icmp.ics_seq = ic->icmp_seq;
+ 			break;
+ 		case ICMP6_MEMBERSHIP_QUERY :
+ 		case ND_ROUTER_SOLICIT :
+@@ -679,7 +685,8 @@
+ 		case ICMP_MASKREQ :
+ 			is->is_icmp.ics_type = ic->icmp_type;
+ 			hv += (is->is_icmp.ics_id = ic->icmp_id);
+-			hv += (is->is_icmp.ics_seq = ic->icmp_seq);
++			/* Don't include the sequence # in the key, but record it */
++			is->is_icmp.ics_seq = ic->icmp_seq;
+ 			break;
+ 		default :
+ 			return NULL;
+@@ -958,8 +965,8 @@
+ 	    (SEQ_GE(seq, fdata->td_end - maxwin)) &&
+ /* XXX what about big packets */
+ #define MAXACKWINDOW 66000
+-	    (-ackskew <= (MAXACKWINDOW << tdata->td_wscale)) &&
+-	    ( ackskew <= (MAXACKWINDOW << tdata->td_wscale))) {
++	    (-ackskew <= (MAXACKWINDOW << fdata->td_wscale)) &&
++	    ( ackskew <= (MAXACKWINDOW << fdata->td_wscale))) {
+ 
+ 		/* if ackskew < 0 then this should be due to fragmented
+ 		 * packets. There is no way to know the length of the
+@@ -1151,11 +1158,9 @@
+ 		 */
+ 		if ((!rev && (icmp->icmp_type == is->is_type)) ||
+ 		    (rev && (icmpreplytype4[is->is_type] == icmp->icmp_type))) {
+-			if (icmp->icmp_type != ICMP_ECHOREPLY)
+-				return 1;
+-			if ((icmp->icmp_id == is->is_icmp.ics_id) &&
+-			    (icmp->icmp_seq == is->is_icmp.ics_seq))
++			if (!ICMP_IS_REPLY_TYPE(icmp->icmp_type))
+ 				return 1;
++			if (icmp->icmp_id == is->is_icmp.ics_id) return 1;
+ 		}
+ 	}
+ #ifdef	USE_INET6
+@@ -1164,9 +1169,7 @@
+ 		    (rev && (icmpreplytype6[is->is_type] == icmp->icmp_type))) {
+ 			if (icmp->icmp_type != ICMP6_ECHO_REPLY)
+ 				return 1;
+-			if ((icmp->icmp_id == is->is_icmp.ics_id) &&
+-			    (icmp->icmp_seq == is->is_icmp.ics_seq))
+-				return 1;
++			if (icmp->icmp_id == is->is_icmp.ics_id) return 1;
+ 		}
+ 	}
+ #endif
+@@ -1325,7 +1328,6 @@
+ 		dst.in4 = oip->ip_dst;
+ 		hv += dst.in4.s_addr;
+ 		hv += icmp->icmp_id;
+-		hv += icmp->icmp_seq;
+ 		hv %= fr_statesize;
+ 
+ 		READ_ENTER(&ipf_state);
+@@ -1497,7 +1499,7 @@
+ 			if ((ic->icmp_type == ICMP6_ECHO_REQUEST) ||
+ 			    (ic->icmp_type == ICMP6_ECHO_REPLY)) {
+ 				hv += ic->icmp_id;
+-				hv += ic->icmp_seq;
++				/* Do *not* include seq # here */
+ 			}
+ 		}
+ 		READ_ENTER(&ipf_state);
+@@ -1507,6 +1509,8 @@
+ 			if ((is->is_p == pr) && (is->is_v == v) &&
+ 			    fr_matchsrcdst(is, src, dst, fin, NULL) &&
+ 			    fr_matchicmpqueryreply(v, is, ic, fin->fin_rev)) {
++			    	/* Record seq # for perusal */
++				is->is_icmp.ics_seq = ic->icmp_seq;
+ 				rev = fin->fin_rev;
+ 				if (is->is_frage[rev] != 0)
+ 					is->is_age = is->is_frage[rev];
+@@ -1554,7 +1558,7 @@
+ 		tcp = NULL;
+ 		if (v == 4) {
+ 			hv += ic->icmp_id;
+-			hv += ic->icmp_seq;
++			/* Do *not* include seq # here */
+ 		}
+ 		hvm = hv % fr_statesize;
+ 		READ_ENTER(&ipf_state);
+@@ -1562,6 +1566,8 @@
+ 			if ((is->is_p == pr) && (is->is_v == v) &&
+ 			    fr_matchsrcdst(is, src, dst, fin, NULL) &&
+ 			    fr_matchicmpqueryreply(v, is, ic, fin->fin_rev)) {
++			    	/* Record seq # for perusal */
++				is->is_icmp.ics_seq = ic->icmp_seq;
+ 				rev = fin->fin_rev;
+ 				if (is->is_frage[rev] != 0)
+ 					is->is_age = is->is_frage[rev];
+@@ -2239,7 +2245,6 @@
+ 		for (isp = &ips_table[hv]; (is = *isp); isp = &is->is_hnext)
+ 			if ((is->is_p == pr) &&
+ 			    (oic->icmp6_id == is->is_icmp.ics_id) &&
+-			    (oic->icmp6_seq == is->is_icmp.ics_seq) &&
+ 			    fr_matchsrcdst(is, src, dst, &ofin, NULL)) {
+ 			    	/*
+ 			    	 * in the state table ICMP query's are stored
+diff -u -r sys.orig/contrib/ipfilter/netinet/mlfk_ipl.c sys/contrib/ipfilter/netinet/mlfk_ipl.c
+--- sys.orig/contrib/ipfilter/netinet/mlfk_ipl.c	Sat Apr 27 19:37:12 2002
++++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	Mon May  9 00:58:58 2005
+@@ -45,6 +45,11 @@
+ # include <netinet/tcpip.h>
+ #endif
+ 
++#if __FreeBSD_version >= 300000
++# if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#  include "opt_ipfilter.h"
++# endif
++#endif
+ 
+ #include <netinet/ipl.h>
+ #include <netinet/ip_compat.h>
+@@ -102,6 +107,12 @@
+ SYSCTL_INT(_net_inet_ipf, OID_AUTO, fr_minttl, CTLFLAG_RW, &fr_minttl, 0, "");
+ SYSCTL_INT(_net_inet_ipf, OID_AUTO, fr_minttllog, CTLFLAG_RW,
+ 	   &fr_minttllog, 0, "");
++#if IPFILTER_MSSCLAMP_FORCE
++SYSCTL_INT(_net_inet_ipf, OID_AUTO, fr_mssclamp, CTLFLAG_RW,
++	   &fr_mssclamp, 0, "");
++SYSCTL_STRING(_net_inet_ipf, OID_AUTO, fr_mssif, CTLFLAG_RW,
++	   fr_mssif, IFNAMSIZ, "");
++#endif /* IPFILTER_MSSCLAMP_FORCE */
+ 
+ #define CDEV_MAJOR 79
+ static struct cdevsw ipl_cdevsw = {
+diff -u -r sys.orig/i386/isa/clock.c sys/i386/isa/clock.c
+--- sys.orig/i386/isa/clock.c	Sat Nov  2 05:41:50 2002
++++ sys/i386/isa/clock.c	Sun Apr 24 08:51:20 2005
+@@ -950,7 +950,7 @@
+ 	writertc(RTC_HRS, bin2bcd(tm%24)); tm /= 24;	/* Write back Hours   */
+ 
+ 	/* We have now the days since 01-01-1970 in tm */
+-	writertc(RTC_WDAY, (tm+4)%7);			/* Write back Weekday */
++	writertc(RTC_WDAY, (tm+4)%7+1);			/* Write back Weekday */
+ 	for (y = 1970, m = DAYSPERYEAR + LEAPYEAR(y);
+ 	     tm >= m;
+ 	     y++,      m = DAYSPERYEAR + LEAPYEAR(y))
+diff -u -r sys.orig/kern/subr_diskslice.c sys/kern/subr_diskslice.c
+--- sys.orig/kern/subr_diskslice.c	Tue Jul 24 11:49:41 2001
++++ sys/kern/subr_diskslice.c	Sun Apr 24 08:51:20 2005
+@@ -892,9 +892,11 @@
+ 	}
+ 	if (pp->p_size != sp->ds_size) {
+ 		if (sname != NULL) {
++			/*
+ 			printf("%s: raw partition size != slice size\n", sname);
+ 			slice_info(sname, sp);
+ 			partition_info(sname, RAW_PART, pp);
++			*/
+ 		}
+ 		if (pp->p_size > sp->ds_size) {
+ 			if (sname == NULL)
+diff -u -r sys.orig/net/if_ethersubr.c sys/net/if_ethersubr.c
+--- sys.orig/net/if_ethersubr.c	Wed Mar  3 13:35:16 2004
++++ sys/net/if_ethersubr.c	Sun Apr 24 08:51:20 2005
+@@ -605,8 +605,10 @@
+ 			 * it dropped (m_free'd) the packet itself.
+ 			 */
+ 			if (m == NULL) {
++			    /*
+ 			    if (bif == BDG_BCAST || bif == BDG_MCAST)
+ 				printf("bdg_forward drop MULTICAST PKT\n");
++			    */
+ 			    return;
+ 			}
+ 			eh = &save_eh ;
+diff -u -r sys.orig/netgraph/ng_ppp.c sys/netgraph/ng_ppp.c
+--- sys.orig/netgraph/ng_ppp.c	Sun Dec 12 20:37:52 2004
++++ sys/netgraph/ng_ppp.c	Sun Apr 24 08:51:21 2005
+@@ -744,7 +744,11 @@
+ 	case HOOK_INDEX_VJC_VJIP:
+ 		if (priv->conf.enableCompression
+ 		    && priv->hooks[HOOK_INDEX_COMPRESS] != NULL) {
+-			if ((m = ng_ppp_addproto(m, proto, 0)) == NULL) {
++			if ((m = ng_ppp_addproto(m, proto,
++			/* Get the PFC enable from the first link (RFC1990) */
++			    priv->links[priv->activeLinks[0]]
++			    .conf.enableProtoComp
++			    )) == NULL) {
+ 				NG_FREE_META(meta);
+ 				return (ENOBUFS);
+ 			}
+@@ -755,7 +759,11 @@
+ 	case HOOK_INDEX_COMPRESS:
+ 		if (priv->conf.enableEncryption
+ 		    && priv->hooks[HOOK_INDEX_ENCRYPT] != NULL) {
+-			if ((m = ng_ppp_addproto(m, proto, 1)) == NULL) {
++			if ((m = ng_ppp_addproto(m, proto,
++			/* Get the PFC enable from the first link (RFC1990) */
++			    priv->links[priv->activeLinks[0]]
++			    .conf.enableProtoComp
++			    )) == NULL) {
+ 				NG_FREE_META(meta);
+ 				return (ENOBUFS);
+ 			}
+@@ -973,8 +981,9 @@
+ 
+ 	/* Prepend protocol number, possibly compressed */
+ 	if ((m = ng_ppp_addproto(m, proto,
+-	    linkNum == NG_PPP_BUNDLE_LINKNUM
+-	      || link->conf.enableProtoComp)) == NULL) {
++	    /* On a bundle, get the PFC enable from the first link (RFC1990) */
++	    (link ? link
++	    : &priv->links[priv->activeLinks[0]])->conf.enableProtoComp)) == NULL) {
+ 		NG_FREE_META(meta);
+ 		return (ENOBUFS);
+ 	}
+diff -u -r sys.orig/netinet/ip_input.c sys/netinet/ip_input.c
+--- sys.orig/netinet/ip_input.c	Sun Jan  2 06:03:16 2005
++++ sys/netinet/ip_input.c	Sun Apr 24 08:51:21 2005
+@@ -356,7 +356,7 @@
+ 	if (args.rule) {	/* dummynet already filtered us */
+ 		ip = mtod(m, struct ip *);
+ 		hlen = IP_VHL_HL(ip->ip_vhl) << 2;
+-		goto iphack ;
++		goto ipfw;	/* skip ipfilter now (already passed it)! */
+ 	}
+ 
+ 	ipstat.ips_total++;
+@@ -467,7 +467,6 @@
+ 	 * - Encapsulate: put it in another IP and send out. <unimp.>
+  	 */
+ 
+-iphack:
+ 	/*
+ 	 * Check if we want to allow this packet to be processed.
+ 	 * Consider it to be bad if not.
+@@ -479,6 +478,7 @@
+ 			return;
+ 		ip = mtod(m = m1, struct ip *);
+ 	}
++ipfw:
+ 	if (fw_enable && IPFW_LOADED) {
+ 		/*
+ 		 * If we've been forwarded from the output side, then
+diff -u -r sys.orig/netinet/ip_output.c sys/netinet/ip_output.c
+--- sys.orig/netinet/ip_output.c	Tue Jun  1 09:38:56 2004
++++ sys/netinet/ip_output.c	Sun Apr 24 08:51:21 2005
+@@ -705,20 +705,6 @@
+ 	}
+ spd_done:
+ #endif /* FAST_IPSEC */
+-	/*
+-	 * IpHack's section.
+-	 * - Xlate: translate packet's addr/port (NAT).
+-	 * - Firewall: deny/allow/etc.
+-	 * - Wrap: fake packet's addr/port <unimpl.>
+-	 * - Encapsulate: put it in another IP and send out. <unimp.>
+-	 */ 
+-	if (fr_checkp) {
+-		struct  mbuf    *m1 = m;
+-
+-		if ((error = (*fr_checkp)(ip, hlen, ifp, 1, &m1)) || !m1)
+-			goto done;
+-		ip = mtod(m = m1, struct ip *);
+-	}
+ 
+ 	/*
+ 	 * Check with the firewall...
+@@ -952,6 +938,21 @@
+ 	}
+ 
+ pass:
++	/*
++	 * IpHack's section.
++	 * - Xlate: translate packet's addr/port (NAT).
++	 * - Firewall: deny/allow/etc.
++	 * - Wrap: fake packet's addr/port <unimpl.>
++	 * - Encapsulate: put it in another IP and send out. <unimp.>
++	 */ 
++	if (fr_checkp) {
++		struct  mbuf    *m1 = m;
++
++		if ((error = (*fr_checkp)(ip, hlen, ifp, 1, &m1)) || !m1)
++			goto done;
++		ip = mtod(m = m1, struct ip *);
++	}
++
+ 	/* 127/8 must not appear on wire - RFC1122. */
+ 	if ((ntohl(ip->ip_dst.s_addr) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET ||
+ 	    (ntohl(ip->ip_src.s_addr) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
+diff -u -r sys.orig/netipsec/key.c sys/netipsec/key.c
+--- sys.orig/netipsec/key.c	Sat Feb 14 23:23:23 2004
++++ sys/netipsec/key.c	Sun Apr 24 08:51:21 2005
+@@ -110,6 +110,34 @@
+  *   field hits 0 (= no external reference other than from SA header.
+  */
+ 
++/*
++ * New feature: SA holdoff
++ * When key_preferred_oldsa is negative, new SAs are preferred (as if =0),
++ * but only when established for at least -key_preferred_oldsa seconds.
++ * If no "sufficiently mature" SAs are found, the oldest is used.
++ * This gets around the "blackout" problem caused by sender/receiver skew
++ * when establishing new SAs, without the potentially lingering inconsistencies
++ * caused by preferring old SAs.
++ *	Fred Wright
++ */
++#ifndef IPSEC_SA_HOLDOFF
++#define IPSEC_SA_HOLDOFF 1
++#endif
++
++/*
++ * Old, probably obsolete feature: SA "early retirement"
++ * There was code to delete non-preferred send SAs discovered while sending.
++ * This was only operative with key_preferred_oldsa=0, and we suspect it was
++ * an attempt at solving the "blackout" problem.  Since there is now better
++ * control over SA selection, that other code is probably unnecessary and
++ * certainly adds complication, so it's conditionaled out here.  Nevertheless,
++ * it's tweaked to work correctly if it is enabled.
++ *	Fred Wright
++ */
++#ifndef IPSEC_SA_EARLY_RETIRE
++#define IPSEC_SA_EARLY_RETIRE 0
++#endif
++
+ u_int32_t key_debug_level = 0;
+ static u_int key_spi_trycnt = 1000;
+ static u_int32_t key_spi_minval = 0x100;
+@@ -119,7 +147,7 @@
+ static u_int key_larval_lifetime = 30;	/* interval to expire acquiring, 30(s)*/
+ static int key_blockacq_count = 10;	/* counter for blocking SADB_ACQUIRE.*/
+ static int key_blockacq_lifetime = 20;	/* lifetime for blocking SADB_ACQUIRE.*/
+-static int key_prefered_oldsa = 1;	/* prefered old sa rather than new sa.*/
++static int key_preferred_oldsa = 1;	/* preferred old sa rather than new sa.*/
+ 
+ static u_int32_t acq_seq = 0;
+ static int key_tick_init_random = 0;
+@@ -134,12 +162,11 @@
+ static LIST_HEAD(_spacqtree, secspacq) spacqtree;	/* SP acquiring list */
+ 
+ /* search order for SAs */
+-static u_int saorder_state_valid[] = {
++static const u_int saorder_state_valid_prefer_old[] = {
+ 	SADB_SASTATE_DYING, SADB_SASTATE_MATURE,
+-	/*
+-	 * This order is important because we must select the oldest SA
+-	 * for outbound processing.  For inbound, This is not important.
+-	 */
++};
++static const u_int saorder_state_valid_prefer_new[] = {
++	SADB_SASTATE_MATURE, SADB_SASTATE_DYING,
+ };
+ static u_int saorder_state_alive[] = {
+ 	/* except DEAD */
+@@ -247,8 +274,8 @@
+ 	&ipsec_ah_keymin,	0,	"");
+ 
+ /* perfered old SA rather than new SA */
+-SYSCTL_INT(_net_key, KEYCTL_PREFERED_OLDSA,	prefered_oldsa, CTLFLAG_RW,\
+-	&key_prefered_oldsa,	0,	"");
++SYSCTL_INT(_net_key, KEYCTL_PREFERED_OLDSA,	preferred_oldsa, CTLFLAG_RW,\
++	&key_preferred_oldsa,	0,	"");
+ 
+ #ifndef LIST_FOREACH
+ #define LIST_FOREACH(elm, head, field)                                     \
+@@ -351,7 +378,8 @@
+ 
+ static struct secasvar *key_allocsa_policy __P((const struct secasindex *));
+ static void key_freesp_so __P((struct secpolicy **));
+-static struct secasvar *key_do_allocsa_policy __P((struct secashead *, u_int));
++static struct secasvar *key_do_allocsa_policy __P((struct secashead *, u_int,
++	time_t, struct secasvar **));
+ static void key_delsp __P((struct secpolicy *));
+ static struct secpolicy *key_getsp __P((struct secpolicyindex *));
+ static struct secpolicy *key_getspbyid __P((u_int32_t));
+@@ -816,6 +844,10 @@
+ 	struct secashead *sah;
+ 	struct secasvar *sav;
+ 	u_int stateidx, state;
++	const u_int *saorder_state_valid;
++	int arraysize;
++	time_t cutoff = 0;
++	struct secasvar *fallback = NULL;
+ 
+ 	LIST_FOREACH(sah, &sahtree, chain) {
+ 		if (sah->state == SADB_SASTATE_DEAD)
+@@ -828,17 +860,29 @@
+ 
+     found:
+ 
+-	/* search valid state */
+-	for (stateidx = 0;
+-	     stateidx < _ARRAYLEN(saorder_state_valid);
+-	     stateidx++) {
++	/*
++	 * search a valid state list for outbound packet.
++	 * This search order is important.
++	 */
++	if (key_preferred_oldsa > 0) {
++		saorder_state_valid = saorder_state_valid_prefer_old;
++		arraysize = _ARRAYLEN(saorder_state_valid_prefer_old);
++	} else {
++		saorder_state_valid = saorder_state_valid_prefer_new;
++		arraysize = _ARRAYLEN(saorder_state_valid_prefer_new);
++		cutoff = time_second - key_preferred_oldsa;
++	}
++
++	for (stateidx = 0; stateidx < arraysize; stateidx++) {
+ 
+ 		state = saorder_state_valid[stateidx];
+ 
+-		sav = key_do_allocsa_policy(sah, state);
++		sav = key_do_allocsa_policy(sah, state, cutoff, &fallback);
+ 		if (sav != NULL)
+ 			return sav;
+ 	}
++	/* If we have fallback, feed it through for refcnt update */
++	if ( fallback ) return key_do_allocsa_policy(NULL, 0, 0, &fallback);
+ 
+ 	return NULL;
+ }
+@@ -851,13 +895,24 @@
+  *	others	: found, pointer to a SA.
+  */
+ static struct secasvar *
+-key_do_allocsa_policy(struct secashead *sah, u_int state)
++key_do_allocsa_policy(struct secashead *sah, u_int state,
++			time_t cutoff, struct secasvar **fbp)
+ {
+-	struct secasvar *sav, *nextsav, *candidate, *d;
++	struct secasvar *sav, *nextsav, *candidate;
++#if !SA_EARLY_RETIRE
++	#define RETIRE_SA(sa)
++#else
++	struct secasvar *d = NULL;
++	#define RETIRE_SA(sa) d = sa;
++#endif
+ 
+ 	/* initilize */
+ 	candidate = NULL;
+ 
++#if IPSEC_SA_HOLDOFF
++	if ( !sah ) candidate = *fbp;
++	else
++#endif
+ 	for (sav = LIST_FIRST(&sah->savtree[state]);
+ 	     sav != NULL;
+ 	     sav = nextsav) {
+@@ -880,8 +935,9 @@
+ 			panic("key_do_allocsa_policy: "
+ 				"lifetime_current is NULL.\n");
+ 
++#if !IPSEC_SA_HOLDOFF
+ 		/* What the best method is to compare ? */
+-		if (key_prefered_oldsa) {
++		if (key_preferred_oldsa > 0) {
+ 			if (candidate->lft_c->sadb_lifetime_addtime >
+ 					sav->lft_c->sadb_lifetime_addtime) {
+ 				candidate = sav;
+@@ -890,20 +946,47 @@
+ 			/*NOTREACHED*/
+ 		}
+ 
+-		/* prefered new sa rather than old sa */
++		/* preferred new sa rather than old sa */
+ 		if (candidate->lft_c->sadb_lifetime_addtime <
+ 				sav->lft_c->sadb_lifetime_addtime) {
+-			d = candidate;
++			RETIRE_SA(candidate)
+ 			candidate = sav;
+-		} else
+-			d = sav;
++		} else {
++			RETIRE_SA(sav)
++		}
++#else /* IPSEC_SA_HOLDOFF */
++		/* Decide handling based on SA addtime vs. cutoff */
++		if ( sav->lft_c->sadb_lifetime_addtime < cutoff ) {
++			/* Prefer newer among "sufficiently old */
++			if ( sav->lft_c->sadb_lifetime_addtime
++			    > candidate->lft_c->sadb_lifetime_addtime ) {
++				RETIRE_SA(candidate)
++				candidate = sav;
++			} else {
++				RETIRE_SA(sav)
++			}
++		} else {
++			/* Prefer older among "too new" */
++			if ( sav->lft_c->sadb_lifetime_addtime
++			    < candidate->lft_c->sadb_lifetime_addtime ) {
++				if ( !cutoff ) {
++				/* Use immediately in "pure older" mode */
++					candidate = sav;
++				} else {
++				/* Otherwise use as fallback */
++					*fbp = sav;
++				}
++			}
++		}
++#endif /* IPSEC_SA_HOLDOFF */
+ 
++#if IPSEC_SA_EARLY_RETIRE
+ 		/*
+ 		 * prepared to delete the SA when there is more
+ 		 * suitable candidate and the lifetime of the SA is not
+ 		 * permanent.
+ 		 */
+-		if (d->lft_c->sadb_lifetime_addtime != 0) {
++		if (d && d->lft_c->sadb_lifetime_addtime != 0) {
+ 			struct mbuf *m, *result;
+ 
+ 			key_sa_chgstate(d, SADB_SASTATE_DEAD);
+@@ -959,6 +1042,7 @@
+ 		 msgfail:
+ 			KEY_FREESAV(&d);
+ 		}
++#endif /* IPSEC_SA_EARLY_RETIRE */
+ 	}
+ 
+ 	if (candidate) {
+@@ -997,6 +1081,8 @@
+ 	struct secasvar *sav;
+ 	u_int stateidx, state;
+ 	int s;
++	const u_int *saorder_state_valid;
++	int arraysize;
+ 
+ 	KASSERT(dst != NULL, ("key_allocsa: null dst address"));
+ 
+@@ -1004,6 +1090,22 @@
+ 		printf("DP key_allocsa from %s:%u\n", where, tag));
+ 
+ 	/*
++	 * when both systems employ similar strategy to use a SA.
++	 * the search order is important even in the inbound case.
++	 */
++	/*
++	 * The above should be untrue since the lookup is by SPI,
++	 * but we're leaving this aspect alone for now. - FW
++	 */
++	if (key_preferred_oldsa > 0) {
++		saorder_state_valid = saorder_state_valid_prefer_old;
++		arraysize = _ARRAYLEN(saorder_state_valid_prefer_old);
++	} else {
++		saorder_state_valid = saorder_state_valid_prefer_new;
++		arraysize = _ARRAYLEN(saorder_state_valid_prefer_new);
++	}
++
++	/*
+ 	 * searching SAD.
+ 	 * XXX: to be checked internal IP header somewhere.  Also when
+ 	 * IPsec tunnel packet is received.  But ESP tunnel mode is
+@@ -1011,10 +1113,11 @@
+ 	 */
+ 	s = splnet();	/*called from softclock()*/
+ 	LIST_FOREACH(sah, &sahtree, chain) {
+-		/* search valid state */
+-		for (stateidx = 0;
+-		     stateidx < _ARRAYLEN(saorder_state_valid);
+-		     stateidx++) {
++		/*
++		 * search a valid state list for inbound packet.
++	 	 * the search order is not important.
++		 */
++		for (stateidx = 0; stateidx < arraysize; stateidx++) {
+ 			state = saorder_state_valid[stateidx];
+ 			LIST_FOREACH(sav, &sah->savtree[state], chain) {
+ 				/* sanity check */
+Only in sys/netipsec: key.c.netkey
+diff -u -r sys.orig/netipsec/key_var.h sys/netipsec/key_var.h
+--- sys.orig/netipsec/key_var.h	Fri Jan 24 06:11:36 2003
++++ sys/netipsec/key_var.h	Sun Apr 24 08:51:21 2005
+@@ -61,7 +61,7 @@
+ 	{ "esp_keymin", CTLTYPE_INT }, \
+ 	{ "esp_auth", CTLTYPE_INT }, \
+ 	{ "ah_keymin", CTLTYPE_INT }, \
+-	{ "prefered_oldsa", CTLTYPE_INT }, \
++	{ "preferred_oldsa", CTLTYPE_INT }, \
+ }
+ 
+ #ifdef _KERNEL
+diff -u -r sys.orig/i386/i386/identcpu.c sys/i386/i386/identcpu.c
+--- sys.orig/i386/i386/identcpu.c	Tue Apr  6 03:40:30 2004
++++ sys/i386/i386/identcpu.c	Sun Apr 24 09:16:38 2005
+@@ -380,7 +380,13 @@
+ 			break;
+ 		case 0x540:
+ 			cpu_class = CPUCLASS_586;
+-			strcat(cpu_model, "GXm");
++			if (cyrix_did < 0x6000) {
++				strcat(cpu_model, "GXm");
++			} else if (cyrix_did < 0x7000) {
++				strcat(cpu_model, "GXLV");
++			} else {
++				strcat(cpu_model, "GX1");
++			}
+ 			break;
+ 		case 0x600:
+ 			strcat(cpu_model, "6x86MX");
+@@ -504,6 +510,13 @@
+ 			}
+ 			break;
+ 		}
++	} else if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		strcpy(cpu_model, "NSC Geode");
++		switch (cpu_id & 0xff0) {
++		case 0x540:
++			cpu_class = CPUCLASS_586;
++			break;
++		}
+ 	} else if (strcmp(cpu_vendor, "RiseRiseRise") == 0) {
+ 		strcpy(cpu_model, "Rise ");
+ 		switch (cpu_id & 0xff0) {
+@@ -602,10 +615,11 @@
+ 	    strcmp(cpu_vendor, "AuthenticAMD") == 0 ||
+ 	    strcmp(cpu_vendor, "RiseRiseRise") == 0 ||
+ 	    strcmp(cpu_vendor, "CentaurHauls") == 0 ||
++	    strcmp(cpu_vendor, "Geode by NSC") == 0 ||
+ 		((strcmp(cpu_vendor, "CyrixInstead") == 0) &&
+-		 ((cpu_id & 0xf00) > 0x500))) {
++		 ((cpu_id & 0xff0) >= 0x540))) {
+ 		printf("  Stepping = %u", cpu_id & 0xf);
+-		if (strcmp(cpu_vendor, "CyrixInstead") == 0)
++		if ((strcmp(cpu_vendor, "CyrixInstead") == 0) || (strcmp(cpu_vendor, "Geode by NSC") == 0))
+ 			printf("  DIR=0x%04x", cyrix_did);
+ 		if (cpu_high > 0) {
+ 			/*
+@@ -938,6 +952,14 @@
+ 				cpu_feature = regs[3];	/* edx */
+ 				break;
+ 			}
++		}
++	} else if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		identifycyrix();
++		switch (cyrix_did & 0x00f0) {
++			case 0x40:  /*  GX1  */
++			case 0xb0:  /*  SCx200  */
++				cpu = CPU_M1SC;
++				break;
+ 		}
+ 	} else if (cpu == CPU_486 && *cpu_vendor == '\0') {
+ 		/*
+diff -u -r sys.orig/i386/i386/vm_machdep.c sys/i386/i386/vm_machdep.c
+--- sys.orig/i386/i386/vm_machdep.c	Sun Aug 31 02:16:27 2003
++++ sys/i386/i386/vm_machdep.c	Sun Apr 24 09:31:04 2005
+@@ -432,6 +432,16 @@
+ 	outb(0xf0, 0x00);		/* Reset. */
+ #else
+ 	/*
++	 * reset Geode via PCI function 0
++	 */
++	if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		if (((cpu_id & 0xfff0) == 0x0540) && ((cyrix_did & 0xfff0) == 0x81b0)) {
++			outl(0xcf8, 0x80009044);
++			outb(0xcfc, 0x0f);
++			outl(0xcf8, 0);
++		}
++	}
++	/*
+ 	 * Attempt to do a CPU reset via the keyboard controller,
+ 	 * do not turn of the GateA20, as any machine that fails
+ 	 * to do the reset here would then end up in no man's land.
+diff -u -r sys.orig/dev/ata/ata-pci.c sys/dev/ata/ata-pci.c
+--- sys.orig/dev/ata/ata-pci.c	Wed Dec 31 19:05:16 2003
++++ sys/dev/ata/ata-pci.c	Sun Apr 24 10:01:12 2005
+@@ -28,6 +28,7 @@
+  * $FreeBSD: src/sys/dev/ata/ata-pci.c,v 1.32.2.21 2003/12/31 18:05:16 jhb Exp $
+  */
+ 
++#include "opt_ata.h"
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+@@ -569,8 +570,10 @@
+ 
+     ata_pci_add_child(dev, 0);
+ 
++#ifndef ATA_DISABLE_SLAVE
+     if (ATA_MASTERDEV(dev) || pci_read_config(dev, 0x18, 4) & IOMASK)
+ 	ata_pci_add_child(dev, 1);
++#endif
+ 
+     return bus_generic_attach(dev);
+ }
+diff -u -r sys.orig/dev/ata/ata-disk.c sys/dev/ata/ata-disk.c
+--- sys.orig/dev/ata/ata-disk.c	Sat Sep 18 12:26:12 2004
++++ sys/dev/ata/ata-disk.c	Sat Apr 30 21:05:21 2005
+@@ -105,7 +105,7 @@
+ 	   "ATA disk write caching");
+ SYSCTL_INT(_hw_ata, OID_AUTO, tags, CTLFLAG_RD, &ata_tags, 0,
+ 	   "ATA disk tagged queuing support");
+-SYSCTL_INT(_hw_ata, OID_AUTO, suspend, CTLFLAG_RD, &ata_suspend, 0,
++SYSCTL_INT(_hw_ata, OID_AUTO, suspend, CTLFLAG_RW, &ata_suspend, 0,
+ 	   "ATA disk suspend timer");
+   
+ void
+@@ -940,6 +940,34 @@
+ 		    ata_umode(adp->device->param));
+     else
+ 	ata_dmainit(atadev, ata_pmode(adp->device->param), -1, -1);
++
++    if (ata_suspend > 0) {
++        /* 
++	 * Attempt to set the standby timer.
++	 * The parameters are documented in sections 8.42.4 p. 210 and
++	 * 8.14.4 (table 23) p. 118 of the ATAPI-5 interface spec 
++	 * http://www.t13.org.
++	 */  
++	int value = ata_suspend;
++	if (atadev->param->stdby_ovlap) {
++	    /* 
++	     * The device supports the standard values.
++	     * Scale the seconds in value appropriately.
++	     */
++	    if (value <= 1200)
++		/* Values 1-240 specify 5 second increments. */
++		value /= 5;
++	    else if (value <= 18000)
++		/* Values 241-251 specify 30 minute increments. */
++		value = (value / 60 / 30) + 241;
++	    else
++		/* A period between 8 and 12 hours. */
++		value = 253;
++	} else
++		ata_prtdev(atadev, "timer value is vendor-specific\n");
++        if (ata_command(atadev, ATA_C_STANDBY, 0, value, 0, ATA_WAIT_INTR))
++	    ata_prtdev(atadev, "suspend mode failed\n");
++    }
+ }
+ 
+ void
+diff -u -r sys.orig/modules/ipfw/Makefile sys/modules/ipfw/Makefile
+--- sys.orig/modules/ipfw/Makefile	Fri Feb 14 15:09:21 2003
++++ sys/modules/ipfw/Makefile	Mon May  9 21:19:08 2005
+@@ -16,7 +16,7 @@
+ #CFLAGS+= -DIPFIREWALL_VERBOSE_LIMIT=100
+ #
+ #If you want it to pass all packets by default
+-#CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
++CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
+ #
+ 
+ .include <bsd.kmod.mk>
+diff -u -r sys.orig/pci/if_sis.c sys/pci/if_sis.c
+--- sys.orig/pci/if_sis.c	Fri Apr 23 00:03:28 2004
++++ sys/pci/if_sis.c	Fri May 27 06:49:50 2005
+@@ -921,6 +921,7 @@
+ 	struct sis_softc	*sc;
+ {
+ 	register int		i;
++	u_int32_t		ns_srr;
+ 
+ 	SIS_SETBIT(sc, SIS_CSR, SIS_CSR_RESET);
+ 
+@@ -942,6 +943,54 @@
+ 	if (sc->sis_type == SIS_TYPE_83815) {
+ 		CSR_WRITE_4(sc, NS_CLKRUN, NS_CLKRUN_PMESTS);
+ 		CSR_WRITE_4(sc, NS_CLKRUN, 0);
++
++		/*
++		 * Page 78 of the DP83815 manual recommends the
++		 * following (0x300 case) register settings "for optimum
++		 * performance." Note however that at least three
++		 * of the registers are listed as "reserved" in
++		 * the register map, so who knows what they do.
++		 *
++		 * This has now been updated for various chip revisions,
++		 * as "documented" in the NatSemi Linux driver.
++		 *
++		 * The documented 83815/83816 SRR values are:
++		 *	DP83815CVNG	0x00000302
++		 *	DP83815DVNG/UJB	0x00000403
++		 *	DP83816AVNG	0x00000505
++		 */
++
++		ns_srr = CSR_READ_4(sc, NS_SRR);
++		switch ( ns_srr & 0xF00 ) {
++
++			case 0x200:
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
++				CSR_WRITE_4(sc, NS_PHY_CR, 0x0802);
++				CSR_WRITE_4(sc, NS_PHY_FCSCR, 0x0010);
++				CSR_WRITE_4(sc, NS_PHY_SDCFG, 0x0333);
++				CSR_WRITE_4(sc, NS_PHY_10BTSCR, 0x0860);
++				CSR_WRITE_4(sc, NS_PHY_RECR, 0x2100);
++				CSR_WRITE_4(sc, 0xE0, 0x4F48);
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0000);
++				SIS_SETBIT(sc, NS_PHY_10BTSCR, 0x04);
++				break;
++
++			case 0x300:
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
++				CSR_WRITE_4(sc, NS_PHY_CR, 0x189C);
++				CSR_WRITE_4(sc, NS_PHY_TDATA, 0x0000);
++				CSR_WRITE_4(sc, NS_PHY_DSPCFG, 0x5040);
++				CSR_WRITE_4(sc, NS_PHY_SDCFG, 0x008C);
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0000);
++				break;
++
++			case 0x400:
++			case 0x500:
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
++				CSR_WRITE_4(sc, NS_PHY_CR, 0x189C);
++				CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0000);
++				break;
++		}
+ 	}
+ 
+         return;
+@@ -1823,6 +1872,7 @@
+ 	 * Cancel pending I/O and free all RX/TX buffers.
+ 	 */
+ 	sis_stop(sc);
++	sc->sis_stopped = 0;
+ 
+ 	mii = device_get_softc(sc->sis_miibus);
+ 
+@@ -1940,27 +1990,46 @@
+ 		SIS_CLRBIT(sc, SIS_RX_CFG, SIS_RXCFG_RX_TXPKTS);
+ 	}
+ 
+-	if (sc->sis_type == SIS_TYPE_83815 &&
+-	     IFM_SUBTYPE(mii->mii_media_active) == IFM_100_TX) {
+-		uint32_t reg;
++	if ( sc->sis_type == SIS_TYPE_83815 ) {
++		uint32_t phy_status, ns_srr, tmp_val;
+ 
+ 		/*
+ 		 * Some DP83815s experience problems when used with short
+ 		 * (< 30m/100ft) Ethernet cables in 100BaseTX mode.  This
+ 		 * sequence adjusts the DSP's signal attenuation to fix the
+ 		 * problem.
++		 *
++		 * This has now been updated to duplicate the logic in
++		 * the NatSemi Linux driver.
+ 		 */
+-		CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
+ 
+-		reg = CSR_READ_4(sc, NS_PHY_DSPCFG);
+-		CSR_WRITE_4(sc, NS_PHY_DSPCFG, (reg & 0xfff) | 0x1000);
+-		DELAY(100);
+-		reg = CSR_READ_4(sc, NS_PHY_TDATA);
+-		if ((reg & 0x0080) == 0 || (reg & 0xff) >= 0xd8) {
+-			CSR_WRITE_4(sc, NS_PHY_TDATA, 0x00e8);
+-			SIS_SETBIT(sc, NS_PHY_DSPCFG, 0x20);
++		phy_status = CSR_READ_4(sc, NS_PHY_PHYSTS);
++		/* Check for link valid and not 10Mb */
++		if ( (phy_status & 0x03) == 0x01 ) {
++			ns_srr = CSR_READ_4(sc, NS_SRR);
++			switch ( ns_srr & 0xF00 ) {
++
++				case 0x500:
++					if ( (ns_srr & 0xFFF) == 0x505 ) break;
++				case 0x300:
++				case 0x400:
++					CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
++					tmp_val = CSR_READ_4(sc, NS_PHY_DSPCFG);
++					tmp_val = (tmp_val & 0x0FFF) | 0x1000;
++					CSR_WRITE_4(sc, NS_PHY_DSPCFG, tmp_val);
++					DELAY(2000);
++					tmp_val = CSR_READ_4(sc, NS_PHY_TDATA);
++					tmp_val &= 0x00FF;
++					if ( tmp_val < 0x80
++							|| tmp_val >= 0xD8 ) {
++						CSR_WRITE_4(sc, NS_PHY_TDATA,
++								0x00E8);
++						SIS_SETBIT(sc, NS_PHY_DSPCFG,
++								0x20);
++					}
++					CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0000);
++			}
+ 		}
+-		CSR_WRITE_4(sc, NS_PHY_PAGE, 0);
+ 	}
+ 
+ 	/*
+@@ -1986,21 +2055,6 @@
+ 	mii_mediachg(mii);
+ #endif
+ 
+-	/*
+-	 * Page 75 of the DP83815 manual recommends the
+-	 * following register settings "for optimum
+-	 * performance." Note however that at least three
+-	 * of the registers are listed as "reserved" in
+-	 * the register map, so who knows what they do.
+-	 */
+-	if (sc->sis_type == SIS_TYPE_83815) {
+-		CSR_WRITE_4(sc, NS_PHY_PAGE, 0x0001);
+-		CSR_WRITE_4(sc, NS_PHY_CR, 0x189C);
+-		CSR_WRITE_4(sc, NS_PHY_TDATA, 0x0000);
+-		CSR_WRITE_4(sc, NS_PHY_DSPCFG, 0x5040);
+-		CSR_WRITE_4(sc, NS_PHY_SDCFG, 0x008C);
+-	}
+-
+ 	ifp->if_flags |= IFF_RUNNING;
+ 	ifp->if_flags &= ~IFF_OACTIVE;
+ 
+@@ -2138,6 +2192,9 @@
+ 	register int		i;
+ 	struct ifnet		*ifp;
+ 
++	if (sc->sis_stopped)
++		return;
++
+ 	ifp = &sc->arpcom.ac_if;
+ 	ifp->if_timer = 0;
+ 
+@@ -2180,6 +2237,8 @@
+ 
+ 	bzero((char *)&sc->sis_ldata->sis_tx_list,
+ 		sizeof(sc->sis_ldata->sis_tx_list));
++
++	sc->sis_stopped = 1;
+ 
+ 	return;
+ }
+diff -u -r sys.orig/pci/if_sisreg.h sys/pci/if_sisreg.h
+--- sys.orig/pci/if_sisreg.h	Wed Feb  5 22:49:01 2003
++++ sys/pci/if_sisreg.h	Fri May 27 06:13:22 2005
+@@ -76,6 +76,7 @@
+ 
+ /* NS DP83815 registers */
+ #define NS_CLKRUN		0x3C
++#define NS_SRR			0x58
+ #define NS_BMCR			0x80
+ #define NS_BMSR			0x84
+ #define NS_PHYIDR1		0x88
+@@ -85,6 +86,9 @@
+ #define NS_ANER			0x98
+ #define NS_ANNPTR		0x9C
+ 
++#define NS_PHY_PHYSTS		0xC0
++#define NS_PHY_FCSCR		0xD0
++#define NS_PHY_RECR		0xD4
+ #define NS_PHY_CR		0xE4
+ #define NS_PHY_10BTSCR		0xE8
+ #define NS_PHY_PAGE		0xCC
+@@ -444,6 +448,7 @@
+ 	struct sis_list_data	*sis_ldata;
+ 	struct sis_ring_data	sis_cdata;
+ 	struct callout_handle	sis_stat_ch;
++	int			sis_stopped;
+ #ifdef DEVICE_POLLING
+ 	int			rxcycles;
+ #endif
+diff -u -r sys.orig/dev/wi/if_wi.c sys/dev/wi/if_wi.c
+--- sys.orig/dev/wi/if_wi.c	Tue May 18 08:57:33 2004
++++ sys/dev/wi/if_wi.c	Sat Jun 18 19:48:38 2005
+@@ -1018,9 +1018,11 @@
+ 		 * set in the event status register.
+ 		 */
+ 		s = CSR_READ_2(sc, WI_EVENT_STAT);
++		DELAY(1);
+ 		if (s & WI_EV_CMD) {
+ 			/* Ack the event and read result code. */
+ 			s = CSR_READ_2(sc, WI_STATUS);
++			DELAY(1);
+ 			CSR_WRITE_2(sc, WI_EVENT_ACK, WI_EV_CMD);
+ #ifdef foo
+ 			if ((s & WI_CMD_CODE_MASK) != (cmd & WI_CMD_CODE_MASK))
+diff -u -r sys.orig/pci/if_xl.c sys/pci/if_xl.c
+--- sys.orig/pci/if_xl.c	Fri Aug 13 16:42:18 2004
++++ sys/pci/if_xl.c	Sat Jun 18 19:57:54 2005
+@@ -188,6 +188,8 @@
+ 		"3Com 3c905C-TX Fast Etherlink XL" },
+ 	{ TC_VENDORID, TC_DEVICEID_TORNADO_10_100BT_920B,
+ 		"3Com 3c920B-EMB Integrated Fast Etherlink XL" },
++	{ TC_VENDORID, TC_DEVICEID_TORNADO_10_100BT_920B_WNM,
++		"3Com 3c920B-EMB-WNM Integrated Fast Etherlink XL" },
+ 	{ TC_VENDORID, TC_DEVICEID_HURRICANE_10_100BT_SERV,
+ 		"3Com 3c980 Fast Etherlink XL" },
+ 	{ TC_VENDORID, TC_DEVICEID_TORNADO_10_100BT_SERV,
+@@ -1268,6 +1270,7 @@
+ 	case TC_DEVICEID_HURRICANE_656B:	/* 3c656B */
+ 	case TC_DEVICEID_TORNADO_656C:		/* 3c656C */
+ 	case TC_DEVICEID_TORNADO_10_100BT_920B:	/* 3c920B-EMB */
++	case TC_DEVICEID_TORNADO_10_100BT_920B_WNM:	/* 3c920B-EMB-WNM */
+ 		sc->xl_media = XL_MEDIAOPT_MII;
+ 		sc->xl_xcvr = XL_XCVR_MII;
+ 		if (verbose)
+@@ -1365,7 +1368,8 @@
+ 	    pci_get_device(dev) == TC_DEVICEID_HURRICANE_656B)
+ 		sc->xl_flags |= XL_FLAG_INVERT_MII_PWR |
+ 		    XL_FLAG_INVERT_LED_PWR;
+-	if (pci_get_device(dev) == TC_DEVICEID_TORNADO_10_100BT_920B)
++	if (pci_get_device(dev) == TC_DEVICEID_TORNADO_10_100BT_920B ||
++	    pci_get_device(dev) == TC_DEVICEID_TORNADO_10_100BT_920B_WNM)
+ 		sc->xl_flags |= XL_FLAG_PHYOK;
+ #ifndef BURN_BRIDGES
+ 	/*
+diff -u -r sys.orig/pci/if_xlreg.h sys/pci/if_xlreg.h
+--- sys.orig/pci/if_xlreg.h	Sun Aug 10 23:55:57 2003
++++ sys/pci/if_xlreg.h	Sat Jun 18 19:58:13 2005
+@@ -683,6 +683,7 @@
+ #define TC_DEVICEID_CYCLONE_10_100FX		0x905A
+ #define TC_DEVICEID_TORNADO_10_100BT		0x9200
+ #define TC_DEVICEID_TORNADO_10_100BT_920B	0x9201
++#define TC_DEVICEID_TORNADO_10_100BT_920B_WNM	0x9202
+ #define TC_DEVICEID_HURRICANE_10_100BT_SERV	0x9800
+ #define TC_DEVICEID_TORNADO_10_100BT_SERV	0x9805
+ #define TC_DEVICEID_HURRICANE_SOHO100TX		0x7646
