@@ -584,7 +584,7 @@ function system_set_harddisk_standby() {
 			mwexec('/bin/sync');
 			if (!mwexec('/sbin/sysctl hw.ata.suspend=' . ((int)$standby*60))) {
 				// Reinitialize ATA-drives
-				mwexec('/usr/local/sbin/atareinit');
+				mwexec('/sbin/atacontrol reinit 0');
 				if ($g['booting']) {
 					echo "done\n";
 				}
