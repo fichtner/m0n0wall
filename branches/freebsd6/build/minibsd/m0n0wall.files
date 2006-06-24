@@ -24,6 +24,7 @@ bin/sync
 
 # contents of /sbin
 sbin/adjkerntz
+sbin/atacontrol
 sbin/dhclient
 sbin/dhclient-script
 sbin/dmesg
