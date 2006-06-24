@@ -1,0 +1,262 @@
+--- sys/conf/options.orig	Sat Jun 24 15:32:24 2006
++++ sys/conf/options	Sat Jun 24 15:33:47 2006
+@@ -316,6 +316,7 @@
+ # Options used in the 'ata' ATA/ATAPI driver
+ ATA_STATIC_ID		opt_ata.h
+ ATA_NOPCI		opt_ata.h
++ATA_DISABLE_SLAVE	opt_ata.h
+ 
+ # Net stuff.
+ ACCEPT_FILTER_DATA
+@@ -358,6 +359,12 @@
+ IPFILTER_LOG		opt_ipfilter.h
+ IPFILTER_LOOKUP		opt_ipfilter.h
+ IPFILTER_DEFAULT_BLOCK	opt_ipfilter.h
++# Existing options made configurable for m0n0wall
++IPSTATE_SIZE	opt_ipfilter.h
++IPSTATE_MAX 	opt_ipfilter.h
++# New options for m0n0wall
++IPFILTER_MSSCLAMP_FORCE 	opt_ipfilter.h
++# End of m0n0wall additions
+ IPFIREWALL		opt_ipfw.h
+ IPFIREWALL_VERBOSE	opt_ipfw.h
+ IPFIREWALL_VERBOSE_LIMIT	opt_ipfw.h
+--- sys/contrib/ipfilter/netinet/fil.c.orig	Sat Jun 24 15:35:31 2006
++++ sys/contrib/ipfilter/netinet/fil.c	Sat Jun 24 15:37:46 2006
+@@ -87,6 +87,12 @@
+ # include <sys/hashing.h>
+ # include <netinet/in_var.h>
+ #endif
++#if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
++# include <sys/malloc.h>
++# if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#  include "opt_ipfilter.h"
++# endif
++#endif
+ #include <netinet/tcp.h>
+ #if !defined(__sgi) || defined(_KERNEL)
+ # include <netinet/udp.h>
+@@ -122,12 +128,6 @@
+ #endif
+ #if defined(IPFILTER_BPF) && defined(_KERNEL)
+ # include <net/bpf.h>
+-#endif
+-#if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
+-# include <sys/malloc.h>
+-# if defined(_KERNEL) && !defined(IPFILTER_LKM)
+-#  include "opt_ipfilter.h"
+-# endif
+ #endif
+ #include "netinet/ipl.h"
+ /* END OF INCLUDES */
+--- sys/contrib/ipfilter/netinet/ip_state.c.orig	Sat Jun 24 16:27:46 2006
++++ sys/contrib/ipfilter/netinet/ip_state.c	Sat Jun 24 16:47:56 2006
+@@ -152,7 +152,7 @@
+ 	fr_udptimeout = IPF_TTLVAL(120),
+ 	fr_udpacktimeout = IPF_TTLVAL(12),
+ 	fr_icmptimeout = IPF_TTLVAL(60),
+-	fr_icmpacktimeout = IPF_TTLVAL(6),
++	fr_icmpacktimeout = IPF_TTLVAL(60), /* Longer now that it matches mutiple segments */
+ 	fr_iptimeout = IPF_TTLVAL(60);
+ int	fr_statemax = IPSTATE_MAX,
+ 	fr_statesize = IPSTATE_SIZE;
+@@ -218,6 +218,11 @@
+ 	icmpreplytype4[ICMP_TSTAMP] = ICMP_TSTAMPREPLY;
+ 	icmpreplytype4[ICMP_IREQ] = ICMP_IREQREPLY;
+ 	icmpreplytype4[ICMP_MASKREQ] = ICMP_MASKREPLY;
++
++#define ICMP_REPLY_MASK ((1<<ICMP_ECHOREPLY)|(1<<ICMP_TSTAMPREPLY) \
++			|(1<<ICMP_IREQREPLY)|(1<<ICMP_MASKREPLY))
++#define ICMP_IS_REPLY_TYPE(type) ((1<<(type)) & ICMP_REPLY_MASK)
++
+ #ifdef	USE_INET6
+ 	/* fill icmp reply type table */
+ 	for (i = 0; i <= ICMP6_MAXTYPE; i++)
+@@ -896,6 +901,8 @@
+ 		case ICMP6_ECHO_REQUEST :
+ 			is->is_icmp.ici_type = ic->icmp_type;
+ 			hv += (is->is_icmp.ici_id = ic->icmp_id);
++			/* Don't include the sequence # in the key, but record it */
++			is->is_icmp.ics_seq = ic->icmp_seq;
+ 			break;
+ 		case ICMP6_MEMBERSHIP_QUERY :
+ 		case ND_ROUTER_SOLICIT :
+@@ -920,6 +927,8 @@
+ 		case ICMP_MASKREQ :
+ 			is->is_icmp.ici_type = ic->icmp_type;
+ 			hv += (is->is_icmp.ici_id = ic->icmp_id);
++			/* Don't include the sequence # in the key, but record it */
++			is->is_icmp.ics_seq = ic->icmp_seq;
+ 			break;
+ 		default :
+ 			return NULL;
+--- sys/contrib/ipfilter/netinet/mlfk_ipl.c.orig	Sat Jun 24 16:50:18 2006
++++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	Sat Jun 24 16:50:56 2006
+@@ -20,6 +20,12 @@
+ #include <netinet/in.h>
+ 
+ 
++#if __FreeBSD_version >= 300000
++# if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#  include "opt_ipfilter.h"
++# endif
++#endif
++
+ #include <netinet/ipl.h>
+ #include <netinet/ip_compat.h>
+ #include <netinet/ip_fil.h>
+--- sys/net/bridge.c.orig	Thu Aug 25 13:01:19 2005
++++ sys/net/bridge.c	Sat Jun 24 17:00:42 2006
+@@ -1043,7 +1043,7 @@
+ 	 * NetBSD-style generic packet filter, pfil(9), hooks.
+ 	 * Enables ipf(8) in bridging.
+ 	 */
+-	if (!IPFW_LOADED) { /* XXX: Prevent ipfw from being run twice. */
++	if (!IPFW_LOADED || bdg_ipfw == 0) { /* XXX: Prevent ipfw from being run twice. */
+ 	if (inet_pfil_hook.ph_busy_count >= 0 &&
+ 	    m0->m_pkthdr.len >= sizeof(struct ip) &&
+ 	    ntohs(save_eh.ether_type) == ETHERTYPE_IP) {
+--- sys/net/pfil.c.orig	Tue May 24 01:07:16 2005
++++ sys/net/pfil.c	Sat Jun 24 17:06:28 2006
+@@ -358,9 +358,9 @@
+ 	 * so that the same path is followed in or out of the kernel.
+ 	 */
+ 	if (flags & PFIL_IN)
+-		TAILQ_INSERT_HEAD(list, pfh1, pfil_link);
+-	else
+ 		TAILQ_INSERT_TAIL(list, pfh1, pfil_link);
++	else
++		TAILQ_INSERT_HEAD(list, pfh1, pfil_link);
+ 
+ 	return 0;
+ }
+--- sys/netgraph/ng_ppp.c.orig	Sat Jun 24 17:08:00 2006
++++ sys/netgraph/ng_ppp.c	Sat Jun 24 17:13:40 2006
+@@ -749,7 +749,8 @@
+ 	case HOOK_INDEX_VJC_VJIP:
+ 		if (priv->conf.enableCompression
+ 		    && priv->hooks[HOOK_INDEX_COMPRESS] != NULL) {
+-			if ((m = ng_ppp_addproto(m, proto, 0)) == NULL) {
++			/* Get the PFC enable from the first link (RFC1990) */
++			if ((m = ng_ppp_addproto(m, proto, priv->links[priv->activeLinks[0]].conf.enableProtoComp)) == NULL) {
+ 				NGI_M(item) = NULL;
+ 				NG_FREE_ITEM(item);
+ 				return (ENOBUFS);
+@@ -762,7 +763,8 @@
+ 	case HOOK_INDEX_COMPRESS:
+ 		if (priv->conf.enableEncryption
+ 		    && priv->hooks[HOOK_INDEX_ENCRYPT] != NULL) {
+-			if ((m = ng_ppp_addproto(m, proto, 1)) == NULL) {
++			/* Get the PFC enable from the first link (RFC1990) */
++			if ((m = ng_ppp_addproto(m, proto, priv->links[priv->activeLinks[0]].conf.enableProtoComp)) == NULL) {
+ 				NGI_M(item) = NULL;
+ 				NG_FREE_ITEM(item);
+ 				return (ENOBUFS);
+@@ -994,8 +996,8 @@
+ 
+ 	/* Prepend protocol number, possibly compressed */
+ 	if ((m = ng_ppp_addproto(m, proto,
+-	    linkNum == NG_PPP_BUNDLE_LINKNUM
+-	      || link->conf.enableProtoComp)) == NULL) {
++	    /* On a bundle, get the PFC enable from the first link (RFC1990) */
++	    (link ? link : &priv->links[priv->activeLinks[0]])->conf.enableProtoComp)) == NULL) {
+ 		NG_FREE_ITEM(item);
+ 		return (ENOBUFS);
+ 	}
+--- sys/netinet/ip_input.c.orig	Sat Jun 24 17:19:10 2006
++++ sys/netinet/ip_input.c	Sat Jun 24 17:19:54 2006
+@@ -463,6 +463,9 @@
+ 	/* Jump over all PFIL processing if hooks are not active. */
+ 	if (inet_pfil_hook.ph_busy_count == -1)
+ 		goto passin;
++	if (m->m_flags & M_SKIP_FIREWALL)
++		goto passin;
++		
+ 
+ 	odst = ip->ip_dst;
+ 	if (pfil_run_hooks(&inet_pfil_hook, &m, m->m_pkthdr.rcvif,
+--- sys/i386/i386/identcpu.c.orig	Sat Jun 24 17:33:34 2006
++++ sys/i386/i386/identcpu.c	Sat Jun 24 17:44:20 2006
+@@ -402,7 +402,13 @@
+ 			break;
+ 		case 0x540:
+ 			cpu_class = CPUCLASS_586;
+-			strcat(cpu_model, "GXm");
++			if (cyrix_did < 0x6000) {
++				strcat(cpu_model, "GXm");
++			} else if (cyrix_did < 0x7000) {
++				strcat(cpu_model, "GXLV");
++			} else {
++				strcat(cpu_model, "GX1");
++			}
+ 			break;
+ 		case 0x600:
+ 			strcat(cpu_model, "6x86MX");
+@@ -527,6 +533,13 @@
+ 			}
+ 			break;
+ 		}
++	} else if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		strcpy(cpu_model, "NSC Geode");
++		switch (cpu_id & 0xff0) {
++		case 0x540:
++			cpu_class = CPUCLASS_586;
++			break;
++		}
+ 	} else if (strcmp(cpu_vendor, "RiseRiseRise") == 0) {
+ 		strcpy(cpu_model, "Rise ");
+ 		switch (cpu_id & 0xff0) {
+@@ -652,7 +665,7 @@
+ 		((strcmp(cpu_vendor, "CyrixInstead") == 0) &&
+ 		 ((cpu_id & 0xf00) > 0x500))) {
+ 		printf("  Stepping = %u", cpu_id & 0xf);
+-		if (strcmp(cpu_vendor, "CyrixInstead") == 0)
++		if ((strcmp(cpu_vendor, "CyrixInstead") == 0) || (strcmp(cpu_vendor, "Geode by NSC") == 0))
+ 			printf("  DIR=0x%04x", cyrix_did);
+ 		if (cpu_high > 0) {
+ 			u_int cmp = 1, htt = 1;
+@@ -1130,6 +1143,14 @@
+ 				cpu_feature = regs[3];	/* edx */
+ 				break;
+ 			}
++		}
++	} else if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		identifycyrix();
++		switch (cyrix_did & 0x00f0) {
++			case 0x40:  /*  GX1  */
++			case 0xb0:  /*  SCx200  */
++				cpu = CPU_M1SC;
++				break;
+ 		}
+ 	} else if (cpu == CPU_486 && *cpu_vendor == '\0') {
+ 		/*
+--- sys/i386/i386/vm_machdep.c.orig	Sat Jun 24 17:45:38 2006
++++ sys/i386/i386/vm_machdep.c	Sat Jun 24 17:47:41 2006
+@@ -598,6 +598,16 @@
+ 	}
+ 	outb(0xf0, 0x00);		/* Reset. */
+ #else
++ 	/*
++	 * reset Geode via PCI function 0
++	 */
++	if (strcmp(cpu_vendor, "Geode by NSC") == 0) {
++		if (((cpu_id & 0xfff0) == 0x0540) && ((cyrix_did & 0xfff0) == 0x81b0)) {
++			outl(0xcf8, 0x80009044);
++			outb(0xcfc, 0x0f);
++			outl(0xcf8, 0);
++		}
++	}
+ #if !defined(BROKEN_KEYBOARD_RESET)
+ 	/*
+ 	 * Attempt to do a CPU reset via the keyboard controller,
+--- sys/modules/ipfw/Makefile.orig	Sat Jun 24 19:42:17 2006
++++ sys/modules/ipfw/Makefile	Sat Jun 24 19:42:26 2006
+@@ -13,7 +13,7 @@
+ #CFLAGS+= -DIPFIREWALL_VERBOSE_LIMIT=100
+ #
+ #If you want it to pass all packets by default
+-#CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
++CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
+ #
+ 
+ .if !defined(KERNBUILDDIR)
