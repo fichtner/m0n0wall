@@ -597,16 +597,6 @@ function system_set_harddisk_standby() {
 	}
 }
 
-function system_polling_configure() {
-	global $config, $g;
-	
-	if (isset($config['system']['polling'])) {
-		mwexec("/sbin/sysctl kern.polling.enable=1");
-	} else {
-		mwexec("/sbin/sysctl kern.polling.enable=0");
-	}
-}
-
 function system_set_termcap() {
 	global $config;
 	

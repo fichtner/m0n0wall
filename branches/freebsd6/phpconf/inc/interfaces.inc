@@ -115,10 +115,14 @@ function interfaces_lan_configure() {
 	$addflags = "";
 	if (strpos($lancfg['if'], "fxp") !== false)
 		$addflags .= " link0";
+
+	if (isset($config['system']['polling']))
+		$addflags .= " polling";
 	
 	mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " " . 
 		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']) . $addflags);
 	
+
 	if (!$g['booting']) {
 		/* make new hosts file */
 		system_hosts_generate();
@@ -240,6 +244,9 @@ function interfaces_optional_configure_if($opti) {
 		if (strpos($optcfg['if'], "fxp") !== false)
 			$addflags .= " link0";
 		
+		if (isset($config['system']['polling']))
+			mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) .  " polling") ;
+	
 		/* bridged? */
 		if ($optcfg['bridge']) {
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
@@ -380,6 +387,9 @@ function interfaces_wan_configure() {
 	$addflags = "";
 	if (strpos($wancfg['if'], "fxp") !== false)
 		$addflags .= " link0";
+	
+	if (isset($config['system']['polling']))
+		mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) .  " polling") ;
 	
 	switch ($wancfg['ipaddr']) {
 	

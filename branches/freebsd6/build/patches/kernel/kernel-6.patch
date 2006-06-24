@@ -72,24 +72,6 @@
  #ifdef	USE_INET6
  	/* fill icmp reply type table */
  	for (i = 0; i <= ICMP6_MAXTYPE; i++)
-@@ -896,6 +901,8 @@
- 		case ICMP6_ECHO_REQUEST :
- 			is->is_icmp.ici_type = ic->icmp_type;
- 			hv += (is->is_icmp.ici_id = ic->icmp_id);
-+			/* Don't include the sequence # in the key, but record it */
-+			is->is_icmp.ics_seq = ic->icmp_seq;
- 			break;
- 		case ICMP6_MEMBERSHIP_QUERY :
- 		case ND_ROUTER_SOLICIT :
-@@ -920,6 +927,8 @@
- 		case ICMP_MASKREQ :
- 			is->is_icmp.ici_type = ic->icmp_type;
- 			hv += (is->is_icmp.ici_id = ic->icmp_id);
-+			/* Don't include the sequence # in the key, but record it */
-+			is->is_icmp.ics_seq = ic->icmp_seq;
- 			break;
- 		default :
- 			return NULL;
 --- sys/contrib/ipfilter/netinet/mlfk_ipl.c.orig	Sat Jun 24 16:50:18 2006
 +++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	Sat Jun 24 16:50:56 2006
 @@ -20,6 +20,12 @@

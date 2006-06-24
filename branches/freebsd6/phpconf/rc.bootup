@@ -70,9 +70,6 @@
 	/* establish ipfilter ruleset */
 	filter_configure();
 	
-	/* set up device polling */
-	system_polling_configure();
-	
 	/* configure loopback interface */
 	interfaces_loopback_configure();
 	
