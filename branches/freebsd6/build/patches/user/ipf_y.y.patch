@@ -1,0 +1,18 @@
+--- ipf_y.y.orig	Sat Jun 24 15:00:31 2006
++++ ipf_y.y	Sat Jun 24 15:00:45 2006
+@@ -2067,6 +2067,7 @@
+ 			if ((opts & OPT_DONOTHING) != 0) {
+ 				fprintf(stderr, "%d:", yylineNum);
+ 				perror("ioctl(delete rule)");
++				exit(1);
+ 			}
+ 		}
+ 	} else {
+@@ -2074,6 +2075,7 @@
+ 			if (!(opts & OPT_DONOTHING)) {
+ 				fprintf(stderr, "%d:", yylineNum);
+ 				perror("ioctl(add/insert rule)");
++				exit(1);
+ 			}
+ 		}
+ 	}

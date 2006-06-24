@@ -1,6 +1,6 @@
---- usr.sbin/syslogd/syslogd.c.orig	Tue Jun 29 12:07:35 2004
-+++ usr.sbin/syslogd/syslogd.c	Sun Apr 24 05:59:35 2005
-@@ -69,6 +69,7 @@
+--- syslogd.c.orig	Mon Jan 16 01:50:37 2006
++++ syslogd.c	Sat Jun 24 15:03:40 2006
+@@ -66,6 +66,7 @@
   *   by Peter da Silva.
   * -u and -v by Harlan Stenn.
   * Priority comparison code by Harlan Stenn.
@@ -8,7 +8,7 @@
   */
  
  #define	MAXLINE		1024		/* maximum line length */
-@@ -89,6 +90,7 @@
+@@ -86,6 +87,7 @@
  #include <sys/time.h>
  #include <sys/resource.h>
  #include <sys/syslimits.h>
@@ -16,7 +16,7 @@
  #include <sys/types.h>
  
  #include <netinet/in.h>
-@@ -111,6 +113,7 @@
+@@ -108,6 +110,7 @@
  #include <utmp.h>
  
  #include "pathnames.h"
@@ -24,7 +24,7 @@
  #include "ttymsg.h"
  
  #define SYSLOG_NAMES
-@@ -125,6 +128,7 @@
+@@ -116,6 +119,7 @@
  const char	*ConfFile = _PATH_LOGCONF;
  const char	*PidFile = _PATH_LOGPID;
  const char	ctty[] = _PATH_CONSOLE;
@@ -32,7 +32,7 @@
  
  #define	dprintf		if (Debug) printf
  
-@@ -177,6 +181,11 @@
+@@ -181,6 +185,11 @@
  			char	f_pname[MAXPATHLEN];
  			pid_t	f_pid;
  		} f_pipe;
@@ -44,7 +44,7 @@
  	} f_un;
  	char	f_prevline[MAXSVLINE];		/* last message logged */
  	char	f_lasttime[16];			/* time of last occurrence */
-@@ -254,10 +263,12 @@
+@@ -259,10 +268,12 @@
  #define F_USERS		5		/* list of users */
  #define F_WALL		6		/* everyone logged on */
  #define F_PIPE		7		/* pipe to program */
@@ -59,7 +59,7 @@
  };
  
  static struct filed *Files;	/* Log files that we write to */
-@@ -314,6 +325,8 @@
+@@ -323,6 +334,8 @@
  static void	printline(const char *, char *);
  static void	printsys(char *);
  static int	p_open(const char *, pid_t *);
@@ -68,9 +68,9 @@
  static void	readklog(void);
  static void	reapchild(int);
  static void	usage(void);
-@@ -1150,6 +1163,20 @@
- 		} else if ((flags & SYNC_FILE) && (f->f_flags & FFLAG_SYNC))
- 			(void)fsync(f->f_file);
+@@ -1152,6 +1165,20 @@
+ 	case F_UNUSED:
+ 		dprintf("\n");
  		break;
 +		
 +	case F_RING:
@@ -87,9 +87,9 @@
 +		}
 +		break;
  
- 	case F_PIPE:
- 		dprintf(" %s\n", f->f_un.f_pipe.f_pname);
-@@ -1463,6 +1490,10 @@
+ 	case F_FORW:
+ 		dprintf(" %s\n", f->f_un.f_forw.f_hname);
+@@ -1545,6 +1572,10 @@
  			}
  			f->f_un.f_pipe.f_pid = 0;
  			break;
@@ -100,7 +100,7 @@
  		}
  		next = f->f_next;
  		if (f->f_program) free(f->f_program);
-@@ -1584,6 +1615,10 @@
+@@ -1666,6 +1697,10 @@
  			case F_FORW:
  				printf("%s", f->f_un.f_forw.f_hname);
  				break;
@@ -111,7 +111,7 @@
  
  			case F_PIPE:
  				printf("%s", f->f_un.f_pipe.f_pname);
-@@ -1625,6 +1660,7 @@
+@@ -1717,6 +1752,7 @@
  	const char *p, *q;
  	char *bp;
  	char buf[MAXLINE], ebuf[100];
@@ -119,7 +119,7 @@
  
  	dprintf("cfline(\"%s\", f, \"%s\", \"%s\")\n", line, prog, host);
  
-@@ -1812,6 +1848,38 @@
+@@ -1904,6 +1940,38 @@
  			f->f_type = F_FILE;
  		}
  		break;
@@ -158,7 +158,7 @@
  
  	case '|':
  		f->f_un.f_pipe.f_pid = 0;
-@@ -2500,4 +2568,46 @@
+@@ -2596,6 +2664,48 @@
  		freeaddrinfo(res);
  
  	return (socks);
@@ -205,3 +205,5 @@
 +	f->f_un.f_ring.f_footer->cf_lock = 0;
 +	return out;
  }
+ 
+ static void
