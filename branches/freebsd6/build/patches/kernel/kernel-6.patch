@@ -260,3 +260,14 @@
  #
  
  .if !defined(KERNBUILDDIR)
+--- vfs_mount.c.orig	Sun Jun 18 04:02:28 2006
++++ vfs_mount.c	Sat Jun 24 21:28:18 2006
+@@ -1468,7 +1468,7 @@
+ 		strcpy(path, ROOTNAME);
+ 
+ 	error = kernel_vmount(
+-	    MNT_RDONLY | MNT_ROOTFS,
++	    MNT_ROOTFS,
+ 	    "fstype", vfsname,
+ 	    "fspath", "/",
+ 	    "from", path,
