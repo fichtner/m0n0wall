@@ -171,17 +171,17 @@ function interfaces_optional_configure() {
 	
 	if ($bridgeconfig) {
 		/* Set the system bridge configuration and enable bridging. */
-		mwexec("/sbin/sysctl net.link.ether.bridge_cfg=" . $bridgeconfig);
+		mwexec("/sbin/sysctl net.link.ether.bridge.config=" . $bridgeconfig);
 		
 		if (isset($config['bridge']['filteringbridge']))
-			mwexec("/sbin/sysctl net.link.ether.bridge_ipf=1");
+			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=1");
 		else
-			mwexec("/sbin/sysctl net.link.ether.bridge_ipf=0");
+			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
 		
-		mwexec("/sbin/sysctl net.link.ether.bridge=1");
+		mwexec("/sbin/sysctl net.link.ether.bridge.enable=1");
 	} else {
-		mwexec("/sbin/sysctl net.link.ether.bridge_ipf=0");
-		mwexec("/sbin/sysctl net.link.ether.bridge=0");
+		mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
+		mwexec("/sbin/sysctl net.link.ether.bridge.enable=0");
 	}
 	
 	if (!$g['booting']) {
@@ -347,7 +347,7 @@ function interfaces_wan_configure() {
 		echo "Configuring WAN interface... ";
 	else {
 		/* kill dhclient */
-		killbypid("{$g['varrun_path']}/dhclient.pid");
+		mwexec("/usr/bin/killall dhclient");
 		
 		/* kill PPPoE client (mpd) */
 		killbypid("{$g['varrun_path']}/mpd.pid");
@@ -485,14 +485,14 @@ EOD;
 	fclose($fd);
 	
 	/* fire up dhclient - don't wait for the lease (-nw) */
-	mwexec("/sbin/dhclient -nw -cf {$g['varetc_path']}/dhclient.conf " .
+	mwexec("/sbin/dhclient -b -c {$g['varetc_path']}/dhclient.conf " .
 		escapeshellarg($wancfg['if']));
 	
 	return 0;
 }
 
 function interfaces_wan_dhcp_down() {
-	mwexec("/sbin/dhclient -r");
+	mwexec("/usr/bin/killall dhclient");
 
 	sleep(3);
 }

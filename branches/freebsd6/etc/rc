@@ -34,9 +34,6 @@ adjkerntz -i
 # Create an initial utmp file
 cd /var/run && cp /dev/null utmp && chmod 644 utmp
 
-# Build devices database
-dev_mkdb
-
 # Run ldconfig
 /sbin/ldconfig -elf /usr/lib /usr/local/lib
 
