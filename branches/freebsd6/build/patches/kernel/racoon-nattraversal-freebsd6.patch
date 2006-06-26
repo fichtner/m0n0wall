@@ -84,19 +84,21 @@
  	.pr_init =		udp_init,
  	.pr_usrreqs =		&udp_usrreqs
  },
---- ./netinet/udp_usrreq.c.orig	Fri Nov  4 19:34:45 2005
-+++ ./netinet/udp_usrreq.c	Tue Dec  6 10:04:02 2005
-@@ -84,6 +84,9 @@
+--- udp_usrreq.c.orig	Fri Jun 23 19:25:54 2006
++++ udp_usrreq.c	Mon Jun 26 18:41:46 2006
+@@ -86,6 +86,11 @@
  
  #include <machine/in_cksum.h>
  
++#ifdef INET6
 +#include <netinet6/ipsec.h>
 +#include <netinet6/esp.h>
++#endif
 +
  /*
   * UDP protocol implementation.
   * Per RFC 768, August, 1980.
-@@ -126,6 +129,11 @@ static void udp_append(struct inpcb *las
+@@ -128,6 +133,11 @@
  static int udp_detach(struct socket *so);
  static	int udp_output(struct inpcb *, struct mbuf *, struct sockaddr *,
  		struct mbuf *, struct thread *);
@@ -106,9 +108,9 @@
 +#endif
 +#endif
  
- void
- udp_init()
-@@ -437,6 +445,41 @@ udp_append(last, ip, n, off, udp_in)
+ static void
+ udp_zone_change(void *tag)
+@@ -464,6 +474,41 @@
  		return;
  	}
  #endif /*IPSEC || FAST_IPSEC*/
@@ -150,7 +152,7 @@
  #ifdef MAC
  	if (mac_check_inpcb_deliver(last, n) != 0) {
  		m_freem(n);
-@@ -675,6 +718,80 @@ SYSCTL_PROC(_net_inet_udp, OID_AUTO, get
+@@ -702,6 +747,80 @@
      CTLTYPE_OPAQUE|CTLFLAG_RW|CTLFLAG_PRISON, 0, 0,
      udp_getcred, "S,xucred", "Get the xucred of a UDP connection");
  
@@ -231,7 +233,7 @@
  static int
  udp_output(inp, m, addr, control, td)
  	register struct inpcb *inp;
-@@ -895,6 +1012,115 @@ release:
+@@ -922,6 +1041,115 @@
  	m_freem(m);
  	return (error);
  }
