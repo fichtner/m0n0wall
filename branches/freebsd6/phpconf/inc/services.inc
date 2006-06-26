@@ -539,7 +539,7 @@ EOD;
 			fclose($fd);
 			
 			/* invoke nsupdate */
-			$cmd = "/usr/sbin/nsupdate -k {$g['varetc_path']}:{$keyname}";
+			$cmd = "/usr/bin/nsupdate -k {$g['varetc_path']}:{$keyname}";
 			if (isset($config['dnsupdate']['usetcp']))
 				$cmd .= " -v";
 			$cmd .= " {$g['varetc_path']}/nsupdatecmds";
