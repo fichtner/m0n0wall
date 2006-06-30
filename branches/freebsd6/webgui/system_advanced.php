@@ -124,7 +124,6 @@ if ($_POST) {
 			$retval |= interfaces_optional_configure();
 			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa)
 				$retval |= vpn_ipsec_configure();
-			$retval |= system_polling_configure();
 			$retval |= system_set_termcap();
 			config_unlock();
 		}
