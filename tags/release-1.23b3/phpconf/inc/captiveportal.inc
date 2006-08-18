@@ -893,7 +893,6 @@ function captiveportal_read_db() {
         } else {
             $cpdb = array();
         }
-        print_r($cpdb);
         return $cpdb;
 }
 
@@ -911,7 +910,7 @@ function captiveportal_write_db($cpdb) {
 
 function captiveportal_write_elements() {
     global $g, $config;
-    
+
     /* delete any existing elements */
     if (is_dir($g['captiveportal_element_path'])) {
         $dh = opendir($g['captiveportal_element_path']);

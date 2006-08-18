@@ -9,6 +9,7 @@ $Id$
 - changes in Captive portal (jdegraeve):
   - Changed CP database to use serialisation
   - Almost directly read in the radius servers from the config instead of parsing the radius.db file we don't need
+  - Webgui Status:Captive portal now uses captiveportal_read_db()
 
 - updated base system to FreeBSD 4.11-RELEASE-p19
 

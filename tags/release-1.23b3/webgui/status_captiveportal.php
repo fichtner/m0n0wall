@@ -1,5 +1,5 @@
 #!/usr/local/bin/php
-<?php 
+<?php
 /*
     $Id$
     part of m0n0wall (http://m0n0.ch/wall)
@@ -46,45 +46,39 @@ function clientcmp($a, $b) {
     return strcmp($a[$order], $b[$order]);
 }
 
-$cpdb = array();
 captiveportal_lock();
-$fp = @fopen("{$g['vardb_path']}/captiveportal.db","r");
-
-if ($fp) {
-    while (!feof($fp)) {
-        $line = trim(fgets($fp));
-        if ($line) {
-            $cpent = explode(",", $line);
-            $volume = getVolume($cpent[1]);
-            $cpent[7] = $volume['output_bytes'];
-            $cpent[8] = $volume['input_bytes'];
-            if ($_GET['showact'])
-                $cpent[9] = captiveportal_get_last_activity($cpent[1]);
-            $cpdb[] = $cpent;
-        }
-    }
-
-    fclose($fp);
-
-    if ($_GET['order']) {
-        if ($_GET['order'] == "ip")
-            $order = 2;
-        else if ($_GET['order'] == "mac")
-            $order = 3;
-        else if ($_GET['order'] == "user")
-            $order = 4;
-        else if ($_GET['order'] == "download")
-            $order = 7;
-        else if ($_GET['order'] == "upload")
-            $order = 8;
-        else if ($_GET['order'] == "lastact")
-            $order = 9;
-        else
-            $order = 0;
-        usort($cpdb, "clientcmp");
-    }
-}
+$cpdb_orig = captiveportal_read_db();
 captiveportal_unlock();
+
+$cpdb = array();
+
+foreach ($cpdb_orig as $cpent) {
+        $volume = getVolume($cpent[1]);
+        $cpent[7] = $volume['output_bytes'];
+        $cpent[8] = $volume['input_bytes'];
+        if ($_GET['showact'])
+            $cpent[9] = captiveportal_get_last_activity($cpent[1]);
+        $cpdb[] = $cpent;
+}
+
+
+if ($_GET['order']) {
+    if ($_GET['order'] == "ip")
+        $order = 2;
+    else if ($_GET['order'] == "mac")
+        $order = 3;
+    else if ($_GET['order'] == "user")
+        $order = 4;
+    else if ($_GET['order'] == "download")
+        $order = 7;
+    else if ($_GET['order'] == "upload")
+        $order = 8;
+    else if ($_GET['order'] == "lastact")
+        $order = 9;
+    else
+        $order = 0;
+    usort($cpdb, "clientcmp");
+}
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
