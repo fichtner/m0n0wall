@@ -78,7 +78,8 @@ if (!$clientmac && $macfilter) {
 }
 
 /* find out if we need RADIUS + RADIUSMAC or not */
-if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
+if ($config['captiveportal']['radiusip'] && (!isset($config['captiveportal']['auth_method']) ||
+                ($config['captiveportal']['auth_method'] == "radius"))) {
     $radius_enable = TRUE;
     if ($radius_enable && isset($config['captiveportal']['radmac_enable']))
         $radmac_enable = TRUE;

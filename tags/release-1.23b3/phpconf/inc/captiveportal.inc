@@ -731,6 +731,48 @@ function captiveportal_get_last_activity($ruleno) {
 /* read RADIUS servers into array */
 function captiveportal_get_radius_servers() {
 
+        global $config;
+
+            /* RADIUS server 1 */
+            $radiusservers[0]['ipaddr'] = $config['captiveportal']['radiusip'];
+
+            if ($config['captiveportal']['radiusport'])
+                $radiusservers[0]['port'] = $config['captiveportal']['radiusport'];
+            else
+                $radiusservers[0]['port'] = 1812;
+
+
+            if ($config['captiveportal']['radiusacctport'])
+                $radiusservers[0]['acctport'] = $config['captiveportal']['radiusacctport'];
+            else
+                $radiusservers[0]['acctport'] = 1813;
+
+            $radiusservers[0]['key'] = $config['captiveportal']['radiuskey'];
+
+            /* RADIUS server 2 */
+            if (isset($config['captiveportal']['radiusip2'], $config['captiveportal']['radiuskey2'])) {
+                $radiusservers[1]['ipaddr'] = $config['captiveportal']['radiusip2'];
+                $radiusservers[1]['key'] = $config['captiveportal']['radiuskey2'];
+
+                if ($config['captiveportal']['radiusport2'])
+                    $radiusservers[1]['port'] = $config['captiveportal']['radiusport2'];
+                else
+                    $radiusservers[1]['port'] = 1812;
+
+                if ($config['captiveportal']['radiusacctport2'])
+                    $radiusservers[1]['acctport'] = $config['captiveportal']['radiusacctport2'];
+                else
+                    $radiusservers[1]['acctport'] = 1813;
+
+            }
+
+            return $radiusservers;
+
+}
+
+/* read RADIUS servers into array */
+function captiveportal_get_radius_servers_old() {
+
         global $g;
 
         if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
@@ -846,32 +888,25 @@ function captiveportal_read_db() {
 
         global $g;
 
-        $cpdb = array();
-        $fd = @fopen("{$g['vardb_path']}/captiveportal.db", "r");
-        if ($fd) {
-                while (!feof($fd)) {
-                        $line = trim(fgets($fd));
-                        if ($line) {
-                                $cpdb[] = explode(",", $line);
-                        }
-                }
-                fclose($fd);
+        if (file_exists("{$g['vardb_path']}/captiveportal.db")) {
+            $cpdb = unserialize(file_get_contents("{$g['vardb_path']}/captiveportal.db"));
+        } else {
+            $cpdb = array();
         }
+        print_r($cpdb);
         return $cpdb;
 }
 
 /* write captive portal DB */
 function captiveportal_write_db($cpdb) {
-                 
+
         global $g;
-                
+
         $fd = @fopen("{$g['vardb_path']}/captiveportal.db", "w");
-        if ($fd) { 
-                foreach ($cpdb as $cpent) {
-                        fwrite($fd, join(",", $cpent) . "\n");
-                }       
-                fclose($fd);
-        }       
+        if ($fd) {
+            fwrite($fd,serialize($cpdb));
+            fclose($fd);
+        }
 }
 
 function captiveportal_write_elements() {

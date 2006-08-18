@@ -6,13 +6,17 @@ $Id$
 1.23b3 (jdgraeve)
 ------
 
+- changes in Captive portal (jdegraeve):
+  - Changed CP database to use serialisation
+  - Almost directly read in the radius servers from the config instead of parsing the radius.db file we don't need
+
 - updated base system to FreeBSD 4.11-RELEASE-p19
 
 - updated Dnsmasq to 2.33 (bugfixes)
 
 - updated ipsec-tools to 0.6.6 including setkey|racoon|racoonctl (fixes memleak)
 
-- updated PHP to 4.4.3
+- updated PHP to 4.4.4
 
 - Addition of netstat -m|-s and kldstat to status
 
