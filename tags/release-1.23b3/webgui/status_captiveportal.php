@@ -47,18 +47,18 @@ function clientcmp($a, $b) {
 }
 
 captiveportal_lock();
-$cpdb_orig = captiveportal_read_db();
+$cpdb = captiveportal_read_db();
 captiveportal_unlock();
 
-$cpdb = array();
+$cpdb_status = array();
 
-foreach ($cpdb_orig as $cpent) {
+foreach ($cpdb as $cpent) {
         $volume = getVolume($cpent[1]);
         $cpent[7] = $volume['output_bytes'];
         $cpent[8] = $volume['input_bytes'];
         if ($_GET['showact'])
             $cpent[9] = captiveportal_get_last_activity($cpent[1]);
-        $cpdb[] = $cpent;
+        $cpdb_status[] = $cpent;
 }
 
 
@@ -77,7 +77,7 @@ if ($_GET['order']) {
         $order = 9;
     else
         $order = 0;
-    usort($cpdb, "clientcmp");
+    usort($cpdb_status, "clientcmp");
 }
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -93,7 +93,7 @@ if ($_GET['order']) {
     <td class="listhdr"><a href="?order=user&showact=<?=$_GET['showact'];?>">Username</a></td>
     <td class="list"></td>
   </tr>
-<?php foreach ($cpdb as $cpent): ?>
+<?php foreach ($cpdb_status as $cpent): ?>
   <tr>
     <td class="listlr"><?=$cpent[2];?></td>
     <td class="listr"><?=$cpent[3];?>&nbsp;</td>
