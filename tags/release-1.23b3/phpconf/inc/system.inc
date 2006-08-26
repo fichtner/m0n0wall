@@ -492,7 +492,7 @@ function system_do_shell_commands($early = 0) {
 function system_do_extensions($early = false) {
 	global $config, $g;
 	
-	if (!is_dir("{$g['etc_path']}/inc/ext"))
+	if (!is_dir("{$g['etc_path']}/inc/ext") || is_dir("{$g['www_path']}/ext"))
 		return;
 	
 	$dh = @opendir("{$g['etc_path']}/inc/ext");
@@ -517,8 +517,8 @@ function system_do_extensions($early = false) {
     				continue;
     			if (is_dir("{$g['www_path']}/ext/$extd")) {
     			    // Create links
-    			    symlink("{$g['www_path']}/.htpasswd",".htpasswd");
-    			    symlink("{$g['www_path']}/gui.css","gui.css");
+    			    symlink("{$g['www_path']}/.htpasswd","{$g['www_path']}/ext/{$extd}/.htpasswd");
+    			    symlink("{$g['www_path']}/gui.css","{$g['www_path']}/ext/{$extd}/gui.css");
     			}
     		}
     		closedir($dh);

@@ -12,9 +12,17 @@ $Id$
   - Webgui Status:Captive portal now uses captiveportal_read_db()
   - Radius accounting: now sends session-time in interim accounting
 
+- update extensions with userpatch (sil)
+
 - updated base system to FreeBSD 4.11-RELEASE-p19
 
 - updated Dnsmasq to 2.33 (bugfixes)
+
+- updated DHCP/DHCPrelay to 3.0.4 (bugfixes)
+
+- updated MSNTP to 1.6
+
+- updated MPD to 3.18
 
 - updated ipsec-tools to 0.6.6 including setkey|racoon|racoonctl (fixes memleak)
 
