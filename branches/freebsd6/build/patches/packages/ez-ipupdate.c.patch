@@ -1,5 +1,14 @@
---- ez-ipupdate.c.orig	Sat Jun 24 20:19:45 2006
-+++ ez-ipupdate.c	Sat Jun 24 20:23:06 2006
+--- ez-ipupdate.c.orig	Tue Mar 12 00:31:47 2002
++++ ez-ipupdate.c	Sun May  8 13:18:47 2005
+@@ -798,7 +798,7 @@
+     sprintf(buf, "message incomplete because your OS sucks: %s\n", fmt);
+ #endif
+ 
+-    syslog(LOG_NOTICE, buf);
++    syslog(LOG_NOTICE, "%s", buf);
+   }
+   else
+   {
 @@ -1602,26 +1602,23 @@
    return(bread);
  }

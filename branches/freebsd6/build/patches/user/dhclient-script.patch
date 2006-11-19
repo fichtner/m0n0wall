@@ -1,5 +1,5 @@
---- dhclient-script.orig	Sat Jun 24 15:13:55 2006
-+++ dhclient-script	Sat Jun 24 15:28:20 2006
+--- dhclient-script.orig	Sat Sep 30 16:12:07 2006
++++ dhclient-script	Sun Nov 19 20:37:37 2006
 @@ -20,9 +20,7 @@
  #
  
@@ -10,28 +10,83 @@
  
  LOCALHOST=127.0.0.1
  
-@@ -135,16 +133,16 @@
- 	# thus broke the script. This code creates the resolv.conf if either
- 	# are provided.
+@@ -49,9 +47,7 @@
+ }
  
--	local tmpres=/var/run/resolv.conf.${interface}
--	rm -f $tmpres
-+	rm -f /var/etc/defaultdomain.conf
-+	rm -f /var/etc/nameservers.conf
+ arp_flush() {
+-	arp -an -i $interface | \
+-		sed -n -e 's/^.*(\(.*\)) at .*$/arp -d \1/p' | \
+-		sh >/dev/null 2>&1
++	arp -a -i $interface -d > /dev/null 2>&1
+ }
  
- 	if [ -n "$new_domain_name" ]; then
--		echo "search $new_domain_name" >>$tmpres
-+		echo $new_domain_name >/var/etc/defaultdomain.conf
- 	fi
+ delete_old_address() {
+@@ -129,56 +125,18 @@
+ }
  
- 	if [ -n "$new_domain_name_servers" ]; then
+ add_new_resolv_conf() {
+-	# XXX Old code did not create/update resolv.conf unless both
+-	# $new_domain_name and $new_domain_name_servers were provided.  PR
+-	# #3135 reported some ISP's only provide $new_domain_name_servers and
+-	# thus broke the script. This code creates the resolv.conf if either
+-	# are provided.
+-
+-	rm -f /etc/resolv.conf.std
+-
+-	if [ -n "$new_domain_name" ]; then
+-		echo "search $new_domain_name" >>/etc/resolv.conf.std
+-	fi
+-
+-	if [ -n "$new_domain_name_servers" ]; then
++	if [ x"$new_domain_name_servers" != x ]; then
++		if [ "x$new_domain_name" != x ]; then
++			echo $new_domain_name >/var/etc/defaultdomain.conf
++		else
++			rm -f /var/etc/defaultdomain.conf
++		fi
++		rm -f /var/etc/nameservers.conf
  		for nameserver in $new_domain_name_servers; do
--			echo "nameserver $nameserver" >>$tmpres
-+			echo $nameserver >/var/etc/nameservers.conf
+-			echo "nameserver $nameserver" >>/etc/resolv.conf.std
++			echo $nameserver >>/var/etc/nameservers.conf
  		done
  	fi
  
-@@ -208,11 +206,7 @@
+-	if [ -f /etc/resolv.conf.std ]; then
+-		if [ -f /etc/resolv.conf.tail ]; then
+-			cat /etc/resolv.conf.tail >>/etc/resolv.conf.std
+-		fi
+-
+-		# When resolv.conf is not changed actually, we don't
+-		# need to update it.
+-		# If /usr is not mounted yet, we cannot use cmp, then
+-		# the following test fails.  In such case, we simply
+-		# ignore an error and do update resolv.conf.
+-		if cmp -s /etc/resolv.conf.std /etc/resolv.conf; then
+-			rm -f /etc/resolv.conf.std
+-			return 0
+-		fi 2>/dev/null
+-
+-		# In case (e.g. during OpenBSD installs) /etc/resolv.conf
+-		# is a symbolic link, take care to preserve the link and write
+-		# the new data in the correct location.
+-
+-		if [ -f /etc/resolv.conf ]; then
+-			cat /etc/resolv.conf > /etc/resolv.conf.save
+-		fi
+-		cat /etc/resolv.conf.std > /etc/resolv.conf
+-		rm -f /etc/resolv.conf.std
+-
+-		# Try to ensure correct ownership and permissions.
+-		chown -RL root:wheel /etc/resolv.conf
+-		chmod -RL 644 /etc/resolv.conf
+-
+-		return 0
+-	fi
+-
+ 	return 1
+ }
+ 
+@@ -207,11 +165,7 @@
  	fi
  fi
  
@@ -44,14 +99,20 @@
  
  case $reason in
  MEDIUM)
-@@ -282,14 +276,14 @@
- 			fi
- 			add_new_routes
- 			if add_new_resolv_conf; then
--				exit_with_hooks 0
-+				exit 0
- 			fi
- 		fi
+@@ -249,7 +203,12 @@
+ 	if [ "$new_ip_address" != "$alias_ip_address" ]; then
+ 		add_new_alias
+ 	fi
++	if [ x"$new_ip_address" = x"$new_routers" ]; then
++		route delete default >/dev/null 2>&1
++		route add default -interface -link $interface >/dev/null 2>&1
++	fi
+ 	add_new_resolv_conf
++	exit_with_hooks 0
+ 	;;
+ 
+ EXPIRE|FAIL)
+@@ -287,8 +246,8 @@
  	fi
  	eval "ifconfig $interface inet -alias $new_ip_address $medium"
  	delete_old_routes
