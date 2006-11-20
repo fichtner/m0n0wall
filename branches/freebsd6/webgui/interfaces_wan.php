@@ -75,7 +75,6 @@ if ($wancfg['ipaddr'] == "dhcp") {
 
 $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
 $pconfig['spoofmac'] = $wancfg['spoofmac'];
-$pconfig['mtu'] = $wancfg['mtu'];
 
 /* Wireless interface? */
 if (isset($optcfg['wireless'])) {
@@ -161,9 +160,6 @@ if ($_POST) {
 	if (($_POST['spoofmac'] && !is_macaddr($_POST['spoofmac']))) {
 		$input_errors[] = "A valid MAC address must be specified.";
 	}
-	if ($_POST['mtu'] && (($_POST['mtu'] < 576) || ($_POST['mtu'] > 1500))) {
-		$input_errors[] = "The MTU must be between 576 and 1500 bytes.";
-	}
 	
 	/* Wireless interface? */
 	if (isset($optcfg['wireless'])) {
@@ -234,7 +230,6 @@ if ($_POST) {
 		
 		$wancfg['blockpriv'] = $_POST['blockpriv'] ? true : false;
 		$wancfg['spoofmac'] = $_POST['spoofmac'];
-		$wancfg['mtu'] = $_POST['mtu'];
 			
 		write_config();
 		
@@ -428,16 +423,6 @@ function type_change(enable_change,enable_change_pptp) {
                     (may be required with some cable connections)<br>
                     Enter a MAC address in the following format: xx:xx:xx:xx:xx:xx 
                     or leave blank</td>
-                </tr>
-                <tr> 
-                  <td valign="top" class="vncell">MTU</td>
-                  <td class="vtable"> <input name="mtu" type="text" class="formfld" id="mtu" size="8" value="<?=htmlspecialchars($pconfig['mtu']);?>"> 
-                    <br>
-                    If you enter a value in this field, then MSS clamping for 
-                    TCP connections to the value entered above minus 40 (TCP/IP 
-                    header size) will be in effect. If you leave this field blank, 
-                    an MTU of 1492 bytes for PPPoE and 1500 bytes for all other 
-                    connection types will be assumed.</td>
                 </tr>
                 <tr> 
                   <td colspan="2" valign="top" height="16"></td>

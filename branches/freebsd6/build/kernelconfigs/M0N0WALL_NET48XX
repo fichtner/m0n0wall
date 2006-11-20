@@ -1,98 +1,102 @@
-# $Id$
-
 machine		i386
-cpu 		I586_CPU
+cpu		I586_CPU
 ident		M0N0WALL_NET48XX
-maxusers	0
-options		INCLUDE_CONFIG_FILE
 
-#makeoptions	DEBUG=-g		#Build kernel with gdb(1) debug symbols
-makeoptions	MODULES_OVERRIDE="dummynet if_tap if_vlan ipfw"
-
-options 	INET			#InterNETworking
-options		FAST_IPSEC
-options 	FFS			#Berkeley Fast Filesystem
-options 	FFS_ROOT		#FFS usable as root device [keep this!]
-options 	SOFTUPDATES		#Enable FFS soft updates support
-options 	MFS			#Memory Filesystem
-options 	MD_ROOT			#MD is a potential root device
-options 	PROCFS			#Process filesystem
-options 	COMPAT_43		#Compatible with BSD 4.3 [KEEP THIS!]
-options 	SCSI_DELAY=15000	#Delay (in ms) before probing SCSI
-options 	UCONSOLE		#Allow users to grab the console
-options 	KTRACE			#ktrace(1) support
-options 	SYSVSHM			#SYSV-style shared memory
-options 	SYSVMSG			#SYSV-style message queues
-options 	SYSVSEM			#SYSV-style semaphores
-options 	P1003_1B		#Posix P1003_1B real-time extensions
-options 	_KPOSIX_PRIORITY_SCHEDULING
-options		ICMP_BANDLIM		#Rate limit bad replies
+makeoptions	MODULES_OVERRIDE="dummynet ipfw"
 
 options		HZ=1000
+
+options		CPU_GEODE
+options		CPU_SOEKRIS
+
+hints		"M0N0WALL_NET48XX.hints"
+
+options 	SCHED_4BSD		# 4BSD scheduler
+options 	PREEMPTION		# Enable kernel thread preemption
+options 	INET			# InterNETworking
+options 	FFS			# Berkeley Fast Filesystem
+options 	SOFTUPDATES		# Enable FFS soft updates support
+options 	UFS_ACL			# Support for access control lists
+options 	UFS_DIRHASH		# Improve performance on big directories
+options 	MD_ROOT			# MD is a potential root device
+options 	PROCFS			# Process filesystem (requires PSEUDOFS)
+options 	PSEUDOFS		# Pseudo-filesystem framework
+options 	GEOM_GPT		# GUID Partition Tables.
+options 	COMPAT_43		# Compatible with BSD 4.3 [KEEP THIS!]
+options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
+options 	KTRACE			# ktrace(1) support
+options 	SYSVSHM			# SYSV-style shared memory
+options 	SYSVMSG			# SYSV-style message queues
+options 	SYSVSEM			# SYSV-style semaphores
+options 	_KPOSIX_PRIORITY_SCHEDULING # POSIX P1003_1B real-time extensions
+options 	ADAPTIVE_GIANT		# Giant mutex is adaptive.
+
+options		NO_SWAPPING
+options         DEVICE_POLLING
+
+options		FAST_IPSEC              #new IPsec (cannot define w/ IPSEC)
 
 options		IPFILTER
 options		IPFILTER_LOG
 options		IPFILTER_DEFAULT_BLOCK
 options		IPSTATE_SIZE=42859
 options		IPSTATE_MAX=30000
-options		IPFILTER_MSSCLAMP_FORCE
-options		IPFIREWALL_DEFAULT_TO_ACCEPT
 
-options		BRIDGE
-options		DEVICE_POLLING
+device		apic			# I/O APIC
 
-options		NO_SWAPPING
-
-device		isa
+# Bus support.
+device		eisa
 device		pci
 
 # ATA and ATAPI devices
-device		ata0	at isa? port IO_WD1 irq 14
-device		ata1	at isa? port IO_WD2 irq 15
 device		ata
-device		atadisk			# ATA disk drives
-options 	ATA_STATIC_ID		#Static device numbering
+device		atadisk		# ATA disk drives
+options 	ATA_STATIC_ID	# Static device numbering
 
-# Floating point support - do not disable.
-device		npx0	at nexus? port IO_NPX irq 13
+device          scbus           # SCSI bus (required for SCSI)
+device          da              # Direct Access (disks)
 
-# Power management support (see LINT for more options)
-device		apm0	at nexus? disable flags 0x20 # Advanced Power Management
+# Add suspend/resume support for the i8254.
+device		pmtimer
 
 # Serial (COM) ports
-device		sio0	at isa? port IO_COM1 flags 0x30 irq 4
-device		sio1	at isa? port IO_COM2 irq 3
-device		sio2	at isa? disable port IO_COM3 irq 5
-device		sio3	at isa? disable port IO_COM4 irq 9
+device		sio		# 8250, 16[45]50 based serial ports
 
 # PCI Ethernet NICs that use the common MII bus controller code.
 # NOTE: Be sure to keep the 'device miibus' line in order to use these NICs!
 device		miibus		# MII bus support
 device		sis		# Silicon Integrated Systems SiS 900/SiS 7016
 
-# WaveLAN/IEEE 802.11 wireless NICs. Note: the WaveLAN/IEEE really
-# exists only as a PCMCIA device, so there is no ISA attachment needed
-# and resources will always be dynamically assigned by the pccard code.
-device		wi
+# Wireless NIC cards
+device		wlan		# 802.11 support
+device          wlan_wep                #802.11 WEP support
+device          wlan_ccmp               #802.11 CCMP support
+device          wlan_tkip               #802.11 TKIP support
+device          wlan_xauth              #802.11 external authenticator support
+device          wlan_acl
+device          ath
+device          ath_hal         # Atheros HAL (includes binary component)
+device          ath_rate_sample # SampleRate rate control for the ath driver
+device		an		# Aironet 4500/4800 802.11 wireless NICs.
+device		ral		# Ralink Technology RT2500 wireless NICs.
+device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 
-# Aironet 4500/4800 802.11 wireless NICs. Note: the declaration below will
-# work for PCMCIA and PCI cards, as well as ISA cards set to ISA PnP
-# mode (the factory default). If you set the switches on your ISA
-# card for a manually chosen I/O address and IRQ, you must specify
-# those parameters here.
-device		an
+# Pseudo devices.
+device		loop		# Network loopback
+device		random		# Entropy device
+device		ether		# Ethernet support
+device		tun		# Packet tunnel.
+device		pty		# Pseudo-ttys (telnet etc)
+device		md		# Memory "disks"
+device		gif		# IPv6 and IPv4 tunneling
 
-# Pseudo devices - the number indicates how many units to allocate.
-pseudo-device	loop		# Network loopback
-pseudo-device	ether		# Ethernet support
-pseudo-device	tun		# Packet tunnel.
-pseudo-device	pty		# Pseudo-ttys (telnet etc)
-pseudo-device	md		# Memory "disks"
-pseudo-device	gif		# IPv6 and IPv4 tunneling
+device		if_bridge	#Bridge interface
+device          vlan
 
-# The `bpf' pseudo-device enables the Berkeley Packet Filter.
+# The `bpf' device enables the Berkeley Packet Filter.
 # Be aware of the administrative consequences of enabling this!
-pseudo-device	bpf		#Berkeley packet filter
+# Note that 'bpf' is required for DHCP.
+device		bpf		# Berkeley packet filter
 
 options 	NETGRAPH		#netgraph(4) system
 options 	NETGRAPH_ASYNC
@@ -110,9 +114,9 @@ options 	NETGRAPH_TEE
 options 	NETGRAPH_UI
 options 	NETGRAPH_VJC
 
-pseudo-device	crypto
-pseudo-device	cryptodev
-device       	hifn
+device		crypto
+device		cryptodev
+device		hifn
 
 # USB support
 device		ohci		# OHCI PCI->USB interface
@@ -120,8 +124,13 @@ device		usb		# USB Bus (required)
 device		ugen		# Generic
 device		uhid		# "Human Interface Devices"
 device		ukbd		# Keyboard
-# USB Ethernet, requires mii
-device		aue		# ADMtek USB ethernet
-device		cue		# CATC USB ethernet
-device		kue		# Kawasaki LSI USB ethernet
-device		rue
+device		umass		# Disks/Mass storage - Requires scbus and da
+device		ural		# Ralink Technology RT2500USB wireless NICs
+
+# USB Ethernet, requires miibus
+device		aue		# ADMtek USB Ethernet
+device		axe		# ASIX Electronics USB Ethernet
+device		cdce		# Generic USB over Ethernet
+device		cue		# CATC USB Ethernet
+device		kue		# Kawasaki LSI USB Ethernet
+device		rue		# RealTek RTL8150 USB Ethernet

@@ -60,8 +60,8 @@ function vpn_ipsec_configure($ipchg = false) {
 	}
 	
 	/* flush SPD and SAD */
-	mwexec("/usr/sbin/setkey -FP");
-	mwexec("/usr/sbin/setkey -F");
+	mwexec("/sbin/setkey -FP");
+	mwexec("/sbin/setkey -F");
 	
 	/* prefer old SAs only for 30 seconds, then use the new one */
 	if (!isset($config['ipsec']['preferoldsa']))
@@ -121,7 +121,7 @@ function vpn_ipsec_configure($ipchg = false) {
 				fclose($fd);
 			
 				/* load SPD */
-				mwexec("/usr/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
+				mwexec("/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
 			}
 			
 			/* generate racoon.conf */

@@ -82,19 +82,6 @@ function filter_configure() {
 	fwrite($fd, $ipfrules);
 	pclose($fd);
 	
-	/* set up MSS clamping */
-	$wanif = get_real_wan_interface();
-	
-	if ($config['interfaces']['wan']['mtu'])
-		$mssclamp = $config['interfaces']['wan']['mtu'] - 40;
-	else if ($config['interfaces']['wan']['ipaddr'] == "pppoe")
-		$mssclamp = 1452;
-	else
-		$mssclamp = 0;
-	
-	mwexec("/sbin/sysctl net.inet.ipf.fr_mssif={$wanif}");
-	mwexec("/sbin/sysctl net.inet.ipf.fr_mssclamp={$mssclamp}");
-	
 	if ($g['booting'])
 		echo "done\n";
 	
