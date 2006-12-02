@@ -23,8 +23,6 @@ bin/sync
 # contents of /sbin
 sbin/adjkerntz
 sbin/atacontrol
-sbin/dhclient
-sbin/dhclient-script
 sbin/dmesg
 sbin/fastboot:sbin/fasthalt:sbin/halt:sbin/reboot
 sbin/ifconfig
@@ -38,9 +36,11 @@ sbin/ipnat
 sbin/kldload
 sbin/kldunload
 sbin/ldconfig
+sbin/mdconfig
+sbin/mdmfs
 sbin/mount
-sbin/mount_mfs
 sbin/mount_msdosfs
+sbin/newfs
 sbin/nologin
 sbin/ping
 sbin/reboot

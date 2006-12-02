@@ -44,15 +44,6 @@ function interfaces_vlan_configure() {
 	
 	if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
 		
-		/* load the VLAN module */
-		mwexec("/sbin/kldload if_vlan");
-		
-		/* devices with native VLAN support */
-		$vlan_native_supp = explode(" ", "bge em gx nge ti txp");
-		
-		/* devices with long frame support */
-		$vlan_long_supp = explode(" ", "dc fxp sis ste tl tx xl");
-		
 		$i = 0;
 		
 		foreach ($config['vlans']['vlan'] as $vlan) {
@@ -60,18 +51,6 @@ function interfaces_vlan_configure() {
 			$cmd = "/sbin/ifconfig vlan{$i} create vlan " . 
 				escapeshellarg($vlan['tag']) . " vlandev " . 
 				escapeshellarg($vlan['if']);
-			
-			/* get driver name */
-			for ($j = 0; $j < strlen($vlan['if']); $j++) {
-				if ($vlan['if'][$j] >= '0' && $vlan['if'][$j] <= '9')
-					break;
-			}
-			$drvname = substr($vlan['if'], 0, $j);
-			
-			if (in_array($drvname, $vlan_native_supp))
-				$cmd .= " link0";
-			else if (in_array($drvname, $vlan_long_supp))
-				$cmd .= " mtu 1500";
 			
 			mwexec($cmd);
 			
@@ -485,7 +464,7 @@ EOD;
 	fclose($fd);
 	
 	/* fire up dhclient - don't wait for the lease (-nw) */
-	mwexec("/sbin/dhclient -b -c {$g['varetc_path']}/dhclient.conf " .
+	mwexec("/sbin/dhclient -nw -cf {$g['varetc_path']}/dhclient.conf -sf /sbin/dhclient-script " .
 		escapeshellarg($wancfg['if']));
 	
 	return 0;
