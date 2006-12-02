@@ -55,6 +55,26 @@
  
  #include <netinet/ipl.h>
  #include <netinet/ip_compat.h>
+--- sys/contrib/ipfilter/netinet/ip_state.c.orig	Mon Apr 25 20:43:14 2005
++++ sys/contrib/ipfilter/netinet/ip_state.c	Sat Dec  2 13:57:54 2006
+@@ -143,14 +143,14 @@
+ #define	FIVE_DAYS	(5 * ONE_DAY)
+ #define	DOUBLE_HASH(x)	(((x) + ips_seed[(x) % fr_statesize]) % fr_statesize)
+ 
+-u_long	fr_tcpidletimeout = FIVE_DAYS,
++u_long	fr_tcpidletimeout = IPF_TTLVAL(9000),
+ 	fr_tcpclosewait = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcplastack = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcptimeout = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcpclosed = IPF_TTLVAL(60),
+-	fr_tcphalfclosed = IPF_TTLVAL(2 * 3600),	/* 2 hours */
++	fr_tcphalfclosed = IPF_TTLVAL(240),
+ 	fr_udptimeout = IPF_TTLVAL(120),
+-	fr_udpacktimeout = IPF_TTLVAL(12),
++	fr_udpacktimeout = IPF_TTLVAL(240),
+ 	fr_icmptimeout = IPF_TTLVAL(60),
+ 	fr_icmpacktimeout = IPF_TTLVAL(6),
+ 	fr_iptimeout = IPF_TTLVAL(60);
 --- sys/net/pfil.c.orig	Mon May 23 19:07:16 2005
 +++ sys/net/pfil.c	Sat Nov 18 21:05:56 2006
 @@ -354,13 +354,15 @@
@@ -118,16 +138,49 @@
  		return (ENOBUFS);
  	}
 --- sys/netinet/ip_input.c.orig	Sat Mar  4 10:15:08 2006
-+++ sys/netinet/ip_input.c	Sat Nov 18 21:09:37 2006
-@@ -460,6 +460,8 @@
++++ sys/netinet/ip_input.c	Sat Dec  2 22:21:03 2006
+@@ -386,18 +386,22 @@
+ 		}
+ 	}
+ 
+-	if (m->m_pkthdr.csum_flags & CSUM_IP_CHECKED) {
+-		sum = !(m->m_pkthdr.csum_flags & CSUM_IP_VALID);
+-	} else {
+-		if (hlen == sizeof(struct ip)) {
+-			sum = in_cksum_hdr(ip);
++	/* skip checksum checks if we came from dummynet, since we'll already
++	   have been here in that case */
++	if (!(m->m_flags & M_SKIP_FIREWALL)) {
++		if (m->m_pkthdr.csum_flags & CSUM_IP_CHECKED) {
++			sum = !(m->m_pkthdr.csum_flags & CSUM_IP_VALID);
+ 		} else {
+-			sum = in_cksum(m, hlen);
++			if (hlen == sizeof(struct ip)) {
++				sum = in_cksum_hdr(ip);
++			} else {
++				sum = in_cksum(m, hlen);
++			}
++		}
++		if (sum) {
++			ipstat.ips_badsum++;
++			goto bad;
+ 		}
+-	}
+-	if (sum) {
+-		ipstat.ips_badsum++;
+-		goto bad;
+ 	}
+ 
+ #ifdef ALTQ
+@@ -459,6 +463,8 @@
+ 
  	/* Jump over all PFIL processing if hooks are not active. */
  	if (inet_pfil_hook.ph_busy_count == -1)
- 		goto passin;
-+	if (m->m_flags & M_SKIP_FIREWALL)
 +		goto passin;
++	if (m->m_flags & M_SKIP_FIREWALL)
+ 		goto passin;
  
  	odst = ip->ip_dst;
- 	if (pfil_run_hooks(&inet_pfil_hook, &m, m->m_pkthdr.rcvif,
 --- sys/netinet/ip_dummynet.c.orig	Thu Feb 23 09:28:15 2006
 +++ sys/netinet/ip_dummynet.c	Sat Nov 18 21:10:30 2006
 @@ -774,6 +774,7 @@
