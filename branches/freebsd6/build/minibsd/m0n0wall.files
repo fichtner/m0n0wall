@@ -71,7 +71,6 @@ usr/sbin/chown
 usr/sbin/chroot
 usr/sbin/pwd_mkdb
 usr/sbin/traceroute
-usr/sbin/wicontrol
 
 # contents of /usr/libexec
 usr/libexec/ld-elf.so.1

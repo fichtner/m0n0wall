@@ -50,12 +50,14 @@ function filter_configure() {
 		echo "Configuring firewall... ";
 	
 	/* set TCP timeouts */
-	$tcpidletimeout = 9000*2;
-	if ($config['filter']['tcpidletimeout'])
+	if ($config['filter']['tcpidletimeout'] && $g['booting']) {
 		$tcpidletimeout = $config['filter']['tcpidletimeout']*2;
-	mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
-	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=480");
-	mwexec("/sbin/sysctl net.inet.ipf.fr_udpacktimeout=480");	/* SIP... */
+		
+		/* ipfilter now needs to be disabled briefly in order to change the timeout value :( */
+		mwexec("/sbin/ipf -D");
+		mwexec("/sbin/sysctl net.inet.ipf.fr_tcpidletimeout={$tcpidletimeout}");
+		mwexec("/sbin/ipf -E");
+	}
 	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();

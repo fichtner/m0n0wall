@@ -28,7 +28,57 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$wlchannels = array(1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+$wlstandards = wireless_get_standards($optcfg['if']);
+$wlchannels = wireless_get_channellist($optcfg['if']);
+
+function wireless_get_standards($if) {
+	$standards = array();
+	
+	$fd = popen("/sbin/ifconfig -m $if", "r");
+	
+	if ($fd) {
+		while (!feof($fd)) {
+			$line = trim(fgets($fd));
+			
+			if (preg_match("/media \S+ mode (11\S+)/", $line, $matches)) {
+				$standards[] = $matches[1];
+			}
+		}
+	}
+	
+	return array_unique($standards);
+}
+
+function wireless_get_channellist($if) {
+	
+	$chanlist = array();
+	
+	$fd = popen("/sbin/ifconfig $if list chan", "r");
+	if ($fd) {
+		while (!feof($fd)) {
+			$line = trim(fgets($fd));
+			
+			/* could have two channels on this line */
+			$chans = explode("Channel", $line);
+			
+			foreach ($chans as $chan) {
+				if (preg_match("/(\d+)\s+:\s+(\d+)\s+Mhz\s+(.+)/", $chan, $matches)) {
+					$chaninfo = array();
+					$chaninfo['chan'] = $matches[1];
+					$chaninfo['freq'] = $matches[2];
+					$chaninfo['mode'] = trim($matches[3]);
+					
+					$chanlist[$chaninfo['chan']] = $chaninfo;
+				}
+			}
+		}
+		pclose($fd);
+	}
+	
+	ksort($chanlist, SORT_NUMERIC);
+	
+	return $chanlist;
+}
 
 function wireless_config_init() {
 	global $optcfg, $pconfig;
@@ -36,7 +86,6 @@ function wireless_config_init() {
 	$pconfig['standard'] = $optcfg['wireless']['standard'];
 	$pconfig['mode'] = $optcfg['wireless']['mode'];
 	$pconfig['ssid'] = $optcfg['wireless']['ssid'];
-	$pconfig['stationname'] = $optcfg['wireless']['stationname'];
 	$pconfig['channel'] = $optcfg['wireless']['channel'];
 	$pconfig['wep_enable'] = isset($optcfg['wireless']['wep']['enable']);
 	
@@ -54,7 +103,7 @@ function wireless_config_init() {
 }
 
 function wireless_config_post() {
-	global $optcfg, $pconfig;
+	global $optcfg, $pconfig, $wlchannels;
 
 	unset($input_errors);
 
@@ -68,6 +117,14 @@ function wireless_config_post() {
 			/* bridge check (hostap only!) */
 			if ($pconfig['bridge'] && ($pconfig['mode'] != "hostap"))
 				$input_errors[] = "Bridging a wireless interface is only possible in hostap mode.";
+				
+			/* if an 11a channel is selected, the mode must be 11a too, and vice versa */
+			$is_chan_11a = (strpos($wlchannels[$_POST['channel']]['mode'], "11a") !== false);
+			$is_std_11a = ($_POST['standard'] == "11a");
+			if ($is_chan_11a && !$is_std_11a)
+				$input_errors[] = "802.11a channels can only be selected if the standard is set to 802.11a too.";
+			else if (!$is_chan_11a && $is_std_11a)
+				$input_errors[] = "802.11a can only be selected if an 802.11a channel is selected too.";				
 		}
 	}
 
@@ -76,7 +133,6 @@ function wireless_config_post() {
 		$optcfg['wireless']['standard'] = $_POST['standard'];
 		$optcfg['wireless']['mode'] = $_POST['mode'];
 		$optcfg['wireless']['ssid'] = $_POST['ssid'];
-		$optcfg['wireless']['stationname'] = $_POST['stationname'];
 		$optcfg['wireless']['channel'] = $_POST['channel'];
 		$optcfg['wireless']['wep']['enable'] = $_POST['wep_enable'] ? true : false;
 		
@@ -96,7 +152,7 @@ function wireless_config_post() {
 }
 
 function wireless_config_print() {
-	global $optcfg, $pconfig, $wlchannels;
+	global $optcfg, $pconfig, $wlchannels, $wlstandards;
 ?>
                 <tr> 
                   <td colspan="2" valign="top" height="16"></td>
@@ -104,20 +160,17 @@ function wireless_config_print() {
                 <tr> 
                   <td colspan="2" valign="top" class="listtopic">Wireless configuration</td>
 				</tr>
-				<?php if (strstr($optcfg['if'], "ath")): ?>
-                <tr> 
+                <tr>
                   <td valign="top" class="vncellreq">Standard</td>
                   <td class="vtable"><select name="standard" class="formfld" id="standard">
                       <?php
-					  $standards = array("11b" => "802.11b", "11g" => "802.11g", "11a" => "802.11a");
-					  foreach ($standards as $sn => $sv): ?>
+					  foreach ($wlstandards as $sn): ?>
                       <option value="<?=$sn;?>" <?php if ($sn == $pconfig['standard']) echo "selected";?>>
-                      <?=$sv;?>
+                      <?="802.$sn";?>
                       </option>
                       <?php endforeach; ?>
                     </select></td>
                 </tr>
-				<?php endif; ?>
                 <tr> 
                   <td valign="top" class="vncellreq">Mode</td>
                   <td class="vtable"><select name="mode" class="formfld" id="mode">
@@ -147,19 +200,19 @@ function wireless_config_print() {
                   <td class="vtable"><select name="channel" class="formfld" id="channel">
                       <option <?php if ($pconfig['channel'] == 0) echo "selected";?> value="0">Auto</option>
                       <?php
-					  foreach ($wlchannels as $channel): ?>
+					  foreach ($wlchannels as $channel => $chaninfo):
+					    if ($chaninfo['mode'] == "11g")
+					    	$mode = "11b/g";
+					    else
+					    	$mode = $chaninfo['mode'];
+					    
+					  	$chandescr = "{$chaninfo['chan']} ({$chaninfo['freq']} MHz, {$mode})";
+					  ?>
                       <option <?php if ($channel == $pconfig['channel']) echo "selected";?> value="<?=$channel;?>">
-                      <?=$channel;?>
+                      <?=$chandescr;?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <br>
-                    Note: Not all channels may be supported by your card</td>
-                </tr>
-                <tr> 
-                  <td valign="top" class="vncell">Station name</td>
-                  <td class="vtable"><input name="stationname" type="text" class="formfld" id="stationname" size="20" value="<?=htmlspecialchars($pconfig['stationname']);?>"> 
-                    <br>
-                    Hint: this field can usually be left blank</td>
+                    </select></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">WEP</td>

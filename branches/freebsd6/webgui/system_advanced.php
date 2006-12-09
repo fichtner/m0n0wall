@@ -92,6 +92,7 @@ if ($_POST) {
 		}
 		$config['system']['webgui']['noantilockout'] = $_POST['noantilockout'] ? true : false;
 		$config['filter']['bypassstaticroutes'] = $_POST['bypassstaticroutes'] ? true : false;
+		$oldtcpidletimeout = $config['filter']['tcpidletimeout'];
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
@@ -115,6 +116,10 @@ if ($_POST) {
 				// No need to set the standby-time if a reboot is needed anyway
 				system_set_harddisk_standby();
 			}
+		}
+		
+		if ($config['filter']['tcpidletimeout'] != $oldtcpidletimeout) {
+			touch($d_sysrebootreqd_path);
 		}
 		
 		$retval = 0;

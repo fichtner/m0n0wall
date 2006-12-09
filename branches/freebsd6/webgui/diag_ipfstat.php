@@ -140,9 +140,9 @@ if (isset($rawdata)) {
 				break;
 			default :
 			// Debug logic, in case there is an unforseen issue
-				echo $line . "<br>";
+				/*echo $line . "<br>";
 				echo $linelimit . "<br>";
-				echo $timeTmp . "<br>";
+				echo $timeTmp . "<br>";*/
 				break;
 			}
 			$count++;

@@ -156,10 +156,10 @@ function enable_change(enable_over) {
 	document.iform.bridge.disabled = endis;
 
 	if (document.iform.mode) {
+		 document.iform.standard.disabled = endis;
 		 document.iform.mode.disabled = endis;
 		 document.iform.ssid.disabled = endis;
 		 document.iform.channel.disabled = endis;
-		 document.iform.stationname.disabled = endis;
 		 document.iform.wep_enable.disabled = endis;
 		 document.iform.key1.disabled = endis;
 		 document.iform.key2.disabled = endis;

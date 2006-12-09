@@ -36,6 +36,7 @@ options         DEVICE_POLLING
 
 options		FAST_IPSEC              #new IPsec (cannot define w/ IPSEC)
 
+options		BRIDGE
 options		IPFILTER
 options		IPFILTER_LOG
 options		IPFILTER_DEFAULT_BLOCK

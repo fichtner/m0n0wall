@@ -256,12 +256,16 @@ function interfaces_wireless_configure($if, $wlcfg) {
 	global $config, $g;
 	
 	/* wireless configuration */
+	
+	/* the mode/standard (11a/b/g) needs to be set separately */
+	if ($wlcfg['standard']) {
+		mwexec("/sbin/ifconfig " . escapeshellarg($if) . " mode " .
+			escapeshellarg($wlcfg['standard']));
+	}
+	
 	$ifcargs = escapeshellarg($if) . 
 		" ssid " . escapeshellarg($wlcfg['ssid']) . " channel " . 
 		escapeshellarg($wlcfg['channel']) . " ";
-	
-	if ($wlcfg['stationname'])
-		$ifcargs .= "stationname " . escapeshellarg($wlcfg['stationname']) . " ";
 	
 	if (isset($wlcfg['wep']['enable']) && is_array($wlcfg['wep']['key'])) {
 		$ifcargs .= "wepmode on ";
@@ -278,35 +282,23 @@ function interfaces_wireless_configure($if, $wlcfg) {
 		$ifcargs .= "wepmode off ";
 	}
 	
-	if (strstr($if, "ath")) {
-		if ($wlcfg['standard'])
-			$ifcargs .= "mode {$wlcfg['standard']} ";
-	}
-	
 	switch ($wlcfg['mode']) {
 		case 'hostap':
-			if (strstr($if, "ath"))
-				$ifcargs .= "-mediaopt adhoc mediaopt hostap ";
-			else if (strstr($if, "wi"))
-				$ifcargs .= "-mediaopt ibss mediaopt hostap ";
+			$ifcargs .= "-mediaopt adhoc mediaopt hostap ";
 			break;
 		case 'ibss':
 		case 'IBSS':
-			if (strstr($if, "ath"))
-				$ifcargs .= "-mediaopt hostap mediaopt adhoc ";
-			else if (strstr($if, "wi"))
-				$ifcargs .= "-mediaopt hostap mediaopt ibss ";
-			else if (strstr($if, "an"))
+			if (strstr($if, "an"))
 				$ifcargs .= "mediaopt adhoc ";
+			else
+				$ifcargs .= "-mediaopt hostap mediaopt adhoc ";
 			break;
 		case 'bss':
 		case 'BSS':
-			if (strstr($if, "ath"))
-				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
-			else if (strstr($if, "wi"))
-				$ifcargs .= "-mediaopt hostap -mediaopt ibss ";
-			else if (strstr($if, "an"))
+			if (strstr($if, "an"))
 				$ifcargs .= "-mediaopt adhoc ";
+			else
+				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
 			break;
 	}
 	
