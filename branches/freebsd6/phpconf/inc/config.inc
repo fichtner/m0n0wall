@@ -50,9 +50,38 @@ if ($g['booting']) {
 	if (!file_exists("{$g['etc_path']}/fstab")) {
 	
 		if (strstr($g['platform'], "cdrom")) {
-			/* config is on floppy disk for CD-ROM version */
-			$cfgdevice = $cfgpartition = "fd0";
+			/* config is either on floppy disk or USB stick for CD-ROM version */
+			
+			/* try the USB stick at da0 first, and if this fails, use the floppy disk  */
+			$cfgdevice = "da0";
+			$cfgpartition = "da0s1";
 			$cfgfstype = "msdos";
+			
+			if (mwexec("/sbin/mount -t msdos -r /dev/da0s1 {$g['cf_path']}") == 0) {
+				/* USB stick is OK */
+				echo "Using USB memory stick for configuration storage.\n";
+				mwexec("/sbin/umount -f {$g['cf_path']}");
+			} else {
+				$cfgdevice = $cfgpartition = "fd0";
+				
+				if (mwexec("/sbin/mount -t msdos -r /dev/fd0 {$g['cf_path']}") != 0) {
+					echo <<<EOD
+
+
+*******************************************************************************
+* WARNING!                                                                    *
+* No FAT formatted USB memory stick or floppy disk could be found.            *
+* Your configuration changes will be lost on reboot.                          *
+*******************************************************************************
+
+
+EOD;
+					sleep(5);
+				} else {
+					echo "Using floppy disk for configuration storage.\n";
+					mwexec("/sbin/umount -f {$g['cf_path']}");
+				}
+			}
 		} else {
 			/* probe kernel known disks until we find one with config.xml */
 			$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
@@ -131,13 +160,10 @@ if (!$noparseconfig) {
 		if (!file_exists("{$g['conf_path']}/config.xml")) {
 			if ($g['booting']) {
 				if (strstr($g['platform'], "cdrom")) {
-					/* try copying the default config. to the floppy */
+					/* try copying the default config. to the floppy/USB stick */
 					reset_factory_defaults();
 					
-					echo "No XML configuration file found - using factory defaults.\n"; 
-					echo "Make sure that the configuration floppy disk with the conf/config.xml\n";
-					echo "file is inserted. If it isn't, your configuration changes will be lost\n";
-					echo "on reboot.\n";
+					echo "No XML configuration file found - using factory defaults.\n";
 				} else {
 					echo "XML configuration file not found. m0n0wall cannot continue booting.\n"; 
 					mwexec("/sbin/halt");

@@ -12,19 +12,12 @@ options		CPU_SOEKRIS
 hints		"M0N0WALL_NET48XX.hints"
 
 options 	SCHED_4BSD		# 4BSD scheduler
-options 	PREEMPTION		# Enable kernel thread preemption
 options 	INET			# InterNETworking
 options 	FFS			# Berkeley Fast Filesystem
 options 	SOFTUPDATES		# Enable FFS soft updates support
-options 	UFS_ACL			# Support for access control lists
-options 	UFS_DIRHASH		# Improve performance on big directories
 options 	MD_ROOT			# MD is a potential root device
-options 	PROCFS			# Process filesystem (requires PSEUDOFS)
-options 	PSEUDOFS		# Pseudo-filesystem framework
-options 	GEOM_GPT		# GUID Partition Tables.
 options 	COMPAT_43		# Compatible with BSD 4.3 [KEEP THIS!]
 options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
-options 	KTRACE			# ktrace(1) support
 options 	SYSVSHM			# SYSV-style shared memory
 options 	SYSVMSG			# SYSV-style message queues
 options 	SYSVSEM			# SYSV-style semaphores

@@ -257,28 +257,6 @@ EOD;
 	return $retval;
 }
 
-function system_pccard_start() {
-	global $config, $g;
-	
-	if ($g['booting'])
-		echo "Initializing PC cards... ";
-	
-	/* kill any running pccardd */
-	killbypid("{$g['varrun_path']}/pccardd.pid");
-	
-	/* fire up pccardd */
-	$res = mwexec("/usr/sbin/pccardd -z -f {$g['etc_path']}/pccard.conf");
-	
-	if ($g['booting']) {
-		if ($res == 0)
-			echo "done\n";
-		else
-			echo "failed (probably no PC card controller present)\n";
-	}
-		
-	return $res;
-}
-
 function system_webgui_start() {
 	global $config, $g;
 	
