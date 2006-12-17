@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- changes in Captive Portal (jdegraeve):
+ - Always sent the session-time instead of only sending it within a stop. This
+   will cause most prepaid systems to work again.
+
 - changed base system to FreeBSD 6.2-RC1 (final 1.3 version will be based on FreeBSD 6.2-RELEASE)
 
 - WARNING: the generic-pc image no longer fits on 8 MB CF cards! (>= 10 MB required)
