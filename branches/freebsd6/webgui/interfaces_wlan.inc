@@ -152,7 +152,7 @@ function wireless_config_post() {
 }
 
 function wireless_config_print() {
-	global $optcfg, $pconfig, $wlchannels, $wlstandards;
+	global $g, $optcfg, $pconfig, $wlchannels, $wlstandards;
 ?>
                 <tr> 
                   <td colspan="2" valign="top" height="16"></td>
@@ -176,7 +176,7 @@ function wireless_config_print() {
                   <td class="vtable"><select name="mode" class="formfld" id="mode">
                       <?php 
 						$opts = array();
-						if (strstr($optcfg['if'], "wi") || strstr($optcfg['if'], "ath"))
+						if (preg_match($g['wireless_hostap_regex'], $optcfg['if']))
 							$opts[] = "hostap";
 						$opts[] = "BSS";
 						$opts[] = "IBSS";

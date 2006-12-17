@@ -96,6 +96,7 @@ if ($_POST) {
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
+		$oldpolling = $config['system']['polling'];
 		$config['system']['polling'] = $_POST['polling_enable'] ? true : false;
 		if (!$_POST['ipfstatentries'])
 			unset($config['diag']['ipfstatentries']);
@@ -105,9 +106,12 @@ if ($_POST) {
 		write_config();
 		
 		if (($config['system']['webgui']['certificate'] != $oldcert)
-				|| ($config['system']['webgui']['private-key'] != $oldkey)) {
+				|| ($config['system']['webgui']['private-key'] != $oldkey)
+				|| ($config['filter']['tcpidletimeout'] != $oldtcpidletimeout)
+				|| ($config['system']['polling'] != $oldpolling)) {
 			touch($d_sysrebootreqd_path);
-		} else if (($g['platform'] == "generic-pc") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
+		}
+		if (($g['platform'] == "generic-pc") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
 			if (!$config['system']['harddiskstandby']) {
 				// Reboot needed to deactivate standby due to a stupid ATA-protocol
 				touch($d_sysrebootreqd_path);
@@ -116,10 +120,6 @@ if ($_POST) {
 				// No need to set the standby-time if a reboot is needed anyway
 				system_set_harddisk_standby();
 			}
-		}
-		
-		if ($config['filter']['tcpidletimeout'] != $oldtcpidletimeout) {
-			touch($d_sysrebootreqd_path);
 		}
 		
 		$retval = 0;
