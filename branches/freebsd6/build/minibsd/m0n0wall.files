@@ -45,7 +45,6 @@ sbin/nologin
 sbin/ping
 sbin/reboot
 sbin/route
-sbin/setkey
 sbin/shutdown
 sbin/sysctl
 sbin/umount

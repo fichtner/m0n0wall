@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- use setkey from ipsec-tools now that we use NAT-T (mkasper)
+
+
+1.3b2
+-----
+
 - enabled AES for IPsec phase 1 (mkasper)
 
 - bumped MFS size in rc.firmware to 10 MB (mkasper)
