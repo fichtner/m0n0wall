@@ -183,6 +183,11 @@ function vpn_ipsec_configure($ipchg = false) {
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
  				}
+					
+				$nattline = '';
+				if (isset($tunnel['natt'])) {
+					$nattline = "nat_traversal on;";
+				}
 				
 				if (isset($tunnel['p1']['authentication_method'])) {
 					$authmethod = $tunnel['p1']['authentication_method'];
@@ -244,6 +249,7 @@ EOD;
 remote {$tunnel['remote-gateway']} \{
 	exchange_mode {$tunnel['p1']['mode']};
 	my_identifier {$myidentt} "{$myident}";
+	{$nattline}
 	{$certline}
 	peers_identifier address {$tunnel['remote-gateway']};
 	initial_contact on;
@@ -305,6 +311,11 @@ EOD;
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
  				}
+					
+				$nattline = '';
+				if (isset($tunnel['natt'])) {
+					$nattline = "nat_traversal on;";
+				}
 				
 				if (isset($tunnel['p1']['authentication_method'])) {
 					$authmethod = $tunnel['p1']['authentication_method'];
@@ -350,6 +361,7 @@ EOD;
 remote anonymous \{
 	exchange_mode {$tunnel['p1']['mode']};
 	my_identifier {$myidentt} "{$myident}";
+	{$nattline}
 	{$certline}
 	initial_contact on;
 	passive on;

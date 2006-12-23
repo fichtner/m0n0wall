@@ -3,6 +3,17 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- enabled AES for IPsec phase 1 (mkasper)
+
+- bumped MFS size in rc.firmware to 10 MB (mkasper)
+
+- set "-P" option in boot.config for generic-pc and generic-pc-cdrom to automatically
+  probe for a keyboard and use the serial port if no keyboard is found (mkasper)
+
+- compiled SNMP agent with support for memory usage information MIB (mkasper)
+
+- enabled NAT-T support for IPsec tunnels -> new option on IPsec webGUI pages (mkasper)
+
 - back-ported MSS clamping fix from MPD 4.0b5 to MPD 3.18 (fixes MTU problems with
   PPPoE client) (mkasper)
 

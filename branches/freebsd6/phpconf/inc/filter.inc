@@ -886,6 +886,10 @@ function filter_rules_ipsec_generate($ifname, $ip) {
 pass in quick on {$ifname} proto udp from any to {$ip} port = 500
 pass out quick on {$ifname} proto udp from {$ip} port = 500 to any
 
+# Pass NAT-T encapsulated ESP packets
+pass in quick on {$ifname} proto udp from any to {$ip} port = 4500
+pass out quick on {$ifname} proto udp from {$ip} port = 4500 to any
+
 # Pass ESP packets
 pass in quick on {$ifname} proto esp from any to {$ip}
 pass out quick on {$ifname} proto esp from {$ip} to any

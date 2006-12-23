@@ -30,6 +30,7 @@ options		NO_SWAPPING
 options         DEVICE_POLLING
 
 options		FAST_IPSEC              #new IPsec (cannot define w/ IPSEC)
+options		IPSEC_NAT_T
 
 options		BRIDGE
 options		IPFILTER

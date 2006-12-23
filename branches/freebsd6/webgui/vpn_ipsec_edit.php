@@ -78,6 +78,7 @@ function pconfig_to_address(&$adr, $padr, $pmask) {
 
 if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['disabled'] = isset($a_ipsec[$id]['disabled']);
+	$pconfig['natt'] = isset($a_ipsec[$id]['natt']);
 	//$pconfig['auto'] = isset($a_ipsec[$id]['auto']);
 
 	if (!isset($a_ipsec[$id]['local-subnet']))
@@ -127,7 +128,7 @@ if (isset($id) && $a_ipsec[$id]) {
 	/* defaults */
 	$pconfig['interface'] = "wan";
 	$pconfig['localnet'] = "lan";
-	$pconfig['p1mode'] = "aggressive";
+	$pconfig['p1mode'] = "main";
 	$pconfig['p1myidentt'] = "myaddress";
 	$pconfig['p1authentication_method'] = "pre_shared_key";
 	$pconfig['p1ealgo'] = "3des";
@@ -211,6 +212,7 @@ if ($_POST) {
 		$ipsecent['disabled'] = $_POST['disabled'] ? true : false;
 		//$ipsecent['auto'] = $_POST['auto'] ? true : false;
 		$ipsecent['interface'] = $pconfig['interface'];
+		$ipsecent['natt'] = $_POST['natt'] ? true : false;
 		pconfig_to_address($ipsecent['local-subnet'], $_POST['localnet'], $_POST['localnetmask']);
 		$ipsecent['remote-subnet'] = $_POST['remotenet'] . "/" . $_POST['remotebits'];
 		$ipsecent['remote-gateway'] = $_POST['remotegw'];
@@ -337,6 +339,14 @@ function methodsel_change() {
                       <?php endforeach; ?>
                     </select> <br>
                     <span class="vexpl">Select the interface for the local endpoint of this tunnel.</span></td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncellreq">NAT-T</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="natt" type="checkbox" id="natt" value="yes" <?php if ($pconfig['natt']) echo "checked"; ?>>
+                    <strong>Enable NAT Traversal (NAT-T)</strong><br>
+                    <span class="vexpl">Set this option to enable the use of NAT-T (i.e. the encapsulation of ESP in UDP packets) if needed,
+                    	which can help with clients that are behind restrictive firewalls.</span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Local subnet</td>

@@ -97,7 +97,7 @@ $my_identifier_list = array('myaddress' => 'My IP address',
 							'user_fqdn' => 'User FQDN');
 
 $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish', 
-					'cast128' => 'CAST128');
+					'cast128' => 'CAST128', 'aes' => 'AES');
 $p2_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
 					'cast128' => 'CAST128', 'rijndael' => 'Rijndael (AES)');
 $p1_halgos = array('sha1' => 'SHA1', 'md5' => 'MD5');
