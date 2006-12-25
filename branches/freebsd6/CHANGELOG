@@ -3,6 +3,16 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- modified kernel patch to handle ipnat+dummynet in ip_input -> should fix problems
+  with captive portal not reporting downloaded data per user properly when the
+  traffic shaper is on, and also makes per-user bandwidth limits work again
+
+- add ural(4) to list of recognized wireless NICs
+
+- removed "-P" option from boot.config again (doesn't work properly with USB keyboards)
+
+- add kbdmux to kernel config of generic-pc(-cdrom) -> should fix problems with USB keyboards (hopefully)
+
 - use setkey from ipsec-tools now that we use NAT-T (mkasper)
 
 

@@ -366,7 +366,7 @@ to access after they've authenticated.</td>
         <strong>Enable per-user bandwidth restriction</strong><br><br>
         <table cellpadding="0" cellspacing="0">
         <tr>
-        <td>Default download</td>
+        <td>Default download&nbsp;&nbsp;</td>
         <td><input type="text" class="formfld" name="bwdefaultdn" id="bwdefaultdn" size="10" value="<?=htmlspecialchars($pconfig['bwdefaultdn']);?>"> Kbit/s</td>
         </tr>
         <tr>
@@ -517,7 +517,7 @@ to access after they've authenticated.</td>
 				the Called-Station-Id to the client's MAC address. Default behaviour is Calling-Station-Id = client's MAC address and Called-Station-Id = m0n0wall's WAN MAC address.</td>
 			</tr>
             <tr>
-                <td class="vncell">MAC address format</td>
+                <td class="vncell" valign="top">MAC address format</td>
                 <td class="vtable">
                 <select name="radmac_format" id="radmac_format">
                 <option>default</option>

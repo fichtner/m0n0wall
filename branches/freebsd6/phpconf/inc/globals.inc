@@ -50,8 +50,8 @@ $g = array(
     "pptp_subnet" => 28,
     "debug" => false,
     "latest_config" => "1.6",
-    "wireless_regex" => "/^(wi|ath|an|ral)/",
-    "wireless_hostap_regex" => "/^(wi|ath|ral)/"
+    "wireless_regex" => "/^(wi|ath|an|ral|ural)/",
+    "wireless_hostap_regex" => "/^(wi|ath|ral|ural)/"
 );
 
 ?>

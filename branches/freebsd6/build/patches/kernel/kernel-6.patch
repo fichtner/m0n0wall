@@ -427,7 +427,7 @@
  		return (ENOBUFS);
  	}
 --- sys/netinet/ip_input.c.orig	Mon Sep  4 12:39:47 2006
-+++ sys/netinet/ip_input.c	Sat Dec  9 16:33:01 2006
++++ sys/netinet/ip_input.c	Mon Dec 25 18:22:56 2006
 @@ -389,18 +389,22 @@
  		}
  	}
@@ -439,7 +439,7 @@
 -			sum = in_cksum_hdr(ip);
 +	/* skip checksum checks if we came from dummynet, since we'll already
 +	   have been here in that case */
-+	if (!(m->m_flags & M_SKIP_FIREWALL)) {
++	if (!(m->m_flags & M_IPIN_SKIPPFIL)) {
 +		if (m->m_pkthdr.csum_flags & CSUM_IP_CHECKED) {
 +			sum = !(m->m_pkthdr.csum_flags & CSUM_IP_VALID);
  		} else {
@@ -461,22 +461,34 @@
  	}
  
  #ifdef ALTQ
-@@ -462,6 +466,8 @@
- 
+@@ -463,6 +467,20 @@
  	/* Jump over all PFIL processing if hooks are not active. */
  	if (inet_pfil_hook.ph_busy_count == -1)
-+		goto passin;
-+	if (m->m_flags & M_SKIP_FIREWALL)
  		goto passin;
++	if (m->m_flags & M_IPIN_SKIPPFIL) {
++		/* m0n0wall: packet has already been through dummynet, and therefore
++		   also through ipnat (reversed processing order in m0n0wall);
++		   we skip the pfil hooks to avoid ipnat being called again on
++		   this packet (this implicitly assumes that one_pass=1).
++		   However, we need to remove the dummynet tag, otherwise the
++		   packet will be treated improperly in ip_output. */
++		struct m_tag *dn_tag;
++		dn_tag = m_tag_find(m, PACKET_TAG_DUMMYNET, NULL);
++		if (dn_tag != NULL)
++			m_tag_delete(m, dn_tag);
++		
++		goto passin;
++	}
  
  	odst = ip->ip_dst;
---- sys/netinet/ip_dummynet.c.orig	Thu Feb 23 09:28:15 2006
-+++ sys/netinet/ip_dummynet.c	Sat Nov 18 21:10:30 2006
+ 	if (pfil_run_hooks(&inet_pfil_hook, &m, m->m_pkthdr.rcvif,
+--- sys/netinet/ip_dummynet.c.orig	Sat Jul 29 10:24:12 2006
++++ sys/netinet/ip_dummynet.c	Mon Dec 25 13:08:04 2006
 @@ -774,6 +774,7 @@
  			ip = mtod(m, struct ip *);
  			ip->ip_len = htons(ip->ip_len);
  			ip->ip_off = htons(ip->ip_off);
-+			m->m_flags |= M_SKIP_FIREWALL;
++			m->m_flags |= M_IPIN_SKIPPFIL;
  			ip_input(m);
  			break;
  #ifdef INET6
@@ -504,3 +516,13 @@
  	    "fstype", vfsname,
  	    "fspath", "/",
  	    "from", path,
+--- sys/sys/mbuf.h.orig	Fri Mar 24 00:24:32 2006
++++ sys/sys/mbuf.h	Mon Dec 25 16:31:16 2006
+@@ -179,6 +179,7 @@
+ #define	M_FIRSTFRAG	0x1000	/* packet is first fragment */
+ #define	M_LASTFRAG	0x2000	/* packet is last fragment */
+ #define	M_VLANTAG	0x10000	/* packet has VLAN tag attached */
++#define	M_IPIN_SKIPPFIL	0x20000  /* m0n0wall: skip pfil processing in ip_input */
+ 
+ /*
+  * External buffer types: identify ext_buf type.
