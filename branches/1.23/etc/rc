@@ -40,6 +40,9 @@ dev_mkdb
 # Run ldconfig
 /sbin/ldconfig -elf /usr/lib /usr/local/lib
 
+# disable core dumping (to avoid running out of MFS space)
+/sbin/sysctl kern.coredump=0
+
 # let the PHP-based configuration subsystem set up the system now
 /etc/rc.bootup
 

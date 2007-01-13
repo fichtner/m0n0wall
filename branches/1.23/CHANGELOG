@@ -3,8 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
-1.23b3 (jdgraeve)
-------
+- disabled core dumping by default (to avoid running out of MFS space) (mkasper)
+
+- back-ported MSS clamping fix from MPD 4.0b5 to MPD 3.18 (fixes MTU
+  issues with some PPTP clients during "large" uploads from the PPTP
+  client to a remote server)
 
 - changes in Captive portal (jdegraeve):
   - Changed CP database to use serialisation
@@ -14,26 +17,19 @@ $Id$
 
 - update extensions with userpatch (sil)
 
-- updated base system to FreeBSD 4.11-RELEASE-p19
+- updated base system to FreeBSD 4.11-RELEASE-p22
 
-- updated Dnsmasq to 2.33 (bugfixes)
+- updated Dnsmasq to 2.35 (bugfixes)
 
-- updated DHCP/DHCPrelay to 3.0.4 (bugfixes)
+- updated DHCP/DHCPrelay to 3.0.5 (bugfixes)
 
-- updated MSNTP to 1.6
-
-- updated MPD to 3.18
-
-- updated ipsec-tools to 0.6.6 including setkey|racoon|racoonctl (fixes memleak)
+- updated ipsec-tools to 0.6.6 (fixes memleak)
 
 - updated PHP to 4.4.4
 
 - Addition of netstat -m|-s and kldstat to status
 
 - Comply to PHP-4.4.0 array datatypes in system_firmware.php/guiconfig.php
-
-1.23b2
-------
 
 - changes in Captive portal (jdegraeve):
   - add PfSense ideas (slighty different implemented):
