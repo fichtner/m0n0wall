@@ -2,6 +2,7 @@
 
 machine		i386
 cpu 		I586_CPU
+options		CPU_GEODE		#Adds LED and HW watchdog support
 ident		M0N0WALL_WRAP
 maxusers	0
 options		INCLUDE_CONFIG_FILE

@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add watchdog code for WRAP (contributed by Marcel Wiget)
+  -> this is off by default and can be enabled on the System: Advanced page
+
 - add fix for ipnat FTP proxy to properly handle RST packets from an active
   mode FTP client behind m0n0wall
 

@@ -47,6 +47,7 @@
 		<!-- <harddiskstandby></harddiskstandby> -->
 		<!-- <polling/> -->
 		<!-- <notes></notes> -->
+		<!-- <watchdog/> -->
 	</system>
 	<interfaces>
 		<lan>

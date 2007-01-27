@@ -157,6 +157,9 @@
 	
 	/* enable HD standby */
 	system_set_harddisk_standby();
+
+	/* enable watchdog */
+	system_watchdog_configure();
 	
 	/* done */
 	unlink("{$g['varrun_path']}/booting");

@@ -679,4 +679,22 @@ EOD;
 	return 0;
 }
 
+function system_watchdog_configure() {
+	global $config, $g;
+
+	/* start watchdog process for WRAP, if enabled */
+	if ($g['platform'] != "wrap")
+		return 0;
+
+	/* kill watchdogd, if running */
+	killbyname("watchdogd");
+
+	if (isset($config['system']['watchdog'])) {
+		/* start watchdogd */
+		return mwexec("/usr/local/sbin/watchdogd");
+	}
+
+	return 0;
+}
+
 ?>

@@ -49,6 +49,7 @@ $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
 $pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
+$pconfig['watchdog'] = isset($config['system']['watchdog']);
 
 if ($_POST) {
 
@@ -100,6 +101,7 @@ if ($_POST) {
 			unset($config['diag']['ipfstatentries']);
 		else
 			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
+		$config['system']['watchdog'] = $_POST['watchdog'] ? true : false;
 		
 		write_config();
 		
@@ -126,6 +128,7 @@ if ($_POST) {
 				$retval |= vpn_ipsec_configure();
 			$retval |= system_polling_configure();
 			$retval |= system_set_termcap();
+			$retval |= system_watchdog_configure();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
@@ -231,6 +234,16 @@ function enable_change(enable_over) {
                     <strong>Disable console menu</strong><span class="vexpl"><br>
                     Changes to this option will take effect after a reboot.</span></td>
                 </tr>
+<?php if ($g['platform'] == "wrap"): ?>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">Watchdog</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="watchdog" type="checkbox" id="watchdog" value="yes" <?php if ($pconfig['watchdog']) echo "checked"; ?>>
+                    <strong>Enable hardware watchdog</strong><span class="vexpl"><br>
+                    If the hardware watchdog is enabled, it will reset the CPU after a few seconds if the system software
+                    has stopped responding.</span></td>
+                </tr>
+<?php endif; ?>
 				<tr>
                   <td valign="top" class="vncell">Firmware version check </td>
                   <td class="vtable">
