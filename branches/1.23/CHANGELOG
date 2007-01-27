@@ -3,6 +3,13 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add support for Framed-IP-Address attribute from RADIUS server for
+  PPTP VPN (i.e. allow the RADIUS server to assign the client IP address)
+
+- return m0n0wall-specific string in SNMP sysDescr; format:
+  $os $host $version $platform $base $base_version $base_hardware
+  e.g. "m0n0wall m0n0wall.local 1.23b3 wrap FreeBSD 4.11-RELEASE-p26 i386"
+
 - add watchdog code for WRAP (contributed by Marcel Wiget)
   -> this is off by default and can be enabled on the System: Advanced page
 

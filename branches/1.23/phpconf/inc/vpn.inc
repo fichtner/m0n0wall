@@ -574,6 +574,14 @@ EOD;
 
 EOD;
 				}
+
+				if (isset($pptpdcfg['radius']['radiusip'])) {
+					$mpdconf .= <<<EOD
+	set ipcp yes radius-ip
+	set ipcp enable radius-ip
+
+EOD;
+				}
 			}
 
 			fwrite($fd, $mpdconf);

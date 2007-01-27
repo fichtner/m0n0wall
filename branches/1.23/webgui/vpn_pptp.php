@@ -44,6 +44,7 @@ $pconfig['mode'] = $pptpcfg['mode'];
 $pconfig['req128'] = isset($pptpcfg['req128']);
 $pconfig['radiusenable'] = isset($pptpcfg['radius']['enable']);
 $pconfig['radacct_enable'] = isset($pptpcfg['radius']['accounting']);
+$pconfig['radiusip_enable'] = isset($pptpcfg['radius']['radiusip']);
 $pconfig['radiusserver'] = $pptpcfg['radius']['server'];
 $pconfig['radiussecret'] = $pptpcfg['radius']['secret'];
 
@@ -107,6 +108,7 @@ if ($_POST) {
 		$pptpcfg['req128'] = $_POST['req128'] ? true : false;
 		$pptpcfg['radius']['enable'] = $_POST['radiusenable'] ? true : false;
 		$pptpcfg['radius']['accounting'] = $_POST['radacct_enable'] ? true : false;
+		$pptpcfg['radius']['radiusip'] = $_POST['radiusip_enable'] ? true : false;
 		$pptpcfg['radius']['server'] = $_POST['radiusserver'];
 		$pptpcfg['radius']['secret'] = $_POST['radiussecret'];
 			
@@ -143,10 +145,12 @@ function enable_change(enable_over) {
 		
 		if (document.iform.radiusenable.checked || enable_over) {
 			document.iform.radacct_enable.disabled = 0;
+			document.iform.radiusip_enable.disabled = 0;
 			document.iform.radiusserver.disabled = 0;
 			document.iform.radiussecret.disabled = 0;
 		} else {
 			document.iform.radacct_enable.disabled = 1;
+			document.iform.radiusip_enable.disabled = 1;
 			document.iform.radiusserver.disabled = 1;
 			document.iform.radiussecret.disabled = 1;
 		}
@@ -156,6 +160,7 @@ function enable_change(enable_over) {
 		document.iform.req128.disabled = 1;
 		document.iform.radiusenable.disabled = 1;
 		document.iform.radacct_enable.disabled = 1;
+		document.iform.radiusip_enable.disabled = 1;
 		document.iform.radiusserver.disabled = 1;
 		document.iform.radiussecret.disabled = 1;
 	}
@@ -244,7 +249,12 @@ function enable_change(enable_over) {
                       <br>
                       <input name="radacct_enable" type="checkbox" id="radacct_enable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radacct_enable']) echo "checked"; ?>>
                       <strong>Enable RADIUS accounting <br>
-                      </strong>Sends accounting packets to the RADIUS server.</td>
+                      </strong>Sends accounting packets to the RADIUS server.
+                      <br>
+                      <input name="radiusip_enable" type="checkbox" id="radiusip_enable" onclick="enable_change(false)" value="yes" <?php if ($pconfig['radiusip_enable']) echo "checked"; ?>>
+                      <strong>Enable IP address assignment by RADIUS server<br>
+                      </strong>When set, this option makes the PPTP VPN server assign the IP address
+                      that the RADIUS server provided in its Framed-IP-Address attribute to the client.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS server </td>

@@ -146,6 +146,13 @@
 		<local-ip></local-ip>
 		<remote-ip></remote-ip>
 		<timeout></timeout>
+		<radius>
+			<enable/>
+			<accounting/>
+			<radiusip/>
+			<server></server>
+			<secret></secret>
+		</radius>
 		-->
 	</pptp>
 	<bigpond>
