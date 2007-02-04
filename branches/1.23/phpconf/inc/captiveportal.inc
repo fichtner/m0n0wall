@@ -4,6 +4,7 @@
     part of m0n0wall (http://m0n0.ch/wall)
     
     Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    and (C) 2006-2007 Jonathan De Graeve <m0n0wall@esstec.be>
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without

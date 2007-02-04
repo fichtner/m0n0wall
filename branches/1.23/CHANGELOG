@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- changes in Captive Portal (jdegraeve)
+  - Fix bug: The option RADIUS authentication/No authentication working reversely.
+
 - add support for Framed-IP-Address attribute from RADIUS server for
   PPTP VPN (i.e. allow the RADIUS server to assign the client IP address)
 

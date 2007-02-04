@@ -4,7 +4,7 @@
 
     $Id$
 
-    Copyright (c) 2006, Jonathan De Graeve <jonathan.de.graeve@imelda.be>
+    Copyright (c) 2006-2007, Jonathan De Graeve <m0n0wall@esstec.be>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without 

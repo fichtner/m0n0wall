@@ -162,7 +162,7 @@ require("guiconfig.inc");
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: disable concurrent logins, file manager</font></em><br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Webgui users/groups</font></em><br>
 			  <br>
-              Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
+              Jonathan De Graeve (<a href="mailto:m0n0wall@esstec.be">m0n0wall@esstec.be</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Complete captive portal RADIUS overhaul, cleanup</font></em><br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: file manager, volume stats, FW rulepool (virtual port pool), MAC formatting, per-user bandwidth limitation</font></em><br>
 			  <br>
