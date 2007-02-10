@@ -751,7 +751,7 @@ function captiveportal_get_radius_servers() {
             $radiusservers[0]['key'] = $config['captiveportal']['radiuskey'];
 
             /* RADIUS server 2 */
-            if (isset($config['captiveportal']['radiusip2'], $config['captiveportal']['radiuskey2'])) {
+            if ($config['captiveportal']['radiusip2'] && $config['captiveportal']['radiuskey2']) {
                 $radiusservers[1]['ipaddr'] = $config['captiveportal']['radiusip2'];
                 $radiusservers[1]['key'] = $config['captiveportal']['radiuskey2'];
 
