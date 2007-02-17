@@ -3,8 +3,15 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- update time zone data to reflect US DST changes
+
+- fix captive portal RADIUS login when only one RADIUS server is specified (mkasper)
+
 - changes in Captive Portal (jdegraeve)
   - Fix bug: The option RADIUS authentication/No authentication working reversely.
+
+1.23b3
+------
 
 - add support for Framed-IP-Address attribute from RADIUS server for
   PPTP VPN (i.e. allow the RADIUS server to assign the client IP address)
