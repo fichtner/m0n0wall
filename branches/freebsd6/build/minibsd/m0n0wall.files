@@ -72,4 +72,4 @@ usr/sbin/pwd_mkdb
 usr/sbin/traceroute
 
 # contents of /usr/libexec
-usr/libexec/ld-elf.so.1
+usr/libexec/ld-elf.so.1:libexec/ld-elf.so.1
