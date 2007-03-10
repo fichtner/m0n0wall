@@ -3,6 +3,14 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- update default webGUI SSL certificate
+
+- add support for hardware button on WRAP (if pressed during boot, it will
+  trigger a reset to factory defaults)
+
+1.23b4
+------
+
 - update time zone data to reflect US DST changes
 
 - fix captive portal RADIUS login when only one RADIUS server is specified (mkasper)
