@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+1.23
+----
+
+- updated PHP to 4.4.6
+
 - update default webGUI SSL certificate
 
 - add support for hardware button on WRAP (if pressed during boot, it will
