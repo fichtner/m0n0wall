@@ -28,6 +28,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+
+/* omit no-cache headers because it confuses IE with file downloads */
+$omit_nocacheheaders = true;
 require("guiconfig.inc");
 
 if (($_POST['submit'] == "Download") && file_exists($_POST['dlPath'])) {
