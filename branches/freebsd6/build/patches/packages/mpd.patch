@@ -103,7 +103,7 @@ diff -u -r src.orig/iface.h src/iface.h
  #endif
 diff -u -r src.orig/ngfunc.c src/ngfunc.c
 --- src.orig/ngfunc.c	Tue May  4 18:12:28 2004
-+++ src/ngfunc.c	Sun Dec 17 11:28:25 2006
++++ src/ngfunc.c	Sun Mar 18 21:12:22 2007
 @@ -271,6 +271,17 @@
        b->name, BPF_HOOK_MPD, MPD_HOOK_DEMAND_TAP, strerror(errno)));
      goto fail;
@@ -138,9 +138,9 @@ diff -u -r src.orig/ngfunc.c src/ngfunc.c
        break;
      case BPF_MODE_ON:
 -    case BPF_MODE_MSSFIX:
-+      hp->bpf_prog_len = NOMATCH_PROG_LEN;
-+      memcpy(&hp->bpf_prog, &gNoMatchProg,
-+        NOMATCH_PROG_LEN * sizeof(*gNoMatchProg));
++      hp->bpf_prog_len = DEMAND_PROG_LEN;
++      memcpy(&hp->bpf_prog, &gDemandProg,
++        DEMAND_PROG_LEN * sizeof(*gDemandProg));
        snprintf(hp->ifMatch, sizeof(hp->ifMatch), "%s", BPF_HOOK_PPP);
        snprintf(hp->ifNotMatch, sizeof(hp->ifNotMatch), "%s", BPF_HOOK_PPP);
        break;
