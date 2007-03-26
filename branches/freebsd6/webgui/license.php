@@ -165,6 +165,9 @@ require("guiconfig.inc");
               Jonathan De Graeve (<a href="mailto:Jonathan.De.Graeve@imelda.be">Jonathan.De.Graeve@imelda.be</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Complete captive portal RADIUS overhaul, cleanup</font></em><br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: file manager, volume stats, FW rulepool (virtual port pool), MAC formatting, per-user bandwidth limitation</font></em><br>
+			  <br>
+              Marcel Wiget (<a href="mailto:mwiget@mac.com">mwiget@mac.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: Voucher authentication</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

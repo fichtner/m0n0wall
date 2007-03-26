@@ -83,6 +83,7 @@ if ($_GET['act'] == "del") {
            		  'Pass-through MAC' => 'services_captiveportal_mac.php',
            		  'Allowed IP addresses' => 'services_captiveportal_ip.php',
            		  'Users' => 'services_captiveportal_users.php',
+           		  'Vouchers' => 'services_captiveportal_vouchers.php',
            		  'File Manager' => 'services_captiveportal_filemanager.php');
 	dynamic_tab_menu($tabs);
 ?> 

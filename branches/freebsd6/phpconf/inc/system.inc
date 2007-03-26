@@ -449,6 +449,7 @@ function system_reboot_sync() {
 
 function system_reboot_cleanup() {
 	captiveportal_radius_stop_all();
+    voucher_save_db_to_config();
 }
 
 function system_do_shell_commands($early = 0) {

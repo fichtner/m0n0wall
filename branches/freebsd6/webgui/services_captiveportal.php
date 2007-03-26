@@ -269,6 +269,7 @@ function enable_change(enable_change) {
            		  'Pass-through MAC' => 'services_captiveportal_mac.php',
            		  'Allowed IP addresses' => 'services_captiveportal_ip.php',
            		  'Users' => 'services_captiveportal_users.php',
+           		  'Vouchers' => 'services_captiveportal_vouchers.php',
            		  'File Manager' => 'services_captiveportal_filemanager.php');
 	dynamic_tab_menu($tabs);
 ?> 
@@ -579,12 +580,13 @@ to access after they've authenticated.</td>
 		<?php endif; ?>
 		  Upload an HTML file for the portal page here (leave blank to keep the current one). Make sure to include a form (POST to &quot;$PORTAL_ACTION$&quot;)
 with a submit button (name=&quot;accept&quot;) and a hidden field with name=&quot;redirurl&quot; and value=&quot;$PORTAL_REDIRURL$&quot;.
-Include the &quot;auth_user&quot; and &quot;auth_pass&quot; input fields if authentication is enabled, otherwise it will always fail.
+Include the &quot;auth_user&quot; and &quot;auth_pass&quot; and/or &quot;auth_voucher&quot; input fields if authentication is enabled, otherwise it will always fail.
 Example code for the form:<br>
 		  <br>
 		  <tt>&lt;form method=&quot;post&quot; action=&quot;$PORTAL_ACTION$&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_user&quot; type=&quot;text&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_pass&quot; type=&quot;password&quot;&gt;<br>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;auth_voucher&quot; type=&quot;text&quot;&gt;<br>
 		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;redirurl&quot; type=&quot;hidden&quot; value=&quot;$PORTAL_REDIRURL$&quot;&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;input name=&quot;accept&quot; type=&quot;submit&quot; value=&quot;Continue&quot;&gt;<br>
 		  &lt;/form&gt;</tt></td>

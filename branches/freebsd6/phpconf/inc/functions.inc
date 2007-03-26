@@ -38,6 +38,7 @@ require_once("filter.inc");
 require_once("shaper.inc");
 require_once("vpn.inc");
 require_once("captiveportal.inc");
+require_once("voucher.inc");
 require_once("util.inc");
 
 ?>

@@ -142,6 +142,9 @@
 	/* start the captive portal */
 	captiveportal_configure();
 	
+	/* start Voucher support */
+	voucher_configure();
+	
 	/* set up termcap (for the firewall states page) */
 	system_set_termcap();
 	
