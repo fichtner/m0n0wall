@@ -1,6 +1,6 @@
 diff -u -r src.orig/iface.c src/iface.c
 --- src.orig/iface.c	Tue May  4 18:12:28 2004
-+++ src/iface.c	Sun Dec 17 11:25:08 2006
++++ src/iface.c	Sat Apr  7 10:20:30 2007
 @@ -88,7 +88,7 @@
    static int	IfaceFindACL (struct acl_pool *ap, char * ifname, int number);
    static char *	IFaceParseACL (char * src, char * ifname);
@@ -65,6 +65,15 @@ diff -u -r src.orig/iface.c src/iface.c
  /*
   * IfaceAllocACL ()
   *
+@@ -847,7 +850,7 @@
+   memcpy(&iface->idleStats, u.reply.data, sizeof(iface->idleStats));
+ 
+   /* Mark current traffic period if there was traffic */
+-  if (iface->idleStats.recvMatchFrames > oldStats.recvMatchFrames)
++  if (iface->idleStats.recvFrames > oldStats.recvFrames)
+     iface->traffic[0] = TRUE;
+   else {		/* no demand traffic for a whole idle timeout period? */
+     for (k = 0; k < IFACE_IDLE_SPLIT && !iface->traffic[k]; k++);
 @@ -1417,13 +1420,18 @@
  }
  
@@ -103,7 +112,7 @@ diff -u -r src.orig/iface.h src/iface.h
  #endif
 diff -u -r src.orig/ngfunc.c src/ngfunc.c
 --- src.orig/ngfunc.c	Tue May  4 18:12:28 2004
-+++ src/ngfunc.c	Sun Mar 18 21:12:22 2007
++++ src/ngfunc.c	Sat Apr  7 09:31:48 2007
 @@ -271,6 +271,17 @@
        b->name, BPF_HOOK_MPD, MPD_HOOK_DEMAND_TAP, strerror(errno)));
      goto fail;
@@ -138,9 +147,9 @@ diff -u -r src.orig/ngfunc.c src/ngfunc.c
        break;
      case BPF_MODE_ON:
 -    case BPF_MODE_MSSFIX:
-+      hp->bpf_prog_len = DEMAND_PROG_LEN;
-+      memcpy(&hp->bpf_prog, &gDemandProg,
-+        DEMAND_PROG_LEN * sizeof(*gDemandProg));
++      hp->bpf_prog_len = NOMATCH_PROG_LEN;
++      memcpy(&hp->bpf_prog, &gNoMatchProg,
++        NOMATCH_PROG_LEN * sizeof(*gNoMatchProg));
        snprintf(hp->ifMatch, sizeof(hp->ifMatch), "%s", BPF_HOOK_PPP);
        snprintf(hp->ifNotMatch, sizeof(hp->ifNotMatch), "%s", BPF_HOOK_PPP);
        break;
@@ -224,7 +233,6 @@ diff -u -r src.orig/ngfunc.c src/ngfunc.c
        mbwrite(mballoc(MB_FRAME_IN, nread), buf, nread));
      return;
    }
-diff -u -r src.orig/ngfunc.h src/ngfunc.h
 --- src.orig/ngfunc.h	Tue May  4 18:12:28 2004
 +++ src/ngfunc.h	Sun Dec 17 11:29:42 2006
 @@ -20,17 +20,30 @@
