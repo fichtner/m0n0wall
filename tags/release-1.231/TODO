@@ -1,0 +1,15 @@
+$Id:$
+
+*** Note: Please add new entries to the top of this file. ***
+-------------------------------------------------------------------------------
+
+1.23b3 (CP: jdgraeve)
+------
+
+- Change CP to read configurations directly from the config instead of reading/parsing files 
+
+- Change CP locking mechanisms so that locking is done in the captiveportal_read_db & captiveportal_write_db structures
+
+- Add debugging code and a secret DEBUG config option to trackdown possible problems when there are a lot of users conneced to CP
+
+- Create software schematics for better understanding calls and functions
