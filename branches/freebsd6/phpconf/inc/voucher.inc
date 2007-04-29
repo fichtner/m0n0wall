@@ -103,6 +103,7 @@ function voucher_auth($voucher_received, $test = 0) {
                     $mask = 1 << ($nr % 8);
                     if (ord($bitstring[$roll][$pos]) & $mask) {
                         $test_result[] = "$voucher ($roll/$nr) already used and expired";
+                        $total_minutes = -1;    // voucher expired
                         $error++;
                     } else {
                         // mark bit for this voucher as used
@@ -137,7 +138,9 @@ function voucher_auth($voucher_received, $test = 0) {
 
     if ($error) {
         voucher_unlock();
-        return 0;       // well, at least one voucher had errors. Say NO ACCESS
+        if ($total_minutes > 0)     // probably not needed, but want to make sure
+            $total_minutes = 0;     // we only report -1 (expired) or 0 (no access)
+        return $total_minutes;       // well, at least one voucher had errors. Say NO ACCESS
     }
 
     // All given vouchers were valid and this isn't simply a test.
@@ -226,13 +229,15 @@ function voucher_configure() {
                 $minutes = $rollent['minutes'];
                 $active_vouchers = array();
                 $a_active = &$rollent['active'];
-                foreach ($a_active as $activent) {
-                    $voucher = $activent['voucher'];
-                    $timestamp = $activent['timestamp'];
-                    $minutes = $activent['minutes'];
-                    // its tempting to check for expired timestamps, but during
-                    // bootup, we most likely don't have the correct time time.
-                    $active_vouchers[$voucher] = "$timestamp,$minutes";
+                if (is_array($a_active)) {
+                    foreach ($a_active as $activent) {
+                        $voucher = $activent['voucher'];
+                        $timestamp = $activent['timestamp'];
+                        $minutes = $activent['minutes'];
+                        // its tempting to check for expired timestamps, but during
+                        // bootup, we most likely don't have the correct time time.
+                        $active_vouchers[$voucher] = "$timestamp,$minutes";
+                    }
                 }
                 voucher_write_active_db($roll, $active_vouchers);
             }
@@ -298,22 +303,25 @@ function voucher_read_active_db($roll) {
 
     $active = array();
     $dirty = 0;
-    $fd = fopen("{$g['vardb_path']}/voucher_active_$roll.db", "r");
-    if ($fd) {
-        while (!feof($fd)) {
-            $line = trim(fgets($fd));
-            if ($line) {
-                list($voucher,$timestamp,$minutes) = explode(",", $line); // voucher,timestamp
-                if ((($timestamp + 60*$minutes) - time()) > 0) {
-                    $active[$voucher] = "$timestamp,$minutes";
-                } else {
-                    $dirty=1;
+    $file = "{$g['vardb_path']}/voucher_active_$roll.db";
+    if (file_exists($file)) {
+        $fd = fopen($file, "r");
+        if ($fd) {
+            while (!feof($fd)) {
+                $line = trim(fgets($fd));
+                if ($line) {
+                    list($voucher,$timestamp,$minutes) = explode(",", $line); // voucher,timestamp
+                    if ((($timestamp + 60*$minutes) - time()) > 0) {
+                        $active[$voucher] = "$timestamp,$minutes";
+                    } else {
+                        $dirty=1;
+                    }
                 }
             }
+            fclose($fd);
+            if ($dirty) // if we found expired entries, lets save our snapshot
+                voucher_write_active_db($roll, $active);
         }
-        fclose($fd);
-        if ($dirty) // if we found expired entries, lets save our snapshot
-            voucher_write_active_db($roll, $active);
     }
     return $active;
 }
@@ -354,12 +362,15 @@ function voucher_read_used_db($roll) {
     global $g;
 
     $vdb = "";
-    $fd = fopen("{$g['vardb_path']}/voucher_used_$roll.db", "r");
-    if ($fd) {
-        $vdb = trim(fgets($fd));
-        fclose($fd);
-    } else {
-        voucher_log(LOG_ERR, "cant read {$g['vardb_path']}/voucher_used_$roll.db");
+    $file = "{$g['vardb_path']}/voucher_used_$roll.db";
+    if (file_exists($file)) {
+        $fd = fopen($file, "r");
+        if ($fd) {
+            $vdb = trim(fgets($fd));
+            fclose($fd);
+        } else {
+            voucher_log(LOG_ERR, "cant read {$g['vardb_path']}/voucher_used_$roll.db");
+        }
     }
     return base64_decode($vdb);
 }

@@ -130,11 +130,14 @@ EOD;
             // YES: user is good for $timecredit minutes.
             captiveportal_logportalauth($voucher,$clientmac,$clientip,"VOUCHER LOGIN good for $timecredit min.");
         } else {
-            portal_reply_page($redirurl, "error", "Zeit abgelaufen / temps \351coul\351 / no time left");
+            portal_reply_page($redirurl, "error", $config['voucher']['msgexpired']);
         }
+    } else if (-1 == $timecredit) {  // valid but expired
+        captiveportal_logportalauth($voucher,$clientmac,$clientip,"FAILURE","voucher expired");
+        portal_reply_page($redirurl, "error", $config['voucher']['msgexpired']);
     } else {
         captiveportal_logportalauth($voucher,$clientmac,$clientip,"FAILURE");
-        portal_reply_page($redirurl, "error", "Zugang verweigert / acc\350s interdit / Access denied: $timecredit");
+        portal_reply_page($redirurl, "error", $config['voucher']['msgnoaccess']);
     }
 
 } else if ($_POST['accept'] && $radius_enable) {

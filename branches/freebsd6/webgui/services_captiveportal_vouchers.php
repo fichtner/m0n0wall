@@ -68,6 +68,13 @@ if (!isset($config['voucher']['publickey'])) {
 	    $config['voucher']['privatekey'] = base64_encode($privkey);
 	}
 }
+if (!isset($config['voucher']['msgnoaccess'])) {
+    $config['voucher']['msgnoaccess'] = "Voucher invalid";
+}
+if (!isset($config['voucher']['msgexpired'])) {
+    $config['voucher']['msgexpired'] = "Voucher expired";
+}
+
 $a_roll = &$config['voucher']['roll'];
 
 if ($_GET['act'] == "del") {
@@ -123,6 +130,8 @@ $pconfig['checksumbits'] = $config['voucher']['checksumbits'];
 $pconfig['magic'] = $config['voucher']['magic'];
 $pconfig['publickey'] = base64_decode($config['voucher']['publickey']);
 $pconfig['privatekey'] = base64_decode($config['voucher']['privatekey']);
+$pconfig['msgnoaccess'] = $config['voucher']['msgnoaccess'];
+$pconfig['msgexpired'] = $config['voucher']['msgexpired'];
 
 if ($_POST) {
 
@@ -175,6 +184,8 @@ if ($_POST) {
         $config['voucher']['saveinterval'] = $_POST['saveinterval'];
         $config['voucher']['publickey'] = base64_encode($_POST['publickey']);
         $config['voucher']['privatekey'] = base64_encode($_POST['privatekey']);
+        $config['voucher']['msgnoaccess'] = $_POST['msgnoaccess'];
+        $config['voucher']['msgexpired'] = $_POST['msgexpired'];
         voucher_lock();
 		write_config();
         voucher_configure();
@@ -200,6 +211,8 @@ function enable_change(enable_change) {
 	document.iform.magic.disabled = endis;
 	document.iform.publickey.disabled = endis;
 	document.iform.privatekey.disabled = endis;
+	document.iform.msgnoaccess.disabled = endis;
+	document.iform.msgexpired.disabled = endis;
 }
 //-->
 </script>
@@ -258,7 +271,7 @@ function enable_change(enable_change) {
                   <td valign="middle" nowrap class="list"> 
                   <?php if ($pconfig['enable']): ?> 
                     <a href="services_captiveportal_vouchers_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit voucher" width="17" height="17" border="0"></a>
-                    <a href="services_captiveportal_vouchers.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this voucher? This makes all vouchers from this roll invalid')"><img src="x.gif" title="delete voucher" width="17" height="17" border="0"></a>
+                    <a href="services_captiveportal_vouchers.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this voucher? This makes all vouchers from this roll invalid')"><img src="x.gif" title="delete vouchers" width="17" height="17" border="0"></a>
                     <a href="services_captiveportal_vouchers.php?act=csv&id=<?=$i; ?>"><img src="log_s.gif" title="generate vouchers for this roll to CSV file" width="11" height="15" border="0"></a>
                     <?php endif;?>
                   </td>
@@ -336,6 +349,18 @@ Enable Voucher support first using the checkbox above and hit Save at the bottom
          <input name="saveinterval" type="text" class="formfld" id="saveinterval" size="4" value="<?=htmlspecialchars($pconfig['saveinterval']);?>">
          Minutes<br>
          The list of active and used vouchers can be stored in the system's configuration file once every x minutes to survive power outages. No save is done if no new vouchers have been activated.  Enter 0 to never write runtime state to XML config.</td>
+    </tr>
+	<tr> 
+       <td width="22%" valign="top" class="vncellreq">Invalid Voucher Message</td>
+       <td width="78%" class="vtable">
+         <input name="msgnoaccess" type="text" class="formfld" id="msgnoaccess" size="80" value="<?=htmlspecialchars($pconfig['msgnoaccess']);?>">
+         Error message displayed for invalid vouchers on captive portal error page ($PORTAL_MESSAGE$).</td>
+    </tr>
+	<tr> 
+       <td width="22%" valign="top" class="vncellreq">Expired Voucher Message</td>
+       <td width="78%" class="vtable">
+         <input name="msgexpired" type="text" class="formfld" id="msgexpired" size="80" value="<?=htmlspecialchars($pconfig['msgexpired']);?>">
+         Error message displayed for expired vouchers on paptive portal error page ($PORTAL_MESSAGE$).</td>
     </tr>
     <tr>
        <td width="22%" valign="top">&nbsp;</td>

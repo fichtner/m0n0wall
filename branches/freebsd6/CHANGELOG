@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- voucher login error messages for invalid and expired vouchers configurable
+  via GUI Captive Portal -> Voucher (mwiget)
+
+- added voucher support to captive portal (mwiget)
+
 - modified kernel patch to handle ipnat+dummynet in ip_input -> should fix problems
   with captive portal not reporting downloaded data per user properly when the
   traffic shaper is on, and also makes per-user bandwidth limits work again
