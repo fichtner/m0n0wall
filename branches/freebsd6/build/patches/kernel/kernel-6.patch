@@ -14,7 +14,7 @@
  IPFIREWALL_VERBOSE	opt_ipfw.h
  IPFIREWALL_VERBOSE_LIMIT	opt_ipfw.h
 --- sys/contrib/ipfilter/netinet/fil.c.orig	Thu Aug 24 09:37:10 2006
-+++ sys/contrib/ipfilter/netinet/fil.c	Sat Dec  9 16:31:23 2006
++++ sys/contrib/ipfilter/netinet/fil.c	Fri Jul 27 14:50:28 2007
 @@ -92,6 +92,12 @@
  # include <sys/hashing.h>
  # include <netinet/in_var.h>
@@ -28,19 +28,28 @@
  #include <netinet/tcp.h>
  #if (!defined(__sgi) && !defined(AIX)) || defined(_KERNEL)
  # include <netinet/udp.h>
-@@ -127,12 +133,6 @@
- #endif
+@@ -128,12 +134,6 @@
  #if defined(IPFILTER_BPF) && defined(_KERNEL)
  # include <net/bpf.h>
--#endif
+ #endif
 -#if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
 -# include <sys/malloc.h>
 -# if defined(_KERNEL) && !defined(IPFILTER_LKM)
 -#  include "opt_ipfilter.h"
 -# endif
- #endif
+-#endif
  #include "netinet/ipl.h"
  /* END OF INCLUDES */
+ 
+@@ -2485,7 +2485,7 @@
+ 	 * Here rather than fr_firewall because fr_checkauth may decide
+ 	 * to return a packet for "keep state"
+ 	 */
+-	if ((pass & FR_KEEPSTATE) && !(fin->fin_flx & FI_STATE)) {
++	if ((pass & FR_KEEPSTATE) && !(fin->fin_flx & FI_STATE) && !(fin->fin_flx & FI_FRAGBODY)) {
+ 		if (fr_addstate(fin, NULL, 0) != NULL) {
+ 			ATOMIC_INCL(frstats[out].fr_ads);
+ 		} else {
 --- sys/contrib/ipfilter/netinet/mlfk_ipl.c.orig	Thu Aug 24 09:37:12 2006
 +++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	Sat Dec  9 16:33:50 2006
 @@ -23,6 +23,11 @@
