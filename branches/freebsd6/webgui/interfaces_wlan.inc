@@ -88,6 +88,7 @@ function wireless_config_init() {
 	$pconfig['ssid'] = $optcfg['wireless']['ssid'];
 	$pconfig['channel'] = $optcfg['wireless']['channel'];
 	$pconfig['wep_enable'] = isset($optcfg['wireless']['wep']['enable']);
+	$pconfig['hidessid'] = isset($optcfg['wireless']['hidessid']);
 	
 	if (is_array($optcfg['wireless']['wep']['key'])) {
 		$i = 1;
@@ -135,6 +136,7 @@ function wireless_config_post() {
 		$optcfg['wireless']['ssid'] = $_POST['ssid'];
 		$optcfg['wireless']['channel'] = $_POST['channel'];
 		$optcfg['wireless']['wep']['enable'] = $_POST['wep_enable'] ? true : false;
+		$optcfg['wireless']['hidessid'] = $_POST['hidessid'] ? true : false;
 		
 		$optcfg['wireless']['wep']['key'] = array();
 		for ($i = 1; $i <= 4; $i++) {
@@ -193,6 +195,10 @@ function wireless_config_print() {
                 <tr> 
                   <td valign="top" class="vncellreq">SSID</td>
                   <td class="vtable"><?=$mandfldhtml;?><input name="ssid" type="text" class="formfld" id="ssid" size="20" value="<?=htmlspecialchars($pconfig['ssid']);?>">
+                    <br><br><input type="checkbox" name="hidessid" id="hidessid" value="1" <?php if ($pconfig['hidessid']) echo "checked";?>><strong>Hide SSID</strong><br>
+                    If this option is selected, the SSID will not be broadcast, and only clients that
+                    know the exact SSID will be able to connect. Note that this option should never be used
+                    as a substitute for proper security/encryption settings.
                   </td>
                 </tr>
                 <tr> 

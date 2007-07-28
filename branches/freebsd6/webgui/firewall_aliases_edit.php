@@ -70,7 +70,7 @@ if ($_POST) {
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
 	if (($_POST['name'] && !is_validaliasname($_POST['name']))) {
-		$input_errors[] = "The alias name may only consist of the characters a-z, A-Z, 0-9.";
+		$input_errors[] = "The alias name may only consist of the characters a-z, A-Z, 0-9 and '-' (dash).";
 	}
 	if (($_POST['address'] && !is_ipaddr($_POST['address']))) {
 		$input_errors[] = "A valid address must be specified.";
@@ -136,7 +136,7 @@ function typesel_change() {
                   <td valign="top" class="vncellreq">Name</td>
                   <td class="vtable"><?=$mandfldhtml;?><input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>"> 
                     <br> <span class="vexpl">The name of the alias may only consist 
-                    of the characters a-z, A-Z and 0-9.</span></td>
+                    of the characters a-z, A-Z, 0-9 and &apos;-&apos; (dash).</span></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Type</td>

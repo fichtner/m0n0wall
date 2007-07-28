@@ -203,7 +203,7 @@ function is_macaddr($macaddr) {
 
 /* returns true if $name is a valid name for an alias */
 function is_validaliasname($name) {
-	if (!preg_match("/[^a-zA-Z0-9]/", $name))
+	if (!preg_match("/[^a-zA-Z0-9-]/", $name))
 		return true;
 	else
 		return false;

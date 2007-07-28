@@ -559,10 +559,7 @@ function system_set_harddisk_standby() {
 		$standby = $config['system']['harddiskstandby'];
 		// Check for a numeric value
 		if (is_numeric($standby)) {
-			// Sync the disk(s)
-			mwexec('/bin/sync');
-			// Reinitialize ATA-drives
-			mwexec('/sbin/atacontrol reinit 0');
+			mwexec("/usr/local/sbin/ataidle -S $standby 0 0");
 			if ($g['booting']) {
 				echo "done\n";
 			}

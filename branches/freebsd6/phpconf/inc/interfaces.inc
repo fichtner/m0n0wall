@@ -300,6 +300,11 @@ function interfaces_wireless_configure($if, $wlcfg) {
 				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
 			break;
 	}
+
+	if (isset($wlcfg['hidessid']))
+		$ifcargs .= "hidessid ";
+	else
+		$ifcargs .= "-hidessid ";
 	
 	$ifcargs .= "up";
 	

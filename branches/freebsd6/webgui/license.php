@@ -231,5 +231,8 @@ All rights reserved.<br>
 			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;<br>
               <br>
               PHP RADIUS PECL package<br>
-              Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.
+              Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.<br>
+              <br>
+              <a href="http://www.cran.org.uk/bruce/software/ataidle/" target="_blank">ATAidle</a>
+              Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.
 <?php include("fend.inc"); ?>

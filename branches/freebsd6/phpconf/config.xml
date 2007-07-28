@@ -100,6 +100,7 @@
 						<value></value>
 					</key>
 				</wep>
+				<hidessid/>
 			</wireless>
 		</opt[n]>
 		-->
@@ -144,13 +145,6 @@
 		<local-ip></local-ip>
 		<remote-ip></remote-ip>
 		<timeout></timeout>
-		<radius>
-			<enable/>
-			<accounting/>
-			<radiusip/>
-			<server></server>
-			<secret></secret>
-		</radius>
 		-->
 	</pptp>
 	<bigpond>
@@ -222,7 +216,15 @@
 			<name></name>
 			<password></password>
 		</user>
+		<radius>
+			<enable/>
+			<accounting/>
+			<radiusip/>
+			<server></server>
+			<secret></secret>
+		</radius>
 		-->
+		<!-- <nofwrulegen/> -->
 	</pptpd>
 	<dnsmasq>
 		<enable/>

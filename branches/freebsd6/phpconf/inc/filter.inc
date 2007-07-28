@@ -551,7 +551,7 @@ EOD;
 	}
 	
 	/* PPTPd enabled? */
-	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off")) {
+	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off") && !isset($pptpdcfg['nofwrulegen'])) {
 	
 		if ($pptpdcfg['mode'] == "server")
 			$pptpdtarget = $curwanip;

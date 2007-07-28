@@ -3,6 +3,35 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- wireless LAN improvements
+    - hide SSID option
+
+- allow dashes in alias names
+
+- added hidden option to disable auto-generation of PPTP rules on WAN
+  (<nofwrulegen/> in <pptpd> section)
+
+- fix ATA HD spin down feature (using ataidle - needs testing)
+
+- ipfilter TCP window scaling bug fix
+  (see http://www.freebsd.org/cgi/cvsweb.cgi/src/sys/contrib/ipfilter/netinet/ip_state.c#rev1.38)
+
+- sync in changes from 1.23 branch
+
+- increased mfsroot size to 14 MB (from 13 MB)
+
+- updated base system to FreeBSD 6.2-RELEASE-p6
+
+- updated PHP to 4.4.7
+
+- updated ipsec-tools to 0.6.7
+
+- updated isc-dhcpd to 3.0.5
+
+- updated Dnsmasq to 2.39
+
+- add kernel patch for fragment bug in ipfilter (contributed by Frank Edwards)
+
 - voucher login error messages for invalid and expired vouchers configurable
   via GUI Captive Portal -> Voucher (mwiget)
 
