@@ -64,8 +64,8 @@
  
  #include <netinet/ipl.h>
  #include <netinet/ip_compat.h>
---- sys/contrib/ipfilter/netinet/ip_state.c.orig	Mon Apr 25 20:43:14 2005
-+++ sys/contrib/ipfilter/netinet/ip_state.c	Sat Dec  2 13:57:54 2006
+--- sys/contrib/ipfilter/netinet/ip_state.c.orig	Thu Aug 24 09:37:12 2006
++++ sys/contrib/ipfilter/netinet/ip_state.c	Sat Jul 28 14:29:06 2007
 @@ -143,14 +143,14 @@
  #define	FIVE_DAYS	(5 * ONE_DAY)
  #define	DOUBLE_HASH(x)	(((x) + ips_seed[(x) % fr_statesize]) % fr_statesize)
@@ -84,6 +84,59 @@
  	fr_icmptimeout = IPF_TTLVAL(60),
  	fr_icmpacktimeout = IPF_TTLVAL(6),
  	fr_iptimeout = IPF_TTLVAL(60);
+@@ -1358,21 +1358,16 @@
+ 		if (flags == (TH_SYN|TH_ACK)) {
+ 			is->is_s0[source] = ntohl(tcp->th_ack);
+ 			is->is_s0[!source] = ntohl(tcp->th_seq) + 1;
+-			if ((TCP_OFF(tcp) > (sizeof(tcphdr_t) >> 2)) &&
+-			    (tdata->td_winflags & TCP_WSCALE_SEEN)) {
++			if ((TCP_OFF(tcp) > (sizeof(tcphdr_t) >> 2))) {
+ 				if (fr_tcpoptions(fin, tcp, fdata) == -1)
+ 					fin->fin_flx |= FI_BAD;
+-				if (!(fdata->td_winflags & TCP_WSCALE_SEEN)) {
+-					fdata->td_winscale = 0;
+-					tdata->td_winscale = 0;
+-				}
+ 			}
+ 			if ((fin->fin_out != 0) && (is->is_pass & FR_NEWISN))
+ 				fr_checknewisn(fin, is);
+ 		} else if (flags == TH_SYN) {
+ 			is->is_s0[source] = ntohl(tcp->th_seq) + 1;
+ 			if ((TCP_OFF(tcp) > (sizeof(tcphdr_t) >> 2))) {
+-				if (fr_tcpoptions(fin, tcp, tdata) == -1)
++				if (fr_tcpoptions(fin, tcp, fdata) == -1)
+ 					fin->fin_flx |= FI_BAD;
+ 			}
+ 
+@@ -1479,17 +1474,8 @@
+ 	 * the receiver also does window scaling)
+ 	 */
+ 	if (!(tcpflags & TH_SYN) && (fdata->td_winflags & TCP_WSCALE_FIRST)) {
+-		if (tdata->td_winflags & TCP_WSCALE_SEEN) {
+-			fdata->td_winflags &= ~TCP_WSCALE_FIRST;
+-			fdata->td_maxwin = win;
+-		} else {
+-			fdata->td_winscale = 0;
+-			fdata->td_winflags &= ~(TCP_WSCALE_FIRST|
+-						TCP_WSCALE_SEEN);
+-			tdata->td_winscale = 0;
+-			tdata->td_winflags &= ~(TCP_WSCALE_FIRST|
+-						TCP_WSCALE_SEEN);
+-		  }
++		fdata->td_winflags &= ~TCP_WSCALE_FIRST;
++		fdata->td_maxwin = win;
+ 	}
+ 
+ 	end = seq + dsize;
+@@ -1532,7 +1518,7 @@
+ 	    (SEQ_GE(seq, fdata->td_end - maxwin)) &&
+ /* XXX what about big packets */
+ #define MAXACKWINDOW 66000
+-	    (-ackskew <= (MAXACKWINDOW << fdata->td_winscale)) &&
++	    (-ackskew <= (MAXACKWINDOW)) &&
+ 	    ( ackskew <= (MAXACKWINDOW << fdata->td_winscale))) {
+ 		inseq = 1;
+ 	/*
 --- sys/net/pfil.c.orig	Mon May 23 19:07:16 2005
 +++ sys/net/pfil.c	Sat Nov 18 21:05:56 2006
 @@ -354,13 +354,15 @@
