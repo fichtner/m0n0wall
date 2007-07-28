@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -286,34 +286,34 @@ function system_webgui_start() {
 			/* default certificate/key */
 			$cert = <<<EOD
 -----BEGIN CERTIFICATE-----
-MIIBlDCB/gIBADANBgkqhkiG9w0BAQQFADATMREwDwYDVQQKEwhtMG4wd2FsbDAe
-Fw0wNTA1MTAxMjI0NDRaFw0wNzA1MTAxMjI0NDRaMBMxETAPBgNVBAoTCG0wbjB3
-YWxsMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAShszhFz+o8lsMWTGgTxs
-TMPR+v4+qL5jXDyY97MLTGFK7aqQOtpIQc+TcTc4jklgOVlHoR7oBXrsi8YrbCd+
-83LPQmQoSPC0VqhfU3uYf3NzxiK8r97aPCsmWgwT2pQ6TcESTm6sF7nLprOf/zFP
-C4jE2fvjkbzyVolPywBuewIDAQABMA0GCSqGSIb3DQEBBAUAA4GBAFR962c4R5tV
-cTn0OQcszYoW6WC+ini9tQQh5ku5jYDAiC+00atawJEVLnL3lwAcpSKTIWlTkD20
-tl3lz5br1qFgYky+Rd0kwS2nk9jRbkxSXxd6KJVnNRCKre28aw3ENzZfCSurPQsX
-UPp5er+NtwMT1g7s/JDmKTC4w1rGr5/c
+MIIBlDCB/gIBAjANBgkqhkiG9w0BAQQFADATMREwDwYDVQQKEwhtMG4wd2FsbDAe
+Fw0wNzAzMTAxMzE4MzJaFw0wOTAzMTAxMzE4MzJaMBMxETAPBgNVBAoTCG0wbjB3
+YWxsMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+4vzJYQu+BlqmlPTrnZ5N
+px7fDp51TwGn6TIhykW//IQm6EKPysZXGSa3yRdTNSraeAee0Qq96LQAstO2WibG
+J+HI+Bcx99j+fHnndUz19bEWkIQ5JbWRnIJ8Oq68h7IDp8g0+9DWQ7bSbsccq7CA
+nCowvG4zY3zeJ/djbHkSkQIDAQABMA0GCSqGSIb3DQEBBAUAA4GBAGSo5A00HzoJ
+kD7HzBgB3KwOm4IE1QMaD0NnYTd8g/5CxEW+Uu+Sk43M1ftIv9p+KTpyyIuZ9xH7
+26F2R+WAj9oTuPU5wfozt89O+fx+avt3MRrvaipGVU6O7jEcAM8MtYjzL7/FCmkC
+Zd7GpQZnyHbDIwxSw/i6GOA9+8+Y3VP6
 -----END CERTIFICATE-----
 
 EOD;
 
 			$key = <<<EOD
 -----BEGIN RSA PRIVATE KEY-----
-MIICXQIBAAKBgQDAShszhFz+o8lsMWTGgTxsTMPR+v4+qL5jXDyY97MLTGFK7aqQ
-OtpIQc+TcTc4jklgOVlHoR7oBXrsi8YrbCd+83LPQmQoSPC0VqhfU3uYf3NzxiK8
-r97aPCsmWgwT2pQ6TcESTm6sF7nLprOf/zFPC4jE2fvjkbzyVolPywBuewIDAQAB
-AoGAbJJrQW9fQrggJuLMz/hwsYW2m31oyOBmf5u463YQtjRuSuxe/gj87weZuNqY
-H2rXq2k2K+ehl8hgW+egASyUL3L7kCkEAsVREujKTEyhSqqIRDPWTxo9S/YA9Gvn
-2ZnJvkrcKjqCO9aHX3rvJOK/ErYI6akctgI3KmgkYw5XNmECQQDuZU97RTWH9rmP
-aQr57ysNXxgFsyhetOOqeYkPtIVwpOiNbfwE1zi5RGdtO4Ku3fG1lV4J2UoWJ9yD
-awdoyYIHAkEAzn0xJ90IjPsHk+8SODEj5JGdHSZPNu1tgtrbjEi9sfGWg4K7XTxr
-QW90pWb1bKKU1uh5FzW6OhnFfuQXt1kC7QJAPSthqY+onKqCEnoxhtAHi/bKgyvl
-P+fKQwPMV2tKkgy+XwvJjrRqqZ8TqsOKVLQ+QQmCh6RpjiXMPyxHSmvqIQJBAKLR
-HF1ucDuaBROkwx0DwmWMW/KMLpIFDQDNSaiIAuu4rxHrl4mhBoGGPNffI04RtILw
-s+qVNs5xW8T+XaT4ztECQQDFHPnZeoPWE5z+AX/UUQIUWaDExz3XRzmIxRbOrlFi
-CsF1s0TdJLi/wzNQRAL37A8vqCeVFR/ng3Xpg96Yg+8Z
+MIICXAIBAAKBgQC+4vzJYQu+BlqmlPTrnZ5Npx7fDp51TwGn6TIhykW//IQm6EKP
+ysZXGSa3yRdTNSraeAee0Qq96LQAstO2WibGJ+HI+Bcx99j+fHnndUz19bEWkIQ5
+JbWRnIJ8Oq68h7IDp8g0+9DWQ7bSbsccq7CAnCowvG4zY3zeJ/djbHkSkQIDAQAB
+AoGAdh9qxIdMR+QQtqLYyPD5pB31yZx3TCp+4NQ6lJRiA0MU2CrD/c1CXWWQAwzq
+ZTAye4zpUksTtZ9JvGDtCBvTf5vgnCymwQfIXTniI/JyvzKP4dvpDcetxcnVETw6
+fBxAGHWm3uhu5QbEBVK/QN1h+O4BOU/UQeoJBnHdSoUPTAECQQDqaHjfGA5R4rzl
+Nkbug5bz4QOZHfXKBMRfbGqZ3kbzJy7ERuHECYUBE/b+HlC6UZ2CaXun909Ds/58
+DUvWN/lRAkEA0Hg+6eGXxKGoPEmONEQub/n/nSUlbSdSF5qfcoVTqLPu/fvR/PrM
+b8UGlj8EAXZHaU0EiLKYdjIZQQwBnhU1QQJBAIerPcIJn0gfjiqvtnAXs0elxTpa
+z8ZD6hA8pJo3vyK+W9/4EnUu+U79aif8Dcc4s4wmVw6JIdRSmgjcfTcYIHECQFTg
+kGTzJ7K0SuX44MAg/nMy60LVC+7sMn1PxBmBdTVbxTN9otqIVlIveuYTVBMwUBTs
+easaY/7DmQql08bERcECQAFdAJ0ZuVId1za1Y8V6l4UcNpVnIKGKhGFfqUghv15J
+hnum6oGAvY0KROJ6BTjjOU6AeHCYa01iOaRfBxJmS+o=
 -----END RSA PRIVATE KEY-----
 
 EOD;
@@ -471,7 +471,7 @@ function system_do_shell_commands($early = 0) {
 function system_do_extensions($early = false) {
 	global $config, $g;
 	
-	if (!is_dir("{$g['etc_path']}/inc/ext"))
+	if (!is_dir("{$g['etc_path']}/inc/ext") || is_dir("{$g['www_path']}/ext"))
 		return;
 	
 	$dh = @opendir("{$g['etc_path']}/inc/ext");
@@ -496,8 +496,8 @@ function system_do_extensions($early = false) {
     				continue;
     			if (is_dir("{$g['www_path']}/ext/$extd")) {
     			    // Create links
-    			    symlink("{$g['www_path']}/.htpasswd",".htpasswd");
-    			    symlink("{$g['www_path']}/gui.css","gui.css");
+    			    symlink("{$g['www_path']}/.htpasswd","{$g['www_path']}/ext/{$extd}/.htpasswd");
+    			    symlink("{$g['www_path']}/gui.css","{$g['www_path']}/ext/{$extd}/gui.css");
     			}
     		}
     		closedir($dh);

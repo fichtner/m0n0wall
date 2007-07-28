@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -410,8 +410,14 @@ function services_snmpd_configure() {
 			printf("Error: cannot open snmpd.conf in services_snmpd_configure().\n");
 			return 1;
 		}
-			
+		
+		$version = chop(file_get_contents("{$g['etc_path']}/version"));
+		$sysDescr = "m0n0wall " . php_uname("n") . " " . $version . " " .
+			$g['platform'] . " " . php_uname("s") . " " . php_uname("r") .
+			" " . php_uname("m");
+		
 		$snmpdconf = <<<EOD
+sysdescr "$sysDescr"
 syslocation "{$config['snmpd']['syslocation']}"
 syscontact "{$config['snmpd']['syscontact']}"
 rocommunity "{$config['snmpd']['rocommunity']}"

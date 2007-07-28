@@ -5,7 +5,7 @@
 
 	Copyright (C) 2006 Paul Taylor <paultaylor@winn-dixie.com>.
 	All rights reserved. 
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without

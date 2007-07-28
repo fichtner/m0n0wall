@@ -121,7 +121,13 @@ function execCmds() {
 defCmdT("System uptime","uptime");
 defCmdT("Interfaces","/sbin/ifconfig -a");
 
-defCmdT("Routing tables","netstat -nr");
+defCmdT("Routing tables","/usr/bin/netstat -nr");
+
+defCmdT("Network buffers", "/usr/bin/netstat -m");
+defCmdT("Network protocol statistics", "/usr/bin/netstat -s");
+
+defCmdT("Kernel parameters", "/sbin/sysctl -a");
+defCmdT("Kernel modules loaded", "/sbin/kldstat");
 
 defCmdT("ipfw show", "/sbin/ipfw show");
 defCmdT("ipnat -lv", "/sbin/ipnat -lv");

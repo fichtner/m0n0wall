@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -583,6 +583,14 @@ EOD;
 				if (isset($pptpdcfg['radius']['accounting'])) {
 					$mpdconf .= <<<EOD
 	set bundle enable radius-acct
+
+EOD;
+				}
+
+				if (isset($pptpdcfg['radius']['radiusip'])) {
+					$mpdconf .= <<<EOD
+	set ipcp yes radius-ip
+	set ipcp enable radius-ip
 
 EOD;
 				}

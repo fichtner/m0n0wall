@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -101,7 +101,6 @@ function interfaces_lan_configure() {
 	mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " " . 
 		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']) . $addflags);
 	
-
 	if (!$g['booting']) {
 		/* make new hosts file */
 		system_hosts_generate();
