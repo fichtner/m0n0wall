@@ -346,6 +346,7 @@ if ($_POST) {
 
 ?>
 <?php include("fbegin.inc"); ?>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
 <form action="firewall_shaper_magic.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
