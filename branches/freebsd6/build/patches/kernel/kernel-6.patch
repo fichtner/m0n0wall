@@ -14,7 +14,7 @@
  IPFIREWALL_VERBOSE	opt_ipfw.h
  IPFIREWALL_VERBOSE_LIMIT	opt_ipfw.h
 --- sys/contrib/ipfilter/netinet/fil.c.orig	Thu Aug 24 09:37:10 2006
-+++ sys/contrib/ipfilter/netinet/fil.c	Fri Jul 27 14:50:28 2007
++++ sys/contrib/ipfilter/netinet/fil.c	Sun Jul 29 21:21:53 2007
 @@ -92,6 +92,12 @@
  # include <sys/hashing.h>
  # include <netinet/in_var.h>
@@ -41,12 +41,13 @@
  #include "netinet/ipl.h"
  /* END OF INCLUDES */
  
-@@ -2485,7 +2485,7 @@
+@@ -2485,7 +2485,8 @@
  	 * Here rather than fr_firewall because fr_checkauth may decide
  	 * to return a packet for "keep state"
  	 */
 -	if ((pass & FR_KEEPSTATE) && !(fin->fin_flx & FI_STATE)) {
-+	if ((pass & FR_KEEPSTATE) && !(fin->fin_flx & FI_STATE) && !(fin->fin_flx & FI_FRAGBODY)) {
++	if ((pass & FR_KEEPSTATE) && !(fin->fin_flx & FI_STATE) &&
++		!((fin->fin_flx & FI_FRAGBODY) && (pass & FR_KEEPFRAG))) {
  		if (fr_addstate(fin, NULL, 0) != NULL) {
  			ATOMIC_INCL(frstats[out].fr_ads);
  		} else {
