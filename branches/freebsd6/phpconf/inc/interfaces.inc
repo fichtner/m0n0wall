@@ -266,21 +266,6 @@ function interfaces_wireless_configure($if, $wlcfg) {
 		" ssid " . escapeshellarg($wlcfg['ssid']) . " channel " . 
 		escapeshellarg($wlcfg['channel']) . " ";
 	
-	if (isset($wlcfg['wep']['enable']) && is_array($wlcfg['wep']['key'])) {
-		$ifcargs .= "wepmode on ";
-		
-		$i = 1;
-		foreach ($wlcfg['wep']['key'] as $wepkey) {
-			$ifcargs .= "wepkey " . escapeshellarg("{$i}:{$wepkey['value']}") . " ";
-			if (isset($wepkey['txkey'])) {
-				$ifcargs .= "weptxkey {$i} ";
-			}
-			$i++;
-		}
-	} else {
-		$ifcargs .= "wepmode off ";
-	}
-	
 	switch ($wlcfg['mode']) {
 		case 'hostap':
 			$ifcargs .= "-mediaopt adhoc mediaopt hostap ";
@@ -300,17 +285,84 @@ function interfaces_wireless_configure($if, $wlcfg) {
 				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
 			break;
 	}
-
-	if (isset($wlcfg['hidessid']))
-		$ifcargs .= "hidessid ";
-	else
-		$ifcargs .= "-hidessid ";
 	
 	$ifcargs .= "up";
 	
 	mwexec("/sbin/ifconfig " . $ifcargs);
 	
+	/* need to set AP-specific parameters in a separate ifconfig call */
+	if ($wlcfg['mode'] == "hostap") {
+		$ifcargs = escapeshellarg($if);
+		
+		if (isset($wlcfg['hidessid']))
+			$ifcargs .= " hidessid";
+		else
+			$ifcargs .= " -hidessid";
+			
+		mwexec("/sbin/ifconfig " . $ifcargs);
+	}
+	
+	/* configure encryption (if needed) */
+	interfaces_wireless_configure_encryption($if, $wlcfg);
+	
 	return 0;
+}
+
+function interfaces_wireless_configure_encryption($if, $wlcfg) {
+	global $config, $g;
+	
+	/* kill any running hostapd */
+	killbypid("{$g['varrun_path']}/hostapd-$if.pid");
+	unlink_if_exists("{$g['varetc_path']}/hostapd-$if.conf");
+	
+	/* killing hostapd leaves the interface in down state - make sure it's up again */
+	mwexec("/sbin/ifconfig " . escapeshellarg($if) . " up");
+
+	if ($wlcfg['wpa']['mode'] && $wlcfg['wpa']['mode'] != "none") {
+
+		if ($wlcfg['mode'] == "hostap") {
+			/* use WPA in hostap mode */
+			$hostapdcfg = generate_hostapd_config($if, $wlcfg);
+			
+			/* write config to temporary file */
+			$fd = fopen("{$g['varetc_path']}/hostapd-$if.conf", "w");
+			if (!$fd) {
+				echo("Error: cannot open hostapd-$if.conf in interfaces_wireless_configure_encryption().\n");
+				return 1;
+			}
+	
+			fwrite($fd, $hostapdcfg);
+			fclose($fd);
+			
+			/* start hostapd */
+			$pid = mwexec_bg("/usr/sbin/hostapd {$g['varetc_path']}/hostapd-$if.conf");
+			
+			/* write hostapd PID to file for later use */
+			$fd = fopen("{$g['varrun_path']}/hostapd-$if.pid", "w");
+			fwrite($fd, $pid);
+			fclose($fd);
+		}
+		
+	} else {
+		/* use WEP (or no encryption) */
+	
+		if (isset($wlcfg['wep']['enable']) && is_array($wlcfg['wep']['key'])) {
+			$ifcargs = escapeshellarg($if) . " wepmode on";
+			
+			$i = 1;
+			foreach ($wlcfg['wep']['key'] as $wepkey) {
+				$ifcargs .= " wepkey " . escapeshellarg("{$i}:{$wepkey['value']}");
+				if (isset($wepkey['txkey'])) {
+					$ifcargs .= " weptxkey {$i}";
+				}
+				$i++;
+			}
+			mwexec("/sbin/ifconfig " . $ifcargs);
+		} else {
+			/* no encryption - make sure WEP is disabled */
+			mwexec("/sbin/ifconfig " . escapeshellarg($if) . " wepmode off");
+		}
+	}
 }
 
 function interfaces_wan_configure() {
@@ -440,7 +492,7 @@ function interfaces_wan_dhcp_configure() {
 	/* generate dhclient.conf */
 	$fd = fopen("{$g['varetc_path']}/dhclient.conf", "w");
 	if (!$fd) {
-		printf("Error: cannot open dhclient.conf in interfaces_wan_dhcp_configure().\n");
+		echo("Error: cannot open dhclient.conf in interfaces_wan_dhcp_configure().\n");
 		return 1;
 	}
  
@@ -487,7 +539,7 @@ function interfaces_wan_pppoe_configure() {
 	/* generate mpd.conf */
 	$fd = fopen("{$g['varetc_path']}/mpd.conf", "w");
 	if (!$fd) {
-		printf("Error: cannot open mpd.conf in interfaces_wan_pppoe_configure().\n");
+		echo("Error: cannot open mpd.conf in interfaces_wan_pppoe_configure().\n");
 		return 1;
 	}
 	
@@ -565,7 +617,7 @@ EOD;
 	/* generate mpd.links */
 	$fd = fopen("{$g['varetc_path']}/mpd.links", "w");
 	if (!$fd) {
-		printf("Error: cannot open mpd.links in interfaces_wan_pppoe_configure().\n");
+		echo("Error: cannot open mpd.links in interfaces_wan_pppoe_configure().\n");
 		return 1;
 	}
 		
@@ -611,7 +663,7 @@ function interfaces_wan_pptp_configure() {
 	/* generate mpd.conf */
 	$fd = fopen("{$g['varetc_path']}/mpd.conf", "w");
 	if (!$fd) {
-		printf("Error: cannot open mpd.conf in interfaces_wan_pptp_configure().\n");
+		echo("Error: cannot open mpd.conf in interfaces_wan_pptp_configure().\n");
 		return 1;
 	}
 	
@@ -675,7 +727,7 @@ EOD;
 	/* generate mpd.links */
 	$fd = fopen("{$g['varetc_path']}/mpd.links", "w");
 	if (!$fd) {
-		printf("Error: cannot open mpd.links in interfaces_wan_pptp_configure().\n");
+		echo("Error: cannot open mpd.links in interfaces_wan_pptp_configure().\n");
 		return 1;
 	}
 		
@@ -742,7 +794,7 @@ function interfaces_wan_bigpond_configure($curwanip) {
 	/* generate bpalogin.conf */
 	$fd = fopen("{$g['varetc_path']}/bpalogin.conf", "w");
 	if (!$fd) {
-		printf("Error: cannot open bpalogin.conf in interfaces_wan_bigpond_configure().\n");
+		echo("Error: cannot open bpalogin.conf in interfaces_wan_bigpond_configure().\n");
 		return 1;
 	}
 	
@@ -820,6 +872,56 @@ function get_interface_mac($interface) {
         $alink = preg_split("/\s+/", $linkinfo[0]);
         $mac = chop($alink[3]);
         return $mac;
+}
+
+function generate_hostapd_config($if, $wlcfg) {
+	$config = <<<EOD
+interface=$if
+driver=bsd
+logger_syslog=-1
+logger_syslog_level=2
+logger_stdout=0
+ssid={$wlcfg['ssid']}
+wpa={$wlcfg['wpa']['version']}
+
+EOD;
+	
+	if ($wlcfg['wpa']['mode'] == "psk") {
+		$config .= <<<EOD
+wpa_key_mgmt=WPA-PSK
+wpa_passphrase={$wlcfg['wpa']['psk']}
+
+EOD;
+	} else if ($wlcfg['wpa']['mode'] == "enterprise") {
+	
+		$authport = 1812;
+		$acctport = 1813;
+		if ($wlcfg['wpa']['radius']['authport'])
+			$authport = $wlcfg['wpa']['radius']['authport'];
+		if ($wlcfg['wpa']['radius']['acctport'])
+			$acctport = $wlcfg['wpa']['radius']['acctport'];
+	
+		$config .= <<<EOD
+ieee8021x=1
+wpa_key_mgmt=WPA-EAP
+auth_server_addr={$wlcfg['wpa']['radius']['server']}
+auth_server_port={$authport}
+auth_server_shared_secret={$wlcfg['wpa']['radius']['secret']}
+acct_server_addr={$wlcfg['wpa']['radius']['server']}
+acct_server_port={$acctport}
+acct_server_shared_secret={$wlcfg['wpa']['radius']['secret']}
+
+EOD;
+	}
+	
+	if ($wlcfg['wpa']['cipher'] == "tkip")
+		$config .= "wpa_pairwise=TKIP\n";
+	else if ($wlcfg['wpa']['cipher'] == "ccmp")
+		$config .= "wpa_pairwise=CCMP\n";
+	else
+		$config .= "wpa_pairwise=TKIP CCMP\n";
+	
+	return $config;
 }
 
 ?>

@@ -278,17 +278,18 @@ function mwexec($command) {
 	return $retval; 
 }
 
-/* wrapper for exec() in background */
+/* wrapper for exec() in background; returns PID of background process */
 function mwexec_bg($command) {
 
 	global $g;
 	
 	if ($g['debug']) {
 		if (!$_SERVER['REMOTE_ADDR'])
-			echo "mwexec(): $command\n";
+			echo "mwexec_bg(): $command\n";
 	}
 	
-	exec("nohup $command > /dev/null 2>&1 &");
+	$pid = shell_exec("nohup $command > /dev/null 2>&1 & echo \$!");
+	return $pid;
 }
 
 /* unlink a file, if it exists */

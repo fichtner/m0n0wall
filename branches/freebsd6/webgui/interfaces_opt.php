@@ -156,15 +156,7 @@ function enable_change(enable_over) {
 	document.iform.bridge.disabled = endis;
 
 	if (document.iform.mode) {
-		 document.iform.standard.disabled = endis;
-		 document.iform.mode.disabled = endis;
-		 document.iform.ssid.disabled = endis;
-		 document.iform.channel.disabled = endis;
-		 document.iform.wep_enable.disabled = endis;
-		 document.iform.key1.disabled = endis;
-		 document.iform.key2.disabled = endis;
-		 document.iform.key3.disabled = endis;
-		 document.iform.key4.disabled = endis;
+		 wlan_enable_change(enable_over);
 	}
 }
 function bridge_change(enable_over) {
@@ -202,6 +194,9 @@ function ipaddr_change() {
 }
 //-->
 </script>
+<?php if (isset($optcfg['wireless'])): ?>
+<script language="javascript" src="interfaces_wlan.js"></script>
+<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
@@ -283,6 +278,9 @@ function ipaddr_change() {
 <!--
 enable_change(false);
 bridge_change(false);
+<?php if (isset($optcfg['wireless'])): ?>         
+wlan_enable_change(false);
+<?php endif; ?>
 //-->
 </script>
 <?php else: ?>

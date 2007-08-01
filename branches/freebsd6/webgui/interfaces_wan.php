@@ -252,6 +252,10 @@ function enable_change(enable_change) {
 	} else {
 		document.iform.pppoe_idletimeout.disabled = 1;
 	}
+	
+	if (document.iform.mode) {
+		 wlan_enable_change(enable_over);
+	}
 }
 
 function enable_change_pptp(enable_change_pptp) {
@@ -393,6 +397,9 @@ function type_change(enable_change,enable_change_pptp) {
 }
 //-->
 </script>
+<?php if (isset($optcfg['wireless'])): ?>
+<script language="javascript" src="interfaces_wlan.js"></script>
+<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_wan.php" method="post" name="iform" id="iform">
@@ -619,6 +626,9 @@ function type_change(enable_change,enable_change_pptp) {
 <script language="JavaScript">
 <!--
 type_change();
+<?php if (isset($optcfg['wireless'])): ?>
+wlan_enable_change(false);
+<?php endif; ?>
 //-->
 </script>
 <?php include("fend.inc"); ?>

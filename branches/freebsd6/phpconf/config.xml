@@ -101,6 +101,18 @@
 					</key>
 				</wep>
 				<hidessid/>
+				<wpa>
+					<mode>none|psk|enterprise</mode>
+					<version>1|2|3</version>
+					<cipher>tkip|ccmp|both</cipher>
+					<psk></psk>
+					<radius>
+						<server></server>
+						<authport></authport>
+						<acctport></acctport>
+						<secret></secret>
+					</radius>
+				</wpa>
 			</wireless>
 		</opt[n]>
 		-->

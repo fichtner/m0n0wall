@@ -5,6 +5,7 @@ $Id$
 
 - wireless LAN improvements
     - hide SSID option
+    - WPA-PSK and WPA-Enterprise (in hostap mode)
 
 - allow dashes in alias names
 

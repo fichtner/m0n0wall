@@ -114,8 +114,16 @@ function gen_bits(ipaddr) {
 function ipaddr_change() {
 	document.iform.subnet.value = gen_bits(document.iform.ipaddr.value);
 }
+function enable_change(enable_over) {
+	if (document.iform.mode) {
+		 wlan_enable_change(enable_over);
+	}
+}
 // -->
 </script>
+<?php if (isset($optcfg['wireless'])): ?>
+<script language="javascript" src="interfaces_wlan.js"></script>
+<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_lan.php" method="post" name="iform" id="iform">
@@ -140,7 +148,7 @@ function ipaddr_change() {
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
                   </td>
                 </tr>
                 <tr> 
@@ -159,4 +167,11 @@ function ipaddr_change() {
                 </tr>
               </table>
 </form>
+<script language="JavaScript">
+<!--
+<?php if (isset($optcfg['wireless'])): ?>         
+wlan_enable_change(false);
+<?php endif; ?>
+//-->
+</script>
 <?php include("fend.inc"); ?>

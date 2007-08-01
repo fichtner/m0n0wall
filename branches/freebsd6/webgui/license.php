@@ -233,6 +233,6 @@ All rights reserved.<br>
               PHP RADIUS PECL package<br>
               Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.<br>
               <br>
-              <a href="http://www.cran.org.uk/bruce/software/ataidle/" target="_blank">ATAidle</a>
+              ATAidle (<a href="http://www.cran.org.uk/bruce/software/ataidle/" target="_blank">http://www.cran.org.uk/bruce/software/ataidle</a>)<br>
               Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.
 <?php include("fend.inc"); ?>
