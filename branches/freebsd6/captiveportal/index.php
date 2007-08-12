@@ -123,7 +123,6 @@ EOD;
         $voucher = $a_vouchers[0];
         $attr = array( 'voucher' => 1,
                 'session_timeout' => $timecredit*60,
-                'idle_timeout' => 0,
                 'session_terminate_time' => 0);
         if (portal_allow($clientip, $clientmac,$voucher,null,$attr)) {
 

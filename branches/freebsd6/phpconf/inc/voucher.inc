@@ -73,7 +73,7 @@ function voucher_auth($voucher_received, $test = 0) {
         if (strlen($voucher) < 3)
             continue;   // seems too short to be a voucher!
 
-        $result = exec("/usr/local/bin/voucher -c {$g['varetc_path']}/voucher.cfg -k {$g['varetc_path']}/voucher.public $v");
+        $result = exec("/usr/local/bin/voucher -c {$g['varetc_path']}/voucher.cfg -k {$g['varetc_path']}/voucher.public -- $v");
         list($status, $roll, $nr) = explode(" ", $result);
         if ($status == "OK") {
             if (!$first_voucher) 
