@@ -1231,10 +1231,9 @@ diff -u -r sys.orig/i386/i386/identcpu.c sys/i386/i386/identcpu.c
  		}
  	} else if (cpu == CPU_486 && *cpu_vendor == '\0') {
  		/*
-diff -u -r sys.orig/i386/i386/vm_machdep.c sys/i386/i386/vm_machdep.c
---- sys.orig/i386/i386/vm_machdep.c	Sun Aug 31 02:16:27 2003
-+++ sys/i386/i386/vm_machdep.c	Sun Apr 24 09:31:04 2005
-@@ -432,6 +432,16 @@
+--- sys/i386/i386/vm_machdep.c.orig	Sun Aug 31 02:16:27 2003
++++ sys/i386/i386/vm_machdep.c	Fri Aug 17 11:20:12 2007
+@@ -432,6 +432,26 @@
  	outb(0xf0, 0x00);		/* Reset. */
  #else
  	/*
@@ -1247,6 +1246,16 @@ diff -u -r sys.orig/i386/i386/vm_machdep.c sys/i386/i386/vm_machdep.c
 +			outl(0xcf8, 0);
 +		}
 +	}
++	
++	/*
++	 * reset PC Engines ALIX (CS5536) via DIVIL_SOFT_RESET
++	 */
++	if (strcmp(cpu_vendor, "AuthenticAMD") == 0) {
++		if ((cpu_id & 0xfff0) == 0x05a0) {
++			wrmsr(0x51400017, 1LL);
++		}
++	}
++	
 +	/*
  	 * Attempt to do a CPU reset via the keyboard controller,
  	 * do not turn of the GateA20, as any machine that fails
