@@ -231,7 +231,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
 		</tr>
 		<tr>
 			<td colspan="3">
-		      Additional webGui users can be added here.  User permissions are determined by the admin group they are a member of.
+		      Additional webGUI users can be added here.  User permissions are determined by the admin group they are a member of.
 			</td>
 		</tr>
  </table>

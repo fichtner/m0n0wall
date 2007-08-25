@@ -589,3 +589,50 @@
  
  /*
   * External buffer types: identify ext_buf type.
+--- sys/i386/i386/vm_machdep.c.orig	Sat Dec  9 14:05:24 2006
++++ sys/i386/i386/vm_machdep.c	Sat Aug 18 15:10:27 2007
+@@ -600,6 +600,12 @@
+ 		outl(0xcfc, 0xf);
+ 	}
+ 
++	if (strcmp(cpu_vendor, "AuthenticAMD") == 0 &&
++	    (cpu_id & 0xfff0) == 0x05a0) {
++		/* PC Engines ALIX reset via CS5536 DIVIL_SOFT_RESET */
++		wrmsr(0x51400017, 1LL);
++	}
++
+ #ifdef PC98
+ 	/*
+ 	 * Attempt to do a CPU reset via CPU reset port.
+--- sys/dev/usb/ehci_pci.c.orig	Thu Jan 26 02:43:13 2006
++++ sys/dev/usb/ehci_pci.c	Sat Aug 25 20:36:28 2007
+@@ -95,8 +95,10 @@
+ static const char *ehci_device_m5239 = "ALi M5239 USB 2.0 controller";
+ 
+ /* AMD */
+-#define PCI_EHCI_DEVICEID_8111		0x10227463
++#define PCI_EHCI_DEVICEID_8111		0x74631022
++#define PCI_EHCI_DEVICEID_CS5536	0x20951022
+ static const char *ehci_device_8111 = "AMD 8111 USB 2.0 controller";
++static const char *ehci_device_CS5536 = "AMD CS5536 USB 2.0 controller";
+ 
+ /* ATI */
+ #define PCI_EHCI_DEVICEID_SB200		0x43451002
+@@ -210,6 +212,8 @@
+ 		return (ehci_device_m5239);
+ 	case PCI_EHCI_DEVICEID_8111:
+ 		return (ehci_device_8111);
++	case PCI_EHCI_DEVICEID_CS5536:
++		return (ehci_device_CS5536);
+ 	case PCI_EHCI_DEVICEID_SB200:
+ 		return (ehci_device_sb200);
+ 	case PCI_EHCI_DEVICEID_SB400:
+@@ -411,6 +415,8 @@
+ 			if (res != 0 || buscount != 1)
+ 				continue;
+ 			bsc = device_get_softc(nbus[0]);
++			if (bsc == 0 || bsc->bdev == 0)
++				continue;
+ 			DPRINTF(("ehci_pci_attach: companion %s\n",
+ 			    USBDEVNAME(bsc->bdev)));
+ 			sc->sc_comps[ncomp++] = bsc;

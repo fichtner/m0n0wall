@@ -93,27 +93,6 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
-function gen_bits(ipaddr) {
-    if (ipaddr.search(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) != -1) {
-        var adr = ipaddr.split(/\./);
-        if (adr[0] > 255 || adr[1] > 255 || adr[2] > 255 || adr[3] > 255)
-            return "";
-        if (adr[0] == 0 && adr[1] == 0 && adr[2] == 0 && adr[3] == 0)
-            return "";
-		
-		if (adr[0] <= 127)
-			return "8";
-		else if (adr[0] <= 191)
-			return "16";
-		else
-			return "24";
-    }
-    else
-        return "";
-}
-function ipaddr_change() {
-	document.iform.subnet.value = gen_bits(document.iform.ipaddr.value);
-}
 function enable_change(enable_over) {
 	if (document.iform.mode) {
 		 wlan_enable_change(enable_over);
@@ -131,7 +110,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
+                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
                     / 
                     <select name="subnet" class="formfld" id="subnet">
                       <?php for ($i = 31; $i > 0; $i--): ?>

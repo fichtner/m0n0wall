@@ -171,27 +171,6 @@ function bridge_change(enable_over) {
 	document.iform.ipaddr.disabled = endis;
 	document.iform.subnet.disabled = endis;
 }
-function gen_bits(ipaddr) {
-    if (ipaddr.search(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) != -1) {
-        var adr = ipaddr.split(/\./);
-        if (adr[0] > 255 || adr[1] > 255 || adr[2] > 255 || adr[3] > 255)
-            return 0;
-        if (adr[0] == 0 && adr[1] == 0 && adr[2] == 0 && adr[3] == 0)
-            return 0;
-		
-		if (adr[0] <= 127)
-			return 23;
-		else if (adr[0] <= 191)
-			return 15;
-		else
-			return 7;
-    }
-    else
-        return 0;
-}
-function ipaddr_change() {
-	document.iform.subnet.selectedIndex = gen_bits(document.iform.ipaddr.value);
-}
 //-->
 </script>
 <?php if (isset($optcfg['wireless'])): ?>
@@ -242,7 +221,7 @@ function ipaddr_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>" onchange="ipaddr_change()">
+                    <?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
                     /
                 	<select name="subnet" class="formfld" id="subnet">
 					<?php for ($i = 31; $i > 0; $i--): ?>

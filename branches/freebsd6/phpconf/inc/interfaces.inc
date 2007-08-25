@@ -335,12 +335,7 @@ function interfaces_wireless_configure_encryption($if, $wlcfg) {
 			fclose($fd);
 			
 			/* start hostapd */
-			$pid = mwexec_bg("/usr/sbin/hostapd {$g['varetc_path']}/hostapd-$if.conf");
-			
-			/* write hostapd PID to file for later use */
-			$fd = fopen("{$g['varrun_path']}/hostapd-$if.pid", "w");
-			fwrite($fd, $pid);
-			fclose($fd);
+			mwexec("/usr/sbin/hostapd -B -P {$g['varrun_path']}/hostapd-$if.pid {$g['varetc_path']}/hostapd-$if.conf");
 		}
 		
 	} else {

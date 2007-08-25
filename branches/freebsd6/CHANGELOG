@@ -3,6 +3,28 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- console speed for WRAP image is now 38400 as this has always been the
+  default for new WRAP (and ALIX) boards anyway
+
+- modified WRAP image kernel to also work with ALIX.2 (added vr device and
+  USB EHCI + CPU soft reset patches to wrap kernel; tested on prototype board)
+  -> for ALIX, interfaces need to be re-assigned (vr* instead of sis*)
+
+- patched hostapd to support writing PID file; start hostapd with -B
+  flag (fixes problem with wireless interfaces that have WPA enabled
+  not being initialized properly on boot)
+
+- recompiled MPD with current MSS/dial-on-demand patches (also fixes idle timeout bug)
+
+- removed code that auto-selects subnet mask on LAN and OPT setup
+  pages (it's confusing and doesn't necessarily get it right)
+
+- recompiled PHP, this time with radius extension
+
+
+1.3b3
+-----
+
 - wireless LAN improvements
     - hide SSID option
     - WPA-PSK and WPA-Enterprise (in hostap mode)
