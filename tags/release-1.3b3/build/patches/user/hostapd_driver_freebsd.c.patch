@@ -1,0 +1,18 @@
+--- usr.sbin/wpa/hostapd/driver_freebsd.c.orig	Sat Dec  9 14:06:57 2006
++++ usr.sbin/wpa/hostapd/driver_freebsd.c	Wed Aug  1 10:28:33 2007
+@@ -245,6 +245,7 @@
+ 		return -1;
+ 	}
+ 
++/*
+ 	if (dev_up) {
+ 		memset(&ifr, 0, sizeof(ifr));
+ 		snprintf(ifr.ifr_name, IFNAMSIZ, "%s", drv->iface);
+@@ -255,6 +256,7 @@
+ 			       "current value\n");
+ 		}
+ 	}
++*/
+ 
+ 	return 0;
+ }
