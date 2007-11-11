@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- siproxd added. Offers transparent SIP proxy/masquerading and simple
+  registrar service. See http://siproxd.sourceforge.net/
+
+1.3b4
+-----
+
 - console speed for WRAP image is now 38400 as this has always been the
   default for new WRAP (and ALIX) boards anyway
 

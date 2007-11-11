@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2007 Marcel Wiget <mwiget@mac.com>
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,9 @@ if (!$nentries)
 	$nentries = 50;
 
 if ($_POST['clear']) {
-	exec("/usr/sbin/clog -i -s 32768 /var/log/dhcpd.log");
+	exec("/usr/sbin/clog -i -s 32768 /var/log/siproxd.log");
 	/* redirect to avoid reposting form data on refresh */
-	header("Location: diag_logs_dhcp.php");
+	header("Location: diag_logs_sip.php");
 	exit;
 }
 
@@ -86,11 +86,11 @@ function dump_clog($logfile, $tail, $withorig = true) {
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 		  <tr> 
 			<td colspan="2" class="listtopic"> 
-			  Last <?=$nentries;?> DHCP service log entries</td>
+			  Last <?=$nentries;?> SIP service log entries</td>
 		  </tr>
-		  <?php dump_clog("/var/log/dhcpd.log", $nentries); ?>
+		  <?php dump_clog("/var/log/siproxd.log", $nentries); ?>
 		</table>
-		<br><form action="diag_logs_dhcp.php" method="post">
+		<br><form action="diag_logs_sip.php" method="post">
 <input name="clear" type="submit" class="formbtn" value="Clear log">
 </form>
 	</td>

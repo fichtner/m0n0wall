@@ -25,8 +25,9 @@ mkdir /var/run /var/log /var/etc /var/db /var/empty
 clog -i -s 262144 /var/log/system.log
 clog -i -s 262144 /var/log/filter.log
 clog -i -s 65536 /var/log/vpn.log
-clog -i -s 32768 /var/log/portalauth.log
 clog -i -s 32768 /var/log/dhcpd.log
+clog -i -s 32768 /var/log/portalauth.log
+clog -i -s 65536 /var/log/siproxd.log
 chmod 0600 /var/log/*.log
 
 adjkerntz -i

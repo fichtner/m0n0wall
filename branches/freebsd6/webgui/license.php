@@ -168,6 +168,7 @@ require("guiconfig.inc");
 			  <br>
               Marcel Wiget (<a href="mailto:mwiget@mac.com">mwiget@mac.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: Voucher authentication</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">SIP: SIP proxy/masquerading based on siproxd </font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -234,5 +235,8 @@ All rights reserved.<br>
               Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.<br>
               <br>
               ATAidle (<a href="http://www.cran.org.uk/bruce/software/ataidle/" target="_blank">http://www.cran.org.uk/bruce/software/ataidle</a>)<br>
-              Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.
+              Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.<br>
+              <br>
+              Siproxd (<a href="http://siproxd.sourceforge.net" target="_blank">http://siproxd.sourceforge.net/</a>)<br>
+              Copyright 2002-2007 Thomas Ries &lt;tries@gmx.net&gt;. All rights reserved.
 <?php include("fend.inc"); ?>

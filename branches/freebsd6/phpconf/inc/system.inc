@@ -196,8 +196,9 @@ function system_syslogd_start() {
 local0.*					%/var/log/filter.log
 local3.*					%/var/log/vpn.log
 local4.*					%/var/log/portalauth.log
+local6.*					%/var/log/siproxd.log
 local7.*					%/var/log/dhcpd.log
-*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local7.none %/var/log/system.log
+*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local6.none;local7.none %/var/log/system.log
 security.*					%/var/log/system.log
 auth.info;authpriv.info;daemon.info		%/var/log/system.log
 *.emerg						*
