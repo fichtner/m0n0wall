@@ -39,6 +39,7 @@ $pconfig['filter'] = isset($config['syslog']['filter']);
 $pconfig['dhcp'] = isset($config['syslog']['dhcp']);
 $pconfig['portalauth'] = isset($config['syslog']['portalauth']);
 $pconfig['vpn'] = isset($config['syslog']['vpn']);
+$pconfig['sip'] = isset($config['syslog']['sip']);
 $pconfig['system'] = isset($config['syslog']['system']);
 $pconfig['enable'] = isset($config['syslog']['enable']);
 $pconfig['logdefaultblock'] = !isset($config['syslog']['nologdefaultblock']);
@@ -69,6 +70,7 @@ if ($_POST) {
 		$config['syslog']['dhcp'] = $_POST['dhcp'] ? true : false;
 		$config['syslog']['portalauth'] = $_POST['portalauth'] ? true : false;
 		$config['syslog']['vpn'] = $_POST['vpn'] ? true : false;
+		$config['syslog']['sip'] = $_POST['sip'] ? true : false;
 		$config['syslog']['system'] = $_POST['system'] ? true : false;
 		$config['syslog']['enable'] = $_POST['enable'] ? true : false;
 		$oldnologdefaultblock = isset($config['syslog']['nologdefaultblock']);
@@ -101,6 +103,7 @@ function enable_change(enable_over) {
 		document.iform.dhcp.disabled = 0;
 		document.iform.portalauth.disabled = 0;
 		document.iform.vpn.disabled = 0;
+		document.iform.sip.disabled = 0;
 		document.iform.system.disabled = 0;
 	} else {
 		document.iform.remoteserver.disabled = 1;
@@ -108,6 +111,7 @@ function enable_change(enable_over) {
 		document.iform.dhcp.disabled = 1;
 		document.iform.portalauth.disabled = 1;
 		document.iform.vpn.disabled = 1;
+		document.iform.sip.disabled = 1;
 		document.iform.system.disabled = 1;
 	}
 }
@@ -187,7 +191,9 @@ function enable_change(enable_over) {
 						  <input name="portalauth" id="portalauth" type="checkbox" value="yes" <?php if ($pconfig['portalauth']) echo "checked"; ?>>
                           Captive portal<br> 
 						  <input name="vpn" id="vpn" type="checkbox" value="yes" <?php if ($pconfig['vpn']) echo "checked"; ?>>
-                          PPTP VPN events</td>
+                          PPTP VPN events<br>
+						  <input name="sip" id="sip" type="checkbox" value="yes" <?php if ($pconfig['sip']) echo "checked"; ?>>
+                          SIP events</td>
                       </tr>
                       <tr> 
                         <td width="22%" valign="top">&nbsp;</td>

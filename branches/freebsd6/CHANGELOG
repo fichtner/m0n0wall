@@ -3,6 +3,20 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- automatically change sisX interface names to vrX when running on ALIX
+
+- add vr(4) driver VLAN fix (for ALIX etc.)
+
+- added reset button driver for ALIX
+
+- change logo/license/footer to include registered trademark sign
+
+- upgraded ipfilter to 4.1.23 (from FreeBSD CVS); note: kernel patch
+  in build/patches/kernel/kernel-6.patch still reflects ipfilter
+  changes to stock 4.1.13
+
+- fix FIN handling in ipnat FTP proxy
+
 - siproxd added. Offers transparent SIP proxy/masquerading and simple
   registrar service. See http://siproxd.sourceforge.net/
 

@@ -226,6 +226,13 @@ local4.*					@{$syslogcfg['remoteserver']}
 EOD;
 		}
 
+		if (isset($syslogcfg['sip'])) {
+			$syslogconf .= <<<EOD
+local6.*					@{$syslogcfg['remoteserver']}
+
+EOD;
+		}
+
 		if (isset($syslogcfg['dhcp'])) {
 			$syslogconf .= <<<EOD
 local7.*					@{$syslogcfg['remoteserver']}
@@ -235,7 +242,7 @@ EOD;
 
 		if (isset($syslogcfg['system'])) {
 			$syslogconf .= <<<EOD
-*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local7.none @{$syslogcfg['remoteserver']}
+*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local6.none;local7.none @{$syslogcfg['remoteserver']}
 security.*					@{$syslogcfg['remoteserver']}
 auth.info;authpriv.info;daemon.info		@{$syslogcfg['remoteserver']}
 *.emerg						@{$syslogcfg['remoteserver']}
@@ -648,7 +655,22 @@ function system_check_reset_button() {
 	if ($g['platform'] != "wrap")
 		return 0;
 
-	$retval = mwexec("/usr/local/sbin/wrapresetbtn");
+	/* WRAP images can also be used on ALIX, but the reset procedure is
+	   different, so we need to figure out whether it's a WRAP or an ALIX */
+	$pce_platform = "alix";
+	$fd = @popen("/sbin/dmesg", "r");
+	if (!$fd)
+		return 0;
+	while (!feof($fd)) {
+		$line = fgets($fd);
+		if (strpos($line, "PC Engines WRAP") !== false) {
+			$pce_platform = "wrap";
+			break;
+		}
+	}
+	pclose($fd);
+
+	$retval = mwexec("/usr/local/sbin/" . $pce_platform . "resetbtn");
 
 	if ($retval == 99) {
 		/* user has pressed reset button for 2 seconds - 

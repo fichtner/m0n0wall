@@ -230,6 +230,26 @@ function conf_mount_ro() {
 /* convert configuration, if necessary */
 function convert_config() {
 	global $config, $g;
+
+	/* Special solution for WRAP/ALIX: if interfaces in config use sisX, but
+	   we only have vrX, then change all */
+	if ($g['booting'] && strpos($g['platform'], "wrap") === 0 &&
+		strpos($config['interfaces']['lan']['if'], "sis") === 0) {
+	
+		$iflist = get_interface_list();
+		if (!isset($iflist['sis0']) && isset($iflist['vr0'])) {
+		
+			echo "Changing sisX interface names to vrX...";
+			$config['interfaces']['lan']['if']  = str_replace("sis", "vr", $config['interfaces']['lan']['if']);
+			$config['interfaces']['wan']['if']  = str_replace("sis", "vr", $config['interfaces']['wan']['if']);
+			
+			for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+				$config['interfaces']['opt' . $i]['if'] = str_replace("sis", "vr", $config['interfaces']['opt' . $i]['if']);
+			
+			write_config();
+			echo "done\n";
+		}
+	}
 	
 	if ($config['version'] == $g['latest_config'])
 		return;		/* already at latest version */
