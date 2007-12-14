@@ -597,6 +597,23 @@ function convert_config() {
 		$config['version'] = "1.6";
 	}
 	
+	/* convert 1.6 -> 1.7 */
+	if ($config['version'] == "1.6") {
+		
+		/* install a firewall rule to permit all IPsec traffic to reflect
+		   the default behavior in previous versions; the user can then remove
+		   that rule to filter IPsec VPN traffic if desired */
+		$config['filter']['rule'][] = array(
+			'type' => 'pass',
+			'descr' => 'Default IPsec VPN',
+			'interface' => 'ipsec',
+			'source' => array('any' => true),
+			'destination' => array('any' => true)
+		);
+		
+		$config['version'] = "1.7";
+	}
+	
 	write_config();
 	
 	if ($g['booting'])

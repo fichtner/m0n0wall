@@ -565,6 +565,15 @@ EOD;
 	
 	}
 	
+	if (isset($config['ipsec']['enable'])) {
+		$ipfrules .= <<<EOD
+
+# always pass outgoing IPsec encapsulated packets
+pass out quick on enc0 all keep state $out_kf
+
+EOD;
+	}
+	
 	if (!isset($config['system']['webgui']['noantilockout'])) {
 	
 	$ipfrules .= <<<EOD
@@ -605,76 +614,72 @@ pass in quick proto udp from any to any port = 5050 keep state group 200
 EOD;
 	}
 	
-	$i = 0;
-	
 	$ipfrules .= "\n# User-defined rules follow\n";
+	
+	$i = -1;
 	
 	if (isset($config['filter']['rule']))
 		foreach ($config['filter']['rule'] as $rule) {
 		
-		/* don't include disabled rules */
-		if (isset($rule['disabled'])) {
-			$i++;
-			continue;
-		}
+		$i++;
 		
-		/* does the rule deal with a PPTP interface? */
+		/* don't include disabled rules */
+		if (isset($rule['disabled']))
+			continue;
+		
+		/* does the rule deal with a PPTP or IPsec interface? */
 		if ($rule['interface'] == "pptp") {
 		
-			if ($pptpdcfg['mode'] != "server") {
-				$i++;
+			if ($pptpdcfg['mode'] != "server")
 				continue;
-			}
 				
 			$nif = $g['n_pptp_units'];
 			$ispptp = true;
+			$isipsec = false;
+		} else if ($rule['interface'] == "ipsec") {
+		
+			if (!isset($config['ipsec']['enable']))
+				continue;
+		
+			$nif = 1;
+			$ispptp = false;
+			$isipsec = true;
 		} else {
 			
 			if (strstr($rule['interface'], "opt")) {
-				if (!array_key_exists($rule['interface'], $optcfg)) {
-					$i++;
+				if (!array_key_exists($rule['interface'], $optcfg))
 					continue;
-				}
 			}
 			
 			$nif = 1;
 			$ispptp = false;
+			$isipsec = false;
 		}
 		
 		if ($pptpdcfg['mode'] != "server") {
 			if (($rule['source']['network'] == "pptp") ||
-				($rule['destination']['network'] == "pptp")) {
-					$i++;
+				($rule['destination']['network'] == "pptp"))
 					continue;
-				}
 		}
 		
 		if ($rule['source']['network'] && strstr($rule['source']['network'], "opt")) {
-			if (!array_key_exists($rule['source']['network'], $optcfg)) {
-				$i++;
+			if (!array_key_exists($rule['source']['network'], $optcfg))
 				continue;
-			}
 		}
 		if ($rule['destination']['network'] && strstr($rule['destination']['network'], "opt")) {
-			if (!array_key_exists($rule['destination']['network'], $optcfg)) {
-				$i++;
+			if (!array_key_exists($rule['destination']['network'], $optcfg))
 				continue;
-			}
 		}
 		
 		/* check for unresolvable aliases */
-		if ($rule['source']['address'] && !alias_expand($rule['source']['address'])) {
-			$i++;
+		if ($rule['source']['address'] && !alias_expand($rule['source']['address']))
 			continue;
-		}
-		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address'])) {
-			$i++;
+		if ($rule['destination']['address'] && !alias_expand($rule['destination']['address']))
 			continue;
-		}
 		
 		for ($iif = 0; $iif < $nif; $iif++) {
 			
-			if (!$ispptp) {
+			if (!$ispptp && !$isipsec) {
 			
 				$groupnum = $ifgroups[$rule['interface']];
 				
@@ -710,9 +715,10 @@ EOD;
 
 			$line .= "quick ";
 			
-			if ($ispptp) {
+			if ($ispptp)
 				$line .= "on ng" . ($iif+1) . " ";
-			}
+			else if ($isipsec)
+				$line .= "on enc0 ";
 			
 			if (isset($rule['protocol'])) {
 				$line .= "proto {$rule['protocol']} ";
@@ -848,7 +854,7 @@ EOD;
 				$line .= "flags S/SA ";
 			}
 				
-			if (!$ispptp) {
+			if (!$ispptp && !$isipsec) {
 				$line .= "group $groupnum ";
 			}
 			
@@ -856,8 +862,6 @@ EOD;
 			
 			$ipfrules .= $line;
 		}
-		
-		$i++;
 	}
 	
 	$ipfrules .= <<<EOD

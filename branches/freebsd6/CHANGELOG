@@ -3,6 +3,22 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added firewall support for decapsulated IPsec packets (new pseudo-interface
+  "IPsec" in firewall rule editor); this is on by default, but the default
+  configuration contains a "pass all" rule on the new IPsec pseudo-
+  interface (and this is also added automatically for existing configurations),
+  which can then be deleted to actually filter IPsec VPN traffic
+
+- stop discriminating against nge(4) (National Semiconductor PCI Gigabit Ethernet) adapters
+
+- updated FreeBSD to 6.2-RELEASE-p9
+
+- updated ipfilter to 4.1.28
+
+
+1.3b5
+-----
+
 - automatically change sisX interface names to vrX when running on ALIX
 
 - add vr(4) driver VLAN fix (for ALIX etc.)

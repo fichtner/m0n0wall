@@ -143,6 +143,8 @@ function conv_clog($logfile, $tail) {
 			$flent['interface'] = $iftable[$ipfa[$i]];
 		else if (strpos($ipfa[$i], "ng") !== false)
 			$flent['interface'] = "PPTP";
+		else if ($ipfa[$i] == "enc0")
+			$flent['interface'] = "IPsec";
 		else
 			$flent['interface'] = $ipfa[$i];
 		

@@ -63,6 +63,9 @@ function vpn_ipsec_configure($ipchg = false) {
 	mwexec("/usr/local/sbin/setkey -FP");
 	mwexec("/usr/local/sbin/setkey -F");
 	
+	/* mark enc0 interface as up to enable filtering of decapsulated IPsec packets */
+	mwexec("/sbin/ifconfig enc0 up");
+	
 	/* prefer old SAs only for 30 seconds, then use the new one */
 	if (!isset($config['ipsec']['preferoldsa']))
 		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");

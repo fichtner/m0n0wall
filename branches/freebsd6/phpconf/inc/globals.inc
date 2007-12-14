@@ -49,7 +49,7 @@ $g = array(
     "n_pptp_units" => 16,
     "pptp_subnet" => 28,
     "debug" => false,
-    "latest_config" => "1.6",
+    "latest_config" => "1.7",
     "wireless_regex" => "/^(wi|ath|an|ral|ural)/",
     "wireless_hostap_regex" => "/^(wi|ath|ral|ural)/"
 );

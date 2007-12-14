@@ -2,7 +2,7 @@
 <!-- m0n0wall default system configuration -->
 <!-- $Id$ -->
 <m0n0wall>
-	<version>1.6</version>
+	<version>1.7</version>
 	<lastchange></lastchange>
 	<system>
 		<hostname>m0n0wall</hostname>
@@ -392,12 +392,23 @@
 				<any/>
 			</destination>
 		</rule>
+		<rule>
+			<type>pass</type>
+			<descr>Default IPsec VPN</descr>
+			<interface>ipsec</interface>
+			<source>
+				<any/>
+			</source>
+			<destination>
+				<any/>
+			</destination>
+		</rule>
 		<!-- rule syntax:
 		<rule>
 			<disabled/>
 			<type>pass|block|reject</type>
 			<descr>...</descr>
-			<interface>lan|opt[n]|wan|pptp</interface>
+			<interface>lan|opt[n]|wan|pptp|ipsec</interface>
 			<protocol>tcp|udp|tcp/udp|...</protocol>
 			<icmptype></icmptype>
 			<source>
