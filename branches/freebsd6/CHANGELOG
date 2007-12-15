@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added support for IPsec tunnels with (possibly dynamic) remote host names
+  (instead of fixed IP addresses); the host name is polled at regular intervals
+  (default 60 seconds), and if the IP address that it maps to changes, IPsec
+  is reconfigured. Note that this will also cause other (non-dynamic) tunnels
+  to be briefly interrupted.
+
 - added firewall support for decapsulated IPsec packets (new pseudo-interface
   "IPsec" in firewall rule editor); this is on by default, but the default
   configuration contains a "pass all" rule on the new IPsec pseudo-
@@ -10,6 +16,8 @@ $Id$
   which can then be deleted to actually filter IPsec VPN traffic
 
 - stop discriminating against nge(4) (National Semiconductor PCI Gigabit Ethernet) adapters
+
+- fix DHCP release button on interface status page
 
 - updated FreeBSD to 6.2-RELEASE-p9
 

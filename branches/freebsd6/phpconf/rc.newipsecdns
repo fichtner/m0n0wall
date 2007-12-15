@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -33,53 +33,14 @@
 	require_once("config.inc");
 	require_once("functions.inc");
 	
-	/* WAN IP address has changed */
+	/* the IP address that a tunnel's remote gateway host name resolves
+	   to has changed; reload IPsec completely (we can't only change one
+	   specific tunnel at this time) */
 	
 	/* make sure to wait until the boot scripts have finished */
 	while (file_exists("{$g['varrun_path']}/booting")) {
 		sleep(1);
 	}
 	
-	$curwanip = get_current_wan_address();
-	
-	/*	dhclient or MPD told us that the IP address has changed;
-		let's see if that's really true to avoid reloading things
-		when it's not really necessary (dhclient likes to
-		execute its dhclient-exit-hooks also on renewals)
-	*/		
-	if (file_exists("{$g['vardb_path']}/wanip")) {
-		$oldwanip = chop(file_get_contents("{$g['vardb_path']}/wanip"));
-		
-		if ($curwanip == $oldwanip)
-			return 0;	/* nothing to do */
-	}
-	
-	/* reload firewall rules */
-	filter_rules_generate();
-	
-	/* flush NAT table */
-	filter_flush_nat_table();
-	
-	/* regenerate resolv.conf if DNS overrides are allowed or the BigPond
-	   client is enabled */
-	if (isset($config['system']['dnsallowoverride']) ||
-			($config['interfaces']['wan']['ipaddr'] == "bigpond"))
-		system_resolvconf_generate(true);
-	
-	/* fire up the BigPond client, if necessary */
-	if ($config['interfaces']['wan']['ipaddr'] == "bigpond")
-		interfaces_wan_bigpond_configure($curwanip);
-	
-	/* perform RFC 2136 DNS update */
-	services_dnsupdate_process();
-	
-	/* reconfigure IPsec tunnels */
-	vpn_ipsec_configure(true);
-	
-	/* write current WAN IP to file */
-	$fd = @fopen("{$g['vardb_path']}/wanip", "w");
-	if ($fd) {
-		fwrite($fd, $curwanip);
-		fclose($fd);
-	}
+	vpn_ipsec_configure();
 ?>

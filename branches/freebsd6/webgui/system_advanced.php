@@ -45,6 +45,7 @@ if ($g['platform'] == "generic-pc")
 	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
 $pconfig['bypassstaticroutes'] = isset($config['filter']['bypassstaticroutes']);
 $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
+$pconfig['ipsecdnsinterval'] = $config['ipsec']['dns-interval'];
 $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
@@ -58,6 +59,9 @@ if ($_POST) {
 	/* input validation */
 	if ($_POST['ipv6nat_enable'] && !is_ipaddr($_POST['ipv6nat_ipaddr'])) {
 		$input_errors[] = "You must specify an IP address to NAT IPv6 packets.";
+	}
+	if ($_POST['ipsecdnsinterval'] && !is_numericint($_POST['ipsecdnsinterval'])) {
+		$input_errors[] = "The IPsec DNS check interval must be an integer.";
 	}
 	if ($_POST['tcpidletimeout'] && !is_numericint($_POST['tcpidletimeout'])) {
 		$input_errors[] = "The TCP idle timeout must be an integer.";
@@ -94,6 +98,8 @@ if ($_POST) {
 		$config['filter']['bypassstaticroutes'] = $_POST['bypassstaticroutes'] ? true : false;
 		$oldtcpidletimeout = $config['filter']['tcpidletimeout'];
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
+		$oldipsecdnsinterval = $config['ipsec']['dns-interval'];
+		$config['ipsec']['dns-interval'] = $_POST['ipsecdnsinterval'];
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
 		$oldpolling = $config['system']['polling'];
@@ -127,7 +133,7 @@ if ($_POST) {
 			config_lock();
 			$retval = filter_configure();
 			$retval |= interfaces_optional_configure();
-			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa)
+			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa || $config['ipsec']['dns-interval'] != $oldipsecdnsinterval)
 				$retval |= vpn_ipsec_configure();
 			$retval |= system_set_termcap();
 			config_unlock();
@@ -248,6 +254,15 @@ function enable_change(enable_over) {
                     <input name="allowipsecfrags" type="checkbox" id="allowipsecfrags" value="yes" <?php if ($pconfig['allowipsecfrags']) echo "checked"; ?>>
                     <strong>Allow fragmented IPsec packets</strong><span class="vexpl"><br>
     This will cause m0n0wall to allow fragmented IP packets that are encapsulated in IPsec ESP packets.</span></td>
+			    </tr>
+				<tr>
+                  <td valign="top" class="vncell">IPsec DNS check interval</td>
+                  <td class="vtable">                    <span class="vexpl">
+                    <input name="ipsecdnsinterval" type="text" class="formfld" id="ipsecdnsinterval" size="8" value="<?=htmlspecialchars($pconfig['ipsecdnsinterval']);?>">
+                    seconds<br>
+    If at least one IPsec tunnel has a host name (instead of an IP address) as the remote gateway, a DNS lookup
+    is performed at the interval specified here, and if the IP address that the host name resolved to has changed,
+    the IPsec tunnel is reconfigured. The default is 60 seconds.</span></td>
 			    </tr>
 				<tr>
                   <td valign="top" class="vncell">TCP idle timeout </td>

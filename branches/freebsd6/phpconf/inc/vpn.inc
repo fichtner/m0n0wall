@@ -49,10 +49,11 @@ function vpn_ipsec_configure($ipchg = false) {
 		
 		echo "Configuring IPsec VPN... ";
 	} else {
-		/* kill racoon */
+		/* kill racoon and dnswatch */
 		killbyname("racoon");
+		killbypid("{$g['varrun_path']}/dnswatch-ipsec.pid");
 		
-		/* wait for process to die */
+		/* wait for racoon process to die */
 		sleep(2);
 		
 		/* send a SIGKILL to be sure */
@@ -67,7 +68,7 @@ function vpn_ipsec_configure($ipchg = false) {
 	mwexec("/sbin/ifconfig enc0 up");
 	
 	/* prefer old SAs only for 30 seconds, then use the new one */
-	if (!isset($config['ipsec']['preferoldsa']))
+	if (!isset($ipseccfg['preferoldsa']))
 		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");
 	else
 		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=1");
@@ -83,6 +84,9 @@ function vpn_ipsec_configure($ipchg = false) {
 		
 		if ((is_array($ipseccfg['tunnel']) && count($ipseccfg['tunnel'])) ||
 				isset($ipseccfg['mobileclients']['enable'])) {
+		
+			$dnswatch_list = array();
+			$rgmap = array();
 		
 			if (is_array($ipseccfg['tunnel']) && count($ipseccfg['tunnel'])) {
 			
@@ -103,6 +107,20 @@ function vpn_ipsec_configure($ipchg = false) {
 					if (isset($tunnel['disabled']))
 						continue;
 				
+					/* see if this tunnel has a hostname for the remote-gateway, and if so,
+					   try to resolve it now and add it to the list for dnswatch */
+					if (!is_ipaddr($tunnel['remote-gateway'])) {
+						$dnswatch_list[] = $tunnel['remote-gateway'];
+						$rgip = resolve_retry($tunnel['remote-gateway']);
+						
+						if (!$rgip)
+							continue;
+						
+					} else {
+						$rgip = $tunnel['remote-gateway'];
+					}
+					$rgmap[$tunnel['remote-gateway']] = $rgip;
+				
 					$ep = vpn_endpoint_determine($tunnel, $curwanip);
 					if (!$ep)
 						continue;
@@ -112,11 +130,11 @@ function vpn_ipsec_configure($ipchg = false) {
 					$spdconf .= "spdadd {$sa}/{$sn} " . 
 						"{$tunnel['remote-subnet']} any -P out ipsec " . 
 						"{$tunnel['p2']['protocol']}/tunnel/{$ep}-" .
-						"{$tunnel['remote-gateway']}/unique;\n";
+						"{$rgip}/unique;\n";
 						
 					$spdconf .= "spdadd {$tunnel['remote-subnet']} " . 
 						"{$sa}/{$sn} any -P in ipsec " . 
-						"{$tunnel['p2']['protocol']}/tunnel/{$tunnel['remote-gateway']}-" .
+						"{$tunnel['p2']['protocol']}/tunnel/{$rgip}-" .
 						"{$ep}/unique;\n";
 				}
 				
@@ -165,6 +183,10 @@ function vpn_ipsec_configure($ipchg = false) {
 				++$tunnelnumber;
 			
 				if (isset($tunnel['disabled']))
+					continue;
+				
+				$rgip = $rgmap[$tunnel['remote-gateway']];
+				if (!$rgip)
 					continue;
 				
 				$ep = vpn_endpoint_determine($tunnel, $curwanip);
@@ -249,12 +271,12 @@ EOD;
 					} 					
 				} 
 				$racoonconf .= <<<EOD
-remote {$tunnel['remote-gateway']} \{
+remote {$rgip} \{
 	exchange_mode {$tunnel['p1']['mode']};
 	my_identifier {$myidentt} "{$myident}";
 	{$nattline}
 	{$certline}
-	peers_identifier address {$tunnel['remote-gateway']};
+	peers_identifier address {$rgip};
 	initial_contact on;
 	support_proxy on;
 	proposal_check obey;
@@ -425,7 +447,10 @@ EOD;
 				foreach ($ipseccfg['tunnel'] as $tunnel) {
 					if (isset($tunnel['disabled']))
 						continue;
-					$pskconf .= "{$tunnel['remote-gateway']}	 {$tunnel['p1']['pre-shared-key']}\n";
+					$rgip = $rgmap[$tunnel['remote-gateway']];
+					if (!$rgip)
+						continue;
+					$pskconf .= "{$rgip}	 {$tunnel['p1']['pre-shared-key']}\n";
 				}
 			}
 			
@@ -442,6 +467,20 @@ EOD;
 			
 			/* start racoon */
 			mwexec("/usr/local/sbin/racoon -d -f {$g['varetc_path']}/racoon.conf");
+			
+			/* start dnswatch, if necessary */
+			if (count($dnswatch_list) > 0) {
+				$interval = 60;
+				if ($ipseccfg['dns-interval'])
+					$interval = $ipseccfg['dns-interval'];
+				
+				$hostnames = "";
+				foreach ($dnswatch_list as $dns)
+					$hostnames .= " " . escapeshellarg($dns);
+				
+				mwexec("/usr/local/bin/dnswatch {$g['varrun_path']}/dnswatch-ipsec.pid $interval " . 
+					escapeshellarg("/etc/rc.newipsecdns") . $hostnames);
+			}
 			
 			if (is_array($ipseccfg['tunnel'])) {
 				foreach ($ipseccfg['tunnel'] as $tunnel) {

@@ -514,7 +514,7 @@ EOD;
 }
 
 function interfaces_wan_dhcp_down() {
-	mwexec("/usr/bin/killall dhclient");
+	mwexec("/sbin/dhclient -r");
 
 	sleep(3);
 }

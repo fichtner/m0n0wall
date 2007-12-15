@@ -190,8 +190,8 @@ if ($_POST) {
 	if (($_POST['remotenet'] && !is_ipaddr($_POST['remotenet']))) {
 		$input_errors[] = "A valid remote network address must be specified.";
 	}
-	if (($_POST['remotegw'] && !is_ipaddr($_POST['remotegw']))) {
-		$input_errors[] = "A valid remote gateway address must be specified.";
+	if (($_POST['remotegw'] && !is_ipaddr($_POST['remotegw']) && !is_domain($_POST['remotegw']))) {
+		$input_errors[] = "A valid remote gateway address or host name must be specified.";
 	}
 	if ((($_POST['p1myidentt'] == "address") && !is_ipaddr($_POST['p1myident']))) {
 		$input_errors[] = "A valid IP address for 'My identifier' must be specified.";
@@ -398,7 +398,7 @@ function methodsel_change() {
                   <td width="78%" class="vtable"> 
                     <?=$mandfldhtml;?><input name="remotegw" type="text" class="formfld" id="remotegw" size="20" value="<?=$pconfig['remotegw'];?>"> 
                     <br>
-                    Enter the public IP address of the remote gateway</td>
+                    Enter the public IP address or host name of the remote gateway</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>

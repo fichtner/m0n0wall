@@ -480,6 +480,7 @@
 	<ipsec>
 		<!-- <enable/> -->
 		<!-- <preferoldsa/> -->
+		<!-- <dns-interval></dns-interval> -->
 		<!-- syntax:
 		<tunnel>
 			<disabled/>
