@@ -7,6 +7,10 @@ $Id$
   have not passed any traffic by the time they end, skipping sessions
   sometimes during periodic pruning runs) - thanks to Janåke Rönnblom
 
+- fixed FIN handling in ipnat FTP proxy
+
+- updated timezone data
+
 1.231
 -----
 
