@@ -3,6 +3,17 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- captive portal reliability fixes (locking, treatment of sessions that
+  have not passed any traffic by the time they end, skipping sessions
+  sometimes during periodic pruning runs) - thanks to Janåke Rönnblom
+
+1.231
+-----
+
+- fixed PPTP VPN idle timeout and WAN PPPoE/PPTP dial-on-demand
+
+- fixed file download via exec.php for Internet Explorer when using HTTPS
+
 1.23
 ----
 

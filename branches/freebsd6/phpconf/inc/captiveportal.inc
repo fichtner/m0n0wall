@@ -418,7 +418,8 @@ function captiveportal_prune_old() {
 
     $radiusservers = captiveportal_get_radius_servers();
 
-    for ($i = 0; $i < count($cpdb); $i++) {
+    $no_users = count($cpdb);
+    for ($i = 0; $i < $no_users; $i++) {
 
         $timedout = false;
         $term_cause = 1;
@@ -444,6 +445,9 @@ function captiveportal_prune_old() {
         /* if an idle timeout is specified, get last activity timestamp from ipfw */
         if (!$timedout && $idletimeout) {
             $lastact = captiveportal_get_last_activity($cpdb[$i][1]);
+            /* if the user has logged on but not sent any traffic, they will never be logged out.
+               We "fix" this by setting lastact to the login timestamp */
+            $lastact = $lastact ? $lastact : $cpdb[$i][0];
             if ($lastact && ((time() - $lastact) >= $idletimeout)) {
                 $timedout = true;
                 $term_cause = 4; // Idle-Timeout
@@ -762,25 +766,31 @@ function captiveportal_get_radius_servers() {
         return false;
 }
 
-/* lock captive portal information, decide that the lock file is stale after
-   10 seconds */
+/* lock captive portal information, decide that the lock file is stale after 
+   4 minutes, issue warning in syslog every minute */
 function captiveportal_lock() {
 
-        global $lockfile;
-
-        $n = 0;
-        while ($n < 10) {
-                /* open the lock file in append mode to avoid race condition */
-                if ($fd = @fopen($lockfile, "x")) {
-                        /* succeeded */
-                        fclose($fd);
-                        return;
-                } else {
-                        /* file locked, wait and try again */
-                        sleep(1);
-                        $n++;
-                }
-        }
+	global $lockfile;
+	
+	$starttime = time();
+	do {
+		/* open the lock file in append mode to avoid race condition */
+		if ($fd = @fopen($lockfile, "x")) {
+			/* succeeded */
+			fclose($fd);
+			return;
+		} else {
+			/* file locked, wait and try again */
+			usleep(rand(200000,500000));
+			
+			$waittime = time() - $starttime;
+			
+			if ($waittime > 0 && ($waittime % 60) == 0)
+				captiveportal_syslog("LOCKWARNING: waited for lock for " . $waittime/60 ." minute(s)");
+		}
+	} while ($waittime < 240);
+	
+	captiveportal_syslog("LOCKWARNING: waited for lock for " . $waittime/60 ." minute(s) - breaking lock!");
 }
 
 /* unlock captive portal information file */
@@ -795,14 +805,22 @@ function captiveportal_unlock() {
 /* log successful captive portal authentication to syslog */
 /* part of this code from php.net */
 function captiveportal_logportalauth($user,$mac,$ip,$status, $message = null) {
+	$message = trim($message);
+	// Log it
+	if (!$message)
+		$message = "$status: $user, $mac, $ip";
+	else
+		$message = "$status: $user, $mac, $ip, $message";
+	captiveportal_syslog($message);
+}
+
+/* log simple messages to syslog */
+function captiveportal_syslog($message) {
     define_syslog_variables();
     $message = trim($message);
     openlog("logportalauth", LOG_PID, LOG_LOCAL4);
     // Log it
-    if (!$message)
-    syslog(LOG_INFO, "$status: $user, $mac, $ip");
-    else
-    syslog(LOG_INFO, "$status: $user, $mac, $ip, $message");
+    syslog(LOG_INFO, $message);
     closelog();
 }
 

@@ -33,7 +33,7 @@ $pgtitle = array("License");
 require("guiconfig.inc"); 
 ?>
 <?php include("fbegin.inc"); ?>
-            <p><strong>m0n0wall is Copyright &copy; 2002-2007 by Manuel Kasper 
+            <p><strong>m0n0wall&reg; is Copyright &copy; 2002-2007 by Manuel Kasper 
               (<a href="mailto:mk@neon1.net">mk@neon1.net</a>).<br>
               All rights reserved.</strong></p>
             <p> Redistribution and use in source and binary forms, with or without<br>
@@ -66,6 +66,7 @@ require("guiconfig.inc");
               ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
               OF THE<br>
               POSSIBILITY OF SUCH DAMAGE</strong>.</p>
+            <p>m0n0wall is a registered trademark of Manuel Kasper.</p>
             <hr size="1">
             <p>The following persons have contributed code to m0n0wall:</p>
             <p>Bob Zoller (<a href="mailto:bob@kludgebox.com">bob@kludgebox.com</a>)<br>
