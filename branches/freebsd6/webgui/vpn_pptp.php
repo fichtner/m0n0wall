@@ -48,6 +48,10 @@ $pconfig['radiusip_enable'] = isset($pptpcfg['radius']['radiusip']);
 $pconfig['radiusserver'] = $pptpcfg['radius']['server'];
 $pconfig['radiussecret'] = $pptpcfg['radius']['secret'];
 
+$pconfig['nunits'] = $pptpcfg['nunits'];
+if (!$pconfig['nunits'])
+	$pconfig['nunits'] = 16;
+
 if ($_POST) {
 
 	unset($input_errors);
@@ -77,9 +81,9 @@ if ($_POST) {
 		}
 		
 		if (!$input_errors) {	
-			$_POST['remoteip'] = $pconfig['remoteip'] = gen_subnet($_POST['remoteip'], $g['pptp_subnet']);
+			$_POST['remoteip'] = $pconfig['remoteip'] = gen_subnet($_POST['remoteip'], $pptpd_subnet_sizes[$_POST['nunits']]);
 			$subnet_start = ip2long($_POST['remoteip']);
-			$subnet_end = ip2long($_POST['remoteip']) + $g['n_pptp_units'] - 1;
+			$subnet_end = ip2long($_POST['remoteip']) + $_POST['nunits'] - 1;
 						
 			if ((ip2long($_POST['localip']) >= $subnet_start) && 
 			    (ip2long($_POST['localip']) <= $subnet_end)) {
@@ -101,6 +105,7 @@ if ($_POST) {
 	}
 
 	if (!$input_errors) {
+		$pptpcfg['nunits'] = $_POST['nunits'];
 		$pptpcfg['remoteip'] = $_POST['remoteip'];
 		$pptpcfg['redir'] = $_POST['redir'];
 		$pptpcfg['localip'] = $_POST['localip'];
@@ -138,6 +143,7 @@ function get_radio_value(obj)
 
 function enable_change(enable_over) {
 	if ((get_radio_value(document.iform.mode) == "server") || enable_over) {
+		document.iform.nunits.disabled = 0;
 		document.iform.remoteip.disabled = 0;
 		document.iform.localip.disabled = 0;
 		document.iform.req128.disabled = 0;
@@ -155,6 +161,7 @@ function enable_change(enable_over) {
 			document.iform.radiussecret.disabled = 1;
 		}
 	} else {
+		document.iform.nunits.disabled = 1;
 		document.iform.remoteip.disabled = 1;
 		document.iform.localip.disabled = 1;
 		document.iform.req128.disabled = 1;
@@ -194,11 +201,13 @@ function enable_change(enable_over) {
                     <input name="mode" type="radio" onclick="enable_change(false)" value="off"
 				  	<?php if (($pconfig['mode'] != "server") && ($pconfig['mode'] != "redir")) echo "checked";?>>
                     Off</td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
 <input type="radio" name="mode" value="redir" onclick="enable_change(false)" <?php if ($pconfig['mode'] == "redir") echo "checked"; ?>>
                     Redirect incoming PPTP connections to:</td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">PPTP redirection</td>
                   <td width="78%" class="vtable"> 
@@ -206,17 +215,13 @@ function enable_change(enable_over) {
                     <br>
                     Enter the IP address of a host which will accept incoming 
                     PPTP connections.</td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
 <input type="radio" name="mode" value="server" onclick="enable_change(false)" <?php if ($pconfig['mode'] == "server") echo "checked"; ?>>
                     Enable PPTP server</td>
-                <tr> 
-                  <td width="22%" valign="top" class="vncellreq">Max. concurrent 
-                    connections</td>
-                  <td width="78%" class="vtable"> 
-                    <?=$g['n_pptp_units'];?>
-                  </td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Server address</td>
                   <td width="78%" class="vtable"> 
@@ -230,13 +235,21 @@ function enable_change(enable_over) {
                     range</td>
                   <td width="78%" class="vtable"> 
                     <?=$mandfldhtml;?><input name="remoteip" type="text" class="formfld" id="remoteip" size="20" value="<?=htmlspecialchars($pconfig['remoteip']);?>">
-                    / 
-                    <?=$g['pptp_subnet'];?>
+                    <select name="nunits">
+                    <?php
+                    	foreach ($pptpd_subnet_sizes as $units => $sncidr) {
+                    		echo "<option value=\"$units\"";
+                    		if ($units == $pconfig['nunits'])
+                    			echo " selected";
+                    		echo ">/$sncidr ($units addresses)</option>\n";
+                    	}
+                    ?>
+                    </select>
                     <br>
-                    Specify the starting address for the client IP address subnet.<br>
-                    The PPTP server will assign 
-                    <?=$g['n_pptp_units'];?>
-                    addresses, starting at the address entered above, to clients.</td>
+                    Specify the start address and size for the client IP address subnet.<br>
+                    The PPTP server will assign client addresses from the subnet given above
+                    to clients. The size of the subnet determines the maximum number of concurrent connections
+                    that the PPTP server can handle.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">RADIUS</td>

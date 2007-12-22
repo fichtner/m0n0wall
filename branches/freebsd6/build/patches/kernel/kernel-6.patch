@@ -649,3 +649,48 @@
  			} else {
  				if (ippr_ftp_debug > 1) {
  					printf("FIN: thseq %x seqoff %d ftps_seq %x\n",
+--- sys/net/bridge.c.orig	Thu Aug 25 07:01:19 2005
++++ sys/net/bridge.c	Sat Dec 22 19:20:32 2007
+@@ -1043,8 +1043,7 @@
+ 	 * NetBSD-style generic packet filter, pfil(9), hooks.
+ 	 * Enables ipf(8) in bridging.
+ 	 */
+-	if (!IPFW_LOADED) { /* XXX: Prevent ipfw from being run twice. */
+-	if (inet_pfil_hook.ph_busy_count >= 0 &&
++	if ((inet_pfil_hook.ph_busy_count >= 0 && bdg_ipf != 0) &&
+ 	    m0->m_pkthdr.len >= sizeof(struct ip) &&
+ 	    ntohs(save_eh.ether_type) == ETHERTYPE_IP) {
+ 	    /*
+@@ -1056,12 +1055,24 @@
+ 	    ip->ip_len = ntohs(ip->ip_len);
+ 	    ip->ip_off = ntohs(ip->ip_off);
+ 
++	    /* m0n0wall hack: add M_SKIP_FIREWALL flag to make ipfw ignore this
++	       packet, as we'll call it separately below. Otherwise ipfw would be
++	       run twice, and the original code skips this whole block if
++	       IPFW_LOADED, but that's not an option as it will also skip ipfilter.
++	       Note that this doesn't work for pf as it honors the M_SKIP_FIREWALL
++	       flag as well (ipfilter doesn't), but that doesn't matter in m0n0wall.
++	    */
++	    m0->m_flags |= M_SKIP_FIREWALL;
++
+ 	    if (pfil_run_hooks(&inet_pfil_hook, &m0, src, PFIL_IN, NULL) != 0) {
+ 		/* NB: hook should consume packet */
+ 		return NULL;
+ 	    }
+ 	    if (m0 == NULL)			/* consumed by filter */
+ 		return m0;
++	    
++	    m0->m_flags &= ~M_SKIP_FIREWALL;
++	    
+ 	    /*
+ 	     * If we get here, the firewall has passed the pkt, but the mbuf
+ 	     * pointer might have changed. Restore ip and the fields ntohs()'d.
+@@ -1070,7 +1081,6 @@
+ 	    ip->ip_len = htons(ip->ip_len);
+ 	    ip->ip_off = htons(ip->ip_off);
+ 	}
+-	} /* XXX: Prevent ipfw from being run twice. */
+ 
+ 	/*
+ 	 * Prepare arguments and call the firewall.

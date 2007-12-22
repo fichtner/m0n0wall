@@ -470,4 +470,15 @@ function resolve_retry($hostname, $retries = 5) {
 	return false;
 }
 
+function subnet_size_to_cidr($size) {
+	$cidr = 32;
+	
+	while ($size > 1) {
+		$size /= 2;
+		$cidr--;
+	}
+	
+	return $cidr;
+}
+
 ?>

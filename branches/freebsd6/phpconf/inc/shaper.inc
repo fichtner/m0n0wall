@@ -125,7 +125,7 @@ function shaper_rules_generate() {
 	if ($pptpdcfg['mode'] == "server") {
 		$pptpip = $pptpdcfg['localip'];
 		$pptpsa = $pptpdcfg['remoteip'];
-		$pptpsn = $g['pptp_subnet'];
+		$pptpsn = subnet_size_to_cidr($pptpdcfg['nunits'] ? $pptpdcfg['nunits'] : 16);
 	}
 	
 	$rulei = 50000;
@@ -153,7 +153,9 @@ function shaper_rules_generate() {
 				continue;
 			}
 				
-			$nif = $g['n_pptp_units'];
+			$nif = $pptpdcfg['nunits'];
+			if (!$nif)
+				$nif = 16;
 			$ispptp = true;
 		} else {
 			

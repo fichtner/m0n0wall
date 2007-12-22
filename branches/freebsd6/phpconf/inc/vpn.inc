@@ -544,17 +544,21 @@ function vpn_pptpd_configure() {
 				printf("Error: cannot open mpd.conf in vpn_pptpd_configure().\n");
 				return 1;
 			}
-				
+			
+			$nunits = $pptpdcfg['nunits'];
+			if (!$nunits)
+				$nunits = 16;
+			
 			$mpdconf = <<<EOD
 pptpd:
 
 EOD;
 
-			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
+			for ($i = 0; $i < $nunits; $i++) {
 				$mpdconf .= "	load pt{$i}\n";
 			}
 			
-			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
+			for ($i = 0; $i < $nunits; $i++) {
 			
 				$clientip = long2ip(ip2long($pptpdcfg['remoteip']) + $i);
 				$ngif = "ng" . ($i+1);
@@ -650,7 +654,7 @@ EOD;
 			
 			$mpdlinks = "";
 			
-			for ($i = 0; $i < $g['n_pptp_units']; $i++) {
+			for ($i = 0; $i < $nunits; $i++) {
 				$mpdlinks .= <<<EOD
 
 pt{$i}:
@@ -694,8 +698,9 @@ EOD;
 	}
 	
 	if (!$g['booting']) {
-		/* reload the filter */
+		/* reload the filter and traffic shaper */
 		filter_configure();
+		shaper_configure();
 	}
 	
 	if ($g['booting'])

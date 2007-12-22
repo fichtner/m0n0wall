@@ -3,6 +3,13 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fixed filtering bridge when used in conjunction with traffic shaper
+
+- enabled larger client subnet sizes (= more concurrent connections) for
+  PPTP VPN server (up to 256)
+
+- updated timezone data
+
 - captive portal reliability fixes (locking, treatment of sessions that
   have not passed any traffic by the time they end, skipping sessions
   sometimes during periodic pruning runs) - thanks to Janåke Rönnblom

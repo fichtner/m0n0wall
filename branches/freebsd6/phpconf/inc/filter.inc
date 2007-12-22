@@ -194,7 +194,9 @@ function filter_nat_rules_generate() {
 		/* PPTP subnet */
 		if ($pptpdcfg['mode'] == "server") {
 			$natrules .= filter_nat_rules_generate_if($wanif,
-				$pptpdcfg['remoteip'] . "/" . $g['pptp_subnet'], "", null);
+				$pptpdcfg['remoteip'] . "/" . 
+				subnet_size_to_cidr($pptpdcfg['nunits'] ? $pptpdcfg['nunits'] : 16),
+				"", null);
 		}
 		
 		/* static routes */
@@ -329,7 +331,7 @@ function filter_rules_generate() {
 	if ($pptpdcfg['mode'] == "server") {
 		$pptpip = $pptpdcfg['localip'];
 		$pptpsa = $pptpdcfg['remoteip'];
-		$pptpsn = $g['pptp_subnet'];
+		$pptpsn = subnet_size_to_cidr($pptpdcfg['nunits'] ? $pptpdcfg['nunits'] : 16);
 	}
 	
 	/* default block logging? */
@@ -633,7 +635,9 @@ EOD;
 			if ($pptpdcfg['mode'] != "server")
 				continue;
 				
-			$nif = $g['n_pptp_units'];
+			$nif = $pptpdcfg['nunits'];
+			if (!$nif)
+				$nif = 16;
 			$ispptp = true;
 			$isipsec = false;
 		} else if ($rule['interface'] == "ipsec") {

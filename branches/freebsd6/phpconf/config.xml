@@ -218,6 +218,7 @@
 	</dhcpd>
 	<pptpd>
 		<mode><!-- off *or* server *or* redir --></mode>
+		<nunits>16</nunits>
 		<redir></redir>
 		<localip></localip>
 		<remoteip></remoteip>

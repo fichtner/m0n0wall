@@ -106,6 +106,8 @@ $p2_halgos = array('hmac_sha1' => 'SHA1', 'hmac_md5' => 'MD5');
 $p2_protos = array('esp' => 'ESP', 'ah' => 'AH');
 $p2_pfskeygroups = array('0' => 'off', '1' => '1', '2' => '2', '5' => '5');
 
+$pptpd_subnet_sizes = array(16 => 28, 32 => 27, 64 => 26, 128 => 25, 256 => 24);
+
 function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors) {
 	
 	/* check for bad control characters */	
