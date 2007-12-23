@@ -694,3 +694,41 @@
  
  	/*
  	 * Prepare arguments and call the firewall.
+--- sys/netipsec/ipsec_input.c.orig	Tue Jul 25 01:20:59 2006
++++ sys/netipsec/ipsec_input.c	Sun Dec 23 16:20:07 2007
+@@ -450,9 +450,12 @@
+ 	 */
+ 	ipsec_bpf(m, sav, AF_INET);
+ 
+-	if (prot != IPPROTO_IPIP)
++	if (prot != IPPROTO_IPIP) {
+ 		if ((error = ipsec_filter(&m, 1)) != 0)
+ 			return (error);
++		if (m == NULL)		/* consumed by filter */
++			return 0;
++	}
+ #endif
+ 
+ 	/*
+--- sys/netipsec/ipsec_output.c.orig	Tue Jul 25 01:20:59 2006
++++ sys/netipsec/ipsec_output.c	Sun Dec 23 16:20:13 2007
+@@ -364,6 +364,8 @@
+ 	/* pass the mbuf to enc0 for packet filtering */
+ 	if ((error = ipsec_filter(&m, 2)) != 0)
+ 		goto bad;
++	if (m == NULL)		/* consumed by filter */
++		goto bad;
+ #endif
+ 
+ 	if (!tunalready) {
+--- sys/netipsec/xform_ipip.c.orig	Sat Dec  9 14:05:49 2006
++++ sys/netipsec/xform_ipip.c	Sun Dec 23 16:20:22 2007
+@@ -350,6 +350,8 @@
+ 	/* pass the mbuf to enc0 for packet filtering */
+ 	if (ipsec_filter(&m, 1) != 0)
+ 		return;
++	if (m == NULL)		/* consumed by filter */
++		return;
+ #endif
+ 
+ 	/*
