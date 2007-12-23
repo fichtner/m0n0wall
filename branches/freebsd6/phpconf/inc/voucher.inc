@@ -431,3 +431,5 @@ function voucher_save_db_to_config() {
     voucher_unlock(); 
     return;
 }
+
+?>
