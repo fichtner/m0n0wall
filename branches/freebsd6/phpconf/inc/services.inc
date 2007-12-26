@@ -279,7 +279,6 @@ function services_dyndns_configure() {
 	sigkillbypid("{$g['varrun_path']}/ez-ipupdate.pid", "QUIT");
 	
 	$dyndnscfg = $config['dyndns'];
-	$wancfg = $config['interfaces']['wan'];
 	
 	if (isset($dyndnscfg['enable'])) {
 	
@@ -584,13 +583,13 @@ function services_sip_configure() {
 		}
 
         $lancfg = $config['interfaces'][$config['sip']['ifin']];
-        $wancfg = $config['interfaces']['wan'];
+        $wanif = get_real_wan_interface();
         $lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
         $lansn = $lancfg['subnet'];
 
 		$siproxdconf = <<<EOD
 if_inbound = {$lancfg['if']}
-if_outbound = {$wancfg['if']}
+if_outbound = $wanif
 hosts_allow_reg = $lansa/$lansn
 sip_listen_port = {$config['sip']['port']}
 daemonize = 1
