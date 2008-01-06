@@ -33,14 +33,13 @@
     sufficient. If you have less than 10 Mb of Internet bandwidth (combined
     upload and download speed), an embedded device like the WRAP or Soekris
     platforms, or an old 486 will suffice. For 10 Mb up to a full T3 or more,
-    a Pentium II or III PC system, or embedded device like a NexCom is more
-    appropriate. See Chapter 2 of the Users Guide for further details on
-    compatible hardware.</para>
+    a Pentium II or III PC system is more appropriate. See Chapter 2 of the
+    Users Guide for further details on compatible hardware.</para>
 
-    <para>For connections faster than a T3 using many VPN sessions, you will
-    likely want to use a customized version of m0n0wall specifically built for
-    your requirements, and high end Pentium 4, Xeon, or similar hardware. This
-    is beyond the scope of this document.</para>
+    <para>For connections faster than 100 Mb, you will want to use a Pentium 4,
+    Xeon, or similar class hardware. The firewall state table is fixed at 30,000,
+    and changing this requires recompiling the kernel. For large installations,
+    a custom kernel with increased state table size may be required. </para>
 
     <para><emphasis role="bold">RAM</emphasis></para>
 

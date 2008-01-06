@@ -222,9 +222,10 @@
         sorts of bootable storage devices are usable.</para>
       </note>
 
-      <para>Optionally a keyboard and video card/ video monitor or a serial
-      console interface can be installed onto the computer where m0n0wall is
-      installed to directly make the configuration.</para>
+      <para>A keyboard and video card is required for the initial configuration.
+      The serial console can be enabled in the webGUI after this initial
+      configuration, allowing the system to run without a keyboard and video.
+      </para>
     </sect2>
 
     <sect2>
@@ -350,7 +351,7 @@
       <important>
         <para>Be sure that you write down all of your existing Internet
         configuration BEFORE making changes to use your m0n0wall device. Once
-        you have disconnected yourself from the Internet you will loose access
+        you have disconnected yourself from the Internet you will lose access
         to the numerous online help sources until you have re-established your
         connection.</para>
       </important>

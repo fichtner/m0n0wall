@@ -325,11 +325,11 @@ su-2.05b# camcontrol devlist
 
       <orderedlist>
         <listitem>
-          <para>download the ISO image</para>
+          <para>Download the ISO image</para>
         </listitem>
 
         <listitem>
-          <para>burn the ISO image onto a CD-R (or -RW)</para>
+          <para>Burn the ISO image onto a CD-R (or -RW)</para>
 
           <para><emphasis role="bold">FreeBSD</emphasis> (ATAPI recorder):
           burncd -s max -e data cdrom-xxx.iso fixate</para>
@@ -340,7 +340,7 @@ su-2.05b# camcontrol devlist
         </listitem>
 
         <listitem>
-          <para>take a standard 1.44 MB diskette or a USB flash drive
+          <para>Take a standard 1.44 MB diskette or a USB flash drive
           (m0n0wall 1.3b only) and format it (with an MS-DOS/FAT file
           system!)</para>
 
@@ -366,7 +366,7 @@ su-2.05b# camcontrol devlist
         </listitem>
 
         <listitem>
-          <para>plug the PC into the network (LAN/WAN/...).</para>
+          <para>Plug the PC into the network (LAN/WAN/...).</para>
 
           <caution>
             <para>If you have an existing DHCP server, and/or wish to use a
@@ -377,18 +377,18 @@ su-2.05b# camcontrol devlist
         </listitem>
 
         <listitem>
-          <para>power up your PC, enter the BIOS and make sure that booting
+          <para>Power up your PC, enter the BIOS and make sure that booting
           from CD-ROM is enabled and booting from floppy disk is
           disabled</para>
         </listitem>
 
         <listitem>
-          <para>insert CD-ROM and floppy disk (do not write-protect the floppy
+          <para>Insert CD-ROM and floppy disk (do not write-protect the floppy
           disk!)</para>
         </listitem>
 
         <listitem>
-          <para>continue the boot process</para>
+          <para>Continue the boot process</para>
         </listitem>
       </orderedlist>
 
@@ -402,34 +402,10 @@ su-2.05b# camcontrol devlist
 
     <title>Final Preparation</title>
 
-    <para>Now put your written Hard disk/ CF card or CDROM into your PC system
-    and boot from it as described above. There are 3 ways to verify that the
-    installation has completed successfully. Afterwards you can continue to
-    the final steps below.</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>If your computer has a video screen you should see text output
-        to the screen during the bootup and finally a text prompt blinking and
-        waiting for you to start the configuration</para>
-      </listitem>
-
-      <listitem>
-        <para>You can try to access the m0n0wall from a client computer on the
-        same network</para>
-      </listitem>
-
-      <listitem>
-        <para>You can try accessing the m0n0wall using a serial console
-        connection</para>
-      </listitem>
-    </itemizedlist>
-
-    <caution>
-      <para>Since PCI Ethernet cards can be installed in various
-      configurations, you may need to test which interface is actually being
-      used as the LAN interface.</para>
-    </caution>
+    <para>Now put your written hard disk, CF card or CDROM into your PC system
+    and boot from it as described above. The monitor should show text output
+    during the bootup and finally the console menu waiting for you to start the
+    configuration.</para>
 
     <para>These final steps will assign functions to the interfaces and change
     the LAN IP address as needed.</para>
