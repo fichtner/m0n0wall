@@ -6,498 +6,1077 @@
   <title>Introduction</title>
 
   <sect1>
-    <title>TO DO</title>
+    <title>Features</title>
 
-    <para>Add hardware chapter</para>
-    
-    <para>List of things to fix once 1.2 is released (for my own
-    reference).</para>
-    
-    <para>Finish tutorials that rely on current website
-    (need m0n0.ch to show 1.2 release first).</para>
-    
-    <para>Change out screenshots where applicable with
-    final 1.2 release.</para>
-    
-    <para>Change console output to that of final 1.2 release.</para>
-    
+    <para>m0n0wall is a project aimed at creating a complete, embedded
+    firewall software package that, when used together with an embedded PC,
+    provides all the important features of commercial firewall boxes
+    (including ease of use) at a fraction of the price (free software).
+    m0n0wall is based on a bare-bones version of FreeBSD, along with a web
+    server, PHP and a few other utilities. The entire system configuration is
+    stored in one single XML text file to keep things transparent.</para>
+
+    <para>m0n0wall is probably the first UNIX system that has its boot-time
+    configuration done with PHP, rather than the usual shell scripts, and that
+    has the entire system configuration stored in XML format.</para>
+
+    <para>m0n0wall already provides many of the features of expensive
+    commercial firewalls, including:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>web interface (supports SSL)</para>
+      </listitem>
+
+      <listitem>
+        <para>serial console interface for recovery</para>
+
+        <para>set LAN IP address</para>
+
+        <para>reset password</para>
+
+        <para>restore factory defaults</para>
+
+        <para>reboot system</para>
+      </listitem>
+
+      <listitem>
+        <para>wireless support (access point with PRISM-II/2.5/3 cards,
+        BSS/IBSS with other cards including Cisco)</para>
+      </listitem>
+
+      <listitem>
+        <para>captive portal</para>
+      </listitem>
+
+      <listitem>
+        <para>802.1Q VLAN support</para>
+      </listitem>
+
+      <listitem>
+        <para>stateful packet filtering</para>
+
+        <para>block/pass rules</para>
+
+        <para>logging</para>
+      </listitem>
+
+      <listitem>
+        <para>NAT/PAT (including 1:1)</para>
+      </listitem>
+
+      <listitem>
+        <para>DHCP client, PPPoE, PPTP and Telstra BigPond Cable support on
+        the WAN interface</para>
+      </listitem>
+
+      <listitem>
+        <para>IPsec VPN tunnels (IKE; with support for hardware crypto cards,
+        mobile clients and certificates)</para>
+      </listitem>
+
+      <listitem>
+        <para>PPTP VPN (with RADIUS server support)</para>
+      </listitem>
+
+      <listitem>
+        <para>static routes</para>
+      </listitem>
+
+      <listitem>
+        <para>DHCP server and relay</para>
+      </listitem>
+
+      <listitem>
+        <para>caching DNS forwarder</para>
+      </listitem>
+
+      <listitem>
+        <para>DynDNS client and RFC 2136 DNS updater</para>
+      </listitem>
+
+      <listitem>
+        <para>SNMP agent</para>
+      </listitem>
+
+      <listitem>
+        <para>traffic shaper</para>
+      </listitem>
+
+      <listitem>
+        <para>SVG-based traffic grapher</para>
+      </listitem>
+
+      <listitem>
+        <para>firmware upgrade through the web browser</para>
+      </listitem>
+
+      <listitem>
+        <para>Wake on LAN client</para>
+      </listitem>
+
+      <listitem>
+        <para>configuration backup/restore</para>
+      </listitem>
+
+      <listitem>
+        <para>host/network aliases</para>
+      </listitem>
+    </itemizedlist>
   </sect1>
 
   <sect1>
-    
     <title>Getting Started with m0n0wall on the PC</title>
 
-    <para>The m0n0wall Quick Start Guide is intended to get you up 
-    and running with m0n0wall on a two interface (LAN and WAN) setup.  
-    The <ulink url="http://doc.m0n0.ch/handbook/">
-    m0n0wall Handbook</ulink> contains the information you need to 
-    further configure your m0n0wall installation after completing 
-    this guide.  </para>
-    
-    <para>This version of the Quick Start Guide is specifically tailored to the
-    PC platform.  If you are using Soekris hardware, please see the 
-    <ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick Start 
-	Guide</ulink> and for WRAP hardware, please see the <ulink 
-    url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick 
-    Start Guide</ulink>.</para>
-    
-    <para>I am currently working on adding a number of example configurations in
-    <ulink url="http://doc.m0n0.ch/handbook/examples.html">Chapter 9</ulink> of the
-    <ulink url="http://doc.m0n0.ch/handbook/">m0n0wall Handbook</ulink>.  
-    These configurations
-    will describe how to configure several things such as multiple LAN 
-    interfaces, setting up DMZ interfaces, wireless interfaces, etc.  
-    The base for adding those
-    additional features will be the basic LAN/WAN setup this guide 
-    describes.</para>
-    
-  </sect1>
-  
-<sect1>
-  <?dbhtml filename="intro-prerequisites.html"?>
+    <para>The m0n0wall Quick Start Guide is intended to get you up and running
+    with m0n0wall on a two interface (LAN and WAN) setup. The <ulink
+    url="http://doc.m0n0.ch/handbook/"> m0n0wall Handbook</ulink> contains the
+    information you need to further configure your m0n0wall installation after
+    completing this guide.</para>
 
-  <title>Prerequisites</title>
+    <para>This version of the Quick Start Guide is specifically tailored to
+    the PC platform. If you are using Soekris hardware, please see the <ulink
+    url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick Start
+    Guide</ulink> and for WRAP hardware, please see the <ulink
+    url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick Start
+    Guide</ulink>.</para>
 
-  <para>This chapter will go through the hardware and network
-  information you need to gather to proceed through in this guide.
-  </para>
+    <para>Additionally, a VMWare version exists for testing or even using
+    alongside a client computer. More information on this version can be found
+    on the m0n0wall web site.</para>
 
-  <sect2>
-    <title>Required Hardware</title>
-    
-    <para>First, you need to make sure you have the
-    following hardware.
-    </para>
-    
-    <itemizedlist>
-        <listitem>
-            <para>Destination PC</para>
-        </listitem>
-        <listitem>
-            <para>storage medium</para>
-        </listitem>    
-        <listitem>
-            <para>Two network cables</para>
-        </listitem>
-    </itemizedlist>
-    
-   </sect2>
-   
-   <sect2>
-    <title>Required Network Information</title>
-    
-      <para>You'll need some information about your
-      Internet connection.  You'll need to know which
-      category of the below list your Internet connection
-      falls into, and the appropriate details.  You can
-      usually find these details on your ISP's website,
-      and/or in paperwork you receive when you sign up
-      for service.  You can also call your ISP's technical
-      support to get this information.
-      </para>
-        
+    <para>I am currently working on adding a number of example configurations
+    in <ulink url="http://doc.m0n0.ch/handbook/examples.html">Chapter
+    9</ulink> of the <ulink url="http://doc.m0n0.ch/handbook/">m0n0wall
+    Handbook</ulink>. These configurations will describe how to configure
+    several things such as multiple LAN interfaces, setting up DMZ interfaces,
+    wireless interfaces, etc. The base for adding those additional features
+    will be the basic LAN/WAN setup this guide describes.</para>
+
+    <sect2>
+      <title>Why use a PC?</title>
+
+      <para>Below are some reasons you might have chosen to use a PC instead
+      of an embedded system.</para>
+
       <itemizedlist>
         <listitem>
-            <formalpara><title>Static IP</title> - If you
-            have a connection with a static IP, you will
-            need to make note of your IP address, subnet
-            mask, default gateway, and DNS server IP's.
-            </formalpara>
+          <para>free if you have extra computer equipment lying around</para>
         </listitem>
+
         <listitem>
-            <formalpara><title>DHCP</title> - If you have
-            an Internet connection that uses DHCP, you need
-            not gather any more information unless your ISP
-            requires you to pass a certain DHCP hostname
-            value (this is uncommon).  If this is the case,
-            you will need to
-            check with your ISP to determine this hostname.
-            </formalpara>
+          <para>multiple PCI interfaces for high-quality networking
+          cards</para>
         </listitem>
+
         <listitem>
-            <formalpara><title>PPPoE</title> - Many DSL providers
-            provide PPPoE or PPPoA service.  Either of these is
-            supported with the PPPoE WAN option.  You will need
-            to know your PPPoE username and password and possibly
-            your service name (though this can usually be left
-            blank).  
-            </formalpara>
+          <para>higher powered CPU for increased speed for VPN or network
+          traffic processing</para>
         </listitem>
-        <listitem>
-            <formalpara><title>PPTP</title> - A few ISP's require
-            you to connect to them via PPTP.  If your ISP requires
-            this, you will need a username, password, local IP address,
-            and remote IP address from your ISP.  </formalpara>
-        </listitem>
-        <listitem>
-            <formalpara><title>BigPond</title> - This setting is for
-            BigPond cable connections.  You will need your username,
-            password, and possibly authentication server and domain.
-            </formalpara>
-        </listitem>
-        
-    </itemizedlist>
-    
-    <para>Make note of the appropriate information for your connection
-    type for later use.</para>
-        
+      </itemizedlist>
     </sect2>
-    
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="intro-prerequisites.html"?>
+
+    <title>Prerequisites</title>
+
+    <para>This chapter will go through the hardware and network information
+    you need to gather to proceed through in this guide.</para>
+
+    <sect2>
+      <title>Required Hardware</title>
+
+      <para>First, you need to make sure you have the following
+      hardware.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Destination PC with an 486 or better based CPU</para>
+        </listitem>
+
+        <listitem>
+          <para>Bootable storage medium: disk drive, usb drive, CDROM/Floppy,
+          compact flash drive...</para>
+        </listitem>
+
+        <listitem>
+          <para>32MB of RAM or more (64 is recommended)</para>
+        </listitem>
+
+        <listitem>
+          <para>Two Ethernet network interfaces</para>
+        </listitem>
+
+        <listitem>
+          <para>A client computer with network or serial console access to
+          your new m0n0wall, a screen and keyboard to make your initial
+          configuration</para>
+        </listitem>
+      </itemizedlist>
+
+      <note>
+        <para>Check the manual that came with your destination PC to see what
+        sorts of bootable storage devices are usable.</para>
+      </note>
+
+      <para>Optionally a keyboard and video card/ video monitor or a serial
+      console interface can be installed onto the computer where m0n0wall is
+      installed to directly make the configuration.</para>
+    </sect2>
+
+    <sect2>
+      <title>Optional Hardware</title>
+
+      <para><emphasis role="bold">VLAN tagging:</emphasis> The following
+      drivers/NICs either support VLAN tagging in hardware or handle long
+      frames properly. All other drivers/NICs use software emulation that
+      causes a reduced MTU (which may lead to problems).</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>hardware support: bge, em, gx, nge, ti, txp</para>
+        </listitem>
+
+        <listitem>
+          <para>long frame support: dc, fxp, sis, ste, tl, tx, xl
+          (most)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><emphasis role="bold">Polling:</emphasis> The following
+      drivers/NICs support polling mode to improve performance by reducing
+      interrupt overhead (at the expense of a slightly increased forwarding
+      delay). Polling can be enabled on the System: Advanced setup page in
+      m0n0wall.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>polling support: dc, em, fxp, nge, rl, sis, ste, vr</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><emphasis role="bold">Wireless:</emphasis> The m0n0wall 1.2x
+      series only support a few 802.11b wireless adapters/chipsets (most
+      notably Lucent Hermes and Intersil Prism II/2.5. m0n0wall 1.3b, which is
+      based on FreeBSD 6, supports (almost) all Atheros-based 802.11a/b/g
+      cards as well (and some Ralink cards too).</para>
+    </sect2>
+
+    <sect2>
+      <title>Required Network Information</title>
+
+      <para>You'll need some information about your Internet connection.
+      You'll need to know which category of the below list your Internet
+      connection falls into, and the appropriate details. You can usually find
+      these details on your ISP's website, and/or in paperwork you receive
+      when you sign up for service. You can also call your ISP's technical
+      support to get this information.</para>
+
+      <itemizedlist>
+        <listitem>
+          <formalpara>
+             
+
+            <title>Static IP</title>
+
+             - If you have a connection with a static IP, you will need to make note of your IP address, subnet mask, default gateway, and DNS server IP's. 
+          </formalpara>
+        </listitem>
+
+        <listitem>
+          <formalpara>
+             
+
+            <title>DHCP</title>
+
+             - If you have an Internet connection that uses DHCP, you need not gather any more information unless your ISP requires you to pass a certain DHCP hostname value (this is uncommon). If this is the case, you will need to check with your ISP to determine this hostname. 
+          </formalpara>
+        </listitem>
+
+        <listitem>
+          <formalpara>
+             
+
+            <title>PPPoE</title>
+
+             - Many DSL providers provide PPPoE or PPPoA service. Either of these is supported with the PPPoE WAN option. You will need to know your PPPoE username and password and possibly your service name (though this can usually be left blank). 
+          </formalpara>
+        </listitem>
+
+        <listitem>
+          <formalpara>
+             
+
+            <title>PPTP</title>
+
+             - A few ISP's require you to connect to them via PPTP. If your ISP requires this, you will need a username, password, local IP address, and remote IP address from your ISP. 
+          </formalpara>
+        </listitem>
+
+        <listitem>
+          <formalpara>
+             
+
+            <title>BigPond</title>
+
+             - This setting is for BigPond cable connections. You will need your username, password, and possibly authentication server and domain. 
+          </formalpara>
+        </listitem>
+      </itemizedlist>
+
+      <para>You will also need to know if you are connected directly to the
+      Internet or if you are behind a modem or other device that is connected
+      to the Internet. For example, maybe your Internet connection uses PPPoE
+      but you have a PPPoE modem that receives the IP address from your
+      Internet provider and then offers those network services to your
+      internal network using DHCP or static IP.</para>
+
+      <warning>
+        <para>The instructions for using the m0n0wall device are written with
+        the idea that your m0n0wall has direct access to the Internet. If you
+        have another device between your m0n0wall and the Internet that offers
+        security or otherwise affects the network traffic (such as a proxy
+        service, NAT device or port use limitations by your Internet provider)
+        the configuration instructions and troubleshooting may not apply to
+        your case.</para>
+      </warning>
+
+      <para>Make note of the appropriate information for your connection type
+      for later use.</para>
+
+      <important>
+        <para>Be sure that you write down all of your existing Internet
+        configuration BEFORE making changes to use your m0n0wall device. Once
+        you have disconnected yourself from the Internet you will loose access
+        to the numerous online help sources until you have re-established your
+        connection.</para>
+      </important>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="hardware-selection.html"?>
+
+    <title>Choosing Your Hardware</title>
+
+    <para>The hardware you choose will depend on what features you will use,
+    how much bandwidth you have, and some matters of personal preference
+    (embedded device vs. standard PC). Since m0n0wall is based on FreeBSD 4,
+    most hardware that works with FreeBSD also works with m0n0wall. See the
+    <ulink
+    url="http://www.freebsd.org/releases/4.11R/hardware-i386.html">FreeBSD/i386
+    Hardware Notes</ulink> for a detailed listing of supported
+    hardware.</para>
+
+    <note>
+      <para>The final m0n0wall 1.3 version will be based on FreeBSD
+      6.2-RELEASE. The <ulink
+      url="http://www.freebsd.org/releases/6.2R/hardware-i386.html">Hardware
+      Notes</ulink> for this version is different than the older 4.0
+      version.</para>
+    </note>
+
+    <para><emphasis role="bold">Hardware Reliability</emphasis></para>
+
+    <para>While m0n0wall will run on very old hardware, keep in mind the
+    reliability of older hardware is certainly questionable. If uptime isn't
+    critically important, don't hesitate to use old hardware. If this is in a
+    production business environment, a Soekris or WRAP board could save you
+    some explaining down the road on why your Internet connection went
+    down.</para>
+
+    <para>If you are using old hardware, make sure you have a contingency plan
+    should it fail. Keeping a spare machine with your current m0n0wall
+    configuration loaded, ready to be used if necessary, would be a good
+    idea.</para>
+
+    <para><emphasis role="bold">Processor</emphasis></para>
+
+    <para>For most broadband connections, any 486 or faster will be
+    sufficient. If you have less than 10 Mb of Internet bandwidth (combined
+    upload and download speed), an embedded device like the WRAP or Soekris
+    platforms, or an old 486 will suffice. For 10 Mb up to a full T3 or more,
+    a Pentium II or III PC system, or embedded device like a NexCom is more
+    appropriate. See Chapter 2 of the Users Guide for further details on
+    compatible hardware.</para>
+
+    <para>For connections faster than a T3 using many VPN sessions, you will
+    likely want to use a customized version of m0n0wall specifically built for
+    your requirements, and high end Pentium 4, Xeon, or similar hardware. This
+    is beyond the scope of this document.</para>
+
+    <para><emphasis role="bold">RAM</emphasis></para>
+
+    <para>We recommend 64 MB of RAM minimum. 32 MB RAM has been reported to
+    work fine on a CD/floppy setup with no VPN configurations. It has been
+    reported to run out of RAM with a few active VPN tunnels. Hard drive or CF
+    installs are not recommended with less than 64 MB RAM because you will
+    probably run out of RAM during upgrades and m0n0wall has no swap, so the
+    upgrade will fail.</para>
+
+    <para><emphasis role="bold">Hardware Sizing</emphasis></para>
+
+    <para>Keep in mind there is no standard "if you have X Internet connection
+    and Y number of machines on your network, then you need Z hardware". It
+    varies depending on what services you will use, and your Internet traffic
+    characteristics. The one thing that will require significantly more CPU,
+    and/or a VPN accelerator card, is if you'll require more than a couple
+    Mbps of VPN traffic for extended periods.</para>
+
+    <para>Some examples of non-encrypted network throughput can be found
+    below, when using the default configuration. Please note that some of
+    these results were reported by users and not officially tested by a
+    developer of the m0n0wall code. Additional information can be found on
+    <ulink
+    url="http://m0n0.ch/wall/docbook/faq-performancespecifications.html">this
+    FAQ entry.</ulink></para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Soekris net4501, WAN &lt;-&gt; LAN TCP throughput of about 17
+        Mbps, including NAT</para>
+      </listitem>
+
+      <listitem>
+        <para>Soekris net4801, throughput in excess of 50 Mbps</para>
+      </listitem>
+
+      <listitem>
+        <para>PC Engines ALIX.1, throughput in excess of 90 Mbps</para>
+      </listitem>
+
+      <listitem>
+        <para>Soekris net5501-70 500Mhz 512M RAM, 84 Mbps</para>
+      </listitem>
+
+      <listitem>
+        <para>Liantec 5842 with OpenBSD 4.0, 395Mbps</para>
+      </listitem>
+
+      <listitem>
+        <para>New standard PCs, &gt; 100 Mbps (depending on Ethernet cards
+        used)</para>
+      </listitem>
+
+      <listitem>
+        <para>Sempron 2800+ (1.6GHz) using Intel Pro 1000 PT pci-e card,
+        760Mbps</para>
+      </listitem>
+
+      <listitem>
+        <para>Sempron 2800+ (1.6GHz) using Intel Pro 1000 GT pci card,
+        400Mbps</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Some encryption speeds are shown below. Please note that speed will
+    change based on the number of concurrent connections and the type of
+    encryption being used.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Soekris net4801, 3DES-MD5 IPSec encryption, 3.5Mb/s</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><emphasis role="bold">Network Cards</emphasis></para>
+
+    <para>You will need at least two network cards in the hardware you are
+    using. Most any PCI based cards are compatible, check the <ulink
+    url="http://m0n0.ch/wall/docbook/hardware-ethernet.html"> Users
+    Guide</ulink> for further details. ISA cards are much more problematic
+    than PCI cards, and PCI cards are readily available and cheap if you need
+    to buy some.</para>
+
+    <para>For this document, we will assume there are two Ethernet interfaces.
+    You can have additional interfaces installed in the system, but do not
+    configure them during these quick installation procedures. Documentation
+    in the Users Guide will soon be available to assist you in setting up
+    additional LAN interfaces, DMZ interfaces, wireless setups, etc.</para>
+
+    <tip>
+      <para>You should write down the MAC hardware addresses of each Ethernet
+      interface card if possible. During the configuration of m0n0wall, the
+      Ethernet interfaces will be identified by these addresses. If you do not
+      know them in advance you may need to do some tests to find out which
+      network card has been selected for the LAN and which network has been
+      selected for the WAN. These addresses look like
+      00:1c:b3:bb:80:42.</para>
+    </tip>
+
+    <sect2>
+      <title>Storage Medium</title>
+
+      <para>m0n0wall will run off of a hard drive, CD-ROM and floppy, or
+      CompactFlash card. The pros and cons of each follow. Choose the one most
+      appropriate for your situation, taking available hardware and other
+      factors into account.</para>
+
+      <para><emphasis role="bold">Hard Drive</emphasis></para>
+
+      <para>Hard drives are readily available, and if you are using a standard
+      PC, you'll likely have one in it. The hard drive installation is
+      remotely upgradeable via the webGUI, so it's a better choice over a
+      CD/floppy setup in many instances. The likelihood of a hard drive
+      failure is pretty high, given that the hardware being used is likely
+      old. An IDE to CompactFlash adapter should be considered where hardware
+      failure cannot be tolerated, since the likelihood of failure is much
+      less with a CompactFlash card. Such an adapter can be purchased new for
+      about $10 USD. <ulink
+      url="         http://www.pcengines.ch/cflash.htm">PC Engines</ulink>
+      sells them, amongst other vendors.</para>
+
+      <para><emphasis role="bold">CD/floppy Setup</emphasis></para>
+
+      <para>The CD/floppy setup works by booting m0n0wall off of the CD and
+      storing the configuration on a FAT formatted floppy. This is a good
+      solution on systems that you are physically close to very frequently
+      (remote upgrades via webGUI not possible). Floppy disks are notorious
+      for becoming corrupted, so it's even more important to make sure you
+      keep a backup of your configuration. Floppy disks have much more
+      problems in environments that are dusty or dirty, so in those situations
+      we would highly recommend choosing a different setup.</para>
+
+      <para>The machine you are using must support CD booting (some 486 and
+      Pentium systems do not). You also must set the CD-ROM as the first boot
+      device in the boot order in the system's BIOS so it doesn't attempt to
+      boot off of the config floppy. Consult your system or motherboard manual
+      for information on how to configure that.</para>
+
+      <para><emphasis role="bold">CompactFlash</emphasis></para>
+
+      <para>CompactFlash (CF) is a good choice for most any deployment. CF
+      cards are more reliable than hard drives and the floppy drives that hold
+      the configuration in the CD/floppy setup, and are remotely upgradeable
+      via the webGUI. The downside is you might spend more money getting a CF
+      setup working. If you are not using an embedded device with an onboard
+      CF adapter, you will have to spend about $10 USD on a IDE to CF adapter.
+      You'll need to purchase a CF card at least 16 MB in size.</para>
+
+      <para>I purchase used 16 MB CF cards off eBay to use for m0n0wall
+      installations, and get them for $5-$10 USD each. You may also need a CF
+      reader on your PC to write the m0n0wall image to the CF card. Those are
+      approximately $30 USD. So you could be looking at a total expenditure of
+      about $50 USD. But most any business environment should be able to
+      justify such a small expenditure for the increase in reliability.</para>
+    </sect2>
   </sect1>
 
   <sect1>
     <?dbhtml filename="intro-CIDR.html"?>
+
     <title>Understanding CIDR Subnet Mask Notation</title>
-    
-    <para>m0n0wall uses a subnet mask format that you may not be familiar with.
-        Rather than the common 255.x.x.x, it uses CIDR (Classless InterDomain Routing)
-        notation.  
-    </para>
-    
+
+    <para>m0n0wall uses a subnet mask format that you may not be familiar
+    with. Rather than the common 255.x.x.x, it uses CIDR (Classless
+    InterDomain Routing) notation.</para>
+
     <sect2>
-        <title>CIDR Table</title>
-    
-    <para>You can refer to the following table to find the CIDR equivalent of your
-        subnet mask.</para>
-    
-    <para>
-        <table>
-            <title>CIDR Subnet Table</title>
-            <tgroup cols="2">
+      <title>CIDR Table</title>
+
+      <para>You can refer to the following table to find the CIDR equivalent
+      of your subnet mask.</para>
+
+      <para><table>
+          <title>CIDR Subnet Table</title>
+
+          <tgroup cols="5">
             <thead>
-            <row>
-            <entry>Subnet Mask</entry>
-            <entry>CIDR Prefix</entry>
-            <entry>Total IP's</entry>
-            <entry>Usable IP's</entry>
-            <entry>Number of Class C networks</entry>
-            </row>
+              <row>
+                <entry>Subnet Mask</entry>
+
+                <entry>CIDR Prefix</entry>
+
+                <entry>Total IP's</entry>
+
+                <entry>Usable IP's</entry>
+
+                <entry>Number of Class C networks</entry>
+              </row>
             </thead>
-            <tbody>
-            <row>
-                <entry>255.255.255.255</entry>
-                <entry>/32</entry>
-                <entry>1</entry>
-                <entry>1</entry>
-                <entry>1/256th</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.255.254</entry>
-                <entry>/31</entry>
-                <entry>2</entry>
-                <entry>0</entry>
-                <entry>1/128th</entry>
-            </row>
-            </tbody>
-                        <tbody>
-            <row>
-                <entry>255.255.255.252</entry>
-                <entry>/30</entry>
-                <entry>4</entry>
-                <entry>2</entry>
-                <entry>1/64th</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.255.248</entry>
-                <entry>/29</entry>
-                <entry>8</entry>
-                <entry>6</entry>
-                <entry>1/32nd</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.255.240</entry>
-                <entry>/28</entry>
-                <entry>16</entry>
-                <entry>14</entry>
-                <entry>1/16th</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.255.224</entry>
-                <entry>/27</entry>
-                <entry>32</entry>
-                <entry>30</entry>
-                <entry>1/8th</entry>
-            </row>
-            </tbody>
-                        <tbody>
-            <row>
-                <entry>255.255.255.192</entry>
-                <entry>/26</entry>
-                <entry>64</entry>
-                <entry>62</entry>
-                <entry>1/4th</entry>
-            </row>
-            </tbody>
-                        <tbody>
-            <row>
-                <entry>255.255.255.128</entry>
-                <entry>/25</entry>
-                <entry>128</entry>
-                <entry>126</entry>
-                <entry>1 half</entry>
-            </row>
-            </tbody>
-                        <tbody>
-            <row>
-                <entry>255.255.255.0</entry>
-                <entry>/24</entry>
-                <entry>256</entry>
-                <entry>254</entry>
-                <entry>1</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.254.0</entry>
-                <entry>/23</entry>
-                <entry>512</entry>
-                <entry>510</entry>
-                <entry>2</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.252.0</entry>
-                <entry>/22</entry>
-                <entry>1024</entry>
-                <entry>1022</entry>
-                <entry>4</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.248.0</entry>
-                <entry>/21</entry>
-                <entry>2048</entry>
-                <entry>2046</entry>
-                <entry>8</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.240.0</entry>
-                <entry>/20</entry>
-                <entry>4096</entry>
-                <entry>4094</entry>
-                <entry>16</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.224.0</entry>
-                <entry>/19</entry>
-                <entry>8192</entry>
-                <entry>8190</entry>
-                <entry>32</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.192.0</entry>
-                <entry>/18</entry>
-                <entry>16,384</entry>
-                <entry>16,382</entry>
-                <entry>64</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.128.0</entry>
-                <entry>/17</entry>
-                <entry>32,768</entry>
-                <entry>32,766</entry>
-                <entry>128</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.255.0.0</entry>
-                <entry>/16</entry>
-                <entry>65,536</entry>
-                <entry>65,534</entry>
-                <entry>256</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.254.0.0</entry>
-                <entry>/15</entry>
-                <entry>131,072</entry>
-                <entry>131,070</entry>
-                <entry>512</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.252.0.0</entry>
-                <entry>/14</entry>
-                <entry>262,144</entry>
-                <entry>262,142</entry>
-                <entry>1024</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.248.0.0</entry>
-                <entry>/13</entry>
-                <entry>524,288</entry>
-                <entry>524,286</entry>
-                <entry>2048</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>255.240.0.0</entry>
-                <entry>/12</entry>
-                <entry>1,048,576</entry>
-                <entry>1,048,574</entry>
-                <entry>4096</entry>
-            </row>
-            </tbody>            
-            <tbody>
-            <row>
-                <entry>255.224.0.0</entry>
-                <entry>/11</entry>
-                <entry>2,097,152</entry>
-                <entry>2,097,150</entry>
-                <entry>8192</entry>
-            </row>
-            </tbody>            
-            <tbody>
-            <row>
-                <entry>255.192.0.0</entry>
-                <entry>/10</entry>
-                <entry>4,194,304</entry>
-                <entry>4,194,302</entry>
-                <entry>16,384</entry>
-            </row>
-            </tbody>            
-            <tbody>
-            <row>
-                <entry>255.128.0.0</entry>
-                <entry>/9</entry>
-                <entry>8,388,608</entry>
-                <entry>8,388,606</entry>
-                <entry>32,768</entry>
-            </row>
-            </tbody>            
-            <tbody>
-            <row>
-                <entry>255.0.0.0</entry>
-                <entry>/8</entry>
-                <entry>16,777,216</entry>
-                <entry>16,777,214</entry>
-                <entry>65,536</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>254.0.0.0</entry>
-                <entry>/7</entry>
-                <entry>33,554,432</entry>
-                <entry>33,554,430</entry>
-                <entry>131,072</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>252.0.0.0</entry>
-                <entry>/6</entry>
-                <entry>67,108,864</entry>
-                <entry>67,108,862</entry>
-                <entry>262,144</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>248.0.0.0</entry>
-                <entry>/5</entry>
-                <entry>134,217,728</entry>
-                <entry>134,217,726</entry>
-                <entry>1,048,576</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>240.0.0.0</entry>
-                <entry>/4</entry>
-                <entry>268,435,456</entry>
-                <entry>268,435,454</entry>
-                <entry>2,097,152</entry>
-            </row>
-            </tbody>
-            <tbody>
-            <row>
-                <entry>224.0.0.0</entry>
-                <entry>/3</entry>
-                <entry>536,870,912</entry>
-                <entry>536,870,910</entry>
-                <entry>4,194,304</entry>
-            </row>
-            </tbody>
-            
-            <tbody>
-            <row>
-                <entry>192.0.0.0</entry>
-                <entry>/2</entry>
-                <entry>1,073,741,824</entry>
-                <entry>1,073,741,822</entry>
-                <entry>8,388,608</entry>
-            </row>
-            </tbody>            
 
             <tbody>
-            <row>
-                <entry>128.0.0.0</entry>
-                <entry>/1</entry>
-                <entry>2,147,483,648</entry>
-                <entry>2,147,483,646</entry>
-                <entry>16,777,216</entry>
-            </row>
+              <row>
+                <entry>255.255.255.255</entry>
+
+                <entry>/32</entry>
+
+                <entry>1</entry>
+
+                <entry>1</entry>
+
+                <entry>1/256th</entry>
+              </row>
             </tbody>
-            
+
             <tbody>
-            <row>
-                <entry>0.0.0.0</entry>
-                <entry>/0</entry>
-                <entry>4,294,967,296</entry>
-                <entry>4,294,967,294</entry>
+              <row>
+                <entry>255.255.255.254</entry>
+
+                <entry>/31</entry>
+
+                <entry>2</entry>
+
+                <entry>0</entry>
+
+                <entry>1/128th</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.252</entry>
+
+                <entry>/30</entry>
+
+                <entry>4</entry>
+
+                <entry>2</entry>
+
+                <entry>1/64th</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.248</entry>
+
+                <entry>/29</entry>
+
+                <entry>8</entry>
+
+                <entry>6</entry>
+
+                <entry>1/32nd</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.240</entry>
+
+                <entry>/28</entry>
+
+                <entry>16</entry>
+
+                <entry>14</entry>
+
+                <entry>1/16th</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.224</entry>
+
+                <entry>/27</entry>
+
+                <entry>32</entry>
+
+                <entry>30</entry>
+
+                <entry>1/8th</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.192</entry>
+
+                <entry>/26</entry>
+
+                <entry>64</entry>
+
+                <entry>62</entry>
+
+                <entry>1/4th</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.128</entry>
+
+                <entry>/25</entry>
+
+                <entry>128</entry>
+
+                <entry>126</entry>
+
+                <entry>1 half</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.255.0</entry>
+
+                <entry>/24</entry>
+
+                <entry>256</entry>
+
+                <entry>254</entry>
+
+                <entry>1</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.254.0</entry>
+
+                <entry>/23</entry>
+
+                <entry>512</entry>
+
+                <entry>510</entry>
+
+                <entry>2</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.252.0</entry>
+
+                <entry>/22</entry>
+
+                <entry>1024</entry>
+
+                <entry>1022</entry>
+
+                <entry>4</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.248.0</entry>
+
+                <entry>/21</entry>
+
+                <entry>2048</entry>
+
+                <entry>2046</entry>
+
+                <entry>8</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.240.0</entry>
+
+                <entry>/20</entry>
+
+                <entry>4096</entry>
+
+                <entry>4094</entry>
+
+                <entry>16</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.224.0</entry>
+
+                <entry>/19</entry>
+
+                <entry>8192</entry>
+
+                <entry>8190</entry>
+
+                <entry>32</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.192.0</entry>
+
+                <entry>/18</entry>
+
+                <entry>16,384</entry>
+
+                <entry>16,382</entry>
+
+                <entry>64</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.128.0</entry>
+
+                <entry>/17</entry>
+
+                <entry>32,768</entry>
+
+                <entry>32,766</entry>
+
+                <entry>128</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.255.0.0</entry>
+
+                <entry>/16</entry>
+
+                <entry>65,536</entry>
+
+                <entry>65,534</entry>
+
+                <entry>256</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.254.0.0</entry>
+
+                <entry>/15</entry>
+
+                <entry>131,072</entry>
+
+                <entry>131,070</entry>
+
+                <entry>512</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.252.0.0</entry>
+
+                <entry>/14</entry>
+
+                <entry>262,144</entry>
+
+                <entry>262,142</entry>
+
+                <entry>1024</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.248.0.0</entry>
+
+                <entry>/13</entry>
+
+                <entry>524,288</entry>
+
+                <entry>524,286</entry>
+
+                <entry>2048</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.240.0.0</entry>
+
+                <entry>/12</entry>
+
+                <entry>1,048,576</entry>
+
+                <entry>1,048,574</entry>
+
+                <entry>4096</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.224.0.0</entry>
+
+                <entry>/11</entry>
+
+                <entry>2,097,152</entry>
+
+                <entry>2,097,150</entry>
+
+                <entry>8192</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.192.0.0</entry>
+
+                <entry>/10</entry>
+
+                <entry>4,194,304</entry>
+
+                <entry>4,194,302</entry>
+
+                <entry>16,384</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.128.0.0</entry>
+
+                <entry>/9</entry>
+
+                <entry>8,388,608</entry>
+
+                <entry>8,388,606</entry>
+
+                <entry>32,768</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>255.0.0.0</entry>
+
+                <entry>/8</entry>
+
+                <entry>16,777,216</entry>
+
+                <entry>16,777,214</entry>
+
+                <entry>65,536</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>254.0.0.0</entry>
+
+                <entry>/7</entry>
+
                 <entry>33,554,432</entry>
-            </row>
-            </tbody>            
-            
-        </tgroup>
-        </table>
-                
-    </para>
-    
+
+                <entry>33,554,430</entry>
+
+                <entry>131,072</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>252.0.0.0</entry>
+
+                <entry>/6</entry>
+
+                <entry>67,108,864</entry>
+
+                <entry>67,108,862</entry>
+
+                <entry>262,144</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>248.0.0.0</entry>
+
+                <entry>/5</entry>
+
+                <entry>134,217,728</entry>
+
+                <entry>134,217,726</entry>
+
+                <entry>1,048,576</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>240.0.0.0</entry>
+
+                <entry>/4</entry>
+
+                <entry>268,435,456</entry>
+
+                <entry>268,435,454</entry>
+
+                <entry>2,097,152</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>224.0.0.0</entry>
+
+                <entry>/3</entry>
+
+                <entry>536,870,912</entry>
+
+                <entry>536,870,910</entry>
+
+                <entry>4,194,304</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>192.0.0.0</entry>
+
+                <entry>/2</entry>
+
+                <entry>1,073,741,824</entry>
+
+                <entry>1,073,741,822</entry>
+
+                <entry>8,388,608</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>128.0.0.0</entry>
+
+                <entry>/1</entry>
+
+                <entry>2,147,483,648</entry>
+
+                <entry>2,147,483,646</entry>
+
+                <entry>16,777,216</entry>
+              </row>
+            </tbody>
+
+            <tbody>
+              <row>
+                <entry>0.0.0.0</entry>
+
+                <entry>/0</entry>
+
+                <entry>4,294,967,296</entry>
+
+                <entry>4,294,967,294</entry>
+
+                <entry>33,554,432</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table></para>
     </sect2>
-    
+
     <sect2>
-        <title>So where do these CIDR numbers come from anyway?</title>
-        
-        <para>The CIDR number comes from the number of 1's in the subnet mask when
-            converted to binary.  </para>
-        
-        <para>The common subnet mask 255.255.255.0 is 11111111.11111111.11111111.00000000
-            in binary.  This adds up to 24 1's, or /24 (pronounced 'slash twenty four').  </para>
-        
-        <para>A subnet mask of 255.255.255.192
-            is 11111111.11111111.11111111.11000000 in binary, or 26 1's, hence a /26.  </para>
-        
-        <para>And so on...</para>
-        
+      <title>So where do these CIDR numbers come from anyway?</title>
+
+      <para>The CIDR number comes from the number of 1's in the subnet mask
+      when converted to binary.</para>
+
+      <para>The common subnet mask 255.255.255.0 is
+      11111111.11111111.11111111.00000000 in binary. This adds up to 24 1's,
+      or /24 (pronounced 'slash twenty four').</para>
+
+      <para>A subnet mask of 255.255.255.192 is
+      11111111.11111111.11111111.11000000 in binary, or 26 1's, hence a
+      /26.</para>
+
+      <para>And so on...</para>
     </sect2>
-    
   </sect1>
-  
-    
 </chapter>

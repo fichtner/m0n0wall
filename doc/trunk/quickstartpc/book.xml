@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: book.xml,v 1.5 2005/09/25 04:25:08 chris Exp $ -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
@@ -31,12 +31,12 @@
     </authorgroup>
 
     <copyright>
-      <year>2005</year>
+      <year>2007</year>
 
       <holder>m0n0wall Documentation Project</holder>
     </copyright>
 
-    <pubdate>September 2005</pubdate>
+    <pubdate>October 2007</pubdate>
 
     <abstract>
       <para>Getting started with m0n0wall, a complete embedded firewall software
@@ -49,7 +49,7 @@
         </mediaobject></para>
     </abstract>
 
-    <releaseinfo>m0n0wall Version 1.2, September 2005</releaseinfo>
+    <releaseinfo>m0n0wall Version 1.3b4, Octobr 2007</releaseinfo>
 
     <legalnotice>
       <para>All rights reserved.</para>

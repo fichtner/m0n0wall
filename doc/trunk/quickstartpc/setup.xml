@@ -1,96 +1,225 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter>
   <title>Getting and Installing m0n0wall</title>
+
   <?dbhtml filename="setup.html"?>
 
+  <para>The instructions below assume that you have a working PC computer with
+  the proper cables and BIOS options chosen to boot from your selected media.
+  It might save you some troubleshooting time if you first verify that your
+  system is in working condition. One easy way to do this is to download or
+  grab from a computer magazine a bootable Linux or BSD. These are often
+  called Live-CD distributions and can autodetect most hardware and boot your
+  system.</para>
+
   <sect1 id="Setup.ChoosingMedia">
-     <?dbhtml filename="setup-choosingmedia.html"?>
-     <title>Choosing your Media</title>
+    <?dbhtml filename="setup-choosingmedia.html"?>
 
-     <para>m0n0wall provides two options for PC users, 
-	either a CD and floppy setup or a hard disk 
-	setup.  
-     </para>
+    <title>Choosing your Media</title>
 
-     <sect2>
-	<title>CD/floppy Setup</title>
-	
-	<para>m0n0wall can run from a CD, with a floppy 
-	disk to save the configuration.  This is typically 
-	a good way to try m0n0wall without actually overwriting
-	a hard drive.  However, we do not recommend it for 
-	production use, due to the likelihood of floppy disk or 
-	drive failure.  A hard drive is far more reliable, and 
-	Compact Flash is even more reliable still.
-	</para>
-     </sect2>
+    <para>m0n0wall provides two options for PC users, either a CD and floppy
+    setup or a hard disk setup. In either case you will need an existing
+    computer to write to the Compact Flash or CDROM. In both cases you will
+    download a m0n0wall file called an image that contains the bootable
+    operating system. This image will be written to a media that your chosen
+    m0n0wall computer can boot from.</para>
 
-     <sect2>
-	<title>Hard drive Setup</title>
-	
-	<para>You can install m0n0wall to any hard drive of 
-	sufficient size (&gt;=8 MB, so basically any IDE hard drive
-	ever made).  </para>
+    <para>Your customized changes to the default configuration will be stored
+    in active memory of the m0n0wall computer. In a CD/ floppy setup, the
+    floppy will store this customized configuration. In a Hard Drive or CF
+    Card setup, the media itself is also writable and can store the
+    configuration. In all cases the configuration file can be downloaded from
+    the web interface for external storage.</para>
 
-	<para>Of preference to many m0n0wall PC users for 
-	maximum reliability is a Compact Flash to IDE adapter, 
-	and a CF card.  </para>
-
-      </sect2>
-
-  </sect1>
-    
-  <sect1 id="Setup.Installing">
-     <?dbhtml filename="setup-installing.html"?>
-
-     <title id="Setup.Installing.title">Getting and Installing the Software</title>
-
-    <para>To download the PC image or CD, point your web browser
-    to <ulink
-    url="http://www.m0n0.ch/wall/downloads.php">http://www.m0n0.ch/wall/downloads.php</ulink>
-    and select the WRAP download link from that page. Download the file
-    to the machine from which you will be writing to the CompactFlash card.
-    </para>
+    <tip>
+      <para>It is recommended to always store an external backup of your
+      configuration file in case of emergencies.</para>
+    </tip>
 
     <sect2>
-      <title>Preparing the CompactFlash</title>
+      <title>CD/Floppy Setup</title>
 
-       <para>FIXME - add tutorial</para>
+      <para>m0n0wall can run from a CD, with a floppy disk to save the
+      configuration. This is typically a good way to try m0n0wall without
+      actually overwriting a hard drive. However, we do not recommend it for
+      production use, due to the likelihood of floppy disk or drive failure. A
+      hard drive is far more reliable, and Compact Flash is even more reliable
+      still.</para>
 
-       <para>Now you need to write the image to a sufficiently large
-       CF card (at least 8 MB). Extra space on the CF card is
-       ignored; there is
-       no benefit to using one larger than 8 MB other than possibly
-       compatibility on future releases.</para>
+      <para>Starting in version 1.3 a flash drive can be used in place of a
+      floppy disk for storing the configuration file.</para>
+    </sect2>
 
-        <para>The following sections will cover how to write the CF
-        card in Windows, FreeBSD, and Linux.  </para>
+    <sect2>
+      <title>Hard Drive or CF Card Setup</title>
 
-        <sect3>
-            <title>Windows</title>
-            
-            <para>Manuel Kasper's (author of m0n0wall) physdiskwrite should
-            be used on Windows to write the CF card.  Download it from the
-            m0n0wall web site's <ulink url="http://www.m0n0.ch/wall/physdiskwrite.php">
-            physdiskwrite page</ulink>. </para>
-            
-            <para>Save physdiskwrite.exe and the downloaded m0n0wall image in
-            the same directory on your hard drive, then open a Windows Command Prompt
-            (click Start, Run, type in cmd and click OK).</para>
-            
-            <para>Plug in your CF card reader/writer and insert your CF card.</para>
-            
-            <para>'cd' into the directory containing physdiskwrite and the m0n0wall
-            image and run the following:</para>
-            
-            <programlisting>physdiskwrite wrap-xxx.img</programlisting>
+      <para>Many users find that a Compact Flash card offers higher
+      reliability than an old hard drive. A Compact Flash card can be used to
+      boot a traditional PC when using a Compact Flash to IDE Adapter.</para>
 
-            <para>Replacing wrap-xxx.img with the name of the WRAP image you
-            downloaded.</para>
-              
-            <para>You will see output similar to the following:</para>
-            
-              <programlisting>
+      <para>You can also install m0n0wall to any hard drive of sufficient size
+      (&gt;=8 MB in version 1.2 and &gt;10MB in version 1.3 and later), so
+      basically any IDE hard drive ever made).</para>
+
+      <para>The instructions for writing the m0n0wall image are the same as
+      writing to a hard disk unless otherwise noted.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="Setup.Installing">
+    <?dbhtml filename="setup-installing.html"?>
+
+    <title id="Setup.Installing.title">Getting and Installing the
+    Software</title>
+
+    <para>To download the generic-pc image or CD ISO, point your web browser
+    to <ulink
+    url="http://www.m0n0.ch/wall/downloads.php">http://www.m0n0.ch/wall/downloads.php</ulink>
+    and select the generic-pc download link from that page. Download the file
+    to the computer you plan to use for writing to the CompactFlash card or
+    hard disk.</para>
+
+    <sect2>
+      <title>Installing the Standard PC by Hard Disk</title>
+
+      <para>Installation on a standard PC requires the following steps:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>download the raw CF/IDE image (generic-pc)</para>
+        </listitem>
+
+        <listitem>
+          <para>write the image to a CF card (&gt; 5 MB) or an IDE hard disk,
+          either with dd under FreeBSD or under Windows with physdiskwrite. A
+          more detailed description of writing the image to these media is in
+          the following section</para>
+        </listitem>
+
+        <listitem>
+          <para>put the CF card/HD into the target PC</para>
+        </listitem>
+
+        <listitem>
+          <para>plug the PC into the network (LAN/WAN/...).</para>
+
+          <caution>
+            <para>If you have an existing DHCP server, and/or wish to use a
+            different IP subnet on your LAN, you will need to first connect
+            via the PC's keyboard/ monitor or serial console interface as
+            described in the Initial Configuration chapter.</para>
+          </caution>
+        </listitem>
+
+        <listitem>
+          <para>power up the PC</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Now that your system has booted using the m0n0wall software
+      continue to the section <xref linkend="setup-finalprep" />.</para>
+    </sect2>
+
+    <sect2>
+      <title>Writing the Image File</title>
+
+      <para>If you are installing to a standard PC using an IDE or CF disk,
+      you need to write the image to a sufficiently large CF card or hard disk
+      (at least 10 MB for the generic-PC image in version 1.3). Extra space on
+      the CF card or drive is ignored; there is no benefit to using one larger
+      than 8 MB other than possibly compatibility on future releases.</para>
+
+      <para>The following sections will cover how to write the CF card in
+      Windows, FreeBSD, and Linux. A summary is below with details following
+      for each operating system.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Windows:</para>
+
+          <para>(use the -u flag if the target disk is &gt; 800 MB - make very
+          sure you've selected the right disk!!) <programlisting>physdiskwrite [-u] generic-pc-xxx.img</programlisting>(you
+          must use v0.3 or later!)</para>
+        </listitem>
+
+        <listitem>
+          <para>FreeBSD:</para>
+
+          <para><programlisting>gzcat generic-pc-xxx.img | dd of=/dev/rad[n] bs=16k</programlisting>where
+          n = the ad device number of your CF card (check dmesg) (ignore the
+          warning about trailing garbage - it's because of the digital
+          signature)</para>
+        </listitem>
+
+        <listitem>
+          <para>Linux:</para>
+
+          <para><programlisting>gunzip -c generic-pc-xxx.img | dd of=/dev/hdX bs=16k</programlisting>where
+          X = the IDE device name of your HD/CF card (check with hdparm -i
+          /dev/hdX) - some CF adapters, particularly USB, may show up under
+          SCSI emulation as /dev/sdX (ignore the warning about trailing
+          garbage - it's because of the digital signature)</para>
+        </listitem>
+      </itemizedlist>
+
+      <sect3>
+        <title>Windows</title>
+
+        <para>For Windows you will be downloading physdiskwrite from the
+        m0n0wall web site. This is a small Windows NT/2000/XP command line
+        tool that makes it possible to write disk images onto raw disks, like
+        CF cards. It currently has a few rough edges, most notably in the
+        selection of the device to be written – you have to decide which
+        device is the right one by looking at the C/H/S values (though if the
+        CF card was the last device to be connected to the system, it usually
+        shows up as the last one in the list).</para>
+
+        <para>Note that the C/H/S values may be incorrect for CF cards – looks
+        like this is a bug in Windows. There is some protection against
+        accidentally overwriting your hard disk, but then again,<emphasis
+        role="bold"> I CAN'T TAKE ANY RESPONSIBILITY FOR LOST DATA – YOU USE
+        THIS PROGRAM ON YOUR OWN RISK.</emphasis></para>
+
+        <para>Manuel Kasper's (author of m0n0wall) physdiskwrite should be
+        used on Windows to write the CF card. Download it from the m0n0wall
+        web site's <ulink url="http://www.m0n0.ch/wall/physdiskwrite.php">
+        physdiskwrite page</ulink>.</para>
+
+        <note>
+          <para>Note to Windows Vista users: physdiskwrite works with Vista,
+          but you must make sure to run it as administrator (simply having
+          admin rights isn't enough), or it won't find any disks. One way to
+          do this is to create a shortcut to cmd.exe, then right-click it and
+          select "run as administrator". Then you can launch physdiskwrite
+          from the command prompt window that appears, and it should work
+          fine.</para>
+        </note>
+
+        <para>Save physdiskwrite.exe and the downloaded m0n0wall image in the
+        same directory on your hard drive, then open a Windows Command Prompt
+        (click Start, Run, type in cmd and click OK).</para>
+
+        <para>Plug in your CF card reader/writer and insert your CF card. If
+        you are connecting your hard drive you can either connect it directly
+        to your computer or through a fire wire or USB adaptor for external
+        drives.</para>
+
+        <para>'cd' into the directory containing physdiskwrite and the
+        m0n0wall image and run the following:</para>
+
+        <programlisting>physdiskwrite generic-pc-xxx.img</programlisting>
+
+        <para>Replacing generic-pc-xxx.img with the name of the generic-pc
+        image you downloaded.</para>
+
+        <tip>
+          <para>Windows users can just simply drag-and-drop the image file
+          onto the physdiskwrite.exe icon.</para>
+        </tip>
+
+        <para>You will see output similar to the following:</para>
+
+        <programlisting>
 physdiskwrite v0.5 by Manuel Kasper &lt;mk@neon1.net&gt;
 
 Searching for physical drives...
@@ -108,27 +237,32 @@ Information for \\.\PhysicalDrive1:
    Windows:       cyl: 1
                   tpc: 255
                   spt: 63</programlisting>
-              
-            <para>You will see all the hard drives in your system listed, as well as
-            the compact flash card.  Since we did not run <emphasis>
-            physdiskwrite -u</emphasis>, physdiskwrite will refuse to write to any
-            drive over 800
-            MB.  This is a protection so you don't accidentally overwrite your hard drive.
-            </para>
 
-        </sect3>
+        <para>You will see all the hard drives in your system listed, as well
+        as the compact flash card. Since we did not run <emphasis>
+        physdiskwrite -u</emphasis>, physdiskwrite will refuse to write to any
+        drive over 2 GB. This is a protection so you don't accidentally
+        overwrite your hard drive.</para>
 
-        <sect3>
-            <title>FreeBSD</title>
+        <warning>
+          <para>If you are using physdiskwrite.exe to write to a second hard
+          disk be very careful that you identify the correct disk before
+          writing to it (i.e. do not write the image to your own computer's
+          boot disk).</para>
+        </warning>
+      </sect3>
 
-            <para>The procedures to image a CompactFlash card depend upon the
-            type of adapter you are using. The CF card will either appear as
-            a SCSI or IDE hard drive.</para>
-            
-            <para>Run the command <emphasis role="bold">atacontrol list</emphasis>.
-            You will get output similar to the following:</para>
+      <sect3>
+        <title>FreeBSD</title>
 
-            <literallayout class="monospaced">
+        <para>The procedures to image a CompactFlash card depend upon the type
+        of adapter you are using. The CF card will either appear as a SCSI or
+        IDE hard drive.</para>
+
+        <para>Run the command <emphasis role="bold">atacontrol
+        list</emphasis>. You will get output similar to the following:</para>
+
+        <literallayout class="monospaced">
 su-3.00# atacontrol list
 ATA channel 0:
 Master: ad0 &lt;WDC WD200EB-75CSF0/04.01B04&gt; ATA/ATAPI revision 5
@@ -138,101 +272,211 @@ Master: acd0 &lt;_NEC CD-RW NR-7800A/10DA&gt; ATA/ATAPI revision 0
 Slave: no device present
             </literallayout>
 
-            <para>Then run the command <emphasis role="bold">camcontrol devlist</emphasis>.
-            You will see output similar to the following:</para>
-            
-            <literallayout class="monospaced">
+        <para>Then run the command <emphasis role="bold">camcontrol
+        devlist</emphasis>. You will see output similar to the
+        following:</para>
+
+        <literallayout class="monospaced">
 su-2.05b# camcontrol devlist
 &lt;ADAPTEC RAID-5 320R&gt; at scbus2 target 0 lun 0 (pass0,da0)
 &lt;SEAGATE ST39204LC 0005&gt; at scbus2 target 3 lun 0 (pass1,da1)
 &lt;ESG-SHV SCA HSBP M10 0.05&gt; at scbus2 target 6 lun 0 (pass2)                
             </literallayout>
 
-            <para>You will find your CF card somewhere in the
-            above output.  Make note of its device name (adX or daX).
-            </para>
-            
-            <para>Run the following command, replacing adX with your CF
-            device as determined above, and wrap-xxx.img with the name
-            of the m0n0wall image you downloaded.</para>
-            
-            <computeroutput>gzcat wrap-xxx.img | dd of=/dev/adX bs=16k</computeroutput>
+        <para>You will find your CF card somewhere in the above output. Make
+        note of its device name (adX or daX).</para>
 
-              <para><emphasis>Ignore the warning about trailing garbage - it's
-              because of the digital signature.</emphasis></para>
-        </sect3>
+        <para>Run the following command, replacing adX with your CF device as
+        determined above, and generic-pc-xxx.img with the name of the m0n0wall
+        image you downloaded.</para>
 
-        <sect3>
-              <title>Linux</title>
+        <computeroutput>gzcat generic-pc-xxx.img | dd of=/dev/adX
+        bs=16k</computeroutput>
 
-              <programlisting>gunzip -c net45xx-xxx.img | dd of=/dev/hdX bs=16k</programlisting>
-
-              <para>where X = the IDE device name of your CF card 
-              (check with hdparm -i /dev/hdX) - some adapters, particularly
-              USB, may show up under SCSI emulation as /dev/sdX.</para>
-
-              <para><emphasis>Ignore the warning about trailing garbage - it's
-              because of the digital signature.</emphasis></para>
-            
-        </sect3>
-
-    </sect2>
-
-  </sect1>
-  
-  <sect1>
-    <?dbhtml filename="setup-finalprep.html"?>
-    <title>Final Preparation</title>
-    
-    <para>Now put your written CF card into your WRAP board, and put it in its case.
-    </para>
-    
-    <sect2>
-        <title>Plugging in the Network Interfaces</title>
-        
-        <para>The LAN and WAN interfaces are pre-assigned on the WRAP image.  
+        <para>
+          <emphasis>Ignore the warning about trailing garbage - it's because
+          of the digital signature.</emphasis>
         </para>
-        
-        <sect3>
-            <title>Two Ethernet models</title>
-            
-            <para>On the two Ethernet port models, the LAN port is the port
-            closest to where the power adapter plugs in, and the WAN port is
-            the port closest to the serial port.</para>
-            
-            <mediaobject>
-                <imageobject>
-                  <imagedata fileref="images/wrap-2nic.png" />
-                </imageobject>
-            </mediaobject>
-            
-        </sect3>
-        
-        <sect3>
-            <title>Three Ethernet models</title>
-            
-            <para>On three Ethernet port WRAP models, the LAN port is the
-            port closest to where the power adapter plugs in, and the WAN
-            port is the middle port.</para>
-            
-            <mediaobject>
-                <imageobject>
-                  <imagedata fileref="images/wrap-3nic.png" />
-                </imageobject>
-            </mediaobject>
-            
-        </sect3>
-            
-        <para>Plug the LAN interface into the hub or switch that is connected
-        to your LAN.  Plug the WAN interface into your Internet connection (DSL
-        or cable modem, router, etc.)</para>
-        
-        <para>After plugging in your interfaces, plug in your WRAP to turn
-        it on.</para>
-        
-    </sect2>
-    
-  </sect1>
-  
-</chapter>
+      </sect3>
 
+      <sect3>
+        <title>Linux</title>
+
+        <programlisting>gunzip -c generic-pc-xx-xxx.img | dd of=/dev/hdX bs=16k</programlisting>
+
+        <para>where X = the IDE device name of your CF card (check with hdparm
+        -i /dev/hdX) - some adapters, particularly USB, may show up under SCSI
+        emulation as /dev/sdX.</para>
+
+        <para><emphasis>Ignore the warning about trailing garbage - it's
+        because of the digital signature.</emphasis></para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Installing the standard PC by CDROM</title>
+
+      <para>If you are installing to a standard PC using a CDROM and floppy
+      disk, you will need to write the bootable CDROM and format the floppy
+      disk.</para>
+
+      <para>Installation on a standard PC with the CD-ROM (+ floppy disk)
+      version requires the following steps:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>download the ISO image</para>
+        </listitem>
+
+        <listitem>
+          <para>burn the ISO image onto a CD-R (or -RW)</para>
+
+          <para><emphasis role="bold">FreeBSD</emphasis> (ATAPI recorder):
+          burncd -s max -e data cdrom-xxx.iso fixate</para>
+
+          <para><emphasis role="bold">Windows</emphasis>: use your favorite
+          burning program (e.g. Nero) to record the ISO image (2048
+          bytes/sector, Mode-1)</para>
+        </listitem>
+
+        <listitem>
+          <para>take a standard 1.44 MB diskette or a USB flash drive
+          (m0n0wall 1.3b only) and format it (with an MS-DOS/FAT file
+          system!)</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>1.44 MB floppy disk</para>
+
+              <para><emphasis role="bold">FreeBSD</emphasis>: fdformat -f 1440
+              /dev/fd0 &amp;&amp; newfs_msdos -L "m0n0wallcfg" -f 1440
+              /dev/fd0 Note: you can omit the fdformat step if the floppy disk
+              is already (low-level) formatted</para>
+
+              <para><emphasis role="bold">Windows</emphasis>: format A:</para>
+            </listitem>
+
+            <listitem>
+              <para>USB flash drive</para>
+
+              <para><emphasis role="bold">Windows</emphasis>: use Windows
+              Explorer to format the drive (FAT32)</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para>plug the PC into the network (LAN/WAN/...).</para>
+
+          <caution>
+            <para>If you have an existing DHCP server, and/or wish to use a
+            different IP subnet on your LAN, you will need to first connect
+            via the PC's keyboard/ monitor or serial console interface as
+            described in the Initial Configuration chapter.</para>
+          </caution>
+        </listitem>
+
+        <listitem>
+          <para>power up your PC, enter the BIOS and make sure that booting
+          from CD-ROM is enabled and booting from floppy disk is
+          disabled</para>
+        </listitem>
+
+        <listitem>
+          <para>insert CD-ROM and floppy disk (do not write-protect the floppy
+          disk!)</para>
+        </listitem>
+
+        <listitem>
+          <para>continue the boot process</para>
+        </listitem>
+      </orderedlist>
+
+      <para>Now that your system has booted using the m0n0wall software
+      continue to the section <xref linkend="setup-finalprep" />.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="setup-finalprep">
+    <?dbhtml filename="setup-finalprep.html"?>
+
+    <title>Final Preparation</title>
+
+    <para>Now put your written Hard disk/ CF card or CDROM into your PC system
+    and boot from it as described above. There are 3 ways to verify that the
+    installation has completed successfully. Afterwards you can continue to
+    the final steps below.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>If your computer has a video screen you should see text output
+        to the screen during the bootup and finally a text prompt blinking and
+        waiting for you to start the configuration</para>
+      </listitem>
+
+      <listitem>
+        <para>You can try to access the m0n0wall from a client computer on the
+        same network</para>
+      </listitem>
+
+      <listitem>
+        <para>You can try accessing the m0n0wall using a serial console
+        connection</para>
+      </listitem>
+    </itemizedlist>
+
+    <caution>
+      <para>Since PCI Ethernet cards can be installed in various
+      configurations, you may need to test which interface is actually being
+      used as the LAN interface.</para>
+    </caution>
+
+    <para>These final steps will assign functions to the interfaces and change
+    the LAN IP address as needed.</para>
+
+    <orderedlist>
+      <listitem>
+        <para>wait for the console menu to appear, select 1. (assign network
+        ports)</para>
+      </listitem>
+
+      <listitem>
+        <para>assign functions (LAN/WAN/OPT) to your interfaces (hint: use
+        auto-detection, or let the MAC addresses tell you which card is which
+        one)</para>
+      </listitem>
+
+      <listitem>
+        <para>change the LAN IP address, or use the default (192.168.1.1;
+        m0n0wall acts as a DHCP server by default)</para>
+      </listitem>
+
+      <listitem>
+        <para>access the webGUI (user: 'admin', default password:
+        'mono')</para>
+      </listitem>
+
+      <listitem>
+        <para>make the necessary changes to the default configuration</para>
+      </listitem>
+    </orderedlist>
+
+    <sect2>
+      <title>Plugging in the Network Interfaces</title>
+
+      <para>Plug the LAN interface into the hub or switch that is connected to
+      your LAN. Plug the WAN interface into your Internet connection (DSL or
+      cable modem, router, etc.) Additional Network interfaces can optionally
+      be connected to other routers, hubs or an Ethernet capable
+      device.</para>
+
+      <tip>
+        <para>If your Ethernet devices have built-in leds to show
+        connectivity, verify that connected links are showing a green LED when
+        the devices are physically powered on. If it is not showing green then
+        there may be a problem with the cable (damaged or wiring) or with one
+        of the Ethernet interfaces.</para>
+      </tip>
+    </sect2>
+  </sect1>
+</chapter>

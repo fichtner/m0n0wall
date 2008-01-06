@@ -1,137 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter>
   <?dbhtml filename="hardware.html"?>
-  <title>Selecting Your Hardware</title> 
 
- <sect1>
+  <title>Selecting Your Hardware</title>
+
+  <sect1>
     <?dbhtml filename="hardware-selection.html"?>
-    
+
     <title>Choosing Your Hardware</title>
-    
-    <para>The hardware you choose will depend on what features you will use, how
-    much bandwidth you have, and some matters of personal preference (embedded
-    device vs. standard PC).  </para>
-    
+
+    <para>The hardware you choose will depend on what features you will use,
+    how much bandwidth you have, and some matters of personal preference
+    (embedded device vs. standard PC).</para>
+
     <para><emphasis role="bold">Hardware Reliability</emphasis></para>
-    
-    <para>While m0n0wall will run on very old hardware, keep in mind the reliability
-    of older hardware is certainly questionable.  If uptime isn't critically
-    important, don't hesitate to use old hardware.  If this is in a production
-    business environment, a Soekris or WRAP board could save you some explaining
-    down the road on why your internet connection went down.</para>
-    
+
+    <para>While m0n0wall will run on very old hardware, keep in mind the
+    reliability of older hardware is certainly questionable. If uptime isn't
+    critically important, don't hesitate to use old hardware. If this is in a
+    production business environment, a Soekris or WRAP board could save you
+    some explaining down the road on why your Internet connection went
+    down.</para>
+
     <para>If you are using old hardware, make sure you have a contingency plan
-    should it fail.  Keeping a spare machine with your current m0n0wall configuration
-    loaded, ready to be used if necessary, would be a good idea.</para>
-    
+    should it fail. Keeping a spare machine with your current m0n0wall
+    configuration loaded, ready to be used if necessary, would be a good
+    idea.</para>
+
     <para><emphasis role="bold">Processor</emphasis></para>
-    
-    <para>For most broadband connections, any 486 or faster will be sufficient.
-    If you have less than 10 Mb of internet bandwidth (combined upload and
-    download speed), an embedded device like the WRAP or Soekris platforms, or
-    an old 486 will suffice.  For 10 Mb up to a full T3 or more, a Pentium II or III PC
-    system, or embedded device like a NexCom is more appropriate.  See Chapter
-    2 of the Users Guide for further details on compatible hardware.</para>
-    
+
+    <para>For most broadband connections, any 486 or faster will be
+    sufficient. If you have less than 10 Mb of Internet bandwidth (combined
+    upload and download speed), an embedded device like the WRAP or Soekris
+    platforms, or an old 486 will suffice. For 10 Mb up to a full T3 or more,
+    a Pentium II or III PC system, or embedded device like a NexCom is more
+    appropriate. See Chapter 2 of the Users Guide for further details on
+    compatible hardware.</para>
+
     <para>For connections faster than a T3 using many VPN sessions, you will
     likely want to use a customized version of m0n0wall specifically built for
-    your requirements, and high end Pentium 4, Xeon, or similar hardware.  This
+    your requirements, and high end Pentium 4, Xeon, or similar hardware. This
     is beyond the scope of this document.</para>
-    
+
     <para><emphasis role="bold">RAM</emphasis></para>
-    
-    <para>We recommend 64 MB of RAM minimum.  32 MB RAM has been reported to
-    work fine on a CD/floppy setup with no VPN configurations.  It has been
-    reported to run out of RAM with a few active VPN tunnels.  Hard drive or
-    CF installs are not recommended with less than 64 MB RAM because you will
+
+    <para>We recommend 64 MB of RAM minimum. 32 MB RAM has been reported to
+    work fine on a CD/floppy setup with no VPN configurations. It has been
+    reported to run out of RAM with a few active VPN tunnels. Hard drive or CF
+    installs are not recommended with less than 64 MB RAM because you will
     probably run out of RAM during upgrades and m0n0wall has no swap, so the
     upgrade will fail.</para>
-    
+
     <para><emphasis role="bold">Hardware Sizing</emphasis></para>
-    
-    <para>Keep in mind there is no standard "if you have X internet connection
-    and Y number of machines on your network, then you need Z hardware".  It
-    varies depending on what services you will use, and your internet traffic
-    characteristics.  The one thing that will require significantly more CPU,
+
+    <para>Keep in mind there is no standard "if you have X Internet connection
+    and Y number of machines on your network, then you need Z hardware". It
+    varies depending on what services you will use, and your Internet traffic
+    characteristics. The one thing that will require significantly more CPU,
     and/or a VPN accelerator card, is if you'll require more than a couple
-    Mbps of VPN traffic for extended periods.
-    </para>
-    
-    <para>To get an idea of network throughput for Soekris and WRAP boards, see
-    <ulink url="http://m0n0.ch/wall/docbook/faq-performancespecifications.html">
-    this FAQ entry.</ulink></para>
-    
+    Mbps of VPN traffic for extended periods.</para>
+
+    <para>To get an idea of network throughput for Soekris and WRAP boards,
+    see <ulink
+    url="http://m0n0.ch/wall/docbook/faq-performancespecifications.html"> this
+    FAQ entry.</ulink></para>
+
     <para><emphasis role="bold">Network Cards</emphasis></para>
-    
+
     <para>You will need at least two network cards in the hardware you are
-    using.  Most any are compatible, check the <ulink url="http://m0n0.ch/wall/docbook/hardware-ethernet.html">
-    Users Guide</ulink> for further details.
-    ISA cards are much more problematic than PCI cards, and PCI cards are
-    readily available and cheap if you need to buy some.  </para>
-    
+    using. Most any PCI based cards are compatible, check the <ulink
+    url="http://m0n0.ch/wall/docbook/hardware-ethernet.html"> Users
+    Guide</ulink> for further details. ISA cards are much more problematic
+    than PCI cards, and PCI cards are readily available and cheap if you need
+    to buy some.</para>
+
     <para>For this document, we will assume these are two Ethernet interfaces.
     You can have additional interfaces installed in the system, but do not
-    configure them during this process.  Documentation in the Users Guide will
-    soon be available to assist you in setting up additional LAN interfaces,
-    DMZ interfaces, wireless setups, etc.</para>
+    configure them during these quick installation procedures. Documentation
+    in the Users Guide will soon be available to assist you in setting up
+    additional LAN interfaces, DMZ interfaces, wireless setups, etc.</para>
 
     <sect2>
-        <title>Storage Medium</title>
-    
-        <para>m0n0wall will run off of a hard drive, CD-ROM and floppy, or
-            CompactFlash card.  The pros and cons of each follow.  Choose the
-            one most appropriate for your situation, taking available hardware
-            and other factors into account.</para>
-        
-        <para><emphasis role="bold">Hard Drive</emphasis></para>
-        
-        <para>Hard drives are readily available, and if you are using a standard
-        PC, you'll likely have one in it.  The hard drive installation is
-        remotely upgradeable via the webGUI, so it's a better choice over a CD/floppy setup in
-        many instances.  The likelihood of a hard drive failure is pretty high,
-        given that the hardware being used is likely old.  An IDE to
-        CompactFlash adapter should be considered where hardware failure cannot
-        be tolerated, since the likelihood of failure is much less with a
-        CompactFlash card.  Such an adapter can be purchased new for about $10
-        USD.  <ulink url="
-        http://www.pcengines.ch/cflash.htm">PC Engines</ulink> sells them,
-        amongst other vendors.</para>
-        
-        <para><emphasis role="bold">CD/floppy Setup</emphasis></para>
-        
-        <para>The CD/floppy setup works by booting m0n0wall off of the CD and
-        storing the configuration on a FAT formatted floppy. This is a good
-        solution on systems that you are physically close to very frequently
-        (remote upgrades via webGUI not possible).  Floppy disks are notorious
-        for becoming corrupted, so it's even more important to make sure you
-        keep a backup of your configuration.  Floppy disks have much more
-        problems in environments that are dusty or dirty, so in those situations
-        we would highly recommend choosing a different setup.</para>
-        
-        <para>The machine you are using must support CD booting (some 486 and
-        Pentium systems do not).  You also must set the CD-ROM as the first
-        boot device in the boot order in the system's BIOS so it doesn't attempt
-        to boot off of the config floppy.  Consult your system or motherboard
-        manual for information on how to configure that.
-        </para>
-        
-        <para><emphasis role="bold">CompactFlash</emphasis></para>
-        
-        <para>CompactFlash (CF) is a good choice for most any deployment.  CF
-        cards are more reliable than hard drives and the floppy drives that
-        hold the configuration in the CD/floppy setup, and are remotely
-        upgradeable via the webGUI.  The downside is you might spend
-        more money getting a CF setup working.  If you are not using an embedded
-        device with an onboard CF adapter, you will have to spend about $10 USD
-        on a IDE to CF adapter.  You'll need to purchase a CF card at least 8 MB
-        in size.  I purchase used 8 MB CF cards off eBay to use for m0n0wall
-        installations, and get them for $5-$10 USD each.  You may also need a CF
-        reader on your PC to write the m0n0wall image to the CF card.  Those are
-        approximately $30 USD.  So you could be looking at a total expenditure
-        of about $50 USD.  But most any business environment should be able to
-        justify such a small expenditure for the increase in reliability.</para>
-      </sect2>
+      <title>Storage Medium</title>
 
+      <para>m0n0wall will run off of a hard drive, CD-ROM and floppy, or
+      CompactFlash card. The pros and cons of each follow. Choose the one most
+      appropriate for your situation, taking available hardware and other
+      factors into account.</para>
+
+      <para><emphasis role="bold">Hard Drive</emphasis></para>
+
+      <para>Hard drives are readily available, and if you are using a standard
+      PC, you'll likely have one in it. The hard drive installation is
+      remotely upgradeable via the webGUI, so it's a better choice over a
+      CD/floppy setup in many instances. The likelihood of a hard drive
+      failure is pretty high, given that the hardware being used is likely
+      old. An IDE to CompactFlash adapter should be considered where hardware
+      failure cannot be tolerated, since the likelihood of failure is much
+      less with a CompactFlash card. Such an adapter can be purchased new for
+      about $10 USD. <ulink
+      url="         http://www.pcengines.ch/cflash.htm">PC Engines</ulink>
+      sells them, amongst other vendors.</para>
+
+      <para><emphasis role="bold">CD/floppy Setup</emphasis></para>
+
+      <para>The CD/floppy setup works by booting m0n0wall off of the CD and
+      storing the configuration on a FAT formatted floppy. This is a good
+      solution on systems that you are physically close to very frequently
+      (remote upgrades via webGUI not possible). Floppy disks are notorious
+      for becoming corrupted, so it's even more important to make sure you
+      keep a backup of your configuration. Floppy disks have much more
+      problems in environments that are dusty or dirty, so in those situations
+      we would highly recommend choosing a different setup.</para>
+
+      <para>The machine you are using must support CD booting (some 486 and
+      Pentium systems do not). You also must set the CD-ROM as the first boot
+      device in the boot order in the system's BIOS so it doesn't attempt to
+      boot off of the config floppy. Consult your system or motherboard manual
+      for information on how to configure that.</para>
+
+      <para><emphasis role="bold">CompactFlash</emphasis></para>
+
+      <para>CompactFlash (CF) is a good choice for most any deployment. CF
+      cards are more reliable than hard drives and the floppy drives that hold
+      the configuration in the CD/floppy setup, and are remotely upgradeable
+      via the webGUI. The downside is you might spend more money getting a CF
+      setup working. If you are not using an embedded device with an onboard
+      CF adapter, you will have to spend about $10 USD on a IDE to CF adapter.
+      You'll need to purchase a CF card at least 8 MB in size. I purchase used
+      8 MB CF cards off eBay to use for m0n0wall installations, and get them
+      for $5-$10 USD each. You may also need a CF reader on your PC to write
+      the m0n0wall image to the CF card. Those are approximately $30 USD. So
+      you could be looking at a total expenditure of about $50 USD. But most
+      any business environment should be able to justify such a small
+      expenditure for the increase in reliability.</para>
+    </sect2>
   </sect1>
-  
 </chapter>
