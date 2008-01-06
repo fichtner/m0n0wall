@@ -267,3 +267,67 @@ diff -u -r src.orig/ngfunc.c src/ngfunc.c
  
  /*
   * FUNCTIONS
+--- src/ipcp.c.orig	Tue May  4 18:12:28 2004
++++ src/ipcp.c	Sun Jan  6 10:30:25 2008
+@@ -45,8 +45,11 @@
+   #define TY_SECONDARYDNS	131
+   #define TY_SECONDARYNBNS	132
+ 
+-  #define IPCP_REJECTED(p,x)	((p)->peer_reject & (1<<(x)))
+-  #define IPCP_PEER_REJ(p,x)	do{(p)->peer_reject |= (1<<(x));}while(0)
++  /* Keep sync with above */
++  #define o2b(x)		(((x)<128)?(x):(x)-128+3)
++
++  #define IPCP_REJECTED(p,x)	((p)->peer_reject & (1<<o2b(x)))
++  #define IPCP_PEER_REJ(p,x)	do{(p)->peer_reject |= (1<<o2b(x));}while(0)
+ 
+   #define IPCP_VJCOMP_MIN_MAXCHAN	(NG_VJC_MIN_CHANNELS - 1)
+   #define IPCP_VJCOMP_MAX_MAXCHAN	(NG_VJC_MAX_CHANNELS - 1)
+--- src/ipcp.h.orig	Tue May  4 18:12:28 2004
++++ src/ipcp.h	Sun Jan  6 10:31:02 2008
+@@ -66,7 +66,7 @@
+     struct in_addr	want_dns[2];	/* DNS servers we got from peer */
+     struct in_addr	want_nbns[2];	/* NBNS servers we got from peer */
+ 
+-    u_long		peer_reject;	/* Request codes rejected by peer */
++    uint32_t		peer_reject;	/* Request codes rejected by peer */
+ 
+     struct fsm		fsm;
+     u_char		ipDynamic:1;	/* Peer's IP was alloc dynamically */
+--- src/ccp.h.orig	Tue May  4 18:12:28 2004
++++ src/ccp.h	Sun Jan  6 10:31:48 2008
+@@ -53,8 +53,8 @@
+     struct optinfo	options;	/* configured protocols */
+     CompType		xmit;		/* xmit protocol */
+     CompType		recv;		/* recv protocol */
+-    u_short		self_reject;	/* types rejected by me */
+-    u_short		peer_reject;	/* types rejected by peer */
++    uint32_t		self_reject;	/* types rejected by me */
++    uint32_t		peer_reject;	/* types rejected by peer */
+ #ifdef COMPRESSION_STAC
+     struct stacinfo	stac;		/* STAC LZS state */
+ #endif
+--- src/ecp.h.orig	Tue May  4 18:12:28 2004
++++ src/ecp.h	Sun Jan  6 10:30:45 2008
+@@ -48,8 +48,8 @@
+     char		key[ECP_MAX_KEY];	/* Encryption key */
+     EncType		xmit;		/* Xmit encryption type */
+     EncType		recv;		/* Recv encryption type */
+-    u_short		self_reject;
+-    u_short		peer_reject;
++    uint32_t		self_reject;
++    uint32_t		peer_reject;
+     struct fsm		fsm;		/* PPP FSM */
+     struct ecpstat	stat;		/* Statistics */
+     struct optinfo	options;	/* Configured options */
+--- src/lcp.h.orig	Tue May  4 18:12:28 2004
++++ src/lcp.h	Sun Jan  6 10:35:16 2008
+@@ -84,7 +84,7 @@
+     u_char	peer_shortseq:1;	/* Peer gets ML short seq numbers */
+ 
+     /* Misc */
+-    u_long		peer_reject;	/* Request codes rejected by peer */
++    uint32_t		peer_reject;	/* Request codes rejected by peer */
+     struct fsm		fsm;		/* Finite state machine */
+   };
+   typedef struct lcpstate	*LcpState;

@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix MPD IPCP options reject processing (BellSouth/AT&T SECONDARYDNS
+  reject problem)
+
+1.232
+-----
+
 - captive portal reliability fixes (locking, treatment of sessions that
   have not passed any traffic by the time they end, skipping sessions
   sometimes during periodic pruning runs) - thanks to Janåke Rönnblom
