@@ -126,6 +126,7 @@
   </sect1>
 
   <sect1>
+    <?dbhtml filename="intro-gettingstarted.html"?>
     <title>Getting Started with m0n0wall on the PC</title>
 
     <para>The m0n0wall Quick Start Guide is intended to get you up and running
@@ -141,14 +142,14 @@
     url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick Start
     Guide</ulink>.</para>
 
-    <para>Additionally, a VMWare version exists for testing or even using
+    <para>Additionally, a VMware version exists for testing or even using
     alongside a client computer. More information on this version can be found
     on the m0n0wall web site.</para>
 
-    <para>I am currently working on adding a number of example configurations
+    <para>There are a number of example configurations
     in <ulink url="http://doc.m0n0.ch/handbook/examples.html">Chapter
     9</ulink> of the <ulink url="http://doc.m0n0.ch/handbook/">m0n0wall
-    Handbook</ulink>. These configurations will describe how to configure
+    Handbook</ulink>. These configurations describe how to configure
     several things such as multiple LAN interfaces, setting up DMZ interfaces,
     wireless interfaces, etc. The base for adding those additional features
     will be the basic LAN/WAN setup this guide describes.</para>
@@ -156,21 +157,21 @@
     <sect2>
       <title>Why use a PC?</title>
 
-      <para>Below are some reasons you might have chosen to use a PC instead
+      <para>Below are some reasons you might chose to use a PC instead
       of an embedded system.</para>
 
       <itemizedlist>
         <listitem>
-          <para>free if you have extra computer equipment lying around</para>
+          <para>Free if you have extra computer equipment lying around</para>
         </listitem>
 
         <listitem>
-          <para>multiple PCI interfaces for high-quality networking
+          <para>Multiple PCI interfaces for high-quality networking
           cards</para>
         </listitem>
 
         <listitem>
-          <para>higher powered CPU for increased speed for VPN or network
+          <para>Higher powered CPU for increased speed for VPN or network
           traffic processing</para>
         </listitem>
       </itemizedlist>
@@ -202,7 +203,7 @@
         </listitem>
 
         <listitem>
-          <para>32MB of RAM or more (64 is recommended)</para>
+          <para>64 MB of RAM or more</para>
         </listitem>
 
         <listitem>
@@ -311,7 +312,7 @@
 
             <title>PPTP</title>
 
-             - A few ISP's require you to connect to them via PPTP. If your ISP requires this, you will need a username, password, local IP address, and remote IP address from your ISP. 
+             - A few ISPs require you to connect to them via PPTP. If your ISP requires this, you will need a username, password, local IP address, and remote IP address from your ISP. 
           </formalpara>
         </listitem>
 
@@ -371,11 +372,11 @@
     hardware.</para>
 
     <note>
-      <para>The final m0n0wall 1.3 version will be based on FreeBSD
+      <para>The m0n0wall 1.3 releases are based on FreeBSD
       6.2-RELEASE. The <ulink
       url="http://www.freebsd.org/releases/6.2R/hardware-i386.html">Hardware
-      Notes</ulink> for this version is different than the older 4.0
-      version.</para>
+      Notes</ulink> for this version is different than the older FreeBSD 4.x
+      versions.</para>
     </note>
 
     <para><emphasis role="bold">Hardware Reliability</emphasis></para>

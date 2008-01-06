@@ -24,9 +24,9 @@
 
     <para>If you do not need to change the interface assignments, LAN IP
     address, or DHCP server settings, you can skip ahead to the <link
-    linkend="Client.Machine.Config"> next chapter</link>. Otherwise, below are
+    linkend="Client.Machine.Config">next chapter</link>. Otherwise, below are
     steps to make changes to the default configuration using either your
-    m0n0wall PC's keyboard/ monitor or serial console interface.</para>
+    m0n0wall PC's keyboard/monitor or serial console interface.</para>
 
     <para>In general, connecting to a m0n0wall PC with a keyboard/ monitor
     will prove easier for the first time users than connecting to the serial
@@ -175,8 +175,8 @@ m0n0wall console setup
     interfaces these names depend on the Ethernet cards that are installed.
     These 4 characters simply identify the driver used to access the Ethernet
     card and the number of cards that are using the same driver. Other
-    possible Ethernet interface names include: bge, em, gx, nge, ti, txp, dc,
-    fxp, sis, ste, tl, tx, xl.</para>
+    possible Ethernet interface names include, but are not limited to: bge,
+    em, gx, nge, ti, txp, dc, fxp, sis, ste, tl, tx, xl.</para>
 
     <sect2>
       <title>Console Setup Menu Options</title>
@@ -210,10 +210,6 @@ m0n0wall console setup
 
     <para>Press 1 at the console setup screen if you wish to reassign your
     network interfaces.</para>
-
-    <note>
-       To avoid potential problems with mis-assignment, we recommend leaving your interface assignments as is. 
-    </note>
 
     <para>Below are the steps to change the assignment of which Ethernet card
     is used for which network connection. For example if you had both a 10Mbps
@@ -292,6 +288,7 @@ Do you want to proceed? (y/n)
   </sect1>
 
   <sect1>
+    <?dbhtml filename="configure-changing-lan.html"?>
     <title>Changing the LAN IP and/or DHCP server settings.</title>
 
     <para>View this online tutorial for a how to on <ulink
@@ -303,7 +300,7 @@ Do you want to proceed? (y/n)
       connect the m0n0wall to your LAN network until you have first disabled
       the DHCP server on the m0n0wall. Otherwise your m0n0wall might respond
       to a DHCP client computer on your LAN before your normal server and
-      thereby give incorrect information to the IP requesting computer.</para>
+      thereby give incorrect information to the requesting computer.</para>
     </warning>
   </sect1>
 </chapter>

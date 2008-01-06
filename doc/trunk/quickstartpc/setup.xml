@@ -436,28 +436,28 @@ su-2.05b# camcontrol devlist
 
     <orderedlist>
       <listitem>
-        <para>wait for the console menu to appear, select 1. (assign network
+        <para>Wait for the console menu to appear, select 1. (assign network
         ports)</para>
       </listitem>
 
       <listitem>
-        <para>assign functions (LAN/WAN/OPT) to your interfaces (hint: use
+        <para>Assign functions (LAN/WAN/OPT) to your interfaces (hint: use
         auto-detection, or let the MAC addresses tell you which card is which
         one)</para>
       </listitem>
 
       <listitem>
-        <para>change the LAN IP address, or use the default (192.168.1.1;
+        <para>Change the LAN IP address, or use the default (192.168.1.1;
         m0n0wall acts as a DHCP server by default)</para>
       </listitem>
 
       <listitem>
-        <para>access the webGUI (user: 'admin', default password:
+        <para>Access the webGUI (user: 'admin', default password:
         'mono')</para>
       </listitem>
 
       <listitem>
-        <para>make the necessary changes to the default configuration</para>
+        <para>Make the necessary changes to the default configuration</para>
       </listitem>
     </orderedlist>
 
@@ -471,7 +471,7 @@ su-2.05b# camcontrol devlist
       device.</para>
 
       <tip>
-        <para>If your Ethernet devices have built-in leds to show
+        <para>If your Ethernet devices have built-in LEDs to show
         connectivity, verify that connected links are showing a green LED when
         the devices are physically powered on. If it is not showing green then
         there may be a problem with the cable (damaged or wiring) or with one
