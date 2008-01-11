@@ -56,6 +56,8 @@ $pconfig['maxtime'] = $config['dhcpd'][$if]['maxleasetime'];
 list($pconfig['wins1'],$pconfig['wins2']) = $config['dhcpd'][$if]['winsserver'];
 $pconfig['enable'] = isset($config['dhcpd'][$if]['enable']);
 $pconfig['denyunknown'] = isset($config['dhcpd'][$if]['denyunknown']);
+$pconfig['nextserver'] = $config['dhcpd'][$if]['next-server'];
+$pconfig['filename'] = $config['dhcpd'][$if]['filename'];
 
 $ifcfg = $config['interfaces'][$if];
 
@@ -92,6 +94,9 @@ if ($_POST) {
 		if ($_POST['maxtime'] && (!is_numericint($_POST['maxtime']) || ($_POST['maxtime'] <= $_POST['deftime']))) {
 			$input_errors[] = "The maximum lease time must be higher than the default lease time.";
 		}
+		if ($_POST['nextserver'] && !is_ipaddr($_POST['nextserver'])) {
+			$input_errors[] = "A valid next server IP address must be specified.";
+		}
 		
 		if (!$input_errors) {
 			/* make sure the range lies within the current subnet */
@@ -119,6 +124,8 @@ if ($_POST) {
 		$config['dhcpd'][$if]['maxleasetime'] = $_POST['maxtime'];
 		$config['dhcpd'][$if]['enable'] = $_POST['enable'] ? true : false;
 		$config['dhcpd'][$if]['denyunknown'] = $_POST['denyunknown'] ? true : false;
+		$config['dhcpd'][$if]['next-server'] = $_POST['nextserver'];
+		$config['dhcpd'][$if]['filename'] = $_POST['filename'];
 		
 		unset($config['dhcpd'][$if]['winsserver']);
 		if ($_POST['wins1'])
@@ -166,6 +173,8 @@ function enable_change(enable_over) {
 	document.iform.wins2.disabled = endis;
 	document.iform.deftime.disabled = endis;
 	document.iform.maxtime.disabled = endis;
+	document.iform.nextserver.disabled = endis;
+	document.iform.filename.disabled = endis;
 }
 //-->
 </script>
@@ -259,6 +268,22 @@ function enable_change(enable_over) {
                           This is the maximum lease time for clients that ask 
                           for a specific expiration time.<br>
                           The default is 86400 seconds.</td>
+                      </tr>
+                      <tr>
+                        <td width="22%" valign="top" class="vncell">Next server</td>
+                        <td width="78%" class="vtable"> 
+                          <input name="nextserver" type="text" class="formfld" id="nextserver" size="20" value="<?=htmlspecialchars($pconfig['nextserver']);?>"><br>
+                          Specify the server from which clients should load the boot file. This is
+                          usually only needed with PXE booting and some VoIP phones, and can usually
+                          be left empty.</td>
+                      </tr>
+                      <tr>
+                        <td width="22%" valign="top" class="vncell">Filename</td>
+                        <td width="78%" class="vtable"> 
+                          <input name="filename" type="text" class="formfld" id="filename" size="20" value="<?=htmlspecialchars($pconfig['filename']);?>"><br>
+                          Specify the name of the boot file on the server above. This is
+                          usually only needed with PXE booting and some VoIP phones, and can usually
+                          be left empty.</td>
                       </tr>
                       <tr> 
                         <td width="22%" valign="top">&nbsp;</td>

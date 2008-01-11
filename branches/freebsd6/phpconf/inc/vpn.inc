@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2008 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -550,6 +550,8 @@ function vpn_pptpd_configure() {
 				$nunits = 16;
 			
 			$mpdconf = <<<EOD
+startup:
+
 pptpd:
 
 EOD;
@@ -586,7 +588,7 @@ pts:
 	set bundle enable crypt-reqd
 	set link yes acfcomp protocomp
 	set link no pap chap
-	set link enable chap-msv2
+	set link enable chap-msv2 eap
 	set link mtu 1460
 	set link keep-alive 10 60
 	set ipcp yes vjcomp
@@ -621,22 +623,15 @@ EOD;
 	set radius server {$pptpdcfg['radius']['server']} "{$pptpdcfg['radius']['secret']}"
 	set radius retries 3
 	set radius timeout 10
-	set bundle enable radius-auth
-	set bundle disable radius-fallback
+	set auth enable radius-auth
+	set auth disable internal
+	set eap enable radius-proxy
 
 EOD;
 
 				if (isset($pptpdcfg['radius']['accounting'])) {
 					$mpdconf .= <<<EOD
-	set bundle enable radius-acct
-
-EOD;
-				}
-
-				if (isset($pptpdcfg['radius']['radiusip'])) {
-					$mpdconf .= <<<EOD
-	set ipcp yes radius-ip
-	set ipcp enable radius-ip
+	set auth enable radius-acct
 
 EOD;
 				}
@@ -658,11 +653,10 @@ EOD;
 				$mpdlinks .= <<<EOD
 
 pt{$i}:
-	set link type pptp
+	set phys type pptp
 	set pptp enable incoming
 	set pptp disable originate
 	set pptp disable windowing
-	set pptp self 127.0.0.1
 
 EOD;
 			}
@@ -689,7 +683,7 @@ EOD;
 			chmod("{$g['varetc_path']}/mpd-vpn/mpd.secret", 0600);
 			
 			/* fire up mpd */
-			mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']}/mpd-vpn -p {$g['varrun_path']}/mpd-vpn.pid pptpd");
+			mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']}/mpd-vpn -p {$g['varrun_path']}/mpd-vpn.pid pptpd");
 			
 			break;
 			

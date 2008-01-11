@@ -3,6 +3,26 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- updated MPD to 4.4 (also fixed AT&T/Bellsouth secondary DNS reject
+problem) - removes RADIUS IP option
+
+- updated PHP to 4.4.8
+
+- exposed DHCP next-server and filename options via webGUI
+
+
+1.3b7
+-----
+
+- fixed kernel panic when using IPsec and the traffic shaper at the same
+  time (see FreeBSD PR kern/119036)
+
+- fixed SIP proxy when using PPPoE/PPTP mode on WAN interface
+
+
+1.3b6
+-----
+
 - fixed filtering bridge when used in conjunction with traffic shaper
 
 - enabled larger client subnet sizes (= more concurrent connections) for

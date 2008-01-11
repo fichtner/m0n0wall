@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2008 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -549,6 +549,8 @@ function interfaces_wan_pppoe_configure() {
 	}
 	
 	$mpdconf = <<<EOD
+startup:
+
 pppoe:
 	new -i ng0 pppoe pppoe
 	set iface route default
@@ -575,8 +577,8 @@ EOD;
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
-	set bundle authname "{$pppoecfg['username']}"
-	set bundle password "{$pppoecfg['password']}"
+	set auth authname "{$pppoecfg['username']}"
+	set auth password "{$pppoecfg['password']}"
 	set link keep-alive 10 60
 	set link max-redial 0
 	set link no acfcomp protocomp
@@ -600,11 +602,11 @@ EOD;
 EOD;
 		}
 	}
-	
-	$mpdconf .= <<<EOD
-	open iface
 
-EOD;
+	if (isset($pppoecfg['ondemand']))
+		$mpdconf .= "\topen iface\n";
+	else
+		$mpdconf .= "\topen\n";
 
 	fwrite($fd, $mpdconf);
 	fclose($fd);
@@ -618,7 +620,7 @@ EOD;
 		
 	$mpdconf = <<<EOD
 pppoe:
-	set link type pppoe
+	set phys type pppoe
 	set pppoe iface {$wancfg['if']}
 	set pppoe service "{$pppoecfg['provider']}"
 	set pppoe enable originate
@@ -630,7 +632,7 @@ EOD;
 	fclose($fd);
 	
 	/* fire up mpd */
-	mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pppoe");
+	mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pppoe");
 	
 	return 0;
 }
@@ -673,6 +675,8 @@ function interfaces_wan_pptp_configure() {
 	}
 		
 	$mpdconf = <<<EOD
+startup:
+
 pptp:
 	new -i ng0 pptp pptp
 	set iface route default
@@ -691,8 +695,8 @@ EOD;
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
-	set bundle authname "{$pptpcfg['username']}"
-	set bundle password "{$pptpcfg['password']}"
+	set auth authname "{$pptpcfg['username']}"
+	set auth password "{$pptpcfg['password']}"
 	set link keep-alive 10 60
 	set link max-redial 0
 	set link no acfcomp protocomp
@@ -711,10 +715,10 @@ EOD;
 EOD;
 	}
 	
-	$mpdconf .= <<<EOD
-	open
-
-EOD;
+	if (isset($pptpcfg['ondemand']))
+		$mpdconf .= "\topen iface\n";
+	else
+		$mpdconf .= "\topen\n";
 
 	fwrite($fd, $mpdconf);
 	fclose($fd);
@@ -728,7 +732,7 @@ EOD;
 		
 	$mpdconf = <<<EOD
 pptp:
-	set link type pptp
+	set phys type pptp
 	set pptp enable originate outcall
 	set pptp disable windowing
 	set pptp self {$pptpcfg['local']}
@@ -744,7 +748,7 @@ EOD;
 		escapeshellarg($pptpcfg['local'] . "/" . $pptpcfg['subnet']));
 	
 	/* fire up mpd */
-	mwexec("/usr/local/sbin/mpd -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
+	mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
 	
 	return 0;
 }
