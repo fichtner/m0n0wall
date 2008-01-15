@@ -3,6 +3,18 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added patch for trap 12 kernel panics on Nokia IP110/IP120/IP130
+  (thanks to Bruce Walter)
+
+- increased MFS root size by 1 MB to avoid problems with large configs
+
+- fixed bridging with interfaces that support hardware TX checksumming
+  (by turning it off)
+
+
+1.3b8
+-----
+
 - updated MPD to 4.4 (also fixed AT&T/Bellsouth secondary DNS reject
 problem) - removes RADIUS IP option
 

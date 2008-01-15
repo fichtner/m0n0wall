@@ -229,6 +229,10 @@ function interfaces_optional_configure_if($opti) {
 		if ($optcfg['bridge']) {
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
 				" delete up");
+
+			/* ensure that hardware TX/RX checksumming is off for bridged interfaces */
+			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " -rxcsum -txcsum");
+			mwexec("/sbin/ifconfig " . escapeshellarg($config['interfaces'][$optcfg['bridge']]['if']) . " -rxcsum -txcsum");
 			
 			if ($bridgeconfig != "")
 				$bridgeconfig .= ",";
