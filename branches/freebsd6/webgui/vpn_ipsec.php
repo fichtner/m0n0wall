@@ -89,7 +89,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The IPsec tunnel configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -103,7 +103,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr> 
     <td class="tabcont">
-		        <table width="100%" border="0" cellpadding="6" cellspacing="0">
+		        <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="checkbox pane">
                 <tr> 
                   <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
@@ -115,7 +115,7 @@ if ($_GET['act'] == "del") {
                 </tr>
               </table>
               &nbsp;<br>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td nowrap class="listhdrr">Local net<br>
                     Remote net</td>
@@ -168,13 +168,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg"><?=$spans;?>
                     <?=htmlspecialchars($ipsecent['descr']);?>&nbsp;
                   <?=$spane;?></td>
-                  <td valign="middle" nowrap class="list"> <a href="vpn_ipsec_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit tunnel" width="17" height="17" border="0"></a> 
-                    &nbsp;<a href="vpn_ipsec.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this tunnel?')"><img src="x.gif" title="delete tunnel" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="vpn_ipsec_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit tunnel" width="17" height="17" border="0" alt="edit tunnel"></a> 
+                    &nbsp;<a href="vpn_ipsec.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this tunnel?')"><img src="x.gif" title="delete tunnel" width="17" height="17" border="0" alt="delete tunnel"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="6"></td>
-                  <td class="list"> <a href="vpn_ipsec_edit.php"><img src="plus.gif" title="add tunnel" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="vpn_ipsec_edit.php"><img src="plus.gif" title="add tunnel" width="17" height="17" border="0" alt="add tunnel"></a></td>
 				</tr>
               </table>
 			</td>

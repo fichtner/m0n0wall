@@ -1,5 +1,4 @@
-#!/usr/local/bin/php
-<?php 
+<?php
 /*
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
@@ -28,15 +27,27 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-$pgtitle = array("Status", "CPU load");
-require("guiconfig.inc");
 ?>
-<?php include("fbegin.inc"); ?>
-<div align="center">
-<object data="graph_cpu.php" type="image/svg+xml" width="550" height="275">
-Your browser does not support the type SVG! You need to either use Firefox or download the Adobe SVG plugin.
-</object>
-</div>
-<br><span class="red"><strong>Note:</strong></span> if you can't see the graph, you may need to download the most recent version of the <a href="http://www.mozilla.com/" target="_blank">Firefox</a> browser or install the <a href="http://www.adobe.com/svg/viewer/install/" target="_blank">Adobe SVG viewer</a>.
-<?php include("fend.inc"); ?>
+
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta name="DC.title" content="<?= genhtmltitle($pgtitle); ?>">
+<meta name="DC.creator" content="Manuel Kasper">
+<meta name="DC.subject" content="m0n0wall webGUI">
+<meta name="DC.description" content="Part of the m0n0wall distribution">
+<meta name="DC.publisher" content="Manuel Kasper">
+<meta name="DC.contributor" content="Daniel S. Haischt">
+<meta name="DC.date" content="2008-01-18T23:48:00+01:00" scheme="DCTERMS.W3CDTF">
+<meta name="DC.type" content="Text" scheme="DCTERMS.DCMIType">
+<meta name="DC.format" content="text/html" scheme="DCTERMS.IMT">
+<meta name="DC.identifier"
+      content="http://m0n0.ch/wall/"
+      scheme="DCTERMS.URI">
+<meta name="DC.source"
+      content="http://www.w3.org/TR/html401/struct/global.html#h-7.4.4"
+      scheme="DCTERMS.URI">
+<meta name="DC.language" content="en" scheme="DCTERMS.RFC3066">
+<meta name="DC.relation" content="http://dublincore.org/" scheme="DCTERMS.URI">
+<meta name="DC.coverage" content="Zuerich" scheme="DCTERMS.TGN">
+<meta name="DC.rights" content="All rights reserved">

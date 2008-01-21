@@ -145,7 +145,7 @@ $pgtitle = array("Interfaces", "Optional $index (" . htmlspecialchars($optcfg['d
 ?>
 
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_over) {
 	var endis;
@@ -174,13 +174,13 @@ function bridge_change(enable_over) {
 //-->
 </script>
 <?php if (isset($optcfg['wireless'])): ?>
-<script language="javascript" src="interfaces_wlan.js"></script>
+<script type="text/javascript" src="interfaces_wlan.js"></script>
 <?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
             <form action="interfaces_opt.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
@@ -253,7 +253,7 @@ function bridge_change(enable_over) {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 bridge_change(false);

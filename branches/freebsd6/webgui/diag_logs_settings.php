@@ -94,7 +94,7 @@ if ($_POST) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_over) {
 	if (document.iform.enable.checked || enable_over) {
@@ -120,7 +120,7 @@ function enable_change(enable_over) {
 <form action="diag_logs_settings.php" method="post" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -137,7 +137,7 @@ function enable_change(enable_over) {
   </td></tr>
   <tr> 
     <td class="tabcont">
-	  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+	  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                       <tr> 
                         <td width="22%" valign="top" class="vtable">&nbsp;</td>
                         <td width="78%" class="vtable"> <input name="reverse" type="checkbox" id="reverse" value="yes" <?php if ($pconfig['reverse']) echo "checked"; ?>>
@@ -213,7 +213,7 @@ function enable_change(enable_over) {
   </tr>
 </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

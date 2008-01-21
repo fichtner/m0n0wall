@@ -42,7 +42,7 @@ $a_roll = &$config['voucher']['roll'];
 ?>
 
 <form action="status_captiveportal_voucher_rolls.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
 <tr><td class="tabnavtbl">
 <ul id="tabnav">
 <?php 
@@ -57,7 +57,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
 <tr>
 <td class="tabcont">
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
   <tr>
      <td class="listhdrr">Roll#</td>
      <td class="listhdrr">Minutes/Ticket</td>

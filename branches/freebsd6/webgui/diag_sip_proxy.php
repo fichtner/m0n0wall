@@ -83,7 +83,7 @@ while ($line = fgets($fp)) {
 fclose($fp);
 
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
   <tr>
     <td class="listhdrr" colspan=3>True URL</td>
     <td class="listhdrr" colspan=3>Masqueraded URL</td>

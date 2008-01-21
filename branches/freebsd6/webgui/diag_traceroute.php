@@ -64,7 +64,7 @@ if (!isset($do_traceroute)) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -78,7 +78,7 @@ if (!isset($do_traceroute)) {
     <td class="tabcont">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 			<form action="diag_traceroute.php" method="post" name="iform" id="iform">
-			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr>
 				  <td width="22%" valign="top" class="vncellreq">Host</td>
 				  <td width="78%" class="vtable"> 

@@ -80,7 +80,7 @@ if ($_GET['act'] == "del") {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 			<form action="services_wol.php" method="post" name="iform" id="iform">
-			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 			  <tr> 
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
@@ -118,7 +118,7 @@ if ($_GET['act'] == "del") {
                       You may store MAC addresses below for your convenience.
 Click the MAC address to wake up a computer. <br>
 &nbsp;
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="mac-mapping widget">
                 <tr>
                   <td width="15%" class="listhdrr">Interface</td>
                   <td width="25%" class="listhdrr">MAC address</td>
@@ -140,13 +140,13 @@ Click the MAC address to wake up a computer. <br>
                   <td class="listbg">
                     <?=htmlspecialchars($wolent['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_wol_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_wol.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_wol_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0" alt="edit entry"></a>
+                     &nbsp;<a href="services_wol.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0" alt="delete entry"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="services_wol_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="services_wol_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0" alt="edd entry"></a></td>
 				</tr>
               </table>
 </form>

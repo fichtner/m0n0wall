@@ -264,7 +264,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function typesel_change() {
 	switch (document.iform.localnettype.selectedIndex) {
@@ -305,7 +305,7 @@ function methodsel_change() {
 </script>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="vpn_ipsec_edit.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Mode</td>
                   <td width="78%" class="vtable"> Tunnel</td>
@@ -351,7 +351,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Local subnet</td>
                   <td width="78%" class="vtable"> 
-                    <table border="0" cellspacing="0" cellpadding="0">
+                    <table border="0" cellspacing="0" cellpadding="0" summary="network widget">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
 						<td></td>
@@ -592,7 +592,7 @@ function methodsel_change() {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 typesel_change();
 methodsel_change();

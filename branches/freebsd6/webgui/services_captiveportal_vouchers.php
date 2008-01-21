@@ -197,7 +197,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	var endis;
@@ -219,7 +219,7 @@ function enable_change(enable_change) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="services_captiveportal_vouchers.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -235,7 +235,7 @@ function enable_change(enable_change) {
   </td></tr>
   <tr>
   <td class="tabcont">
-  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="checkbox pane">
 	<tr> 
 	  <td width="22%" valign="top" class="vtable">&nbsp;</td>
 	  <td width="78%" class="vtable">
@@ -246,7 +246,7 @@ function enable_change(enable_change) {
 	  <td valign="top" class="vncell">Voucher Rolls</td>
 	  <td class="vtable">
 
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td width="10%" class="listhdrr">Roll#</td>
                   <td width="20%" class="listhdrr">Minutes/Ticket</td>
@@ -270,9 +270,9 @@ function enable_change(enable_change) {
                   </td>
                   <td valign="middle" nowrap class="list"> 
                   <?php if ($pconfig['enable']): ?> 
-                    <a href="services_captiveportal_vouchers_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit voucher" width="17" height="17" border="0"></a>
-                    <a href="services_captiveportal_vouchers.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this voucher? This makes all vouchers from this roll invalid')"><img src="x.gif" title="delete vouchers" width="17" height="17" border="0"></a>
-                    <a href="services_captiveportal_vouchers.php?act=csv&id=<?=$i; ?>"><img src="log_s.gif" title="generate vouchers for this roll to CSV file" width="11" height="15" border="0"></a>
+                    <a href="services_captiveportal_vouchers_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit voucher" width="17" height="17" border="0" alt="edit voucher"></a>
+                    <a href="services_captiveportal_vouchers.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this voucher? This makes all vouchers from this roll invalid')"><img src="x.gif" title="delete vouchers" width="17" height="17" border="0" alt="delete vouchers"></a>
+                    <a href="services_captiveportal_vouchers.php?act=csv&amp;id=<?=$i; ?>"><img src="log_s.gif" title="generate vouchers for this roll to CSV file" width="11" height="15" border="0" alt="generate vouchers for this roll to CSV file"></a>
                     <?php endif;?>
                   </td>
 		</tr>
@@ -280,7 +280,7 @@ function enable_change(enable_change) {
 		<tr> 
 			  <td class="list" colspan="4"></td>
               <?php if ($pconfig['enable']): ?> 
-			  <td class="list"> <a href="services_captiveportal_vouchers_edit.php"><img src="plus.gif" title="add voucher" width="17" height="17" border="0"></a></td>
+			  <td class="list"> <a href="services_captiveportal_vouchers_edit.php"><img src="plus.gif" title="add voucher" width="17" height="17" border="0" alt="add voucher"></a></td>
               <?php endif;?>
 		      </tr>
         </table>     
@@ -380,7 +380,7 @@ Enable Voucher support first using the checkbox above and hit Save at the bottom
   </tr>
   </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

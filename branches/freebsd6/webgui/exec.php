@@ -87,7 +87,7 @@ $intYear = $arrDT[5] + 1900;
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title><?=$Title ?></title>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 
    // Create recall buffer array (of encoded strings).
@@ -195,7 +195,7 @@ if (isBlank( $_POST['txtRecallBuffer'] )) {
 //-->
 </script>
 <link href="gui.css" rel="stylesheet" type="text/css">
-<style>
+<style type="text/css">
 <!--
 
 input {
@@ -256,7 +256,7 @@ if (!isBlank($_POST['txtCommand'])) {
 ?>
 
 <form action="<?=$ScriptName ?>" method="POST" enctype="multipart/form-data" name="frmExecPlus" onSubmit="return frmExecPlus_onSubmit( this );">
-  <table>
+  <table summary="content pane">
     <tr>
       <td class="label" align="right">Command:</td>
       <td class="type"><input name="txtCommand" type="text" size="80" value="" onkeypress="txtCommand_onKey(event);"></td>

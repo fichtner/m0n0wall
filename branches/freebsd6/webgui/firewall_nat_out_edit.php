@@ -179,7 +179,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function typesel_change() {
     switch (document.iform.destination_type.selectedIndex) {
@@ -199,7 +199,7 @@ function typesel_change() {
 </script>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_nat_out_edit.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 			      <tr>
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
@@ -308,7 +308,7 @@ function typesel_change() {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 typesel_change();
 //-->

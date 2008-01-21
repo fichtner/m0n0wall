@@ -114,7 +114,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function typesel_change() {
 	switch (document.iform.type.selectedIndex) {
@@ -131,12 +131,12 @@ function typesel_change() {
 </script>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
             <form action="firewall_aliases_edit.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td valign="top" class="vncellreq">Name</td>
                   <td class="vtable"><?=$mandfldhtml;?><input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>"> 
                     <br> <span class="vexpl">The name of the alias may only consist 
-                    of the characters a-z, A-Z, 0-9 and &apos;-&apos; (dash).</span></td>
+                    of the characters a-z, A-Z, 0-9 and '-' (dash).</span></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Type</td>
@@ -176,7 +176,7 @@ function typesel_change() {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 typesel_change();
 //-->

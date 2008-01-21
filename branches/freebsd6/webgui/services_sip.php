@@ -87,7 +87,7 @@ $lanip = $lancfg['ipaddr'];
 
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	var endis;
@@ -102,7 +102,7 @@ function enable_change(enable_change) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="services_sip.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
@@ -158,27 +158,32 @@ function enable_change(enable_change) {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
-                  <td width="78%"> <p><span class="vexpl"><span class="red">
-                    <strong>Note:<br> </strong></span>
-                    <br><strong>
-                    Local SIP proxy/registrar: <?=htmlspecialchars($lanip);?>:<?=htmlspecialchars($pconfig['port']);?>
-                    </strong>
-                    <br><br>
-                    When enabled on port 5060, all outgoing SIP messages are redirected
-                    to this SIP proxy.
-                    <br>
-                    Firewall rules are added automatically to the WAN interface for
-                    the UDP SIP signaling and UDP RTP streams to be reachable from
-                    the outside world.
-                    <br>
-                    It is possible to use this service as a very simple SIP registrar
-                    (without authentication, but limited to the local LAN subnet).
-                    Use the same server for registration and outbound proxy.
-                    </p></td>
+                  <td width="78%">
+                  <p>
+                    <span class="vexpl">
+                      <span class="red"><strong>Note:</strong><br></span>
+                      <br>
+                      <strong>
+                      Local SIP proxy/registrar: <?=htmlspecialchars($lanip);?>:<?=htmlspecialchars($pconfig['port']);?>
+                      </strong>
+                      <br><br>
+                      When enabled on port 5060, all outgoing SIP messages are redirected
+                      to this SIP proxy.
+                      <br>
+                      Firewall rules are added automatically to the WAN interface for
+                      the UDP SIP signaling and UDP RTP streams to be reachable from
+                      the outside world.
+                      <br>
+                      It is possible to use this service as a very simple SIP registrar
+                      (without authentication, but limited to the local LAN subnet).
+                      Use the same server for registration and outbound proxy.
+                    </span>
+                  </p>
+                  </td>
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

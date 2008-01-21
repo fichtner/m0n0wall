@@ -206,7 +206,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	var endis, radius_endis;
@@ -261,7 +261,7 @@ function enable_change(enable_change) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="services_captiveportal.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -277,7 +277,7 @@ function enable_change(enable_change) {
   </td></tr>
   <tr>
   <td class="tabcont">
-  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 	<tr> 
 	  <td width="22%" valign="top" class="vtable">&nbsp;</td>
 	  <td width="78%" class="vtable">
@@ -304,7 +304,7 @@ function enable_change(enable_change) {
 	<tr>
 	  <td valign="top" class="vncell">Maximum concurrent connections</td>
 	  <td class="vtable">
-		<table cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0" summary="max-conc-connection widget">
                  <tr>
            <td><input name="maxprocperip" type="text" class="formfld" id="maxprocperip" size="5" value="<?=htmlspecialchars($pconfig['maxprocperip']);?>"> per client IP address (0 = no limit)</td>
                  </tr>
@@ -365,7 +365,7 @@ to access after they've authenticated.</td>
       <td class="vtable">
         <input name="peruserbw" type="checkbox" class="formfld" id="peruserbw" value="yes" <?php if ($pconfig['peruserbw']) echo "checked"; ?>>
         <strong>Enable per-user bandwidth restriction</strong><br><br>
-        <table cellpadding="0" cellspacing="0">
+        <table cellpadding="0" cellspacing="0" summary="bandwidth-restriction widget">
         <tr>
         <td>Default download&nbsp;&nbsp;</td>
         <td><input type="text" class="formfld" name="bwdefaultdn" id="bwdefaultdn" size="10" value="<?=htmlspecialchars($pconfig['bwdefaultdn']);?>"> Kbit/s</td>
@@ -380,24 +380,24 @@ to access after they've authenticated.</td>
 	<tr> 
 	  <td width="22%" valign="top" class="vncell">Authentication</td>
 	  <td width="78%" class="vtable"> 
-		<table cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0" summary="authentication widget">
 		<tr>
-		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method" value="none" onClick="enable_change(false)" <?php if($pconfig['auth_method']!="local" && $pconfig['auth_method']!="radius") echo "checked"; ?>>
+		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method_none" value="none" onClick="enable_change(false)" <?php if($pconfig['auth_method']!="local" && $pconfig['auth_method']!="radius") echo "checked"; ?>>
   No authentication</td>  
 		  </tr>
 		<tr>
-		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method" value="local" onClick="enable_change(false)" <?php if($pconfig['auth_method']=="local") echo "checked"; ?>>
+		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method_local" value="local" onClick="enable_change(false)" <?php if($pconfig['auth_method']=="local") echo "checked"; ?>>
   Local <a href="services_captiveportal_users.php">user manager</a></td>  
 		  </tr>
 		<tr>
-		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method" value="radius" onClick="enable_change(false)" <?php if($pconfig['auth_method']=="radius") echo "checked"; ?>>
+		  <td colspan="2"><input name="auth_method" type="radio" id="auth_method_radius" value="radius" onClick="enable_change(false)" <?php if($pconfig['auth_method']=="radius") echo "checked"; ?>>
   RADIUS authentication</td>  
 		  </tr><tr>
 		  <td>&nbsp;</td>
 		  <td>&nbsp;</td>
 		  </tr>
 		</table>
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="radius-server widget">
         	<tr> 
             	<td colspan="2" valign="top" class="optsect_t2">Primary RADIUS server</td>
 			</tr>
@@ -531,7 +531,7 @@ to access after they've authenticated.</td>
                         echo "<option value=\"$macformat\">$macformat</option>\n";
                 }
                 ?>
-                </select></br>
+                </select><br>
                 This option changes the MAC address format used in the whole RADIUS system. Change this if you also
                 need to change the username format for RADIUS MAC authentication.<br>
                 default: 00:11:22:33:44:55<br>
@@ -622,7 +622,7 @@ You may also include a new login form in the error page to allow the user to att
   </tr>
   </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

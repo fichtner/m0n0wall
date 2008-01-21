@@ -96,7 +96,7 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <form action="services_captiveportal_filemanager.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -112,7 +112,7 @@ if ($_POST) {
   </td></tr>
   <tr>
     <td class="tabcont">
-	<table width="80%" border="0" cellpadding="0" cellspacing="0">
+	<table width="80%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
       <tr>
         <td width="70%" class="listhdrr">Name</td>
         <td width="20%" class="listhdr">Size</td>
@@ -123,7 +123,7 @@ if ($_POST) {
 		<td class="listlr"><?=htmlspecialchars($element['name']);?></td>
 		<td class="listr" align="right"><?=format_bytes($element['size']);?></td>
 		<td valign="middle" nowrap class="list">
-		<a href="services_captiveportal_filemanager.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this file?')"><img src="x.gif" title="delete file" width="17" height="17" border="0"></a>
+		<a href="services_captiveportal_filemanager.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this file?')"><img src="x.gif" title="delete file" width="17" height="17" border="0" alt="delete file"></a>
 		</td>
 	  </tr>
   <?php $i++; endforeach; ?>
@@ -141,13 +141,13 @@ if ($_POST) {
 		<td class="listlr" colspan="2"><input type="file" name="new" class="formfld" size="40" id="new"> 
 		<input name="Submit" type="submit" class="formbtn" value="Upload"></td>
 		<td valign="middle" nowrap class="list">
-		<a href="services_captiveportal_filemanager.php"><img src="x.gif" title="cancel" width="17" height="17" border="0"></a>
+		<a href="services_captiveportal_filemanager.php"><img src="x.gif" title="cancel" width="17" height="17" border="0" alt="cancel"></a>
 		</td>
 	  </tr>
   <?php else: ?>
 	  <tr>
 		<td class="list" colspan="2"></td>
-		<td class="list"> <a href="services_captiveportal_filemanager.php?act=add"><img src="plus.gif" title="add file" width="17" height="17" border="0"></a></td>
+		<td class="list"> <a href="services_captiveportal_filemanager.php?act=add"><img src="plus.gif" title="add file" width="17" height="17" border="0" alt="add file"></a></td>
 	  </tr>
   <?php endif; ?>
 	</table>

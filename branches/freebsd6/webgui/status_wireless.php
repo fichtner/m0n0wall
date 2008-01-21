@@ -109,7 +109,7 @@ function get_wireless_info($ifdescr) {
 	}
 		
 	if (count($ifdescrs) > 0): ?>
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="wi-fi info pane">
               <?php
 			      foreach ($ifdescrs as $ifdescr => $ifname): 
 				  $ifinfo = get_wireless_info($ifdescr);
@@ -127,7 +127,7 @@ function get_wireless_info($ifdescr) {
               <tr> 
                 <td width="22%" valign="top" class="vncellt">Last scan results</td>
                 <td width="78%" class="listrpad"> 
-                  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                  <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                     <tr> 
                       <td width="35%" class="listhdrr">SSID</td>
                       <td width="25%" class="listhdrr">BSSID</td>
@@ -141,7 +141,7 @@ function get_wireless_info($ifdescr) {
                       <td class="listlr" nowrap>
                         <?php if (!$ss['ssid']) echo "<span class=\"gray\">(hidden)</span>"; else echo htmlspecialchars($ss['ssid']);?>
                         <?php if (strpos($ss['caps'][0], "E") !== false): ?>
-                        <img src="lock.gif" width="7" height="9">
+                        <img src="lock.gif" width="7" height="9" alt="">
                         <?php endif; ?>
                       </td>
                       <td class="listr"> 
@@ -168,7 +168,7 @@ function get_wireless_info($ifdescr) {
                 </td>
                 <td width="78%" class="listrpad"> 
                   <?php if (count($ifinfo['aslist']) > 0): ?>
-                  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                  <table width="100%" border="0" cellpadding="0" cellspacing="0" summary"station pane">
                     <tr> 
                       <td width="30%" class="listhdrr">MAC address</td>
                       <td width="15%" class="listhdrr">Rate</td>

@@ -349,7 +349,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 var portsenabled = 1;
 
@@ -450,11 +450,12 @@ function dst_rep_change() {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (is_array($config['shaper']['pipe']) && (count($config['shaper']['pipe']) > 0)): ?>
             <form action="firewall_shaper_edit.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td valign="top" class="vncellreq">Target</td>
                   <td class="vtable"><select name="target" class="formfld">
                       <?php 
+	       if (is_array($config['shaper']['pipe']) && count($config['shaper']['pipe']) > 0):
 					  foreach ($config['shaper']['pipe'] as $pipei => $pipe): ?>
                       <option value="<?="targetpipe:$pipei";?>" <?php if ("targetpipe:$pipei" == $pconfig['target']) echo "selected"; ?>> 
                       <?php
@@ -463,7 +464,8 @@ function dst_rep_change() {
 							echo htmlspecialchars(" (" . $pipe['descr'] . ")");
 					  ?>
                       </option>
-                      <?php endforeach;
+                      <?php endforeach; endif;
+               if (is_array($config['shaper']['queue']) && count($config['shaper']['queue']) > 0):
 					  foreach ($config['shaper']['queue'] as $queuei => $queue): ?>
                       <option value="<?="targetqueue:$queuei";?>" <?php if ("targetqueue:$queuei" == $pconfig['target']) echo "selected"; ?>> 
                       <?php
@@ -472,7 +474,7 @@ function dst_rep_change() {
 							echo htmlspecialchars(" (" . $queue['descr'] . ")");
 					  ?>
                       </option>
-                      <?php endforeach; ?>
+                      <?php endforeach; endif; ?>
                     </select> <br>
                     <span class="vexpl">Choose a pipe or queue where packets that 
                     match this rule should be sent.</span></td>
@@ -517,7 +519,7 @@ function dst_rep_change() {
                   <td width="78%" class="vtable"> <input name="srcnot" type="checkbox" id="srcnot" value="yes" <?php if ($pconfig['srcnot']) echo "checked"; ?>> 
                     <strong>not</strong><br>
                     Use this option to invert the sense of the match.<br> <br> 
-                    <table border="0" cellspacing="0" cellpadding="0">
+                    <table border="0" cellspacing="0" cellpadding="0" summary="type-address widget">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
 						<td></td>
@@ -558,7 +560,7 @@ function dst_rep_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Source port range 
                   </td>
-                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0">
+                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0" summary="from-to widget">
                       <tr> 
                         <td>from:&nbsp;&nbsp;</td>
                         <td><select name="srcbeginport" class="formfld" onchange="src_rep_change();ext_change()">
@@ -599,7 +601,7 @@ function dst_rep_change() {
                   <td width="78%" class="vtable"> <input name="dstnot" type="checkbox" id="dstnot" value="yes" <?php if ($pconfig['dstnot']) echo "checked"; ?>> 
                     <strong>not</strong><br>
                     Use this option to invert the sense of the match.<br> <br> 
-                    <table border="0" cellspacing="0" cellpadding="0">
+                    <table border="0" cellspacing="0" cellpadding="0" summary="type-address widget">
                       <tr> 
                         <td>Type:&nbsp;&nbsp;</td>
 						<td></td>
@@ -640,7 +642,7 @@ function dst_rep_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Destination port 
                     range </td>
-                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0">
+                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0" summary="from-to widget">
                       <tr> 
                         <td>from:&nbsp;&nbsp;</td>
                         <td><select name="dstbeginport" class="formfld" onchange="dst_rep_change();ext_change()">
@@ -719,7 +721,7 @@ function dst_rep_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">TCP flags</td>
-                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0">
+                  <td width="78%" class="vtable"> <table border="0" cellspacing="0" cellpadding="0" summary="tcp flags widget">
                       <?php 
 				  $inflags = explode(",", $pconfig['tcpflags']);
 				  foreach ($tcpflags as $tcpflag): $dontcare = true; ?>
@@ -756,7 +758,7 @@ function dst_rep_change() {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 ext_change();
 typesel_change();

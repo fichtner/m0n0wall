@@ -89,7 +89,7 @@ captiveportal_unlock();
 
 <?php if (isset($config['voucher']['enable'])): ?>
 <form action="status_captiveportal.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
 <tr><td class="tabnavtbl">
 <ul id="tabnav">
 <?php 
@@ -105,17 +105,17 @@ $tabs = array('Users' => 'status_captiveportal.php',
 <td class="tabcont">
 <?php endif; ?>
 
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
   <tr>
-    <td class="listhdrr"><a href="?order=ip&showact=<?=$_GET['showact'];?>">IP address</a></td>
-    <td class="listhdrr"><a href="?order=mac&showact=<?=$_GET['showact'];?>">MAC address</a></td>
-    <td class="listhdrr"><a href="?order=start&showact=<?=$_GET['showact'];?>">Session start</a></td>
-    <td class="listhdrr"><a href="?order=download&showact=<?=$_GET['showact'];?>">Download</a></td>
-    <td class="listhdrr"><a href="?order=upload&showact=<?=$_GET['showact'];?>">Upload</a></td>
+    <td class="listhdrr"><a href="?order=ip&amp;showact=<?=$_GET['showact'];?>">IP address</a></td>
+    <td class="listhdrr"><a href="?order=mac&amp;showact=<?=$_GET['showact'];?>">MAC address</a></td>
+    <td class="listhdrr"><a href="?order=start&amp;showact=<?=$_GET['showact'];?>">Session start</a></td>
+    <td class="listhdrr"><a href="?order=download&amp;showact=<?=$_GET['showact'];?>">Download</a></td>
+    <td class="listhdrr"><a href="?order=upload&amp;showact=<?=$_GET['showact'];?>">Upload</a></td>
     <?php if ($_GET['showact']): ?>
-    <td class="listhdrr"><a href="?order=lastact&showact=<?=$_GET['showact'];?>">Last activity</a></td>
+    <td class="listhdrr"><a href="?order=lastact&amp;showact=<?=$_GET['showact'];?>">Last activity</a></td>
     <?php endif; ?>
-    <td class="listhdr"><a href="?order=user&showact=<?=$_GET['showact'];?>">Username</a></td>
+    <td class="listhdr"><a href="?order=user&amp;showact=<?=$_GET['showact'];?>">Username</a></td>
     <td class="list"></td>
   </tr>
 <?php foreach ($cpdb as $cpent): ?>
@@ -130,7 +130,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
     <?php endif; ?>
     <td class="listr"><?=$cpent[4];?>&nbsp;</td>
     <td valign="middle" class="list" nowrap>
-    <a href="?order=<?=$_GET['order'];?>&showact=<?=$_GET['showact'];?>&act=del&id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" title="disconnect client" width="17" height="17" border="0"></a></td>
+    <a href="?order=<?=$_GET['order'];?>&amp;showact=<?=$_GET['showact'];?>&amp;act=del&amp;id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" title="disconnect client" width="17" height="17" border="0" alt="disconnect client"></a></td>
   </tr>
 <?php endforeach; ?>
 </table>
@@ -142,7 +142,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
 </form>
 <?php endif; ?>
 
-<p>
+<p><!-- TODO: paragraph is not valid here -->
 <form action="status_captiveportal.php" method="GET">
 <input type="hidden" name="order" value="<?=$_GET['order'];?>">
 <?php if ($_GET['showact']): ?>

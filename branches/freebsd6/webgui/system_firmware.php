@@ -165,7 +165,7 @@ print_info_box($sig_warning);
 			  to be uploaded.<br>Click &quot;Upgrade firmware&quot; 
               to start the upgrade process.</p>
             <form action="system_firmware.php" method="post" enctype="multipart/form-data">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 

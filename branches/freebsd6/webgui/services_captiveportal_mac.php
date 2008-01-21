@@ -75,7 +75,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The captive portal MAC address configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -91,7 +91,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr>
   <td class="tabcont">
-  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
 	<tr>
 	  <td width="30%" class="listhdrr">MAC address</td>
 	  <td width="60%" class="listhdr">Description</td>
@@ -105,13 +105,13 @@ if ($_GET['act'] == "del") {
 	  <td class="listbg">
 		<?=htmlspecialchars($mac['descr']);?>&nbsp;
 	  </td>
-	  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_mac_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0"></a>
-		 &nbsp;<a href="services_captiveportal_mac.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0"></a></td>
+	  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_mac_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0" alt="edit host"></a>
+		 &nbsp;<a href="services_captiveportal_mac.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0" alt="delete host"></a></td>
 	</tr>
   <?php $i++; endforeach; ?>
 	<tr> 
 	  <td class="list" colspan="2">&nbsp;</td>
-	  <td class="list"> <a href="services_captiveportal_mac_edit.php"><img src="plus.gif" title="add host" width="17" height="17" border="0"></a></td>
+	  <td class="list"> <a href="services_captiveportal_mac_edit.php"><img src="plus.gif" title="add host" width="17" height="17" border="0" alt="add host"></a></td>
 	</tr>
 	<tr>
 	<td colspan="2" class="list"><span class="vexpl"><span class="red"><strong>

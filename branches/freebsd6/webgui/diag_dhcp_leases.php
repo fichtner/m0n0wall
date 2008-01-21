@@ -139,13 +139,13 @@ while ($data = array_shift($return)) {
 if ($_GET['order'])
 	usort($leases, "leasecmp");
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=ip">IP address</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=mac">MAC address</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=hostname">Hostname</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&order=start">Start</a></td>
-    <td class="listhdr"><a href="?all=<?=$_GET['all'];?>&order=end">End</a></td>
+    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=ip">IP address</a></td>
+    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=mac">MAC address</a></td>
+    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=hostname">Hostname</a></td>
+    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=start">Start</a></td>
+    <td class="listhdr"><a href="?all=<?=$_GET['all'];?>&amp;order=end">End</a></td>
     <td class="list"></td>
 	</tr>
 <?php
@@ -170,7 +170,7 @@ foreach ($leases as $data) {
 		echo "<td class=\"listr\">{$fspans}{$data['hostname']}{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['start']) . "{$fspane}&nbsp;</td>\n";
 		echo "<td class=\"listr\">{$fspans}" . adjust_gmt($data['end']) . "{$fspane}&nbsp;</td>\n";
-		echo "<td class=\"list\" valign=\"middle\"><a href=\"services_dhcp_edit.php?if={$data['if']}&mac={$data['mac']}\"><img src=\"plus.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"add a static mapping for this MAC address\"></a></td>\n";
+		echo "<td class=\"list\" valign=\"middle\"><a href=\"services_dhcp_edit.php?if={$data['if']}&amp;mac={$data['mac']}\"><img src=\"plus.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"add a static mapping for this MAC address\" alt=\"add a static mapping for this MAC address\"></a></td>\n";
 		echo "</tr>\n";
 	}
 }

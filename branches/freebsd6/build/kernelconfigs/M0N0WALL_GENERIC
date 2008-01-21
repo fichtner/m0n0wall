@@ -40,6 +40,7 @@ options		IPFILTER_DEFAULT_BLOCK
 options		IPSTATE_SIZE=42859
 options		IPSTATE_MAX=30000
 options		IPFIREWALL_FORWARD
+options		IPSTEALTH
 
 device		apic			# I/O APIC
 

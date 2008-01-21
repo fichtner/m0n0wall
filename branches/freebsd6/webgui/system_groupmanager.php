@@ -187,7 +187,7 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 	<?php 
@@ -210,7 +210,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
 	}
 ?>
 <form action="system_groupmanager.php" method="post" name="iform" id="iform">
-          <table width="100%" border="0" cellpadding="6" cellspacing="0">
+          <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="group management pane">
             <tr> 
               <td width="22%" valign="top" class="vncellreq">Group name</td>
               <td width="78%" class="vtable"> 
@@ -232,7 +232,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
 				</tr>
             <tr>
               <td colspan="2">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="page permission pane">
               <tr>
                 <td class="listhdrr">&nbsp;</td>
                 <td class="listhdrr">Page Description</td>
@@ -266,7 +266,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
 <?php
 } else {
 ?>
- <table width="100%" border="0" cellpadding="0" cellspacing="0">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="page permission pane">
     <tr>
        <td width="35%" class="listhdrr">Group name</td>
        <td width="20%" class="listhdrr">Description</td>
@@ -284,13 +284,13 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
                   <td class="listbg">
                     <?=count($group['pages']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="system_groupmanager.php?act=edit&id=<?=$i; ?>"><img src="e.gif" title="edit group" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="system_groupmanager.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this group?')"><img src="x.gif" title="delete group" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="system_groupmanager.php?act=edit&amp;id=<?=$i; ?>"><img src="e.gif" title="edit group" width="17" height="17" border="0" alt="edit group"></a>
+                     &nbsp;<a href="system_groupmanager.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this group?')"><img src="x.gif" title="delete group" width="17" height="17" border="0" alt="delete group"></a></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 	    <tr> 
 			<td class="list" colspan="3"></td>
-			<td class="list"> <a href="system_groupmanager.php?act=new"><img src="plus.gif" title="add group" width="17" height="17" border="0"></a></td>
+			<td class="list"> <a href="system_groupmanager.php?act=new"><img src="plus.gif" title="add group" width="17" height="17" border="0" alt="add group"></a></td>
 		</tr>
 		<tr>
 			<td colspan="3">

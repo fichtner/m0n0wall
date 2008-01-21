@@ -56,7 +56,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The IPsec tunnel configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td>
   <ul id="tabnav">
 <?php 
@@ -70,7 +70,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr> 
     <td class="tabcont">
-              <table width="80%" border="0" cellpadding="0" cellspacing="0">
+              <table width="80%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr> 
                   <td class="listhdrr">Identifier</td>
                   <td class="list"></td>
@@ -80,13 +80,13 @@ if ($_GET['act'] == "del") {
                   <td class="listlr">
                     <?=htmlspecialchars($secretent['ident']);?>
                   </td>
-                  <td class="list" nowrap> <a href="vpn_ipsec_ca_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit certificate" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="vpn_ipsec_ca.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this certificate?')"><img src="x.gif" title="delete certificate" width="17" height="17" border="0"></a></td>
+                  <td class="list" nowrap> <a href="vpn_ipsec_ca_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit certificate" width="17" height="17" border="0" alt="certificate"></a>
+                     &nbsp;<a href="vpn_ipsec_ca.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this certificate?')"><img src="x.gif" title="delete certificate" width="17" height="17" border="0" alt="delete certificate"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list"></td>
-                  <td class="list"> <a href="vpn_ipsec_ca_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="vpn_ipsec_ca_edit.php"><img src="plus.gif" width="17" height="17" border="0" alt=""></a></td>
 				</tr>
               </table>
 			 </td>

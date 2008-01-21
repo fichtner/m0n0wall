@@ -62,10 +62,10 @@ function dynamic_menu(&$menu, $menu_title) {
 			else { 
 				if (!isset($header_displayed)) {
 					if (isset($config['system']['webgui']['expanddiags']) || strstr($_SERVER['SCRIPT_FILENAME'], "diag_") || strstr($_SERVER['SCRIPT_FILENAME'], "reboot")): ?>
-					<a href="javascript:showhide('diag','tri_diag')"><img src="/tri_o.gif" id="tri_diag" width="14" height="10" border="0"></a><strong><a href="javascript:showhide('diag','tri_diag')" class="navlnk">Diagnostics</a></strong><br>
+					<a href="javascript:showhide('diag','tri_diag')"><img src="/tri_o.gif" id="tri_diag" width="14" height="10" border="0" alt=""></a><strong><a href="javascript:showhide('diag','tri_diag')" class="navlnk">Diagnostics</a></strong><br>
 					<span id="diag">
 					<?php else: ?>
-					<a href="javascript:showhide('diag','tri_diag')"><img src="/tri_c.gif" id="tri_diag" width="14" height="10" border="0"></a><strong><a href="javascript:showhide('diag','tri_diag')" class="navlnk">Diagnostics</a></strong><br>
+					<a href="javascript:showhide('diag','tri_diag')"><img src="/tri_c.gif" id="tri_diag" width="14" height="10" border="0" alt=""></a><strong><a href="javascript:showhide('diag','tri_diag')" class="navlnk">Diagnostics</a></strong><br>
 					<span id="diag" style="display: none">
 					<?php endif;
 					$header_displayed = true;			  
@@ -187,14 +187,16 @@ $menu['Diagnostics']['Reboot system'] 	= array('reboot.php');
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
+<head profile="http://dublincore.org/documents/dcq-html/">
 <title><?=genhtmltitle($pgtitle);?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- common meta tags have been externalized -->
+<?php require_once("fmeta.inc"); ?>
 <link href="gui.css" rel="stylesheet" type="text/css">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script language="javascript">
+<script type="text/javascript">
 <!--
 var tri_open = "";
 var tri_closed = "";
@@ -223,11 +225,11 @@ function showhide(tspan, tri) {
 }
 -->
 </script>
-<table width="750" border="0" cellspacing="0" cellpadding="2">
+<table width="750" border="0" cellspacing="0" cellpadding="2" summary="outer first pane">
   <tr valign="bottom"> 
-    <td width="150" height="65" align="center" valign="middle"> <strong><a href="http://m0n0.ch/wall" target="_blank"><img src="/logo.gif" width="150" height="47" border="0"></a></strong></td>
+    <td width="150" height="65" align="center" valign="middle"> <strong><a href="http://m0n0.ch/wall" target="_blank"><img src="/logo.gif" width="150" height="47" border="0" alt=""></a></strong></td>
     <td height="65" bgcolor="#435370">
-	<table border="0" cellspacing="0" cellpadding="0" width="100%">
+	<table border="0" cellspacing="0" cellpadding="0" width="100%" summary="header pane">
 	<tr><td align="left" valign="bottom"><span class="tfrtitle">&nbsp;webGUI 
       Configuration</span></td>
 	  <td align="right" valign="bottom">
@@ -237,7 +239,7 @@ function showhide(tspan, tri) {
   </tr>
   <tr valign="top"> 
     <td width="150" bgcolor="#9D9D9D">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="menu panel">
         <tr>
           <td><span class="navlnk"><font color="#FFFFFF"> 
             <?php 
@@ -287,7 +289,7 @@ dynamic_menu($menu['Diagnostics'], 'Diagnostics');
 			  </font></span>
             </td>
         </tr></table></td>
-    <td width="600"><table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <td width="600"><table width="100%" border="0" cellpadding="10" cellspacing="0" summary="outer content pane">
         <tr><td>
 <?php if (!$pgtitle_omit): ?>
       <p class="pgtitle"><?=gentitle($pgtitle);?></p>

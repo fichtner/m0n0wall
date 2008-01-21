@@ -165,7 +165,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function methodsel_change() {
 	switch (document.iform.p1authentication_method.selectedIndex) {
@@ -189,7 +189,7 @@ function methodsel_change() {
 <?php endif; ?>
 </form>
 <form action="vpn_ipsec_mobile.php" method="post" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -203,7 +203,7 @@ function methodsel_change() {
   </td></tr>
   <tr> 
     <td class="tabcont">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 			  <tr> 
                         <td width="22%" class="vtable" valign="top">&nbsp;</td>
                         <td width="78%" class="vtable"> 
@@ -386,7 +386,7 @@ function methodsel_change() {
 			</tr>
 		</table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 methodsel_change();
 //-->

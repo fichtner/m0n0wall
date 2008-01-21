@@ -97,7 +97,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The DNS forwarder configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
@@ -136,7 +136,7 @@ if ($_GET['act'] == "del") {
                       forwarders below.</p></td>
                 </tr>
               </table>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="forwarder-override widget">
                 <tr>
                   <td width="20%" class="listhdrr">Host</td>
                   <td width="25%" class="listhdrr">Domain</td>
@@ -158,16 +158,16 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($hostent['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_dnsmasq.php?act=del&type=host&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0" alt="edit host"></a>
+                     &nbsp;<a href="services_dnsmasq.php?act=del&amp;type=host&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0" alt="delete host"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="4"></td>
-                  <td class="list"> <a href="services_dnsmasq_edit.php"><img src="plus.gif" title="add host" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="services_dnsmasq_edit.php"><img src="plus.gif" title="add host" width="17" height="17" border="0" alt="add host"></a></td>
 				</tr>
               </table>
-			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+			  <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="auth-dns-server widget">
                 <tr> 
                   <td><p>Below you can override an entire domain by specifying an
                          authoritative DNS server to be queried for that domain.</p></td>
@@ -191,13 +191,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($doment['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_domainoverride_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_dnsmasq.php?act=del&type=doverride&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this domain override?')"><img src="x.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_domainoverride_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0" alt=""></a>
+                     &nbsp;<a href="services_dnsmasq.php?act=del&amp;type=doverride&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this domain override?')"><img src="x.gif" width="17" height="17" border="0" alt=""></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="services_dnsmasq_domainoverride_edit.php"><img src="plus.gif" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="services_dnsmasq_domainoverride_edit.php"><img src="plus.gif" width="17" height="17" border="0" alt=""></a></td>
 				</tr>
 			  </table>
             </form>

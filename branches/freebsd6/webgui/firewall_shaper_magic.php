@@ -353,7 +353,7 @@ if ($_POST) {
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.$note");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -367,7 +367,7 @@ if ($_POST) {
   </td></tr>
   <tr> 
     <td class="tabcont">
-     <table width="100%" border="0" cellpadding="6" cellspacing="0">
+     <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 		<tr> 
 		  <td width="22%" valign="top" class="vtable">&nbsp;</td>
 		  <td width="78%" class="vtable">

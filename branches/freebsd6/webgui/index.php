@@ -57,12 +57,12 @@ if ($_POST) {
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="" method="POST">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="content pane">
               <tr align="center" valign="top"> 
                 <td height="10" colspan="2">&nbsp;</td>
               </tr>
               <tr align="center" valign="top"> 
-                <td height="170" colspan="2"><img src="logobig.gif" width="520" height="149"></td>
+                <td height="170" colspan="2"><img src="logobig.gif" width="520" height="149" alt=""></td>
               </tr>
               <tr> 
                 <td colspan="2" class="listtopic">System information</td>
@@ -145,10 +145,10 @@ $freeMem = $memory[4];
 $usedMem = $totalMem - $freeMem;
 $memUsage = round(($usedMem * 100) / $totalMem, 0);
 		  
-echo " <img src='bar_left.gif' height='15' width='4' border='0' align='absmiddle'>";
-echo "<img src='bar_blue.gif' height='15' width='" . $memUsage . "' border='0' align='absmiddle'>";
-echo "<img src='bar_gray.gif' height='15' width='" . (100 - $memUsage) . "' border='0' align='absmiddle'>";
-echo "<img src='bar_right.gif' height='15' width='5' border='0' align='absmiddle'> ";
+echo " <img src='bar_left.gif' height='15' width='4' border='0' align='middle' alt=''>";
+echo "<img src='bar_blue.gif' height='15' width='" . $memUsage . "' border='0' align='middle' alt=''>";
+echo "<img src='bar_gray.gif' height='15' width='" . (100 - $memUsage) . "' border='0' align='middle' alt=''>";
+echo "<img src='bar_right.gif' height='15' width='5' border='0' align='middle' alt=''> ";
 echo $memUsage . "%";
 ?>
                 </td>

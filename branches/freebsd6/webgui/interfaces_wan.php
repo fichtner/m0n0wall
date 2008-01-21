@@ -244,7 +244,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	if (document.iform.pppoe_dialondemand.checked || enable_change) {
@@ -403,7 +403,7 @@ function type_change(enable_change,enable_change_pptp) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_wan.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td valign="middle"><strong>Type</strong></td>
                   <td><select name="type" class="formfld" id="type" onchange="type_change()">
@@ -618,12 +618,12 @@ function type_change(enable_change,enable_change_pptp) {
                 </tr>
                 <tr> 
                   <td width="100" valign="top">&nbsp;</td>
-                  <td> &nbsp;<br> <input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change_pptp(true)&&enable_change(true)"> 
+                  <td> &nbsp;<br> <input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change_pptp(true)&amp;&amp;enable_change(true)"> 
                   </td>
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 type_change();
 <?php if (isset($optcfg['wireless'])): ?>

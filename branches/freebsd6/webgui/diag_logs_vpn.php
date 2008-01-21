@@ -70,7 +70,7 @@ function dump_clog($logfile, $tail) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -87,7 +87,7 @@ function dump_clog($logfile, $tail) {
   </td></tr>
   <tr>
     <td class="tabcont">
-		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane"><tr>
 		  <td colspan="4" class="listtopic"> 
 			    Last <?=$nentries;?> PPTP VPN log entries</td>
 			</tr>

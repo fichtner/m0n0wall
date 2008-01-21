@@ -126,7 +126,7 @@ function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors
 
 function print_input_errors($input_errors) {
 	echo "<p><table border=\"0\" cellspacing=\"0\" cellpadding=\"4\" width=\"100%\">\n";
-	echo "<tr><td bgcolor=\"#A12A2A\" width=\"36\" align=\"center\" valign=\"top\"><img src=\"/err.gif\" width=\"28\" height=\"32\"></td>\n";
+	echo "<tr><td bgcolor=\"#A12A2A\" width=\"36\" align=\"center\" valign=\"top\"><img src=\"/err.gif\" width=\"28\" height=\"32\" alt=\"\"></td>\n";
 	echo "<td bgcolor=\"#FFD9D1\" style=\"padding-left: 8px; padding-top: 6px\">";
 	
 	echo "<span class=\"errmsg\"><p>The following input errors were detected:<ul>\n";
@@ -171,16 +171,16 @@ function verify_gzip_file($fname) {
 
 function print_info_box_np($msg) {
 	echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"4\" width=\"100%\">\n";
-	echo "<tr><td bgcolor=\"#687BA4\" align=\"center\" valign=\"top\" width=\"36\"><img src=\"/exclam.gif\" width=\"28\" height=\"32\"></td>\n";
+	echo "<tr><td bgcolor=\"#687BA4\" align=\"center\" valign=\"top\" width=\"36\"><img src=\"/exclam.gif\" width=\"28\" height=\"32\" alt=\"\"></td>\n";
 	echo "<td bgcolor=\"#D9DEE8\" style=\"padding-left: 8px\">";
 	echo $msg;
 	echo "</td></tr></table>";
 }
 
 function print_info_box($msg) {
-	echo "<p>";
+	echo "<!-- do not surround tables using a paragraph tag. use padding or marging instead -->";
 	print_info_box_np($msg);
-	echo "</p>";
+	echo "";
 }
 
 function format_bytes($bytes) {

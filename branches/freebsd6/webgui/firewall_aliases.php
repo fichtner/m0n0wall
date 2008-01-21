@@ -76,7 +76,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The alias list has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td width="25%" class="listhdrr">Name</td>
                   <td width="30%" class="listhdrr">Address</td>
@@ -94,13 +94,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($alias['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="firewall_aliases_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit alias" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="firewall_aliases.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this alias? All elements that still use it will become invalid (e.g. filter rules)!')"><img src="x.gif" title="delete alias" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="firewall_aliases_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit alias" width="17" height="17" border="0" alt="edit alias"></a>
+                     &nbsp;<a href="firewall_aliases.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this alias? All elements that still use it will become invalid (e.g. filter rules)!')"><img src="x.gif" title="delete alias" width="17" height="17" border="0" alt="delete alias"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="firewall_aliases_edit.php"><img src="plus.gif" title="add alias" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="firewall_aliases_edit.php"><img src="plus.gif" title="add alias" width="17" height="17" border="0" alt="add alias"></a></td>
 				</tr>
               </table>
             </form>

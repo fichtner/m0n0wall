@@ -88,7 +88,7 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabinact1"><a href="interfaces_assign.php">Interface assignments</a></li>
@@ -97,7 +97,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr> 
     <td class="tabcont">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td width="20%" class="listhdrr">Interface</td>
                   <td width="20%" class="listhdrr">VLAN tag</td>
@@ -115,13 +115,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($vlan['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="interfaces_vlan_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit VLAN" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="interfaces_vlan.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this VLAN?')"><img src="x.gif" title="delete VLAN" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="interfaces_vlan_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit VLAN" width="17" height="17" border="0" alt="edit VLAN"></a>
+                     &nbsp;<a href="interfaces_vlan.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this VLAN?')"><img src="x.gif" title="delete VLAN" width="17" height="17" border="0" alt="delete VLAN"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3">&nbsp;</td>
-                  <td class="list"> <a href="interfaces_vlan_edit.php"><img src="plus.gif" title="add VLAN" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="interfaces_vlan_edit.php"><img src="plus.gif" title="add VLAN" width="17" height="17" border="0" alt="add VLAN"></a></td>
 				</tr>
 				<tr>
 				<td colspan="3" class="list"><span class="vexpl"><span class="red"><strong>

@@ -189,7 +189,7 @@ if (isset($rawdata)) {
 			$filterPassThru .= "&view=1";
 		
 		// Redirect so we don't hit "new" every time we refresh the screen.
-		header("Location: diag_ipfstat.php?&order=bytes&sort=des".$filterPassThru);
+		header("Location: diag_ipfstat.php?order=bytes&sort=des".$filterPassThru);
 		exit;
 	}
 		
@@ -260,11 +260,11 @@ function sortOrder($column) {
 	
 	if ($_GET['order'] == $column) {
 		if ($_GET['sort'] == 'des')
-			return "&sort=asc";	
-		return "&sort=des";
+			return "&amp;sort=asc";	
+		return "&amp;sort=des";
 	}
 	else 
-		return "&sort=asc";	
+		return "&amp;sort=asc";	
 }
 
 function stripPort($ip, $showPort = false) {
@@ -322,6 +322,9 @@ else {
 // Moved this down here due to the potential for redirects, up above.
 include("fbegin.inc");
 
+// Produce proper HTML
+$filterPassThru = str_replace("&", "&amp;", $filterPassThru);
+
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -330,7 +333,7 @@ include("fbegin.inc");
   </tr>
   <tr>
     <?php if (($lastSnapshot!='Never') && (!isset($_GET['view']))) :?>  
-    <td class="listlr"><a href="?view=1&order=bytes&sort=des<?=$filterPassThru;?>">View delta</a></td>
+    <td class="listlr"><a href="?view=1&amp;order=bytes&amp;sort=des<?=$filterPassThru;?>">View delta</a></td>
     <td class="listr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr"><a href="?clear=1">Clear snapshot</a></td>
 	<td class="listr" colspan="5" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>    

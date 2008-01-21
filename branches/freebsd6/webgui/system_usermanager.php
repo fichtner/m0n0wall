@@ -132,7 +132,7 @@ if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 	<?php 
@@ -155,7 +155,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
 	}	
 ?>
 	<form action="system_usermanager.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Username</td>
                   <td width="78%" class="vtable"> 
@@ -180,11 +180,13 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
                   <td width="22%" valign="top" class="vncell">Group Name</td>
                   <td width="78%" class="vtable">
 				  <select name="groupname" class="formfld" id="groupname">
+                      <?php if (is_array($config['system']['group']) && count($config['system']['group']) > 0): ?>
                       <?php foreach ($config['system']['group'] as $group): ?>
                       <option value="<?=$group['name'];?>" <?php if ($group['name'] == $pconfig['groupname']) echo "selected"; ?>>
                       <?=htmlspecialchars($group['name']);?>
                       </option>
                       <?php endforeach; ?>
+                      <?php endif; ?>
                     </select>                   
                     <br>
                     The admin group to which this user is assigned.</td>
@@ -203,7 +205,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
 <?php
 } else {
 ?>
-     <table width="100%" border="0" cellpadding="0" cellspacing="0">
+     <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="user list pane">
         <tr>
            <td width="35%" class="listhdrr">Username</td>
            <td width="20%" class="listhdrr">Full name</td>
@@ -221,13 +223,13 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
                   <td class="listbg">
                     <?=htmlspecialchars($userent['groupname']); ?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="system_usermanager.php?act=edit&id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="system_usermanager.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="system_usermanager.php?act=edit&amp;id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
+                     &nbsp;<a href="system_usermanager.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 	    <tr> 
 			<td class="list" colspan="3"></td>
-			<td class="list"> <a href="system_usermanager.php?act=new"><img src="plus.gif" title="add user" width="17" height="17" border="0"></a></td>
+			<td class="list"> <a href="system_usermanager.php?act=new"><img src="plus.gif" title="add user" width="17" height="17" border="0" alt="add user"></a></td>
 		</tr>
 		<tr>
 			<td colspan="3">
@@ -272,7 +274,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
       <form action="system_usermanager.php" method="post" name="iform" id="iform">
-         <table width="100%" border="0" cellpadding="6" cellspacing="0">
+         <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="password change pane">
             <tr> 
               <td colspan="2" valign="top" class="listtopic"><?=$_SERVER['REMOTE_USER']?>'s Password</td>
             </tr>

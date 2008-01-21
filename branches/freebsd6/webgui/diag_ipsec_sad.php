@@ -93,7 +93,7 @@ if ($fd) {
 }
 if (count($sad)):
 ?>
-            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="inner content pane">
   <tr>
                 <td nowrap class="listhdrr">Source</td>
                 <td nowrap class="listhdrr">Destination</a></td>
@@ -115,11 +115,11 @@ foreach ($sad as $sa): ?>
 		<td class="list" nowrap>
 		<?php
 			$args = "src=" . rawurlencode($sa['src']);
-			$args .= "&dst=" . rawurlencode($sa['dst']);
-			$args .= "&proto=" . rawurlencode($sa['proto']);
-			$args .= "&spi=" . rawurlencode("0x" . $sa['spi']);
+			$args .= "&amp;dst=" . rawurlencode($sa['dst']);
+			$args .= "&amp;proto=" . rawurlencode($sa['proto']);
+			$args .= "&amp;spi=" . rawurlencode("0x" . $sa['spi']);
 		?>
-		  <a href="diag_ipsec_sad.php?act=del&<?=$args;?>" onclick="return confirm('Do you really want to delete this security association?')"><img src="x.gif" title="delete SA" width="17" height="17" border="0"></a>
+		  <a href="diag_ipsec_sad.php?act=del&amp;<?=$args;?>" onclick="return confirm('Do you really want to delete this security association?')"><img src="x.gif" title="delete SA" width="17" height="17" border="0" alt="delete SA"></a>
 		</td>
 				
 	</tr>

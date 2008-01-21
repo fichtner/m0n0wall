@@ -65,7 +65,7 @@ if ($changed) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td>
   <ul id="tabnav">
 <?php 
@@ -81,7 +81,7 @@ if ($changed) {
   </td></tr>
   <tr>
   <td class="tabcont">
-     <table width="100%" border="0" cellpadding="0" cellspacing="0">
+     <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td width="35%" class="listhdrr">Username</td>
                   <td width="20%" class="listhdrr">Full name</td>
@@ -99,13 +99,13 @@ if ($changed) {
                   <td class="listbg">
                     <?=$userent['expirationdate']; ?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_users_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="services_captiveportal_users.php?act=del&id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_users_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
+                     &nbsp;<a href="services_captiveportal_users.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 		<tr> 
 			  <td class="list" colspan="3"></td>
-			  <td class="list"> <a href="services_captiveportal_users_edit.php"><img src="plus.gif" title="add user" width="17" height="17" border="0"></a></td>
+			  <td class="list"> <a href="services_captiveportal_users_edit.php"><img src="plus.gif" title="add user" width="17" height="17" border="0" alt="add users"></a></td>
 		</tr>
  </table>     
 </td>

@@ -210,7 +210,7 @@ function get_interface_info($ifdescr) {
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="" method="post">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="content pane">
               <?php $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
 						
 					for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
@@ -295,8 +295,10 @@ function get_interface_info($ifdescr) {
                   <?=htmlspecialchars($ifinfo['gateway']);?>
                 </td>
               </tr><?php endif; if ($ifdescr == "wan" && file_exists("{$g['varetc_path']}/nameservers.conf")): ?>
+              <tr>
                 <td width="22%" class="vncellt">ISP DNS servers</td>
                 <td width="78%" class="listr"><?php echo nl2br(file_get_contents("{$g['varetc_path']}/nameservers.conf")); ?></td>
+              </tr>
 			  <?php endif; endif; if ($ifinfo['media']): ?>
               <tr> 
                 <td width="22%" class="vncellt">Media</td>

@@ -53,7 +53,7 @@ if ($_POST) {
 ?>
 
 <form action="status_captiveportal_test.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
 <tr><td class="tabnavtbl">
 <ul id="tabnav">
 <?php 
@@ -68,7 +68,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
 <tr>
 <td class="tabcont">
 
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
   <tr>
     <td valign="top" class="vncellreq">Voucher(s)</td>
     <td class="vtable">

@@ -76,7 +76,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The PPTP user list has been modified.<br>You must apply the changes in order for them to take effect.<br><b>Warning: this will terminate all current PPTP sessions!</b>");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -88,7 +88,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr> 
     <td colspan="3" class="tabcont">
-              <table width="80%" border="0" cellpadding="0" cellspacing="0">
+              <table width="80%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr> 
                   <td class="listhdrr">Username</td>
                   <td class="listhdr">IP address</td>
@@ -102,13 +102,13 @@ if ($_GET['act'] == "del") {
                   <td class="listr">
                     <?=htmlspecialchars($secretent['ip']);?>&nbsp;
                   </td>
-                  <td class="list" nowrap> <a href="vpn_pptp_users_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit user" width="17" height="17" border="0"></a>
-                     &nbsp;<a href="vpn_pptp_users.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0"></a></td>
+                  <td class="list" nowrap> <a href="vpn_pptp_users_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
+                     &nbsp;<a href="vpn_pptp_users.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="2"></td>
-                  <td class="list"> <a href="vpn_pptp_users_edit.php"><img src="plus.gif" title="add user" width="17" height="17" border="0"></a></td>
+                  <td class="list"> <a href="vpn_pptp_users_edit.php"><img src="plus.gif" title="add user" width="17" height="17" border="0" alt="add user"></a></td>
 				</tr>
               </table>
 			</td>

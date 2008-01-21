@@ -91,7 +91,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_over) {
 	if (document.iform.mode) {
@@ -106,7 +106,7 @@ function enable_change(enable_over) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="interfaces_lan.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable"> 
@@ -132,17 +132,21 @@ function enable_change(enable_over) {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
-                  <td width="78%"><span class="vexpl"><span class="red"><strong>Warning:<br>
-                    </strong></span>after you click &quot;Save&quot;, you must 
-                    reboot your firewall for changes to take effect. You may also 
-                    have to do one or more of the following steps before you can 
-                    access your firewall again: 
+                  <td width="78%">
+                    <span class="vexpl">
+                      <span class="red">
+                        <strong>Warning:</strong><br>
+                      </span>after you click &quot;Save&quot;, you must 
+                      reboot your firewall for changes to take effect. You may also 
+                      have to do one or more of the following steps before you can 
+                      access your firewall again:
+                    </span> 
                     <ul>
                       <li>change the IP address of your computer</li>
                       <li>renew its DHCP lease</li>
                       <li>access the webGUI with the new IP address</li>
                     </ul>
-                    </span></td>
+                  </td>
                 </tr>
               </table>
 </form>

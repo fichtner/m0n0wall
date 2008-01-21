@@ -145,7 +145,7 @@ if (isset($_POST['del_x'])) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function fr_toggle(id) {
 	var checkbox = document.getElementById('frc' + id);
@@ -206,7 +206,7 @@ function fr_insline(id, on) {
 <?php print_info_box_np("The firewall rule configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php $i = 0; foreach ($iflist as $ifent => $ifname):
@@ -220,7 +220,7 @@ function fr_insline(id, on) {
   </td></tr>
   <tr> 
     <td class="tabcont">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr id="frheader">
                   <td width="3%" class="list">&nbsp;</td>
                   <td width="5%" class="list">&nbsp;</td>
@@ -235,7 +235,7 @@ function fr_insline(id, on) {
 <?php if (($if == "wan") && isset($config['interfaces']['wan']['blockpriv'])): ?>
                 <tr valign="top" id="frrfc1918">
                   <td class="listt"></td>
-                  <td class="listt" align="center"><img src="block.gif" width="11" height="11" border="0"></td>
+                  <td class="listt" align="center"><img src="block.gif" width="11" height="11" border="0" alt=""></td>
                   <td class="listlr" style="background-color: #e0e0e0">*</td>
                   <td class="listr" style="background-color: #e0e0e0">RFC 1918 networks</td>
                   <td class="listr" style="background-color: #e0e0e0">*</td>
@@ -243,14 +243,14 @@ function fr_insline(id, on) {
                   <td class="listr" style="background-color: #e0e0e0">*</td>
                   <td class="listbg" style="background-color: #e0e0e0">Block private networks</td>
                   <td valign="middle" nowrap class="list">
-				    <table border="0" cellspacing="0" cellpadding="1">
+				    <table border="0" cellspacing="0" cellpadding="1" summary="rule table">
 					<tr>
-					  <td><img src="left_d.gif" width="17" height="17" title="move selected rules before this rule"></td>
-					  <td><a href="interfaces_wan.php#rfc1918"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+					  <td><img src="left_d.gif" width="17" height="17" title="move selected rules before this rule" alt="move selected rules before this rule"></td>
+					  <td><a href="interfaces_wan.php#rfc1918"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a></td>
 					</tr>
 					<tr>
 					  <td align="center" valign="middle"></td>
-					  <td><img src="plus_d.gif" title="add a new rule based on this one" width="17" height="17" border="0"></td>
+					  <td><img src="plus_d.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></td>
 					</tr>
 					</table>
 				  </td>
@@ -309,14 +309,14 @@ function fr_insline(id, on) {
                     <?=$textss;?><?=htmlspecialchars($filterent['descr']);?>&nbsp;<?=$textse;?>
                   </td>
                   <td valign="middle" nowrap class="list">
-				    <table border="0" cellspacing="0" cellpadding="1">
+				    <table border="0" cellspacing="0" cellpadding="1" summary="button pane">
 					<tr>
 					  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"></td>
-					  <td><a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+					  <td><a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a></td>
 					</tr>
 					<tr>
 					  <td align="center" valign="middle"></td>
-					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a></td>
+					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a></td>
 					</tr>
 					</table>
 				  </td>
@@ -329,7 +329,7 @@ function fr_insline(id, on) {
 			  <span class="gray">
 			  No rules are currently defined for this interface.<br>
 			  All incoming connections on this interface will be blocked until you add pass rules.<br><br>
-			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="absmiddle"></a> button to add a new rule.</span>
+			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="middle" alt="add new rule"></a> button to add a new rule.</span>
 			  </td>
 			  <?php endif; ?>
                 <tr id="fr<?=$nrules;?>"> 
@@ -342,48 +342,48 @@ function fr_insline(id, on) {
                   <td class="list">&nbsp;</td>
                   <td class="list">&nbsp;</td>
                   <td class="list">
-				    <table border="0" cellspacing="0" cellpadding="1">
+				    <table border="0" cellspacing="0" cellpadding="1" summary="button pane">
 					<tr>
 				      <td>
-					  <?php if ($nrules == 0): ?><img src="left_d.gif" width="17" height="17" title="move selected rules to end" border="0"><?php else: ?><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules to end" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"><?php endif; ?></td>
+					  <?php if ($nrules == 0): ?><img src="left_d.gif" width="17" height="17" title="move selected rules to end" border="0" alt="move selected rules to end"><?php else: ?><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules to end" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"><?php endif; ?></td>
 					  <td></td>
 				    </tr>
 					<tr>
-					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
-					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0"></a></td>
+					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0" alt="delete selected rules"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" alt="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
+					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0" alt="add new rule"></a></td>
 					</tr>
 				    </table>
 				  </td>
 				</tr>
               </table>
-			  <table border="0" cellspacing="0" cellpadding="0">
+			  <table border="0" cellspacing="0" cellpadding="0" summary="info pane">
                 <tr> 
-                  <td width="16"><img src="pass.gif" width="11" height="11"></td>
+                  <td width="16"><img src="pass.gif" width="11" height="11" alt=""></td>
                   <td>pass</td>
                   <td width="14"></td>
-                  <td width="16"><img src="block.gif" width="11" height="11"></td>
+                  <td width="16"><img src="block.gif" width="11" height="11" alt=""></td>
                   <td>block</td>
                   <td width="14"></td>
-                  <td width="16"><img src="reject.gif" width="11" height="11"></td>
+                  <td width="16"><img src="reject.gif" width="11" height="11" alt=""></td>
                   <td>reject</td>
                   <td width="14"></td>
-                  <td width="16"><img src="log.gif" width="11" height="11"></td>
+                  <td width="16"><img src="log.gif" width="11" height="11" alt=""></td>
                   <td>log</td>
                 </tr>
                 <tr>
                   <td colspan="5" height="4"></td>
                 </tr>
                 <tr> 
-                  <td><img src="pass_d.gif" width="11" height="11"></td>
+                  <td><img src="pass_d.gif" width="11" height="11" alt=""></td>
                   <td>pass (disabled)</td>
                   <td></td>
-                  <td><img src="block_d.gif" width="11" height="11"></td>
+                  <td><img src="block_d.gif" width="11" height="11" alt=""></td>
                   <td>block (disabled)</td>
                   <td></td>
-                  <td><img src="reject_d.gif" width="11" height="11"></td>
+                  <td><img src="reject_d.gif" width="11" height="11" alt=""></td>
                   <td>reject (disabled)</td>
                   <td></td>
-                  <td width="16"><img src="log_d.gif" width="11" height="11"></td>
+                  <td width="16"><img src="log_d.gif" width="11" height="11" alt=""></td>
                   <td>log (disabled)</td>
                 </tr>
               </table>

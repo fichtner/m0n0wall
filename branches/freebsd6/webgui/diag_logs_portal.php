@@ -61,7 +61,7 @@ function dump_clog($logfile, $tail) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -78,7 +78,7 @@ function dump_clog($logfile, $tail) {
   </td></tr>
   <tr> 
     <td class="tabcont">
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" summary="content pane">
 		  <tr> 
 			<td colspan="2" class="listtopic"> 
 			  Last <?=$nentries;?> captive portal log entries</td>

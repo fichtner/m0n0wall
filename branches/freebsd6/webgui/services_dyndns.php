@@ -133,7 +133,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_change) {
 	var endis;
@@ -160,10 +160,10 @@ function enable_change(enable_change) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
             <form action="services_dyndns.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td colspan="2" valign="top" class="optsect_t">
-				  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+				  <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="checkbox pane">
 				  <tr><td class="optsect_s"><strong>Dynamic DNS client</strong></td>
 				  <td align="right" class="optsect_s"><input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)"> <strong>Enable</strong></td></tr>
 				  </table></td>
@@ -231,7 +231,7 @@ function enable_change(enable_change) {
                 </tr>
                 <tr> 
                   <td colspan="2" valign="top" class="optsect_t">
-				  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+				  <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="checkbox pane">
 				  <tr>
 				    <td class="optsect_s"><strong>RFC 2136 Dynamic DNS updates</strong></td>
 				    <td align="right" class="optsect_s"><input name="dnsupdate_enable" type="checkbox" value="yes" <?php if ($pconfig['dnsupdate_enable']) echo "checked"; ?> onClick="enable_change(false)"> <strong>Enable</strong></td></tr>
@@ -284,7 +284,7 @@ function enable_change(enable_change) {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

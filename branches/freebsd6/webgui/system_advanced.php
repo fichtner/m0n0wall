@@ -143,7 +143,7 @@ if ($_POST) {
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function enable_change(enable_over) {
 	if (document.iform.ipv6nat_enable.checked || enable_over) {
@@ -160,7 +160,7 @@ function enable_change(enable_over) {
               options on this page are intended for use by advanced users only, 
               and there's <strong>NO</strong> support for them.</span></p>
             <form action="system_advanced.php" method="post" name="iform" id="iform">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td colspan="2" valign="top" class="listtopic">IPv6 tunneling</td>
                 </tr>
@@ -346,7 +346,7 @@ function enable_change(enable_over) {
                 </tr>
               </table>
 </form>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 enable_change(false);
 //-->

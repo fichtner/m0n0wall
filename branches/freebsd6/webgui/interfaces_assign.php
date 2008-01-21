@@ -181,7 +181,7 @@ if ($_GET['act'] == "add") {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
 <form action="interfaces_assign.php" method="post" name="iform" id="iform">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabact">Interface assignments</li>
@@ -190,7 +190,7 @@ if ($_GET['act'] == "add") {
   </td></tr>
   <tr> 
     <td class="tabcont">
-                    <table border="0" cellpadding="0" cellspacing="0">
+                    <table border="0" cellpadding="0" cellspacing="0" summary="content pane">
                       <tr> 
 	<td class="listhdrr">Interface</td>
 	<td class="listhdr">Network port</td>
@@ -222,7 +222,7 @@ if ($_GET['act'] == "add") {
 		</td>
 		<td valign="middle" class="list"> 
 		  <?php if (($ifname != 'lan') && ($ifname != 'wan')): ?>
-		  <a href="interfaces_assign.php?act=del&id=<?=$ifname;?>"><img src="x.gif" title="delete interface" width="17" height="17" border="0"></a> 
+		  <a href="interfaces_assign.php?act=del&amp;id=<?=$ifname;?>"><img src="x.gif" title="delete interface" width="17" height="17" border="0" alt="delete interface"></a> 
 		  <?php endif; ?>
 		</td>
   </tr>
@@ -231,7 +231,7 @@ if ($_GET['act'] == "add") {
   <tr>
 	<td class="list" colspan="2"></td>
 	<td class="list" nowrap>
-	<a href="interfaces_assign.php?act=add"><img src="plus.gif" title="add interface" width="17" height="17" border="0"></a>
+	<a href="interfaces_assign.php?act=add"><img src="plus.gif" title="add interface" width="17" height="17" border="0" alt="add interface"></a>
 	</td>
   </tr>
   <?php else: ?>

@@ -115,7 +115,7 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
 <?php 
@@ -129,7 +129,7 @@ if ($_GET['act'] == "del") {
   </td></tr>
   <tr> 
     <td class="tabcont">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="checkbox pane">
                 <tr> 
                   <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
@@ -141,7 +141,7 @@ if ($_GET['act'] == "del") {
                 </tr>
               </table>
               &nbsp;<br>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                       <tr> 
                         <td width="5%" class="listhdrrns">If</td>
                         <td width="5%" class="listhdrrns">Proto</td>
@@ -209,44 +209,44 @@ if ($_GET['act'] == "del") {
                         <td class="listbg"> 
                           <?=$textss;?><?=htmlspecialchars($shaperent['descr']);?><?=$textse;?>
                           &nbsp; </td>
-                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0"></a> 
+                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a> 
                           <?php if ($i > 0): ?>
-                          <a href="firewall_shaper.php?act=up&id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper.php?act=up&amp;id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0" alt="move up"></a> 
                           <?php else: ?>
-                          <img src="up_d.gif" width="17" height="17" border="0"> 
+                          <img src="up_d.gif" width="17" height="17" border="0" alt""> 
                           <?php endif; ?><br>
-						  <a href="firewall_shaper.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0"></a> 
+						  <a href="firewall_shaper.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0" alt="delete rule"></a> 
                           <?php if (isset($a_shaper[$i+1])): ?>
-                          <a href="firewall_shaper.php?act=down&id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper.php?act=down&amp;id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0" alt="move down"></a> 
                           <?php else: ?>
-                          <img src="down_d.gif" width="17" height="17" border="0"> 
+                          <img src="down_d.gif" width="17" height="17" border="0" alt=""> 
                           <?php endif; ?>
-                          <a href="firewall_shaper_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0"></a> 
+                          <a href="firewall_shaper_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a> 
                         </td>
                       </tr>
                       <?php $i++; endforeach; ?>
                       <tr> 
                         <td class="list" colspan="6"></td>
-                        <td class="list"> <a href="firewall_shaper_edit.php"><img src="plus.gif" title="add rule" width="17" height="17" border="0"></a></td>
+                        <td class="list"> <a href="firewall_shaper_edit.php"><img src="plus.gif" title="add rule" width="17" height="17" border="0" alt="add rule"></a></td>
                       </tr>
                     </table>
 					  
-                    <table border="0" cellspacing="0" cellpadding="0">
+                    <table border="0" cellspacing="0" cellpadding="0" summary="info pane">
                       <tr> 
-                        <td width="16"><img src="in.gif" width="11" height="11"></td>
+                        <td width="16"><img src="in.gif" width="11" height="11" alt=""></td>
                         <td>incoming (as seen by firewall)</td>
                         <td width="14"></td>
-                        <td width="16"><img src="out.gif" width="11" height="11"></td>
+                        <td width="16"><img src="out.gif" width="11" height="11" alt=""></td>
                         <td>outgoing (as seen by firewall)</td>
                       </tr>
                       <tr> 
                         <td colspan="5" height="4"></td>
                       </tr>
                       <tr> 
-                        <td><img src="in_d.gif" width="11" height="11"></td>
+                        <td><img src="in_d.gif" width="11" height="11" alt=""></td>
                         <td>incoming (disabled)</td>
                         <td width="14"></td>
-                        <td><img src="out_d.gif" width="11" height="11"></td>
+                        <td><img src="out_d.gif" width="11" height="11" alt=""></td>
                         <td>outgoing (disabled)</td>
                       </tr>
                     </table><br>
