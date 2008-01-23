@@ -6,6 +6,8 @@ $Id$
 - fix MPD IPCP options reject processing (BellSouth/AT&T SECONDARYDNS
   reject problem)
 
+- updated PHP to 4.4.8
+
 1.232
 -----
 
