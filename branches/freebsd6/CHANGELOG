@@ -3,12 +3,19 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- updated base system to FreeBSD 6.3-RELEASE-p1
+
+- copied dhclient-script from m0n0wall 1.233 (in an attempt at solving the
+  sporadic DHCP renewal problems reported by some users)
+
 - fix MPD WAN PPPoE/PPTP auto-reconnect issue
 
 - webGUI HTML tidyness fixes by Daniel S. Haischt
 
 - put IPSTEALTH in kernel config so that it can be enabled via sysctl
   if needed
+
+- updated ipsec-tools to 0.7
 
 
 1.3b9
