@@ -614,6 +614,21 @@ function convert_config() {
 		$config['version'] = "1.7";
 	}
 	
+	/* convert 1.7 -> 1.8 */
+	if ($config['version'] == "1.7") {
+		/* do one-time conversion from pool.ntp.org to vendor zone */
+		if ($config['system']['timeservers'] == "pool.ntp.org")
+			$config['system']['timeservers-randomize'] = true;
+		
+		$config['version'] = "1.8";
+	}
+
+	/* choose a random NTP server (first time startup)? */
+	if ($config['system']['timeservers-randomize']) {
+		$config['system']['timeservers'] = rand(0, 3) . ".m0n0wall.pool.ntp.org";
+		unset($config['system']['timeservers-randomize']);
+	}
+	
 	write_config();
 	
 	if ($g['booting'])

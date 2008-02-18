@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix MSNTP to properly handle server hostnames that start with a digit
+
 - updated base system to FreeBSD 6.3-RELEASE-p1
 
 - copied dhclient-script from m0n0wall 1.233 (in an attempt at solving the
