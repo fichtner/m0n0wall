@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- use NTP vendor pool zone for m0n0wall instead of pool.ntp.org (this will
+  also be automatically replaced in existing installations on the first
+  boot)
+
 - fix MSNTP to properly handle server hostnames that start with a digit
 
 - updated base system to FreeBSD 6.3-RELEASE-p1
