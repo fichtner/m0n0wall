@@ -916,20 +916,20 @@ function filter_rules_ipsec_generate($ifname, $ip) {
 	$ipfrules = <<<EOD
 
 # Pass IKE packets
-pass in quick on {$ifname} proto udp from any to {$ip} port = 500
-pass out quick on {$ifname} proto udp from {$ip} port = 500 to any
+pass in quick on {$ifname} proto udp from any to {$ip} port = 500 keep frags
+pass out quick on {$ifname} proto udp from {$ip} port = 500 to any keep frags
 
 # Pass NAT-T encapsulated ESP packets
-pass in quick on {$ifname} proto udp from any to {$ip} port = 4500
-pass out quick on {$ifname} proto udp from {$ip} port = 4500 to any
+pass in quick on {$ifname} proto udp from any to {$ip} port = 4500 keep frags
+pass out quick on {$ifname} proto udp from {$ip} port = 4500 to any keep frags
 
 # Pass ESP packets
-pass in quick on {$ifname} proto esp from any to {$ip}
-pass out quick on {$ifname} proto esp from {$ip} to any
+pass in quick on {$ifname} proto esp from any to {$ip} keep frags
+pass out quick on {$ifname} proto esp from {$ip} to any keep frags
 
 # Pass AH packets
-pass in quick on {$ifname} proto ah from any to {$ip}
-pass out quick on {$ifname} proto ah from {$ip} to any
+pass in quick on {$ifname} proto ah from any to {$ip} keep frags
+pass out quick on {$ifname} proto ah from {$ip} to any keep frags
 
 EOD;
 	

@@ -2,7 +2,7 @@
 <!-- m0n0wall default system configuration -->
 <!-- $Id$ -->
 <m0n0wall>
-	<version>1.7</version>
+	<version>1.8</version>
 	<lastchange></lastchange>
 	<system>
 		<hostname>m0n0wall</hostname>

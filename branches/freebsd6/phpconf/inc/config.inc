@@ -251,7 +251,7 @@ function convert_config() {
 		}
 	}
 	
-	if ($config['version'] == $g['latest_config'])
+	if ($config['version'] == $g['latest_config'] && !isset($config['system']['timeservers-randomize']))
 		return;		/* already at latest version */
 	
 	if ($g['booting'])
@@ -624,7 +624,7 @@ function convert_config() {
 	}
 
 	/* choose a random NTP server (first time startup)? */
-	if ($config['system']['timeservers-randomize']) {
+	if (isset($config['system']['timeservers-randomize'])) {
 		$config['system']['timeservers'] = rand(0, 3) . ".m0n0wall.pool.ntp.org";
 		unset($config['system']['timeservers-randomize']);
 	}

@@ -178,9 +178,9 @@ function print_info_box_np($msg) {
 }
 
 function print_info_box($msg) {
-	echo "<!-- do not surround tables using a paragraph tag. use padding or marging instead -->";
+	echo "<div style=\"margin-bottom: 12px\">";
 	print_info_box_np($msg);
-	echo "";
+	echo "</div>";
 }
 
 function format_bytes($bytes) {

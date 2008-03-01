@@ -88,150 +88,139 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 	
 }
 
-$rawdata = array();
-
-//         1         2         3         4         5         6         7         8
-//12345678901234567890123456789012345678901234567890123456789012345678901234567890
-exec("export TERM= && echo q | /sbin/ipfstat -t".$filter,$rawdata);
-// exporting TERM set to nothing gets you a "dumb" term.  echo q to ipfstat -t makes it
-// quit out after displaying the first page of data.
-
-// Get rid of the header data
-unset($rawdata[0],$rawdata[1],$rawdata[2],$rawdata[3]);
+$fd = popen("/sbin/ipfstat -t" . $filter, "r");
 
 // See if the user has set a limit to the number of entries...  
-if (isset($config['diag']['ipfstatentries'])) {
+if (isset($config['diag']['ipfstatentries']))
 	$linelimit = $config['diag']['ipfstatentries']; 
-}
-else {
+else
 	$linelimit = 300;
-}
 
-
-if (isset($rawdata)) {
-	$count = 0;
-	foreach ($rawdata as $line) {
-		if (!strlen(trim($line)) < 70)
-		{
+$count = 0;
+while (!feof($fd)) {
+	$line = trim(fgets($fd));
+	if (!$line)
+		continue;
+	
 //Source IP             Destination IP         ST   PR   #pkts    #bytes       ttl
 //68.16.26.144,1633     167.219.90.224,443    4/4  tcp  366724 370351656   2:30:00
 //      0                        1              2   3      4       5          6
-			$split = preg_split("/\s+/", trim($line));				
-			$srcTmp = $split[0];
-			$data[$count]['srcip'] = stripPort($srcTmp);
-			$data[$count]['srcport'] = stripPort($srcTmp,true);
-			$dstTmp = $split[1];;
-			$data[$count]['dstip'] = stripPort($dstTmp);
-			$data[$count]['dstport'] = stripPort($dstTmp,true);
-			$data[$count]['protocol'] = $split[3];;
-			$data[$count]['packets'] = $split[4];;
-			$data[$count]['bytes'] = $split[5];;
-			$timeTmp = $split[6];;
-			$timeLen = strlen($timeTmp);
-			switch ($timeLen) {
-			case 4: 
-				$data[$count]['ttl'] = strtotime("0:0".$timeTmp);
-				break;
-			case 5: 
-				$data[$count]['ttl'] = strtotime("0:".$timeTmp);
-				break;
-			case 7: 
-				$data[$count]['ttl'] = strtotime($timeTmp);
-				break;
-			default :
-			// Debug logic, in case there is an unforseen issue
-				/*echo $line . "<br>";
-				echo $linelimit . "<br>";
-				echo $timeTmp . "<br>";*/
-				break;
+	$split = explode("\t", trim($line));				
+	$srcTmp = $split[0];
+	$data[$count]['srcip'] = stripPort($srcTmp);
+	$data[$count]['srcport'] = stripPort($srcTmp,true);
+	$dstTmp = $split[1];
+	$data[$count]['dstip'] = stripPort($dstTmp);
+	$data[$count]['dstport'] = stripPort($dstTmp,true);
+	$data[$count]['protocol'] = $split[3];
+	$data[$count]['packets'] = $split[4];
+	$data[$count]['bytes'] = $split[5];
+	$timeTmp = trim($split[6]);
+	$timeLen = strlen($timeTmp);
+	switch ($timeLen) {
+	case 4: 
+		$data[$count]['ttl'] = strtotime("0:0".$timeTmp);
+		break;
+	case 5: 
+		$data[$count]['ttl'] = strtotime("0:".$timeTmp);
+		break;
+	case 7: 
+		$data[$count]['ttl'] = strtotime($timeTmp);
+		break;
+	default :
+	// Debug logic, in case there is an unforseen issue
+		/*echo $line . "<br>";
+		echo $linelimit . "<br>";
+		echo $timeTmp . "<br>";*/
+		break;
+	}
+	$count++;
+	if ($linelimit == $count) {
+		// We've got all the data the user wanted to see - drop out of the foreach.
+		break;
+	}
+}
+
+pclose($fd);
+
+// Clear the statistics snapshot files, which track the packets and bytes of connections
+if (isset($_GET['clear']))
+{
+	if (file_exists('/tmp/packets'))
+		unlink('/tmp/packets');
+	if (file_exists('/tmp/bytes'))
+		unlink('/tmp/bytes');
+		
+	// Redirect so we don't hit "clear" every time we refresh the screen.
+	header("Location: diag_ipfstat.php?".$filterPassThru);
+	exit;
+}
+
+// Create a new set of stats snapshot files
+if (isset($_GET['new']))
+{
+	$packets = array();
+	$bytes = array();
+	
+	// Create variables to let us later quickly access this data
+	if (is_array($data)) {
+		foreach ($data as $row) {
+			$packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']] = $row['packets'];
+			$bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']] = $row['bytes'];
+		}
+	}
+
+	// Write the files out
+	writeStats("packets",$packets);
+	writeStats("bytes",$bytes);
+	
+	// If we're in view mode, pass that on.
+	if (isset($_GET['view']))
+		$filterPassThru .= "&view=1";
+	
+	// Redirect so we don't hit "new" every time we refresh the screen.
+	header("Location: diag_ipfstat.php?order=bytes&sort=des".$filterPassThru);
+	exit;
+}
+	
+// View the delta from the last snapshot against the current data.
+if (isset($_GET['view']))
+{
+
+	// Read the stats data files
+	readStats("packets",$packets);
+	readStats("bytes",$bytes);
+
+	if (is_array($data)) {
+		foreach ($data as $key => $row) {
+			if (isset($packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']]))
+			{
+				if (isset($bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']]))
+				{
+					$tempPackets = $data[$key]['packets'] - $packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']];
+					$tempBytes = $data[$key]['bytes'] - $bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']];
+					if (($tempPackets > -1) && ($tempBytes > -1))
+					{
+						$data[$key]['packets'] = $tempPackets;
+						$data[$key]['bytes'] = $tempBytes;
+					}
+				}
 			}
-			$count++;
-			if ($linelimit == $count) {
-				// We've got all the data the user wanted to see - drop out of the foreach.
-				break;
-			}
+			
 		}
 	}
 	
-	// Clear the statistics snapshot files, which track the packets and bytes of connections
-	if (isset($_GET['clear']))
+	$filterPassThru .= "&view=1";
+	$viewPassThru = "&view=1";
+}
+
+// Sort it by the selected order
+if ($_GET['order']) {
+	natsort2d($data,$_GET['order']);
+	if ($_GET['sort'])
 	{
-		if (file_exists('/tmp/packets'))
-			unlink('/tmp/packets');
-		if (file_exists('/tmp/bytes'))
-			unlink('/tmp/bytes');
-			
-		// Redirect so we don't hit "clear" every time we refresh the screen.
-		header("Location: diag_ipfstat.php?".$filterPassThru);
-		exit;
-	}
-
-	// Create a new set of stats snapshot files
-	if (isset($_GET['new']))
-	{
-		$packets = array();
-		$bytes = array();
-		
-		// Create variables to let us later quickly access this data
-		if (is_array($data)) {
-			foreach ($data as $row) {
-				$packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']] = $row['packets'];
-				$bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']] = $row['bytes'];
-			}
-		}
-
-		// Write the files out
-		writeStats("packets",$packets);
-		writeStats("bytes",$bytes);
-		
-		// If we're in view mode, pass that on.
-		if (isset($_GET['view']))
-			$filterPassThru .= "&view=1";
-		
-		// Redirect so we don't hit "new" every time we refresh the screen.
-		header("Location: diag_ipfstat.php?order=bytes&sort=des".$filterPassThru);
-		exit;
-	}
-		
-	// View the delta from the last snapshot against the current data.
-	if (isset($_GET['view']))
-	{
-
-		// Read the stats data files
-		readStats("packets",$packets);
-		readStats("bytes",$bytes);
-
-		if (is_array($data)) {
-			foreach ($data as $key => $row) {
-				if (isset($packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']]))
-				{
-					if (isset($bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']]))
-					{
-						$tempPackets = $data[$key]['packets'] - $packets[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']];
-						$tempBytes = $data[$key]['bytes'] - $bytes[$row['srcip']][$row['srcport']][$row['dstip']][$row['dstport']][$row['protocol']];
-						if (($tempPackets > -1) && ($tempBytes > -1))
-						{
-							$data[$key]['packets'] = $tempPackets;
-							$data[$key]['bytes'] = $tempBytes;
-						}
-					}
-				}
-				
-			}
-		}
-		
-		$filterPassThru .= "&view=1";
-		$viewPassThru = "&view=1";
-	}
-
-	// Sort it by the selected order
-	if ($_GET['order']) {
-		natsort2d($data,$_GET['order']);
-		if ($_GET['sort'])
-		{
-			if ($_GET['sort'] == "des")
-			$data = array_reverse($data);
-		}
+		if ($_GET['sort'] == "des")
+		$data = array_reverse($data);
 	}
 }
 
