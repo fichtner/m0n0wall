@@ -1,59 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter>
   <title>Getting and Installing m0n0wall</title>
+
   <?dbhtml filename="setup.html"?>
-    
+
+  <para>The instructions below will have you download a m0n0wall file called
+  an image that contains the bootable operating system. This image will be
+  written to a Compact Flash card. Finally you will install the Compact Flash
+  card into the WRAP/ALIX system and connect the ethernet cables.</para>
+
+  <para>It is assumed that you have a working PC computer with the proper
+  Ethernet cables and the default BIOS options chosen to boot from a Compact
+  Flash card. These instructions are for a Windows, FreeBSD or Linux operating
+  system.</para>
+
+  <para>Because the Compact Flash card is writable, your customized changes to
+  the default configuration will be stored in the card itself and be used for
+  subsequent reboots of the WRAP/ALIX embedded system. In all cases the
+  configuration file can be downloaded from the web interface for external
+  storage.</para>
+
+  <tip>
+    <para>It is recommended to always store an external backup of your
+    configuration file in case of emergencies.</para>
+  </tip>
+
+  <para>It might save you some troubleshooting time if you first verify that
+  your system is in working condition. One easy way to do this is to boot the
+  PC Engines system while connected to the serial console interface (see your
+  PC Engines documentation for how to do this.) you can then verify that the
+  entire system is ready to run m0n0wall.</para>
+
+  <warning>
+    <para>Some configurations of the PC Engine systems have difficulties
+    booting from either certain types of Compact Flash cards or when a Compact
+    Flash card and a disk drive are connected at the same time. Try to pick a
+    Compact Flash card that is known to boot or that has been discussed in the
+    PC Engines mailing list.</para>
+  </warning>
+
   <sect1 id="Setup.Installing">
-     <?dbhtml filename="setup-installing.html"?>
+    <?dbhtml filename="setup-installing.html"?>
 
-     <title id="Setup.Installing.title">Getting and Installing the Software</title>
+    <title id="Setup.Installing.title">Getting and Installing the
+    Software</title>
 
-    <para>To download the WRAP image, point your web browser
-    to <ulink
+    <para>To download a WRAP/ALIX image file, point your web browser to <ulink
     url="http://www.m0n0.ch/wall/downloads.php">http://www.m0n0.ch/wall/downloads.php</ulink>
-    and select the WRAP download link from that page. Download the file
-    to the machine from which you will be writing to the CompactFlash card.
-    </para>
+    and select the wrap-xxx.img download link from that page, depending on the
+    model of your board. Download the file to the machine from which you will
+    be writing to the CompactFlash card.</para>
 
     <sect2>
-      <title>Preparing the Hard Drive or Compact Flash</title>
+      <title>Writing the Image File</title>
 
-       <para>FIXME - add tutorial</para>
+      <para>If you are installing to a standard PC using an IDE or CF disk,
+      you need to write the image to a sufficiently large CF card or hard disk
+      (at least 10 MB for the generic-PC image in version 1.3). Extra space on
+      the CF card or drive is ignored; there is no benefit to using one larger
+      than 16 MB other than possibly compatibility on future releases.</para>
 
-       <para>Now you need to write the image to a sufficiently large
-       CF card (at least 8 MB). Extra space on the CF card is
-       ignored; there is
-       no benefit to using one larger than 8 MB other than possibly
-       compatibility on future releases.</para>
+      <para>The following sections will cover how to write the CF card in
+      Windows, FreeBSD, and Linux. A summary is below with details following
+      for each operating system.</para>
 
-        <para>The following sections will cover how to write the CF
-        card in Windows, FreeBSD, and Linux.  </para>
+      <itemizedlist>
+        <listitem>
+          <para>Windows:</para>
 
-        <sect3>
-            <title>Windows</title>
-            
-            <para>Manuel Kasper's (author of m0n0wall) physdiskwrite should
-            be used on Windows to write the CF card.  Download it from the
-            m0n0wall web site's <ulink url="http://www.m0n0.ch/wall/physdiskwrite.php">
-            physdiskwrite page</ulink>. </para>
-            
-            <para>Save physdiskwrite.exe and the downloaded m0n0wall image in
-            the same directory on your hard drive, then open a Windows Command Prompt
-            (click Start, Run, type in cmd and click OK).</para>
-            
-            <para>Plug in your CF card reader/writer and insert your CF card.</para>
-            
-            <para>'cd' into the directory containing physdiskwrite and the m0n0wall
-            image and run the following:</para>
-            
-            <programlisting>physdiskwrite wrap-xxx.img</programlisting>
+          <para>(use the -u flag if the target disk is &gt; 800 MB - make very
+          sure you've selected the right disk!!) <programlisting>physdiskwrite [-u] generic-pc-xxx.img</programlisting>(you
+          must use v0.3 or later!)</para>
+        </listitem>
 
-            <para>Replacing wrap-xxx.img with the name of the WRAP image you
-            downloaded.</para>
-              
-            <para>You will see output similar to the following:</para>
-            
-              <programlisting>
+        <listitem>
+          <para>FreeBSD:</para>
+
+          <para><programlisting>gzcat generic-pc-xxx.img | dd of=/dev/rad[n] bs=16k</programlisting>where
+          n = the ad device number of your CF card (check dmesg) (ignore the
+          warning about trailing garbage - it's because of the digital
+          signature)</para>
+        </listitem>
+
+        <listitem>
+          <para>Linux:</para>
+
+          <para><programlisting>gunzip -c generic-pc-xxx.img | dd of=/dev/hdX bs=16k</programlisting>where
+          X = the IDE device name of your HD/CF card (check with hdparm -i
+          /dev/hdX) - some CF adapters, particularly USB, may show up under
+          SCSI emulation as /dev/sdX (ignore the warning about trailing
+          garbage - it's because of the digital signature)</para>
+        </listitem>
+      </itemizedlist>
+
+      <sect3>
+        <title>Windows</title>
+
+        <para>For Windows you will be downloading physdiskwrite from the
+        m0n0wall web site. This is a small Windows NT/2000/XP command line
+        tool that makes it possible to write disk images onto raw disks, like
+        CF cards. It currently has a few rough edges, most notably in the
+        selection of the device to be written – you have to decide which
+        device is the right one by looking at the C/H/S values (though if the
+        CF card was the last device to be connected to the system, it usually
+        shows up as the last one in the list).</para>
+
+        <para>Note that the C/H/S values may be incorrect for CF cards – looks
+        like this is a bug in Windows. There is some protection against
+        accidentally overwriting your hard disk, but then again,<emphasis
+        role="bold"> I CAN'T TAKE ANY RESPONSIBILITY FOR LOST DATA – YOU USE
+        THIS PROGRAM ON YOUR OWN RISK.</emphasis></para>
+
+        <para>Manuel Kasper's (author of m0n0wall) physdiskwrite should be
+        used on Windows to write the CF card. Download it from the m0n0wall
+        web site's <ulink url="http://www.m0n0.ch/wall/physdiskwrite.php">
+        physdiskwrite page</ulink>.</para>
+
+        <note>
+          <para>Note to Windows Vista users: physdiskwrite works with Vista,
+          but you must make sure to run it as administrator (simply having
+          admin rights isn't enough), or it won't find any disks. One way to
+          do this is to create a shortcut to cmd.exe, then right-click it and
+          select "run as administrator". Then you can launch physdiskwrite
+          from the command prompt window that appears, and it should work
+          fine.</para>
+        </note>
+
+        <para>Save physdiskwrite.exe and the downloaded m0n0wall image in the
+        same directory on your hard drive, then open a Windows Command Prompt
+        (click Start, Run, type in cmd and click OK).</para>
+
+        <para>Plug in your CF card reader/writer and insert your CF card. If
+        you are connecting your hard drive you can either connect it directly
+        to your computer or through a fire wire or USB adaptor for external
+        drives.</para>
+
+        <para>'cd' into the directory containing physdiskwrite and the
+        m0n0wall image and run the following:</para>
+
+        <programlisting>physdiskwrite wrap-xxx.img</programlisting>
+
+        <para>Replacing wrap-xxx.img with the name of the WRAP/ALIX image you
+        downloaded.</para>
+
+        <tip>
+          <para>Windows users can just simply drag-and-drop the image file
+          onto the physdiskwrite.exe icon.</para>
+        </tip>
+
+        <para>You will see output similar to the following:</para>
+
+        <programlisting>
 physdiskwrite v0.5 by Manuel Kasper &lt;mk@neon1.net&gt;
 
 Searching for physical drives...
@@ -71,27 +168,32 @@ Information for \\.\PhysicalDrive1:
    Windows:       cyl: 1
                   tpc: 255
                   spt: 63</programlisting>
-              
-            <para>You will see all the hard drives in your system listed, as well as
-            the compact flash card.  Since we did not run <emphasis>
-            physdiskwrite -u</emphasis>, physdiskwrite will refuse to write to any
-            drive over 800
-            MB.  This is a protection so you don't accidentally overwrite your hard drive.
-            </para>
 
-        </sect3>
+        <para>You will see all the hard drives in your system listed, as well
+        as the compact flash card. Since we did not run <emphasis>
+        physdiskwrite -u</emphasis>, physdiskwrite will refuse to write to any
+        drive over 2 GB. This is a protection so you don't accidentally
+        overwrite your hard drive.</para>
 
-        <sect3>
-            <title>FreeBSD</title>
+        <warning>
+          <para>If you are using physdiskwrite.exe to write to a second hard
+          disk be very careful that you identify the correct disk before
+          writing to it (i.e. do not write the image to your own computer's
+          boot disk).</para>
+        </warning>
+      </sect3>
 
-            <para>The procedures to image a CompactFlash card depend upon the
-            type of adapter you are using. The CF card will either appear as
-            a SCSI or IDE hard drive.</para>
-            
-            <para>Run the command <emphasis role="bold">atacontrol list</emphasis>.
-            You will get output similar to the following:</para>
+      <sect3>
+        <title>FreeBSD</title>
 
-            <literallayout class="monospaced">
+        <para>The procedures to image a CompactFlash card depend upon the type
+        of adapter you are using. The CF card will either appear as a SCSI or
+        IDE hard drive.</para>
+
+        <para>Run the command <emphasis role="bold">atacontrol
+        list</emphasis>. You will get output similar to the following:</para>
+
+        <literallayout class="monospaced">
 su-3.00# atacontrol list
 ATA channel 0:
 Master: ad0 &lt;WDC WD200EB-75CSF0/04.01B04&gt; ATA/ATAPI revision 5
@@ -101,101 +203,113 @@ Master: acd0 &lt;_NEC CD-RW NR-7800A/10DA&gt; ATA/ATAPI revision 0
 Slave: no device present
             </literallayout>
 
-            <para>Then run the command <emphasis role="bold">camcontrol devlist</emphasis>.
-            You will see output similar to the following:</para>
-            
-            <literallayout class="monospaced">
+        <para>Then run the command <emphasis role="bold">camcontrol
+        devlist</emphasis>. You will see output similar to the
+        following:</para>
+
+        <literallayout class="monospaced">
 su-2.05b# camcontrol devlist
 &lt;ADAPTEC RAID-5 320R&gt; at scbus2 target 0 lun 0 (pass0,da0)
 &lt;SEAGATE ST39204LC 0005&gt; at scbus2 target 3 lun 0 (pass1,da1)
 &lt;ESG-SHV SCA HSBP M10 0.05&gt; at scbus2 target 6 lun 0 (pass2)                
             </literallayout>
 
-            <para>You will find your CF card somewhere in the
-            above output.  Make note of its device name (adX or daX).
-            </para>
-            
-            <para>Run the following command, replacing adX with your CF
-            device as determined above, and wrap-xxx.img with the name
-            of the m0n0wall image you downloaded.</para>
-            
-            <computeroutput>gzcat wrap-xxx.img | dd of=/dev/adX bs=16k</computeroutput>
+        <para>You will find your CF card somewhere in the above output. Make
+        note of its device name (adX or daX).</para>
 
-              <para><emphasis>Ignore the warning about trailing garbage - it's
-              because of the digital signature.</emphasis></para>
-        </sect3>
+        <para>Run the following command, replacing adX with your CF device as
+        determined above, and net45xx-xxx.img with the name of the m0n0wall
+        image you downloaded.</para>
 
-        <sect3>
-              <title>Linux</title>
+        <para><computeroutput>gzcat wrap-xxx.img | dd of=/dev/adX
+        bs=16k</computeroutput></para>
 
-              <programlisting>gunzip -c net45xx-xxx.img | dd of=/dev/hdX bs=16k</programlisting>
+        <para><emphasis>Ignore the warning about trailing garbage - it's
+        because of the digital signature.</emphasis></para>
+      </sect3>
 
-              <para>where X = the IDE device name of your CF card 
-              (check with hdparm -i /dev/hdX) - some adapters, particularly
-              USB, may show up under SCSI emulation as /dev/sdX.</para>
+      <sect3>
+        <title>Linux</title>
 
-              <para><emphasis>Ignore the warning about trailing garbage - it's
-              because of the digital signature.</emphasis></para>
-            
-        </sect3>
+        <programlisting>gunzip -c wrap-xxx.img | dd of=/dev/hdX bs=16k</programlisting>
 
+        <para>where X = the IDE device name of your CF card (check with hdparm
+        -i /dev/hdX) - some adapters, particularly USB, may show up under SCSI
+        emulation as /dev/sdX.</para>
+
+        <para><emphasis>Ignore the warning about trailing garbage - it's
+        because of the digital signature.</emphasis></para>
+      </sect3>
     </sect2>
-
   </sect1>
-  
+
   <sect1>
     <?dbhtml filename="setup-finalprep.html"?>
-    <title>Final Preparation</title>
-    
-    <para>Now put your written CF card into your WRAP board, and put it in its case.
-    </para>
-    
-    <sect2>
-        <title>Plugging in the Network Interfaces</title>
-        
-        <para>The LAN and WAN interfaces are pre-assigned on the WRAP image.  
-        </para>
-        
-        <sect3>
-            <title>Two Ethernet models</title>
-            
-            <para>On the two Ethernet port models, the LAN port is the port
-            closest to where the power adapter plugs in, and the WAN port is
-            the port closest to the serial port.</para>
-            
-            <mediaobject>
-                <imageobject>
-                  <imagedata fileref="images/wrap-2nic.png" />
-                </imageobject>
-            </mediaobject>
-            
-        </sect3>
-        
-        <sect3>
-            <title>Three Ethernet models</title>
-            
-            <para>On three Ethernet port WRAP models, the LAN port is the
-            port closest to where the power adapter plugs in, and the WAN
-            port is the middle port.</para>
-            
-            <mediaobject>
-                <imageobject>
-                  <imagedata fileref="images/wrap-3nic.png" />
-                </imageobject>
-            </mediaobject>
-            
-        </sect3>
-            
-        <para>Plug the LAN interface into the hub or switch that is connected
-        to your LAN.  Plug the WAN interface into your Internet connection (DSL
-        or cable modem, router, etc.)</para>
-        
-        <para>After plugging in your interfaces, plug in your WRAP to turn
-        it on.</para>
-        
-    </sect2>
-    
-  </sect1>
-  
-</chapter>
 
+    <title>Final Preparation</title>
+
+    <para>Now put your written CF card into your WRAP board, and put it in its
+    case.</para>
+
+    <sect2>
+      <title>Plugging in the Network Interfaces</title>
+
+      <para>The LAN and WAN interfaces are pre-assigned on the WRAP/ALIX
+      images. See below for photos of these pre-assigned board
+      configurations.</para>
+
+      <para>Plug the LAN interface into the hub or switch that is connected to
+      your LAN. Plug the WAN interface into your Internet connection (DSL or
+      cable modem, router, etc.) Additional Network interfaces can optionally
+      be connected to other routers, hubs or an Ethernet capable
+      device.</para>
+
+      <tip>
+        <para>If your Ethernet devices have built-in LEDs to show
+        connectivity, verify that connected links are showing a green LED when
+        the devices are physically powered on. If it is not showing green then
+        there may be a problem with the cable (damaged or incorrect wiring) or
+        with one of the Ethernet interfaces.</para>
+      </tip>
+
+      <sect3>
+        <title>Two Ethernet models</title>
+
+        <para>On the two Ethernet port models, the LAN port is the port
+        closest to where the power adapter plugs in, and the WAN port is the
+        port closest to the serial port.</para>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/wrap-2nic.png" />
+          </imageobject>
+        </mediaobject>
+      </sect3>
+
+      <sect3>
+        <title>Three Ethernet models</title>
+
+        <para>On three Ethernet port WRAP models, the LAN port is the port
+        closest to where the power adapter plugs in, and the WAN port is the
+        middle port.</para>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/wrap-3nic.png" />
+          </imageobject>
+        </mediaobject>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Connecting to your Network</title>
+
+      <para>Finally, plug the LAN interface into the hub or switch that is
+      connected to your LAN. Plug the WAN interface into your Internet
+      connection (DSL or cable modem, router, etc.)</para>
+
+      <para>After plugging in your interfaces, plug in the power source of
+      your WRAP/ALIX system to turn it on.</para>
+    </sect2>
+  </sect1>
+</chapter>

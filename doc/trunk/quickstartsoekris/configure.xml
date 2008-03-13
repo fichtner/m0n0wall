@@ -7,102 +7,133 @@
 
   <sect1>
     <title>Initial Configuration</title>
-    
-    <para>By default, m0n0wall enables its DHCP server on its LAN interface, and
-    configures the LAN interface with IP address 192.168.1.1.  If you have an
-    existing DHCP server, and/or wish to use a different IP subnet on your LAN,
-    you will need to connect via the Soekris serial console. </para>
-    
-    <note>Unless you know what you're doing, we <emphasis>strongly recommend
-    </emphasis> not changing the LAN IP address or pre-configured DHCP settings
-    to avoid difficulties caused by misconfiguration.
+
+    <para>By default, m0n0wall enables its DHCP server on its LAN interface,
+    and configures the LAN interface with IP address 192.168.1.1. If you have
+    an existing DHCP server, and/or wish to use a different IP subnet on your
+    LAN, you will need to first connect via the Soekris serial console
+    interface.</para>
+
+    <note>
+      <para>Unless you know what you're doing, we <emphasis>strongly
+      recommend</emphasis> not changing the LAN IP address or pre-configured
+      DHCP settings to avoid difficulties caused by misconfiguration.</para>
     </note>
-    
-    <para>If you do not need to change the interface assignments, LAN IP address,
-    or DHCP server settings, you can skip ahead to the <link linkend="Client.Machine.Config">
-    next chapter</link>.</para>
-    
+
+    <para>If you do not need to change the interface assignments, LAN IP
+    address, or DHCP server settings, you can skip ahead to the <link
+    linkend="Client.Machine.Config">next chapter</link>. Otherwise, below are
+    steps to make changes to the default configuration using your m0n0wall
+    system's serial console interface.</para>
+
+    <note>
+      <para>The default configuration for m0n0wall does not activate a
+      wireless interface, even if one is installed. That means that you can
+      not change the default configuration using only a wireless connection.
+      You must be connected by Ethernet or Serial console cable to make the
+      first configuration change.</para>
+    </note>
   </sect1>
-    
+
   <sect1 id="Connecting.Serial.Console">
-        <?dbhtml filename="initial-serialconsole.html"?>
-        <title>Connecting to the Soekris serial console</title>
-        
-        <sect2>
-            <title>Getting the appropriate cable</title>
-            
-            <para>First you need a null modem cable, <emphasis>not</emphasis> a straight
-            through serial cable.  For the appropriate pin-out, see <ulink
-            url="http://www.nullmodem.com/NullModem.htm">this page</ulink>.  You can
-            purchase a null modem cable at most any store that carries computer cables,
-            or from a variety of online sources. (<ulink url="http://froogle.google.com/froogle?q=null+modem+cable">Froogle
-            link</ulink> for null modem cables)
-            </para>
-        
-            <para>Connect the null modem cable to your embedded device and PC.</para>
-            
-        </sect2>
-        
-        <sect2>
-            <title>Connecting to the serial console</title>
-            
-            <para>For Windows users, HyperTerminal isn't great, but it gets the job
-            done.  You can find it under Start, Programs, Communications, HyperTerminal.
-            If you cannot find it on your system, you can download it for free <ulink
-            url="http://www.hilgraeve.com/htpe/">here</ulink>.</para>
-        
-            <para>After opening HyperTerminal, you will see the New Connection screen.</para>
-            
-            <mediaobject>
-             <imageobject>
-              <imagedata fileref="images/hyperterminal/newconnection.png" />
-             </imageobject>
-            </mediaobject>
-        
-            <para>Type in something for the connection name and click OK.</para>
-            
-            <para>Next, you'll see the "Connect to" screen.  Select the COM port
-            number of the serial port in your PC.  If you do not know which it is,
-            trial and error might be the easiest way to determine this.  Start
-            with COM1, and try other ports if necessary.  In this case, I know my
-            serial port is COM1.</para>
-            
-            <mediaobject>
-             <imageobject>
-              <imagedata fileref="images/hyperterminal/connectto.png" />
-             </imageobject>
-            </mediaobject>
-            
-            <para>Now you'll see the Connection Properties screen.  If you have
-            changed the console speed on your Soekris, you will need to change the
-            "Bits per second" field accordingly. </para>
-            
-            <mediaobject>
-             <imageobject>
-               <imagedata fileref="images/hyperterminal/connectionproperties.png" />
-              </imageobject>
-            </mediaobject>
-            
-            <para>Click OK after filling in the Connection Properties appropriately, and
-            you will have a blank HyperTerminal screen.  Now power on your device.</para>
-                
-        </sect2>
-        
+    <?dbhtml filename="initial-serialconsole.html"?>
+
+    <title>Connecting to the Soekris serial console</title>
+
+    <sect2>
+      <title>Getting the appropriate cable</title>
+
+      <para>First you need a null modem cable, <emphasis>not</emphasis> a
+      straight through serial cable. For the appropriate pin-out, see <ulink
+      url="http://www.nullmodem.com/NullModem.htm">this page</ulink>. You can
+      purchase a null modem cable at most any store that carries computer
+      cables, or from a variety of online sources. (<ulink
+      url="http://froogle.google.com/froogle?q=null+modem+cable">Froogle
+      link</ulink> for null modem cables).</para>
+
+      <para>MacOSX users and PC users that do not have a serial console
+      interface can purchase a USB to Serial DB9 adaptor from their local
+      computer store. Additionally, some PC motherboard BIOS settings may have
+      the serial interface disabled or being used by an internal modem. If you
+      experience problems below, verify that your serial interface is
+      activated.</para>
+
+      <para>Connect the null modem cable to your embedded device and
+      PC.</para>
+    </sect2>
+
+    <sect2>
+      <title>Connecting to the serial console</title>
+
+      <para>For Windows users, HyperTerminal isn't great, but it gets the job
+      done. You can find it under Start, Programs, Communications,
+      HyperTerminal. If you cannot find it on your system, you can download it
+      for free <ulink
+      url="http://www.hilgraeve.com/hyperterminal.html">here</ulink>.</para>
+
+      <caution>
+        <para>Windows Vista does not include HyperTerminal. You can either
+        download the free Private Edition of HyperTerminal or use another
+        software such as <ulink
+        url="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</ulink>.</para>
+      </caution>
+
+      <para>After opening HyperTerminal, you will see the New Connection
+      screen.</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/hyperterminal/newconnection.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>Type in something for the connection name and click OK.</para>
+
+      <para>Next, you'll see the "Connect to" screen. Select the COM port
+      number of the serial port in your PC. If you do not know which it is,
+      trial and error might be the easiest way to determine this. Start with
+      COM1, and try other ports if necessary. In this case, I know my serial
+      port is COM1.</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/hyperterminal/connectto.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>Now you'll see the Connection Properties screen. If you have
+      changed the console speed on your Soekris, you will need to change the
+      "Bits per second" field accordingly.</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/hyperterminal/connectionproperties.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>Click OK after filling in the Connection Properties appropriately,
+      and you will have a blank HyperTerminal screen. Now power on your
+      device.</para>
+
+      <para>MacOSX users can use Terminal Emuation software such as <ulink
+      url="http://homepage.mac.com/dalverson/zterm/">Zterm</ulink> to access
+      the console settings. </para>
+    </sect2>
   </sect1>
-  
-   <sect1 id="Config.ConsoleSetup">
-        <?dbhtml filename="initial-m0n0wall-console.html"?>
-        <title>m0n0wall Console Setup</title>
-        
-        <para>To recap from earlier, your system is now ready to be configured.  You
-        are able to view the console at 19200 bps and have the media you loaded with
-        m0n0wall earlier installed in your Soekris.
-        </para>
-        
-        <para>When your system finishes booting, you will see the m0n0wall console.            
-        </para>
-        
-        <literallayout class="monospaced">
+
+  <sect1 id="Config.ConsoleSetup">
+    <?dbhtml filename="initial-m0n0wall-console.html"?>
+
+    <title>m0n0wall Console Setup</title>
+
+    <para>To recap from earlier, your system is now ready to be configured.
+    You are able to view the console at 19200 bps and have the media you
+    loaded with m0n0wall earlier installed in your Soekris.</para>
+
+    <para>When your system finishes booting, you will see the m0n0wall
+    console.</para>
+
+    <literallayout class="monospaced">
 *** This is m0n0wall, version 1.2
     built on Sun Aug 22 11:41:15 CEST 2004 for Soekris
     Copyright (C) 2002-2005 by Manuel Kasper. All rights reserved.
@@ -113,8 +144,8 @@
     
     Port configuration:
     
-    LAN  -> sis0
-    WAN  -> sis1
+    LAN  -&gt; sis0
+    WAN  -&gt; sis1
 
 
 m0n0wall console setup
@@ -123,51 +154,60 @@ m0n0wall console setup
 2) Set up LAN IP address
 3) Reset webGUI password
 4) Reset to factory defaults
-5) Reboot system
-        </literallayout>
-        
-        <sect2>
-            <title>Console Setup Menu Options</title>
-        
-        <para>First I will explain the purpose of each menu option.  </para>
-        
-        <para><emphasis role="bold">Option 1</emphasis> allows you to assign network interfaces to be used for
-        LAN, WAN, and OPT networks, as well as allowing you to configure VLAN's.</para>
-        
-        <para><emphasis role="bold">Option 2</emphasis> allows you to set the LAN IP address to something other than
-        the default 192.168.1.1.</para>
-        
-        <para><emphasis role="bold">Option 3</emphasis> allows you to reset the webGUI password if you have forgotten it.
-        </para>
-        
-        <para><emphasis role="bold">Option 4</emphasis> lets you reset the
-        system to factory default configuration.  If you get stuck at some
-        point during configuration, sometimes it is easier to start over
-        from scratch.</para>
-        
-        <para><emphasis role="bold">Option 5</emphasis> lets you reboot the system.</para>
-        
-        </sect2>
-        
-   </sect1>
-   
-   <sect1>
+5) Reboot system</literallayout>
+
+    <para>Although this example shows sis0 and sis1 as the two Ethernet
+    interfaces these names depend on the Ethernet cards that are installed.
+    These 4 characters simply identify the driver used to access the Ethernet
+    card and the number of cards that are using the same driver. Other
+    possible Ethernet interface names include, but are not limited to: bge,
+    em, gx, nge, ti, txp, dc, fxp, sis, ste, tl, tx, xl.</para>
+
+    <sect2>
+      <title>Console Setup Menu Options</title>
+
+      <para>First I will explain the purpose of each menu option.</para>
+
+      <para><emphasis role="bold">Option 1</emphasis> allows you to assign
+      network interfaces to be used for LAN, WAN, and OPT networks, as well as
+      allowing you to configure VLAN's.</para>
+
+      <para><emphasis role="bold">Option 2</emphasis> allows you to set the
+      LAN IP address to something other than the default 192.168.1.1.</para>
+
+      <para><emphasis role="bold">Option 3</emphasis> allows you to reset the
+      webGUI password if you have forgotten it.</para>
+
+      <para><emphasis role="bold">Option 4</emphasis> lets you reset the
+      system to factory default configuration. If you get stuck at some point
+      during configuration, sometimes it is easier to start over from
+      scratch.</para>
+
+      <para><emphasis role="bold">Option 5</emphasis> lets you reboot the
+      system.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
     <?dbhtml filename="initial-assigning-interfaces.html"?>
+
     <title>Assigning Interfaces</title>
-    
+
     <para>Press 1 at the console setup screen if you wish to reassign your
     network interfaces.</para>
-    
-    <note>To avoid potential problems with mis-assignment, we recommend
-    leaving your interface assignments as is.</note>
-    
+
+    <note>
+      <para>To avoid potential problems with mis-assignment, we recommend
+      leaving your interface assignments as is.</para>
+    </note>
+
     <para>On a three Ethernet port Soekris, sis0 is the NIC closest to the
-    power adapter connector, sis1 is the middle Ethernet port, and sis2
-    is the Ethernet port furthest from the power adapter connector.</para>
-    
-    <para>On a two Ethernet port Soekris, sis0 is the NIC closest to the
-    power adapter connector, and sis1 is the remaining NIC.</para>
-    
+    power adapter connector, sis1 is the middle Ethernet port, and sis2 is the
+    Ethernet port furthest from the power adapter connector.</para>
+
+    <para>On a two Ethernet port Soekris, sis0 is the NIC closest to the power
+    adapter connector, and sis1 is the remaining NIC.</para>
+
     <literallayout class="monospaced">
 Enter a number: 1
 
@@ -183,11 +223,13 @@ should say no here and use the webGUI to configure VLANs later, if required.
 Do you want to set up VLANs now? (y/n) 
     </literallayout>
 
-    <para>As this guide only leads you through a simple two interface configuration,
-        we will press n and hit enter here to skip VLAN configuration.  If you need
-        VLAN support, configure it in the webGUI after this initial configuration
-        is complete.</para>
-    
+    <para>As this guide only leads you through a simple two interface
+    configuration, we will press n and hit enter here to skip VLAN
+    configuration. If you need VLAN support, configure it in the webGUI after
+    this initial configuration is complete. You can use the Valid interfaces
+    list to see how your installed Ethernet cards are identified by the
+    m0n0wall operating system.</para>
+
     <literallayout class="monospaced">
 If you don't know the names of your interfaces, you may choose to use
 auto-detection.  In that case, disconnect all interfaces before you begin,
@@ -195,53 +237,61 @@ and reconnect each one when prompted to do so.
 
 Enter the LAN interface name or 'a' for auto-detection:
     </literallayout>
-    
-    <para>Enter the name of the desired LAN interface (sis0 or sis1 on a two port Soekris,
-    sis0, sis1, or sis2 on a three port Soekris) and press Enter.</para>
+
+    <para>Enter the name of the desired LAN interface (sis0 or sis1 on a two
+    port Soekris, sis0, sis1, or sis2 on a three port Soekris) and press
+    Enter.</para>
 
     <literallayout class="monospaced">
 Enter the WAN interface name or 'a' for auto-detection
 (or nothing if finished):
 </literallayout>
-        
-    <para>Enter one of the remaining available interfaces and press Enter.</para>
-        
-    <para>Next you will be prompted for assigning optional interfaces.
-    You can do this later through the webGUI if need be.  Without entering
-    anything, hit ENTER at this prompt.</para>
-    
+
+    <para>Enter one of the remaining available interfaces and press
+    Enter.</para>
+
+    <para>Next you will be prompted for assigning optional interfaces. You can
+    do this later through the webGUI if need be. Without entering anything,
+    hit ENTER at this prompt.</para>
+
     <literallayout class="monospaced">
 Enter the Optional 1 interface name or 'a' for auto-detection
 (or nothing if finished):
 </literallayout>
-    
+
     <para>You will now see how your interfaces have been configured.</para>
-    
+
     <literallayout class="monospaced">
 The interfaces will be assigned as follows:
 
-LAN  -> sis1
-WAN  -> sis0
+LAN  -&gt; sis1
+WAN  -&gt; sis0
 
 The firewall will reboot after saving the changes.
 
 Do you want to proceed? (y/n)
     </literallayout>
-    
-    <para>This confirms how the interfaces will be assigned.  Press y and hit enter
-    here to restart the firewall for the changes to take effect.  To discard your
-    changes, enter n and press Enter.</para>
-    
-   </sect1>
-    
-    <sect1>
-        <title>Changing the LAN IP and/or DHCP server settings.</title>
-        
-        <para>View this tutorial for a how to on <ulink
-        url="http://doc.m0n0.ch/tutorials/console/lanip/changeLANIP.htm">changing
-        your LAN IP address and/or DHCP server settings</ulink>.
-        </para>
-        
-    </sect1>
-    
+
+    <para>This confirms how the interfaces will be assigned. Press y and hit
+    enter here to restart the firewall for the changes to take effect. To
+    discard your changes, enter n and press Enter. If all of your hardware and
+    cables are correctly installed you should be able to reach the m0n0wall at
+    the 192.168.1.1 IP address from a client computer.</para>
+  </sect1>
+
+  <sect1>
+    <title>Changing the LAN IP and/or DHCP server settings.</title>
+
+    <para>View this tutorial for a how to on <ulink
+    url="http://doc.m0n0.ch/tutorials/console/lanip/changeLANIP.htm">changing
+    your LAN IP address and/or DHCP server settings</ulink>.</para>
+
+    <warning>
+      <para>If you already have a DHCP server on your LAN network DO NOT
+      connect the m0n0wall to your LAN network until you have first disabled
+      the DHCP server on the m0n0wall. Otherwise your m0n0wall might respond
+      to a DHCP client computer on your LAN before your normal server and
+      thereby give incorrect information to the requesting computer.</para>
+    </warning>
+  </sect1>
 </chapter>

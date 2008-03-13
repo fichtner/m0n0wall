@@ -1,59 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Client.Machine.Config">
   <?dbhtml filename="clientconfigure.html"?>
-    <title>Client Machine Configuration</title>
-        
-        <para>Now you need to get one of your client machines configured so you
-            can access the webGUI to finish the configuration.</para>
-        
-    <sect1>
-        <?dbhtml filename="clientconfigure-dhcp.html"?>
-        <title>Using DHCP for client machines</title>
-        
-        <para>If you aren't familiar with networking, the easiest thing to do is
-        set all your machines to obtain their IP address from DHCP.  m0n0wall
-        enables its DHCP server on the LAN interface by default.  </para>
-        
-        <sect2>
-            <title>LAN with m0n0wall as DHCP Server</title>
-            
-            <para>If you are going to use your m0n0wall as a DHCP server, set the
-            machine you will be using to access the webGUI to obtain its IP address
-            using DHCP.   Then release and renew your DHCP lease and you will get
-            a lease from m0n0wall.  The procedures to release and renew vary by
-            the client machine's operating system, but if you don't know how to do
-            this, a reboot will achieve the same result.</para>
-            
-        </sect2>
-        
-        <sect2>
-            <title>LAN with Existing DHCP Server</title>
-            
-            <para>If you have an existing DHCP server on your LAN, you just need
-            to set your m0n0wall's LAN IP address to the default gateway address
-            assigned by your DHCP server.  You can change this using the console
-            "Set LAN IP address" option.</para>
-            
-            <para>When you get into the webGUI, you'll need to disable m0n0wall's
-            DHCP server.  You can also disable it from the console <link
-            linkend="Connecting.Serial.Console">as described
-            in the last chapter</link>.</para>
-        </sect2>
-        
-    </sect1>
-    
-    <sect1>
-        <?dbhtml filename="clientconfigure-static.html"?>
-        <title>Static IP addresses</title>
-        
-        <para>If you want to use a static IP address on your client machines,
-        be sure to configure them in the same subnet as your m0n0wall LAN interface,
-        using the appropriate DNS servers and the m0n0wall LAN IP address as the
-        default gateway.</para>
-        
-        <para>We recommend you stick with DHCP at least initially to reduce the likelihood of
-        problems.</para>
-        
-    </sect1>
-    
+
+  <title>Client Machine Configuration</title>
+
+  <para>Now you need to get one of your client machines configured so you can
+  access the webGUI to finish the configuration. A client machine is any
+  Ethernet device (such as a computer, network printer or scanner, network
+  camera...) that is connected to the LAN network of the m0n0wall PC. These
+  devices will use the m0n0wall PC to reach the Internet and they will be
+  protected by your m0n0wall configuration.</para>
+
+  <para>If you are using the DHCP server built-into the m0n0wall system, these
+  client machines will be receiving all of their IP configuration from the
+  WRAP/ALIX system running m0n0wall, even if they are not expected to connect
+  to the Internet.</para>
+
+  <tip>
+    <para>If you have any servers in your LAN network such as a file or print
+    server, you will want them to have fixed, non-changing IP addresses.
+    Either assign them a fixed DHCP address or a static IP address.</para>
+  </tip>
+
+  <sect1>
+    <?dbhtml filename="clientconfigure-dhcp.html"?>
+
+    <title>Using DHCP for client machines</title>
+
+    <para>If you aren't familiar with networking, the easiest thing to do is
+    set all your client machines to obtain their IP address from DHCP.
+    m0n0wall enables its DHCP server on the LAN interface by default.</para>
+
+    <sect2>
+      <title>LAN with m0n0wall as DHCP Server</title>
+
+      <para>If you are going to use your m0n0wall as a DHCP server, set the
+      client computer you will be using to access the webGUI to obtain its IP
+      address using DHCP. Then release and renew your DHCP lease and you will
+      get a lease from m0n0wall. The procedures to release and renew vary by
+      the client machine's operating system, but if you don't know how to do
+      this, a reboot of the client computer will achieve the same
+      result.</para>
+    </sect2>
+
+    <sect2>
+      <title>LAN with Existing DHCP Server</title>
+
+      <para>If you have an existing DHCP server on your LAN, you just need to
+      set your m0n0wall's LAN IP address as the default gateway address
+      assigned by your DHCP server. This is because your LAN traffic is
+      expected to be going through the LAN interface of your m0n0wall PC so
+      that m0n0wall can protect your network traffic.</para>
+
+      <para>When you get into the webGUI, you'll need to disable m0n0wall's
+      DHCP server. You can also disable it from the console <link
+      linkend="Connecting.Serial.Console">as described in the last
+      chapter</link>.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="clientconfigure-static.html"?>
+
+    <title>Static IP addresses for client machines</title>
+
+    <para>If you want to use a static IP address on your client machines, be
+    sure to configure them in the same subnet as your m0n0wall LAN interface,
+    using the appropriate DNS servers and the m0n0wall LAN IP address as the
+    default gateway.</para>
+
+    <para>We recommend you stick with DHCP at least initially to reduce the
+    likelihood of problems.</para>
+  </sect1>
 </chapter>

@@ -4,226 +4,221 @@
 
   <title>Initial webGUI Configuration</title>
 
-    <para>Now that we have the client machines configured appropriately, the
-    interfaces assigned and LAN IP address configured, and the m0n0wall has
-    rebooted with its new configuration, we will log into the webGUI and finish
-    the configuration.</para>
-    
-    <sect1>
-        <?dbhtml filename="webgui-loggingin.html"?>
-        <title>Logging into the webGUI</title>
-    
-        <para>Open your web browser and go to http://192.168.1.1 (if you changed
-        your LAN IP address in the console setup, replace 192.168.1.1 with your LAN IP
-        throughout the remainder of this documentation).  </para>
-    
-        <para>You will be prompted for a username and password.  Enter username admin and
-        password mono.  You are now logged into the webGUI.</para>
-    
-        <mediaobject>
-           <imageobject>
-             <imagedata fileref="screens/webgui/firstscreen.png" />
-           </imageobject>
-        </mediaobject>
-    
-    </sect1>
-    
-    <sect1>
-        <?dbhtml filename="webgui-general.html"?>
-        <title>webGUI System -> General Setup screen</title>
-        
-        <para>First click "General Setup".  </para>
-        
-        <mediaobject>
-           <imageobject>
-             <imagedata fileref="screens/webgui/generalsetup.png" />
-           </imageobject>
-        </mediaobject>
-        
-        <para><emphasis role="bold">Hostname and Domain</emphasis></para>
-        
-        <para>If you wish to change the hostname and domain of your m0n0wall, you
-        can do so in the first two boxes on this screen.  If you use m0n0wall as
-        your DNS server, this name will resolve to your LAN IP address.  i.e. you
-        can access your webGUI using http://m0n0wall.local or whatever you set
-        the hostname and domain to be. </para>
-        
-        <para><emphasis role="bold">DNS Servers</emphasis></para>
-        
-        <para>If you have a static IP from your ISP, you need to enter the IP
-        addresses of your ISP's DNS servers in these two boxes.  Use one IP address
-        per box.  If you get your IP address from your ISP via DHCP, leave these
-        boxes blank.  If you want to use DNS servers on your LAN, enter their IP
-        addresses here.  You can only use one DNS server by filling in the top
-        box and leaving the bottom one blank.</para>
-        
-        <para>If your ISP uses DHCP and you wish to use the DNS servers the ISP's
-        DHCP server provides, leave the "Allow DNS server list to be overridden by
-        DHCP/PPP on WAN" box checked.  If you are using DHCP on the WAN and wish
-        to use DNS servers other than the ones provided by your ISP, uncheck this
-        box.</para>
-        
-        <para><emphasis role="bold">Username and Password</emphasis></para>
-        
-        <para>If you wish to change the username from the default "admin", change
-        the username box appropriately.</para>
-        
-        <para>It is important that you change your password from the default
-        "mono" by typing in a password of your choosing in the password field and
-        typing it again to confirm in the second field.  </para>
-        
-        <para><emphasis role="bold">webGUI protocol and port</emphasis></para>
-        
-        <para>Here you should change the protocol from HTTP to HTTPS so your
-        username and password and configuration details are encrypted while in
-        transit over your LAN.</para>
-        
-        <para>If you want to make it a little more difficult to find your webGUI
-        logon page, change the port number here.  Just remember you will have to
-        put that port number in the URL when logging into the webGUI.  For example,
-        if you set this port to 5555, and switch to HTTPS, you will have to use
-        https://192.168.1.1:5555 to access the webGUI.</para>
-        
-        <para><emphasis role="bold">Time Zone</emphasis></para>
-        
-        <para>Select your time zone from this drop down box.  This includes all
-        of the time zones from FreeBSD.  I am in Louisville, Kentucky, USA, which
-        has its own entry under America/Louisville that I will select.  You can
-        likely find a city in the same time zone, or at least find the name of
-        your time zone.</para>
-        
-        <para><emphasis role="bold">Time Update Interval</emphasis></para>
-        
-        <para>m0n0wall has a NTP client built in that by default will synchronize
-        its time to a NTP server every 300 minutes (5 hours).  To change the
-        frequency of this update, change this box.  Enter 0 to disable NTP clock
-        synchronization (not recommended).</para>
-        
-        <para><emphasis role="bold">NTP Time Server</emphasis></para>
-        
-        <para>This specifies which NTP server m0n0wall will use to synchronize its
-        time.  You can leave it at pool.ntp.org unless you have a reason to change
-        it.  You might want to change this, for example, to synchronize to a
-        central NTP server on your LAN.</para>
-        
-        <para>Now review all of your changes on this screen, and when you are
-        satisfied with them, click Save.  You'll see notification that the
-        changes were applied successfully. </para>
-        
-        
-    </sect1>
-    
-    <sect1>
-        <?dbhtml filename="webgui-configurewan.html"?>
-        <title>Configuring your WAN interface</title>
+  <para>Now that we have the client machines configured appropriately, the
+  interfaces assigned and LAN IP address configured, and the m0n0wall has
+  rebooted with its new configuration, we will log into the webGUI and finish
+  the configuration.</para>
 
-        <para>Now we will configure your WAN interface.  At this point, you will
-        need some information from your ISP.  The WAN connection types available
-        are DHCP, static IP, PPPoE, PPTP, and BigPond.  Chances are you will be
-        using DHCP, static IP, or PPPoE.  </para>
-        
-        <sect2>
-            <title>WAN configuration screen</title>
-            
-            <mediaobject>
-                <imageobject>
-                  <imagedata fileref="screens/webgui/wan.png" />
-                </imageobject>
-            </mediaobject>
-            
-        </sect2>
-        
-        <sect2>
-            <title>Type</title>
-            
-            <para>In the Type drop down box, you have five choices.  Choose
-            accordingly for the information you gathered earlier, and fill
-            in any necessary information for your connection type.</para>
-            
-        </sect2>
-        
-        <sect2>
-            <title>General configuration options</title>
-            
-            <para>Under "General configuration" on this screen, you can change
-            the MAC address of the WAN interface and change the MTU.</para>
-            
-            <para><emphasis role="bold">MAC address</emphasis></para>
-            
-            <para>Some ISP's keep the MAC address of the device you have connected
-            to their network, and only allow that device access.  There is typically
-            a process to register a new device, though sometimes that may require
-            contacting the ISP.  To avoid this, you can enter the MAC address of
-            the network card you previously used on your broadband connection to
-            make your ISP think you still have the same device connected.</para>
-            
-            <para><emphasis role="bold">MTU</emphasis></para>
-            
-            <para>Unless you have a very good reason for changing it, leave the
-            MTU alone.</para>
-        </sect2>
-        
-        <sect2>
-            <title>Block private networks</title>
-            
-            <para>Unless your WAN subnet lies in private IP address
-            space, leave this box checked.  It protects you from
-            some IP spoofing attempts.</para>
-            
-        </sect2>
-        
-        <sect2>
-            <title>Save and Apply Changes</title>
-            
-            <para>Now click Save at the bottom of the WAN page.  Your changes
-            will immediately take effect, and you should immediately be able to
-            browse the internet from your LAN.  If you cannot, see the troubleshooting
-            section.</para>
-            
-        </sect2>
+  <sect1>
+    <?dbhtml filename="webgui-loggingin.html"?>
 
-    </sect1>
-    
-    <sect1>
-        <?dbhtml filename="webgui-configured.html"?>
-        <title>What next?</title>
-        
-        <para>So you now have m0n0wall configured and working - now what next?</para>
-        
-        <sect2>
-          <title>m0n0wall Announcements List</title>
-          
-        <para>If you are running m0n0wall, we strongly suggest subscribing to the
-        announcements mailing list by sending a blank email to
-        &lt;m0n0wall-announce-subscribe@lists.m0n0.ch&gt;.  This is a very low volume
-        list that can only be posted to by Manuel Kasper.  It might get 10 messages
-        a year.  It's <emphasis role="bold">important to subscribe</emphasis> so you
-        are kept up to date on any new releases, and will know if any security issues
-        are discovered.</para>
-        
-        </sect2>
-        
-        <sect2>
-          <title>m0n0wall Documentation Announcements List</title>
-        
-        <para>You might also wish to subscribe to the documentation updates list if you
-        want to keep up to date on major changes to the m0n0wall documentation.  Send a
-        blank email to &lt;m0n0wall-doc-announce-subscribe@lists.m0n0.ch&gt; to subscribe.
-        This list can only be posted to by Chris Buechler, and is very low volume with
-        typically less than 10 messages per year.  </para>
-        
-        </sect2>
-        
-        <sect2>
-          <title>Explore the Possibilities</title>
-          
-          <para>m0n0wall is capable of much more than the basic two interface LAN/WAN
-          setup you now have running.  Peruse the <ulink url="http://doc.m0n0.ch/handbook/">
-            m0n0wall Handbook</ulink> for information on
-          implementing more of m0n0wall's capabilities.</para>
-          
-        </sect2>
-        
-    </sect1>
-    
+    <title>Logging into the webGUI</title>
+
+    <para>Open your web browser and go to http://192.168.1.1 (if you changed
+    your LAN IP address in the console setup, replace 192.168.1.1 with your
+    LAN IP throughout the remainder of this documentation).</para>
+
+    <para>You will be prompted for a username and password. Enter username
+    admin and password mono. You are now logged into the webGUI.</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="screens/webgui/firstscreen.png" />
+      </imageobject>
+    </mediaobject>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="webgui-general.html"?>
+
+    <title>webGUI System -&gt; General Setup screen</title>
+
+    <para>First click "General Setup".</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="screens/webgui/generalsetup.png" />
+      </imageobject>
+    </mediaobject>
+
+    <para><emphasis role="bold">Hostname and Domain</emphasis></para>
+
+    <para>If you wish to change the hostname and domain of your m0n0wall, you
+    can do so in the first two boxes on this screen. If you use m0n0wall as
+    your DNS server, this name will resolve to your LAN IP address. i.e. you
+    can access your webGUI using http://m0n0wall.local or whatever you set the
+    hostname and domain to be.</para>
+
+    <para><emphasis role="bold">DNS Servers</emphasis></para>
+
+    <para>If you have a static IP from your ISP, you need to enter the IP
+    addresses of your ISP's DNS servers in these two boxes. Use one IP address
+    per box. If you get your IP address from your ISP via DHCP, leave these
+    boxes blank. If you want to use DNS servers on your LAN, enter their IP
+    addresses here. You can only use one DNS server by filling in the top box
+    and leaving the bottom one blank.</para>
+
+    <para>If your ISP uses DHCP and you wish to use the DNS servers the ISP's
+    DHCP server provides, leave the "Allow DNS server list to be overridden by
+    DHCP/PPP on WAN" box checked. If you are using DHCP on the WAN and wish to
+    use DNS servers other than the ones provided by your ISP, uncheck this
+    box.</para>
+
+    <para><emphasis role="bold">Username and Password</emphasis></para>
+
+    <para>If you wish to change the username from the default "admin", change
+    the username box appropriately.</para>
+
+    <para>It is important that you change your password from the default
+    "mono" by typing in a password of your choosing in the password field and
+    typing it again to confirm in the second field.</para>
+
+    <para><emphasis role="bold">webGUI protocol and port</emphasis></para>
+
+    <para>Here you should change the protocol from HTTP to HTTPS so your
+    username and password and configuration details are encrypted while in
+    transit over your LAN.</para>
+
+    <para>If you want to make it a little more difficult to find your webGUI
+    logon page, change the port number here. Just remember you will have to
+    put that port number in the URL when logging into the webGUI. For example,
+    if you set this port to 5555, and switch to HTTPS, you will have to use
+    https://192.168.1.1:5555 to access the webGUI.</para>
+
+    <para><emphasis role="bold">Time Zone</emphasis></para>
+
+    <para>Select your time zone from this drop down box. This includes all of
+    the time zones from FreeBSD. I am in Louisville, Kentucky, USA, which has
+    its own entry under America/Louisville that I will select. You can likely
+    find a city in the same time zone, or at least find the name of your time
+    zone.</para>
+
+    <para><emphasis role="bold">Time Update Interval</emphasis></para>
+
+    <para>m0n0wall has a NTP client built in that by default will synchronize
+    its time to a NTP server every 300 minutes (5 hours). To change the
+    frequency of this update, change this box. Enter 0 to disable NTP clock
+    synchronization (not recommended).</para>
+
+    <para><emphasis role="bold">NTP Time Server</emphasis></para>
+
+    <para>This specifies which NTP server m0n0wall will use to synchronize its
+    time. You can leave it at pool.ntp.org unless you have a reason to change
+    it. You might want to change this, for example, to synchronize to a
+    central NTP server on your LAN.</para>
+
+    <para>Now review all of your changes on this screen, and when you are
+    satisfied with them, click Save. You'll see notification that the changes
+    were applied successfully.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="webgui-configurewan.html"?>
+
+    <title>Configuring your WAN interface</title>
+
+    <para>Now we will configure your WAN interface. At this point, you will
+    need some information from your ISP. The WAN connection types available
+    are DHCP, static IP, PPPoE, PPTP, and BigPond. Chances are you will be
+    using DHCP, static IP, or PPPoE.</para>
+
+    <sect2>
+      <title>WAN configuration screen</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/webgui/wan.png" />
+        </imageobject>
+      </mediaobject>
+    </sect2>
+
+    <sect2>
+      <title>Type</title>
+
+      <para>In the Type drop down box, you have five choices. Choose
+      accordingly for the information you gathered earlier, and fill in any
+      necessary information for your connection type.</para>
+    </sect2>
+
+    <sect2>
+      <title>General configuration options</title>
+
+      <para>Under "General configuration" on this screen, you can change the
+      MAC address of the WAN interface and change the MTU.</para>
+
+      <para><emphasis role="bold">MAC address</emphasis></para>
+
+      <para>Some ISP's keep the MAC address of the device you have connected
+      to their network, and only allow that device access. There is typically
+      a process to register a new device, though sometimes that may require
+      contacting the ISP. To avoid this, you can enter the MAC address of the
+      network card you previously used on your broadband connection to make
+      your ISP think you still have the same device connected.</para>
+
+      <para><emphasis role="bold">MTU</emphasis></para>
+
+      <para>Unless you have a very good reason for changing it, leave the MTU
+      alone.</para>
+    </sect2>
+
+    <sect2>
+      <title>Block private networks</title>
+
+      <para>Unless your WAN subnet lies in private IP address space, leave
+      this box checked. It protects you from some IP spoofing attempts.</para>
+    </sect2>
+
+    <sect2>
+      <title>Save and Apply Changes</title>
+
+      <para>Now click Save at the bottom of the WAN page. Your changes will
+      immediately take effect, and you should immediately be able to browse
+      the Internet from your LAN. If you cannot, see the troubleshooting
+      section.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="webgui-configured.html"?>
+
+    <title>What next?</title>
+
+    <para>So you now have m0n0wall configured and working - now what
+    next?</para>
+
+    <sect2>
+      <title>m0n0wall Announcements List</title>
+
+      <para>If you are running m0n0wall, we strongly suggest subscribing to
+      the announcements mailing list by sending a blank email to
+      &lt;m0n0wall-announce-subscribe@lists.m0n0.ch&gt;. This is a very low
+      volume list that can only be posted to by Manuel Kasper. It might get 10
+      messages a year. It's <emphasis role="bold">important to
+      subscribe</emphasis> so you are kept up to date on any new releases, and
+      will know if any security issues are discovered.</para>
+
+      <para>There might also be an announcements list for your embedded
+      system. Check their website to see if this is available.</para>
+    </sect2>
+
+    <sect2>
+      <title>m0n0wall Documentation Announcements List</title>
+
+      <para>You might also wish to subscribe to the documentation updates list
+      if you want to keep up to date on major changes to the m0n0wall
+      documentation. Send a blank email to
+      &lt;m0n0wall-doc-announce-subscribe@lists.m0n0.ch&gt; to subscribe. This
+      list can only be posted to by Chris Buechler, and is very low volume
+      with typically less than 10 messages per year.</para>
+    </sect2>
+
+    <sect2>
+      <title>Explore the Possibilities</title>
+
+      <para>m0n0wall is capable of much more than the basic two interface
+      LAN/WAN setup you now have running. Peruse the <ulink
+      url="http://doc.m0n0.ch/handbook/"> m0n0wall Handbook</ulink> for
+      information on implementing more of m0n0wall's capabilities.</para>
+    </sect2>
+  </sect1>
 </chapter>
