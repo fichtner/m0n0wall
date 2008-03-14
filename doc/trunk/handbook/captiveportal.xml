@@ -1,9 +1,853 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter>
   <?dbhtml filename="captiveportal.html"?>
 
   <title>Captive Portal</title>
 
+  <para>This Captive Portal functionality allows you to control HTTP browser
+  access to the Internet. All users trying to leave the selected network (for
+  example all users from the LAN network going to the Internet) will be
+  redirected to a HTML page stored on your m0n0wall. This page is typically
+  where the user trying to reach the Internet can enter in username and
+  password information to be authenticated and allowed access to the
+  Internet.</para>
 
+  <para>Users are identified by their MAC hardware address of their ethernet
+  card. All traffic trying to reach the Internet or selected network by any
+  user is blocked until they use a web browser and finish the authentication
+  process on the HTML authentication page.</para>
+
+  <para>Some features of the m0n0wall Captive Portal include:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Interface selection (typically the LAN interface)</para>
+    </listitem>
+
+    <listitem>
+      <para>Allow selected IP or MAC addresses</para>
+    </listitem>
+
+    <listitem>
+      <para>User authentication choices (none, local, or RADIUS)</para>
+    </listitem>
+
+    <listitem>
+      <para>Maximum concurrent connections</para>
+    </listitem>
+
+    <listitem>
+      <para>Concurrent user logins</para>
+    </listitem>
+
+    <listitem>
+      <para>Local user management option</para>
+    </listitem>
+
+    <listitem>
+      <para>Per user bandwidth restrictions</para>
+    </listitem>
+
+    <listitem>
+      <para>Idle and Hard timeout</para>
+    </listitem>
+
+    <listitem>
+      <para>Log out popup window</para>
+    </listitem>
+
+    <listitem>
+      <para>Redirection URL</para>
+    </listitem>
+
+    <listitem>
+      <para>MAC filtering</para>
+    </listitem>
+
+    <listitem>
+      <para>HTTPS authentication</para>
+    </listitem>
+
+    <listitem>
+      <para>Customizable portal page contents</para>
+    </listitem>
+
+    <listitem>
+      <para>Customizable authentication failure page</para>
+    </listitem>
+
+    <listitem>
+      <para>Voucher support (in the upcoming 1.3 m0n0wall)</para>
+    </listitem>
+  </itemizedlist>
+
+  <caution>
+    <para>Don't forget to enable the DHCP server on your captive portal
+    interface! Make sure that the default/maximum DHCP lease time is higher
+    than the timeout entered on this page. Also, the DNS forwarder needs to be
+    enabled for DNS lookups by unauthenticated clients to work.</para>
+  </caution>
+
+  <sect1>
+    <title>Connection Management</title>
+
+    <para>Below are some of the Connection options that can be configured for
+    use with the Captive Portal. Additionally there is some information about
+    allowing pass-through MAC addresses and making a list of allowed IP
+    addresses that do not need authentication.</para>
+
+    <table>
+      <title>Connection Parameters</title>
+
+      <tgroup cols="2" tgroupstyle="Format D">
+        <colspec colname="col1" colnum="1" colwidth="1*" />
+
+        <colspec colname="col2" colnum="2" colwidth="2*" />
+
+        <thead>
+          <row>
+            <entry valign="top">Parameter</entry>
+
+            <entry valign="top">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>Interface</entry>
+
+            <entry>Choose which interface to run the captive portal on.
+            Captive Portal can only be run on one interface.</entry>
+          </row>
+
+          <row>
+            <entry>Maximum concurrent connections</entry>
+
+            <entry>This setting limits the number of concurrent connections to
+            the captive portal HTTP(S) server. This does not set how many
+            users can be logged in to the captive portal, but rather how many
+            users can load the portal page or authenticate at the same time!
+            Default is 4 connections per client IP address, with a total
+            maximum of 16 connections.</entry>
+          </row>
+
+          <row>
+            <entry>Idle timeout</entry>
+
+            <entry>Clients will be disconnected after this amount of
+            inactivity. They may log in again immediately, though. Leave this
+            field blank for no idle timeout.</entry>
+          </row>
+
+          <row>
+            <entry>Hard timeout</entry>
+
+            <entry>Clients will be disconnected after this amount of time,
+            regardless of activity. They may log in again immediately, though.
+            Leave this field blank for no hard timeout (not recommended unless
+            an idle timeout is set).</entry>
+          </row>
+
+          <row>
+            <entry>Logout popup window</entry>
+
+            <entry>If enabled, a popup window will appear when clients are
+            allowed through the captive portal. This allows clients to
+            explicitly disconnect themselves before the idle or hard timeout
+            occurs.</entry>
+          </row>
+
+          <row>
+            <entry>Redirection URL</entry>
+
+            <entry>If you provide a URL here, clients will be redirected to
+            that URL instead of the one they initially tried to access after
+            they've authenticated.</entry>
+          </row>
+
+          <row>
+            <entry>Concurrent user logins</entry>
+
+            <entry>If this option is set, only the most recent login per
+            username will be active. Subsequent logins will cause machines
+            previously logged in with the same username to be
+            disconnected.</entry>
+          </row>
+
+          <row>
+            <entry>MAC filtering</entry>
+
+            <entry>If this option is set, no attempts will be made to ensure
+            that the MAC address of clients stays the same while they're
+            logged in. This is required when the MAC address of the client
+            cannot be determined (usually because there are routers between
+            m0n0wall and the clients).</entry>
+          </row>
+
+          <row>
+            <entry>Per-user bandwidth restriction</entry>
+
+            <entry>If this option is set, the captive portal will restrict
+            each user who logs in to the specified default bandwidth. RADIUS
+            can override the default settings. Leave empty or set to 0 for no
+            limit. <emphasis role="bold">You will need to enable the traffic
+            shaper for this to be effective.</emphasis></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <sect2>
+      <title>Pass-through MAC Addresses</title>
+
+      <para>Adding MAC addresses as pass-through MACs allows them access
+      through the captive portal automatically without being taken to the
+      portal page. The pass-through MACs can change their IP addresses on the
+      fly and upon the next access, the pass-through tables are changed
+      accordingly. Pass-through MACs will however still be disconnected after
+      the captive portal timeout period.</para>
+
+      <para>You can enter a list of MAC address (6 hex octets separated by
+      colons) and a description here for your reference (it is not
+      parsed).</para>
+    </sect2>
+
+    <sect2>
+      <title>Allowed IP Addresses</title>
+
+      <para>Adding allowed IP addresses will allow IP access to/from these
+      addresses through the captive portal without being taken to the portal
+      page. This can be used for a web server serving images for the portal
+      page or a DNS server on another network, for example. By specifying from
+      addresses, it may be used to always allow pass-through access from a
+      client behind the captive portal.</para>
+
+      <para>Some sample rules are:</para>
+
+      <para>any x.x.x.x &gt; All connections to the IP address are
+      allowed</para>
+
+      <para>x.x.x.x &gt; any All connections from the IP address are
+      allowed</para>
+
+      <para>For each entry on the Allowed IP Address list you can use
+      <emphasis>From</emphasis> to always allow an IP address through the
+      captive portal (without authentication). Use <emphasis>To</emphasis> to
+      allow access from all clients (even non-authenticated ones) behind the
+      portal to this IP address. Additionally each entry will contain an IP
+      address and a description for your reference (it is not parsed).</para>
+
+      <caution>
+        <para>If you have servers such as web or email on a separate
+        subnetwork (for example a DMZ) be sure to add their IP addresses to
+        this list. Otherwise users will not be allowed to access them without
+        authenticating first.</para>
+      </caution>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Authentication Management</title>
+
+    <para>There are 3 user management choices that can be used to authenticate
+    users to the Captive Portal.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>No authentication</para>
+      </listitem>
+
+      <listitem>
+        <para>Local user manager</para>
+      </listitem>
+
+      <listitem>
+        <para>Radius authentication</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Optionally web authentication can be secured with HTTPS.</para>
+
+    <sect2>
+      <title>Secure Authentication</title>
+
+      <para>Below are some of the Secure Authentication options that can be
+      configured for use with th Captive Portal to .</para>
+
+      <table>
+        <title>Secure Authentication Parameters</title>
+
+        <tgroup cols="2" tgroupstyle="Format D">
+          <colspec colname="col1" colnum="1" colwidth="1*" />
+
+          <colspec colname="col2" colnum="2" colwidth="2*" />
+
+          <thead>
+            <row>
+              <entry valign="top">Parameter</entry>
+
+              <entry valign="top">Description</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>HTTPS login</entry>
+
+              <entry>If enabled, the username and password will be transmitted
+              over an HTTPS connection to protect against eavesdroppers. A
+              server name, certificate and matching private key must also be
+              specified below.</entry>
+            </row>
+
+            <row>
+              <entry>HTTPS server name</entry>
+
+              <entry>This name will be used in the form action for the HTTPS
+              POST and should match the Common Name (CN) in your certificate
+              (otherwise, the client browser will most likely display a
+              security warning). Make sure captive portal clients can resolve
+              this name in DNS.</entry>
+            </row>
+
+            <row>
+              <entry>HTTPS certificate</entry>
+
+              <entry>Paste a signed certificate in X.509 PEM format
+              here.</entry>
+            </row>
+
+            <row>
+              <entry>HTTPS private key</entry>
+
+              <entry>Paste an RSA private key in PEM format here.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
+
+    <sect2>
+      <title>Local User Management</title>
+
+      <para>When using the Local User Manager option for Authentication it is
+      possible to store and access a list of users on the m0n0wall device
+      itself. This list is manually entered from the web interface and
+      includes the following parameters.</para>
+
+      <table>
+        <title>User Parameters</title>
+
+        <tgroup cols="2" tgroupstyle="Format D">
+          <colspec colname="col1" colnum="1" colwidth="1*" />
+
+          <colspec colname="col2" colnum="2" colwidth="2*" />
+
+          <thead>
+            <row>
+              <entry valign="top">Parameter</entry>
+
+              <entry valign="top">Description</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>Username</entry>
+
+              <entry>The name a user will use to authenticate with</entry>
+            </row>
+
+            <row>
+              <entry>Password</entry>
+
+              <entry>The password a user will use to authenticate with</entry>
+            </row>
+
+            <row>
+              <entry>Fullname</entry>
+
+              <entry>User's full name, for your own information only</entry>
+            </row>
+
+            <row>
+              <entry>Expiration Date</entry>
+
+              <entry>Leave blank if the account shouldn't expire, otherwise
+              enter the expiration date in the following format:
+              mm/dd/yyyy</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
+
+    <sect2>
+      <title>Radius User Management</title>
+
+      <para>When using the Radius Authentication option for Authentication it
+      is possible to authenticate with an existing Radius server on a
+      connected network. The Radius server will manage the user authentication
+      requests. This list is manually entered from the web interface and
+      includes the following parameters.</para>
+
+      <table>
+        <title>Radius Server Parameters</title>
+
+        <tgroup cols="2" tgroupstyle="Format D">
+          <colspec colname="col1" colnum="1" colwidth="1*" />
+
+          <colspec colname="col2" colnum="2" colwidth="2*" />
+
+          <thead>
+            <row>
+              <entry valign="top">Parameter</entry>
+
+              <entry valign="top">Description</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>Primary RADIUS server</entry>
+
+              <entry>Enter the IP address of the RADIUS server which users of
+              the captive portal have to authenticate against. You can change
+              the default port (1812) and shared secret. Optionally leave the
+              shared secret blank to not use a RADIUS shared secret (not
+              recommended).</entry>
+            </row>
+
+            <row>
+              <entry>Secondary RADIUS server</entry>
+
+              <entry>If you have a second RADIUS server, you can activate it
+              by entering its IP address, port and shared secret as done for
+              the primary server.</entry>
+            </row>
+
+            <row>
+              <entry>send RADIUS accounting packets</entry>
+
+              <entry>If this is enabled, RADIUS accounting packets will be
+              sent to the primary RADIUS server. Optionally change the default
+              port (1813).</entry>
+            </row>
+
+            <row>
+              <entry>Reauthentication</entry>
+
+              <entry>If reauthentication is enabled, Access-Requests will be
+              sent to the RADIUS server for each user that is logged in every
+              minute. If an Access-Reject is received for a user, that user is
+              disconnected from the captive portal immediately.</entry>
+            </row>
+
+            <row>
+              <entry>Accounting updates</entry>
+
+              <entry>These reauthentication updates can be configured to
+              support no accounting updates, stop/start accounting, or interim
+              updates.</entry>
+            </row>
+
+            <row>
+              <entry>RADIUS MAC authentication</entry>
+
+              <entry>If this option is enabled, the captive portal will try to
+              authenticate users by sending their MAC address as the username
+              and a static password/secret to the RADIUS server.</entry>
+            </row>
+
+            <row>
+              <entry>RADIUS Session-Timeout attributes</entry>
+
+              <entry>When this is enabled, clients will be disconnected after
+              the amount of time retrieved from the RADIUS Session-Timeout
+              attribute.</entry>
+            </row>
+
+            <row>
+              <entry>Radius Type</entry>
+
+              <entry>If RADIUS type is set to Cisco, in RADIUS requests
+              (Authentication/Accounting) the value of Calling-Station-Id will
+              be set to the client's IP address and the Called-Station-Id to
+              the client's MAC address. Default behaviour is
+              Calling-Station-Id = client's MAC address and Called-Station-Id
+              = m0n0wall's WAN MAC address.</entry>
+            </row>
+
+            <row>
+              <entry>MAC address format</entry>
+
+              <entry>This option changes the MAC address format used in the
+              whole RADIUS system. Change this if you also need to change the
+              username format for RADIUS MAC authentication. default:
+              00:11:22:33:44:55 singledash: 001122-334455 ietf:
+              00-11-22-33-44-55 cisco: 0011.2233.4455 unformatted:
+              001122334455</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Custom Pages And Files</title>
+
+    <para>It is possible to customize the HTML pages that are used for the
+    Captive portal authentication process. The page that does the
+    authentication itself an be changed as well as the default page that is
+    shown for a failed authentication. Graphics files can also be loaded into
+    the m0n0wall device for use on these pages, up to a maximum of 256
+    KB.</para>
+
+    <para>Optionally a redirected URL can be used where clients will be
+    redirected instead of the one they initially tried to access after they've
+    authenticated. After reading this information they are free to access the
+    remote networks since they have already been authenticated.</para>
+
+    <para>Below are the parameters for custom pages and files.</para>
+
+    <sect2>
+      <title>Portal Page Contents</title>
+
+      <para>Upload an HTML file for the portal page here (leave blank to keep
+      the current one). Make sure to include a form (POST to
+      "$PORTAL_ACTION$") with a submit button (name="accept") and a hidden
+      field with name="redirurl" and value="$PORTAL_REDIRURL$". Include the
+      "auth_user" and "auth_pass" input fields if authentication is enabled,
+      otherwise it will always fail. Example code for the form:</para>
+
+      <programlisting>&lt;form method="post" action="$PORTAL_ACTION$"&gt;
+   &lt;input name="auth_user" type="text"&gt;
+   &lt;input name="auth_pass" type="password"&gt;
+   &lt;input name="redirurl" type="hidden" value="$PORTAL_REDIRURL$"&gt;
+   &lt;input name="accept" type="submit" value="Continue"&gt;
+&lt;/form&gt;</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>Authentication Error Page Contents</title>
+
+      <para>The contents of the HTML file that you upload here are displayed
+      when an authentication error occurs. You may include "$PORTAL_MESSAGE$",
+      which will be replaced by the error or reply messages from the RADIUS
+      server, if any. You may also include a new login form in the error page
+      to allow the user to attempt another login directly.</para>
+    </sect2>
+
+    <sect2>
+      <title>Custom Files</title>
+
+      <para>The loading page for custom files can be found in the File Manager
+      section of the Captive Portal main menu.</para>
+
+      <para>Any files that you upload here will be made available in the root
+      directory of the captive portal HTTP(S) server. You may reference them
+      directly from your portal page HTML code using relative paths. Example:
+      you've uploaded an image with the name 'test.jpg' using the file
+      manager. Then you can include it in your portal page like this:</para>
+
+      <programlisting>&lt;img src="test.jpg" width=... height=...&gt; </programlisting>
+
+      <para>The total size limit for all files is 256 KB.</para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Vouchers</title>
+
+    <para>Below are the following parameters that can be configured for
+    voucher use in the upcoming 1.3 m0n0wall). The Enable Vouchers checkbox
+    must activated for these parameters to be used.</para>
+
+    <note>
+      <para>Changing any Voucher parameter (apart from managing the list of
+      Rolls) on this page will render existing vouchers useless if they were
+      generated with different settings.</para>
+    </note>
+
+    <table>
+      <title>Voucher Parameters</title>
+
+      <tgroup cols="2" tgroupstyle="Format D">
+        <colspec colname="col1" colnum="1" colwidth="1*" />
+
+        <colspec colname="col2" colnum="2" colwidth="2*" />
+
+        <thead>
+          <row>
+            <entry valign="top">Parameter</entry>
+
+            <entry valign="top">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>Voucher Rolls</entry>
+
+            <entry>Create, generate and activate Rolls with Vouchers that
+            allow access through the captive portal for the configured time.
+            Once a voucher is activated, its clock is started and runs
+            uninterrupted until it expires. During that time, the voucher can
+            be re-used from the same or a different computer. If the voucher
+            is used again from another computer, the previous session is
+            stopped.</entry>
+          </row>
+
+          <row>
+            <entry>Voucher public key</entry>
+
+            <entry>Paste an RSA public key (64 Bit or smaller) in PEM format
+            here. This key is used to decrypt vouchers.</entry>
+          </row>
+
+          <row>
+            <entry>Voucher private key</entry>
+
+            <entry>Paste an RSA private key (64 Bit or smaller) in PEM format
+            here. This key is only used to generate encrypted vouchers and
+            doesn't need to be available if the vouchers have been generated
+            offline.</entry>
+          </row>
+
+          <row>
+            <entry>Character set</entry>
+
+            <entry>Tickets are generated with the specified character set. It
+            should contain printable characters (numbers, lower case and upper
+            case letters) that are hard to confuse with others. Avoid e.g. 0/O
+            and l/1.</entry>
+          </row>
+
+          <row>
+            <entry># of Roll Bits</entry>
+
+            <entry>Reserves a range in each voucher to store the Roll# it
+            belongs to. Allowed range: 1..31. Sum of Roll+Ticket+Checksum bits
+            must be one Bit less than the RSA key size.</entry>
+          </row>
+
+          <row>
+            <entry># of Ticket Bits</entry>
+
+            <entry>Reserves a range in each voucher to store the Ticket# it
+            belongs to. Allowed range: 1..16. Using 16 bits allows a roll to
+            have up to 65535 vouchers. A bit array, stored in RAM and in the
+            config, is used to mark if a voucher has been used. A bit array
+            for 65535 vouchers requires 8 KB of storage.</entry>
+          </row>
+
+          <row>
+            <entry># of Checksum Bits</entry>
+
+            <entry>Reserves a range in each voucher to store a simple checksum
+            over Roll# and Ticket#. Allowed range is 0..31.</entry>
+          </row>
+
+          <row>
+            <entry>Magic Number</entry>
+
+            <entry>Magic number stored in every voucher. Verified during
+            voucher check. Size depends on how many bits are left by
+            Roll+Ticket+Checksum bits. If all bits are used, no magic number
+            will be used and checked.</entry>
+          </row>
+
+          <row>
+            <entry>Save Interval</entry>
+
+            <entry>The list of active and used vouchers can be stored in the
+            system's configuration file once every x minutes to survive power
+            outages. No save is done if no new vouchers have been activated.
+            Enter 0 to never write runtime state to XML config.</entry>
+          </row>
+
+          <row>
+            <entry>Invalid Voucher Message</entry>
+
+            <entry>Error message displayed for invalid vouchers on captive
+            portal error page ($PORTAL_MESSAGE$)</entry>
+          </row>
+
+          <row>
+            <entry>Expired Voucher Message</entry>
+
+            <entry>Error message displayed for expired vouchers on captive
+            portal error page ($PORTAL_MESSAGE$).</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <sect2>
+      <title>Voucher Rolls</title>
+
+      <para>Each voucher roll has the following parameters.</para>
+
+      <table>
+        <title>Voucher Roll Parameters</title>
+
+        <tgroup cols="2" tgroupstyle="Format D">
+          <colspec colname="col1" colnum="1" colwidth="1*" />
+
+          <colspec colname="col2" colnum="2" colwidth="2*" />
+
+          <thead>
+            <row>
+              <entry valign="top">Parameter</entry>
+
+              <entry valign="top">Description</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>Roll#</entry>
+
+              <entry>Enter the Roll# (0..65535) found on top of the
+              generated/printed vouchers.</entry>
+            </row>
+
+            <row>
+              <entry>Minutes per Ticket</entry>
+
+              <entry>Defines the time in minutes that a user is allowed
+              access. The clock starts ticking the first time a voucher is
+              used for authentication.</entry>
+            </row>
+
+            <row>
+              <entry>Count</entry>
+
+              <entry>Enter the number of vouchers (1..1023) found on top of
+              the generated/printed vouchers. WARNING: Changing this number
+              for an existing Roll will mark all vouchers as unused
+              again.</entry>
+            </row>
+
+            <row>
+              <entry>Comment</entry>
+
+              <entry>Can be used to further identify this roll. Ignored by the
+              system.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Limitations</title>
+
+    <para>Because users are identified by their MAC hardware address it is
+    possible that someone using a packet sniffer can spoof/ impersonate the
+    authenticated MAC hardware address and thereby gain network access.
+    Setting a hard timeout can help to minimize this risk.</para>
+
+    <para>Don't forget to enable the DHCP server on your captive portal
+    interface! Make sure that the default/maximum DHCP lease time is higher
+    than the timeout entered on this page. Also, the DNS forwarder needs to be
+    enabled for DNS lookups by unauthenticated clients to work.</para>
+
+    <para>Plan carefully when you will make changes to the Captive Portal
+    configuration. Changing any settings on the main Captive Portal
+    configuration window will disconnect all clients!</para>
+
+    <para>Because of the way Captive Portal is implemented, it cannot be used
+    on more than one interface.</para>
+  </sect1>
+
+  <sect1>
+    <title>Additional Information</title>
+
+    <sect2>
+      <title>Is there any extra Captive Portal RADIUS functionality
+      available?</title>
+
+      <para>Jonathan De Graeve has implemented a number of new RADIUS features
+      for Captive Portal that will be implemented in a future beta version.
+      For now, these features are available on test images available for
+      download from <ulink url="http://inf.imelda.be/downloads/m0n0wall/">
+      http://inf.imelda.be/downloads/m0n0wall/</ulink>.</para>
+
+      <para>Features currently implemented in the test images include:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>RADIUS-defined URL redirection taking precedence over URL
+          redirection parameter in captive portal setup page.</para>
+        </listitem>
+
+        <listitem>
+          <para>Multiple RADIUS server support</para>
+        </listitem>
+
+        <listitem>
+          <para>Failure message on captive portal login error page, plus
+          logging to the captive portal log on why authentication failed (user
+          account exceeded bandwidth limit, bad password, etc.).</para>
+        </listitem>
+
+        <listitem>
+          <para>Cisco-compatible feature (sending calling-station-id with
+          clientip and called-station-id with clientmac instead of standard
+          behavior calling-station-id and clientmac).</para>
+        </listitem>
+
+        <listitem>
+          <para>Timeout parameter and max authentication retries
+          parameter</para>
+        </listitem>
+
+        <listitem>
+          <para>retrieval of user bandwidth settings</para>
+        </listitem>
+
+        <listitem>
+          <para>retrieval of user group</para>
+        </listitem>
+
+        <listitem>
+          <para>retrieval of session-timeout</para>
+        </listitem>
+      </itemizedlist>
+
+      <note>
+        <para>Retrieval means the variable is present and CAN be used, but
+        there is no action bound to it yet.</para>
+      </note>
+    </sect2>
+
+    <sect2>
+      <title>Using Captive Portal and MAC pass-through</title>
+
+      <para>You can utilize Captive Portal and its MAC pass-through
+      functionality for rudimentary MAC address restrictions.</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Enable Captive Portal on the desired interface (e.g. LAN) at
+          the Services -&gt; Captive Portal screen. Create a HTML page of your
+          liking that does not include the submit button so the user cannot
+          authenticate with the captive portal. Other settings can all be left
+          at their defaults.</para>
+        </listitem>
+
+        <listitem>
+          <para>Click the "Pass-through MAC" tab on the Captive Portal screen.
+          Click the + to start adding permitted MAC addresses. In the MAC
+          address box, type in the six hex octets separated by colons (e.g.
+          ab:cd:ef:12:34:56), optionally (but recommended) enter a
+          description, and click Save. Repeat for every authorized host on
+          your network.</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+  </sect1>
 </chapter>
