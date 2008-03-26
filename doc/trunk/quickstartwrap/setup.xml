@@ -83,13 +83,24 @@
         </listitem>
 
         <listitem>
+          <para>macosx:</para>
+
+          <para><programlisting>sudo dd if=wrap-1.3b10.img of=/dev/diskX bs=16k</programlisting>where
+          X = the IDE device name of your HD/CF card (check with <emphasis
+          role="bold">diskutil list</emphasis> or Disk Utility) - (ignore the
+          warning about trailing garbage - it's because of the digital
+          signature)</para>
+        </listitem>
+
+        <listitem>
           <para>Linux:</para>
 
           <para><programlisting>gunzip -c generic-pc-xxx.img | dd of=/dev/hdX bs=16k</programlisting>where
-          X = the IDE device name of your HD/CF card (check with hdparm -i
-          /dev/hdX) - some CF adapters, particularly USB, may show up under
-          SCSI emulation as /dev/sdX (ignore the warning about trailing
-          garbage - it's because of the digital signature)</para>
+          X = the IDE device name of your HD/CF card (check with <emphasis
+          role="bold">hdparm -i /dev/hdX</emphasis>) - some CF adapters,
+          particularly USB, may show up under SCSI emulation as /dev/sdX
+          (ignore the warning about trailing garbage - it's because of the
+          digital signature)</para>
         </listitem>
       </itemizedlist>
 
@@ -226,6 +237,91 @@ su-2.05b# camcontrol devlist
 
         <para><emphasis>Ignore the warning about trailing garbage - it's
         because of the digital signature.</emphasis></para>
+      </sect3>
+
+      <sect3>
+        <title>MacOSX</title>
+
+        <para>It is important to identify the Disk number that is assigned to
+        your connected compact flash drive and to unmount and opn partitions
+        before writing the CF image. You will be asked for your administrator
+        password when running the command.</para>
+
+        <tip>
+          <para>If your Compact Flash has not been previously formatted or is
+          in a format not readable by MacOSX, you will receive a message
+          saying that the CF card is not readable and asking if you want to
+          format it. Choose the IGNORE button.</para>
+        </tip>
+
+        <para>Run the command <emphasis role="bold">diskutil list</emphasis>.
+        You will get output similar to the following (this was using a 64Mb
+        Compact Flash card and a generic USB CF reader):</para>
+
+        <literallayout class="monospaced">myHome-Computer:Downloads myhome$ diskutil list
+/dev/disk0
+   #:      TYPE NAME                    SIZE       IDENTIFIER
+   0:      GUID_partition_scheme        *74.5 Gi    disk0
+   1:      EFI                           200.0 Mi   disk0s1
+   2:      Apple_HFS Macintosh HD        74.2 Gi    disk0s2
+/dev/disk1
+   #:      TYPE NAME                    SIZE       IDENTIFIER
+   0:                                   *61.2 Mi    disk1            </literallayout>
+
+        <para>Then optionally run the command <emphasis role="bold">diskutil
+        info diskX</emphasis> to get more information on th disk. You will see
+        output similar to the following (in this case the Compact Flash card
+        was assigned disk1.):</para>
+
+        <literallayout class="monospaced">myHome-Computer:Downloads myhome$ diskutil info disk1
+   Device Identifier:        disk1
+   Device Node:              /dev/disk1
+   Part Of Whole:            disk1
+   Device / Media Name:      Honestar USB Storage-CFC Media
+
+   Volume Name:              
+   Mount Point:              
+
+   Partition Type:           
+   Bootable:                 Not bootable
+   Media Type:               Generic
+   Protocol:                 USB
+   SMART Status:             Not Supported
+
+   Total Size:               61.2 Mi (64225280 B) (125440 512-byte blocks)
+   Free Space:               0.0 B (0 B) (0 512-byte blocks)
+
+   Read Only:                No
+   Ejectable:                Yes
+   Whole:                    Yes
+   Internal:                 No
+   OS 9 Drivers:             No
+   Low Level Format:         Not Supported
+</literallayout>
+
+        <tip>
+          <para>You can also find the Disk Identifier by running Open Disk
+          Utility (Applications &gt; Utilities &gt; Disk Utility). Find the CF
+          card that you will be writing to on the menu and be sure to unmount
+          any mounted partitions on that disk.</para>
+        </tip>
+
+        <para>You will find your CF card somewhere in the above output. Make
+        note of its device name (diskX).</para>
+
+        <programlisting>sudo dd if=wrap-1.3b10.img of=/dev/diskX bs=16k</programlisting>
+
+        <para>where X = the IDE device name of your HD/CF card (check with
+        <emphasis role="bold">diskutil list</emphasis> or Disk Utility) -
+        (ignore the warning about trailing garbage - it's because of the
+        digital signature). You will see output similar to the following (in
+        this case the Compact Flash card was assigned disk1.):</para>
+
+        <literallayout class="monospaced">myHome-Computer:Downloads myhome$ sudo dd if=wrap-1.3b10.img of=/dev/disk1 bs=16k
+Password:
+435+1 records in
+435+1 records out
+7139303 bytes transferred in 8.071781 secs (884477 bytes/sec)         </literallayout>
       </sect3>
 
       <sect3>
