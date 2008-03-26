@@ -4,5 +4,385 @@
 
   <title>Wireless</title>
 
+  <para>Wireless functionality is available for selected wireless cards. The
+  1.2.x version of m0n0wall allows some 802.11b wireless adapters/chipsets
+  (most notably Lucent Hermes and Intersil Prism II/2.5 to join a wireless
+  network with WEP encryption. The upcoming 1.3.x version which is based on
+  FreeBSD 6, supports (almost) all Atheros-based 802.11a/b/g cards as well
+  (and some Ralink cards too) and offers more capabilities. Version 1.3.x
+  allows the use of enhanced encryption, using the m0n0wall as an access
+  point, and the capability to use a Radius server for authentication.</para>
 
+  <note>
+    <para>Version 1.3.x m0n0wall is still in beta testing and features can
+    change before it is released as a stable version.</para>
+  </note>
+
+  <para>Some of the m0n0wall wireless features include:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>support for wi and ath wireless cards</para>
+    </listitem>
+
+    <listitem>
+      <para>support for 802.11b/g/a</para>
+    </listitem>
+
+    <listitem>
+      <para>channel selection from 1 to 14</para>
+    </listitem>
+
+    <listitem>
+      <para>support for hostap, BSS ad IBSS modes</para>
+    </listitem>
+
+    <listitem>
+      <para>enable/ disable wireless interface</para>
+    </listitem>
+
+    <listitem>
+      <para>SSID (hiding SSID in the upcoming 1.3 m0n0wall)</para>
+    </listitem>
+
+    <listitem>
+      <para>64bit or 128bit WEP encryption for ASCII or hexadecimal
+      digits</para>
+    </listitem>
+
+    <listitem>
+      <para>Bridging with another Ethernet interface if using hostap
+      mode</para>
+    </listitem>
+
+    <listitem>
+      <para>WPA and WPA2 encryption using PSK and Enterprise mode (in hostap
+      mode of the upcoming 1.3 m0n0wall)</para>
+    </listitem>
+
+    <listitem>
+      <para>AES/CCMP and TKIP ciphers (in the upcoming 1.3 m0n0wall)</para>
+    </listitem>
+
+    <listitem>
+      <para>WPA Radius server parameters (in the upcoming 1.3 m0n0wall)</para>
+    </listitem>
+  </itemizedlist>
+
+  <note>
+    <para>A Wireless Distribution System (WDS) is currently not supported in
+    either 1.2.x or 1.3.x.</para>
+  </note>
+
+  <sect1>
+    <title>Adding A Wireless Interface</title>
+
+    <para>The default m0n0wall configuration includes a LAN and WAN interface.
+    If you have an installed wireless card you will have to add the interface
+    manually. Below are the steps needed to install this interface using the
+    web interface of your m0n0wall device.</para>
+
+    <orderedlist>
+      <listitem>
+        <para>log into the web interface of your m0n0wall device</para>
+      </listitem>
+
+      <listitem>
+        <para>click the + symbol at the bottom right of the Interface
+        Assignment table</para>
+      </listitem>
+
+      <listitem>
+        <para>click on the drop down list and select a wireless interface (if
+        no wireless cards are shown then either your wireless card is not
+        correctly installed or it is not compatible with m0n0wall.</para>
+      </listitem>
+
+      <listitem>
+        <para>click the save button (your new wireless interface will appear
+        under the Interfaces menu item of the web interface)</para>
+      </listitem>
+
+      <listitem>
+        <para>reboot your m0n0wall firewall for the changes to take
+        effect</para>
+      </listitem>
+
+      <listitem>
+        <para>click the new wireless interface (probably named OPT1) and make
+        your desired wireless configuration.</para>
+      </listitem>
+    </orderedlist>
+  </sect1>
+
+  <sect1>
+    <title>Wireless Parameters 1.2.x</title>
+
+    <para>Below are the wireless parameters that are available in the m0n0wall
+    firmware 1.2.x. They will be available only if you have a compatible
+    wireless card installed and if you have added the wireless interface to
+    your interface list.</para>
+
+    <table>
+      <title>Wireless 1.2 Parameters</title>
+
+      <tgroup cols="2" tgroupstyle="Format D">
+        <colspec colname="col1" colnum="1" colwidth="1*" />
+
+        <colspec colname="col2" colnum="2" colwidth="2*" />
+
+        <thead>
+          <row>
+            <entry valign="top">Parameter</entry>
+
+            <entry valign="top">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>Description</entry>
+
+            <entry>custom name for the interface</entry>
+          </row>
+
+          <row>
+            <entry>Bridge with</entry>
+
+            <entry>select an ethernet interface to bridge to the wirelss
+            interface</entry>
+          </row>
+
+          <row>
+            <entry>IP address</entry>
+
+            <entry>assign the wireless interface an IP address and subnet
+            mask</entry>
+          </row>
+
+          <row>
+            <entry>Standard</entry>
+
+            <entry>Select 802.11b/g/a</entry>
+          </row>
+
+          <row>
+            <entry>Mode</entry>
+
+            <entry>Note: To create an access-point, choose "hostap" mode. IBSS
+            mode is sometimes also called "ad-hoc" mode; BSS mode is also
+            known as "infrastructure" mode.</entry>
+          </row>
+
+          <row>
+            <entry>SSID</entry>
+
+            <entry>The service set identifier (SSID) is a 32 character name of
+            your wireless network</entry>
+          </row>
+
+          <row>
+            <entry>Channel</entry>
+
+            <entry>Either choose Auto for the m0n0wall device to scan and find
+            an available wireless channel or select a channel manually. To see
+            currently used channels, click the Wireless option of the m0n0wall
+            Status menu.</entry>
+          </row>
+
+          <row>
+            <entry>Station Name</entry>
+
+            <entry>Hint: this field can usually be left blank</entry>
+          </row>
+
+          <row>
+            <entry>Enable WEP</entry>
+
+            <entry>Check this box to enable WEP encryption of your wireless
+            data</entry>
+          </row>
+
+          <row>
+            <entry>WEP Keys 1-4</entry>
+
+            <entry>40 (64) bit keys may be entered as 5 ASCII characters or 10
+            hex digits preceded by '0x'. 104 (128) bit keys may be entered as
+            13 ASCII characters or 26 hex digits preceded by '0x'.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>Below is a screenshot of the wireless interface configuration screen
+    of 1.2.x m0n0wall.</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="screens/interfaces/wlan.png" />
+      </imageobject>
+    </mediaobject>
+  </sect1>
+
+  <sect1>
+    <title>Wireless Parameters 1.3.x</title>
+
+    <para>Below are the wireless parameters that are available in the upcoming
+    m0n0wall firmware 1.3.x. They will be available only if you have a
+    compatible wireless card installed and if you have added the wireless
+    interface to your interface list.</para>
+
+    <table>
+      <title>Wireless 1.3 Parameters</title>
+
+      <tgroup cols="2" tgroupstyle="Format D">
+        <colspec colname="col1" colnum="1" colwidth="1*" />
+
+        <colspec colname="col2" colnum="2" colwidth="2*" />
+
+        <thead>
+          <row>
+            <entry valign="top">Parameter</entry>
+
+            <entry valign="top">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>Standard</entry>
+
+            <entry>Select 802.11b/g/a</entry>
+          </row>
+
+          <row>
+            <entry>Mode</entry>
+
+            <entry>Note: To create an access-point, choose "hostap" mode. IBSS
+            mode is sometimes also called "ad-hoc" mode; BSS mode is also
+            known as "infrastructure" mode.</entry>
+          </row>
+
+          <row>
+            <entry>SSID</entry>
+
+            <entry>The service set identifier (SSID) is a 32 character name of
+            your wireless network</entry>
+          </row>
+
+          <row>
+            <entry>Hide SSID</entry>
+
+            <entry>If this option is selected, the SSID will not be broadcast
+            in hostap mode, and only clients that know the exact SSID will be
+            able to connect. Note that this option should never be used as a
+            substitute for proper security/encryption settings.</entry>
+          </row>
+
+          <row>
+            <entry>Channel</entry>
+
+            <entry>Either choose Auto for the m0n0wall device to scan and find
+            an available wireless channel or select a channel manually. To see
+            currently used channels, click the Wireless option of the m0n0wall
+            Status menu.</entry>
+          </row>
+
+          <row>
+            <entry>WPA Mode</entry>
+
+            <entry>Choose none to not use WPA encryption on your wireless
+            data. Otherwise choose PSK to use a Preshared Key (password) or
+            Enterprise to use a Radius server.</entry>
+          </row>
+
+          <row>
+            <entry>WPA Version</entry>
+
+            <entry>Choose from WPA, WPA2, or WPA+WPA2. In most cases, you
+            should select "WPA + WPA2" here.</entry>
+          </row>
+
+          <row>
+            <entry>WPA Cipher</entry>
+
+            <entry>Choose from TKIP, AES/CCMP, or TKIP+AES/CCMP. AES/CCMP
+            provides better security than TKIP, but TKIP is more compatible
+            with older hardware.</entry>
+          </row>
+
+          <row>
+            <entry>WPA PSK</entry>
+
+            <entry>Enter the ASCII passphrase that will be used in WPA-PSK
+            mode. This must be between 8 and 63 characters long.</entry>
+          </row>
+
+          <row>
+            <entry>Radius Server IP Address</entry>
+
+            <entry>Enter the IP address of the RADIUS server that will be used
+            in WPA-Enterprise mode.</entry>
+          </row>
+
+          <row>
+            <entry>Radius Authentication Port</entry>
+
+            <entry>Leave this field blank to use the default port
+            (1812).</entry>
+          </row>
+
+          <row>
+            <entry>Radius Accounting Port</entry>
+
+            <entry>Leave this field blank to use the default port
+            (1813).</entry>
+          </row>
+
+          <row>
+            <entry>Radius Shared Secret</entry>
+
+            <entry>Optionally leave the shared secret blank to not use a
+            RADIUS shared secret (not recommended).</entry>
+          </row>
+
+          <row>
+            <entry>Enable WEP</entry>
+
+            <entry>Check this box to enable WEP encryption of your wireless
+            data</entry>
+          </row>
+
+          <row>
+            <entry>WEP Keys 1-4</entry>
+
+            <entry>40 (64) bit keys may be entered as 5 ASCII characters or 10
+            hex digits preceded by '0x'. 104 (128) bit keys may be entered as
+            13 ASCII characters or 26 hex digits preceded by '0x'.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>Below is a screenshot of the wireless interface configuration screen
+    of 1.3.x m0n0wall.</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="screens/interfaces/wlan_1.3.png" />
+      </imageobject>
+    </mediaobject>
+  </sect1>
+
+  <sect1>
+    <title>Wireless Status</title>
+
+    <para></para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="screens/status/wireless.png" />
+      </imageobject>
+    </mediaobject>
+  </sect1>
 </chapter>
