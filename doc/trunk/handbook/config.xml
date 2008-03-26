@@ -1,18 +1,17 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: config.xml,v 1.6 2005/10/08 22:57:23 chris Exp $ -->
 <chapter>
   <?dbhtml filename="config.html"?>
 
   <title>Configuration</title>
 
-  <para>This chapter is meant as a reference for most configuration options. 
-  If you don't know how to get up and running with a basic two interface 
-  setup and get into the webGUI, please see the Quick Start Guide for your 
-  platform.  </para>
+  <para>This chapter is meant as a reference for most configuration options.
+  If you don't know how to get up and running with a basic two interface setup
+  and get into the webGUI, please see the Quick Start Guide for your
+  platform.</para>
 
-  
-  <para><ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick
-  Start Guide</ulink></para>
+  <para><ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick Start
+  Guide</ulink></para>
 
   <para><ulink url="http://doc.m0n0.ch/quickstartpc/">PC Quick Start
   Guide</ulink></para>
@@ -30,14 +29,13 @@
     simple menu on the console.</para>
 
     <para>Using the console menu, you can assign the function of each network
-    port: LAN, WAN, or OPT for additional optional ports such as a DMZ, 
-    additional LAN interfaces, a
-    wireless access point, etc. You only need to assign the LAN port here, and 
-    probably want to assign the WAN interface as well.  The rest
-    can be done in the webGUI if desired.  Change the IP address of the LAN
-    port as appropriate for your network, and you are ready to connect to the
-    webGUI to set up the remainder of your configuration as described in the
-    <link linkend="Config.WebGUI">next section</link>.</para>
+    port: LAN, WAN, or OPT for additional optional ports such as a DMZ,
+    additional LAN interfaces, a wireless access point, etc. You only need to
+    assign the LAN port here, and probably want to assign the WAN interface as
+    well. The rest can be done in the webGUI if desired. Change the IP address
+    of the LAN port as appropriate for your network, and you are ready to
+    connect to the webGUI to set up the remainder of your configuration as
+    described in the <link linkend="Config.WebGUI">next section</link>.</para>
   </sect1>
 
   <sect1 id="Config.WebGUI">
@@ -241,13 +239,13 @@
 
       <!--imported Drupal contribution from Fabrizio Fioravanti <fabrizio.fioravanti@finsystem.net>-->
 
-      <para>Static routes are necessary when you have a subnet behind another 
-      router on any of your internal networks.  Static routes are <emphasis 
-      role="bold">never required for directly connected networks</emphasis> or 
-      if the network in question is reachable through your WAN interface's 
-      default gateway. </para>
+      <para>Static routes are necessary when you have a subnet behind another
+      router on any of your internal networks. Static routes are <emphasis
+      role="bold">never required for directly connected networks</emphasis> or
+      if the network in question is reachable through your WAN interface's
+      default gateway.</para>
 
-	<!-- FIXME - put in Visio here depicting when static routes are needed -->
+      <!-- FIXME - put in Visio here depicting when static routes are needed -->
 
       <para>The Static Routes sub section allow the user to set up static
       routes in order to reach network that must use a gateway different from
@@ -259,8 +257,8 @@
       <itemizedlist>
         <listitem>
           <para>Interface: select the interface to which the route must be
-          applied.  This is the interface off of which the destination 
-          network is located. </para>
+          applied. This is the interface off of which the destination network
+          is located.</para>
         </listitem>
 
         <listitem>
@@ -271,9 +269,9 @@
         </listitem>
 
         <listitem>
-          <para>Gateway: the IP address of the router/gateway that the 
- 	  firewall must use in order to reach the defined Destination 
-	  Network</para>
+          <para>Gateway: the IP address of the router/gateway that the
+          firewall must use in order to reach the defined Destination
+          Network</para>
         </listitem>
 
         <listitem>
@@ -286,9 +284,9 @@
     <sect2>
       <title>Firmware</title>
 
-      <para>The Firmware screen allows you to upgrade or downgrade 
-	your m0n0wall version (only available if you are running
-	a hard drive or compact flash installation).</para>
+      <para>The Firmware screen allows you to upgrade or downgrade your
+      m0n0wall version (only available if you are running a hard drive or
+      compact flash installation).</para>
 
       <figure>
         <title>The Firmware screen</title>
@@ -323,8 +321,8 @@
       <para>The Assign sub menu allows to map the symbolic reference LAN and
       WAN to the physical interfaces that are present on the system. Click on
       the Save button to apply changes, and remember that a change in this
-      assignment will require a system reboot for the changes to 
-      take effect.</para>
+      assignment will require a system reboot for the changes to take
+      effect.</para>
     </sect2>
 
     <sect2>
@@ -342,13 +340,13 @@
       <title>WAN</title>
 
       <!--imported Drupal contribution from Fabrizio Fioravanti <fabrizio.fioravanti@finsystem.net>-->
-      <para>
-        <mediaobject>
+
+      <para><mediaobject>
           <imageobject>
             <imagedata fileref="screens/interfaces/wan.png" />
           </imageobject>
-        </mediaobject>        
-      </para>
+        </mediaobject></para>
+
       <para>In the WAN sub section, it is possible to set up all the
       parameters for WAN interface. The WAN Interface can be a Static IP
       address, a DHCP address, a PPPoE interface or a PPTP connection, as
@@ -454,46 +452,49 @@
               <para>Password: the password the provider assign to your
               connection</para>
             </listitem>
+
             <listitem>
-                <para>Local IP Address: the local IP address the provider assign to
-                your connection</para>
+              <para>Local IP Address: the local IP address the provider assign
+              to your connection</para>
             </listitem>
 
             <listitem>
-              <para>Remote IP Address: the remote IP address the provider assign
-               to your connection</para>
+              <para>Remote IP Address: the remote IP address the provider
+              assign to your connection</para>
             </listitem>
           </itemizedlist>
         </listitem>
-        
-        <listitem>Block Private Networks - This option puts in rules to drop traffic
-        coming in on the WAN from private IP subnets.  If you configure your m0n0wall
-        with the WAN interface on a private subnet of another LAN, for example, you
-        need to disable this option.  Also, some ISP's assign customers private IP's, in
-        which case you'll also need to disable this option.</listitem>
-        
-        <note>You do <emphasis>not</emphasis> need to disable this option if you are using
-        IPsec VPN tunnels with private IP addresses.  When the VPN packets come into the WAN
-        interface, they will be coming from source IP of the WAN interface of the remote VPN
-        device, not from the private IP subnet on the remote side.</note>
-        
+
+        <listitem>
+          <para>Block Private Networks - This option puts in rules to drop
+          traffic coming in on the WAN from private IP subnets. If you
+          configure your m0n0wall with the WAN interface on a private subnet
+          of another LAN, for example, you need to disable this option. Also,
+          some ISP's assign customers private IP's, in which case you'll also
+          need to disable this optio<note>
+              <para>You do <emphasis>not</emphasis> need to disable this
+              option if you are using IPsec VPN tunnels with private IP
+              addresses. When the VPN packets come into the WAN interface,
+              they will be coming from source IP of the WAN interface of the
+              remote VPN device, not from the private IP subnet on the remote
+              side.</para>
+            </note></para>
+        </listitem>
       </itemizedlist>
-      
     </sect2>
 
     <sect2>
       <title>Optional Interfaces</title>
 
-      <para>Optional interfaces can be used for a variety of purposes.  Generally
-        they are used as second LAN interfaces or DMZ interfaces.</para>
-      
+      <para>Optional interfaces can be used for a variety of purposes.
+      Generally they are used as second LAN interfaces or DMZ
+      interfaces.</para>
     </sect2>
 
     <sect2>
       <title>Wireless Interfaces</title>
 
       <para></para>
-      
     </sect2>
   </sect1>
 
@@ -506,320 +507,424 @@
 
     <sect2>
       <title>DNS Forwarder</title>
-      
-      <para>The DNS forwarder screen contains configuration options relevant to the DNS forwarding server on your
-      m0n0wall.  
-      </para>
+
+      <para>This service allows you to use the fixed IP address of your
+      m0n0wall's LAN ethernet interface to resolve/proxy all DNS queries on
+      your LAN network. When the m0n0wall DHCP server assigns IP addresses, it
+      also assigns the LAN IP address as the DNS server to use. Otherwie, to
+      benefit from this service you must manually configure the DNS IP address
+      on your computers to be the LAN IP of your m0n0wall.</para>
+
+      <para>If the DNS forwarder is enabled, the DHCP service (if enabled)
+      will automatically serve the LAN IP address as a DNS server to DHCP
+      clients so they will use the forwarder. The DNS forwarder will use the
+      DNS servers entered in System: General setup or those obtained via DHCP
+      or PPP on WAN if the "Allow DNS server list to be overridden by DHCP/PPP
+      on WAN" is checked. If you don't use that option (or if you use a static
+      IP address on WAN), you must manually specify at least one DNS server on
+      the System: General setup page.</para>
+
+      <para>This is important for instance if you have your DHCP clients
+      renewing their IP address information every 3 days, but every day your
+      WAN IP changes from your ISP. If your ISP changed the DNS servers on you
+      then it would be 2 days until your DHCP clients received the correct
+      information. By using your LAN IP address, all LAN network clients are
+      assured of a working DNS server as long as the m0n0wall has received a
+      good DNS IP address to use... even if it just received the new DNS
+      information a minute ago. This also allows a network administrator to
+      easily redirect all traffic to a new internal DNS server (maybe while
+      transitioning a new server into the network).</para>
+
+      <para>Setting "Allow DNS server list to be overridden by DHCP/PPP on
+      WAN" is necessary if your ISP might change the IP address of the DNS
+      server. If you have a static IP address on your WAN than you would not
+      need this option set</para>
+
+      <para>The DNS forwarder screen contains configuration options relevant
+      to the DNS forwarding server on your m0n0wall.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/dnsforwarder.png" />
         </imageobject>
       </mediaobject>
-    <para><emphasis role="bold">Enabling the DNS Forwarder</emphasis>
-    Check the first checkbox, "Enable DNS forwarder", to enable the service on the LAN interface.  After enabling
-    this, you will need to configure your client machines to use the LAN IP address of your m0n0wall as their DNS
-    server.  </para>
 
-    <note><para>If the DNS forwarder is enabled, the DHCP service (if enabled) will automatically serve the LAN
-    IP address as a DNS server to DHCP clients so they will use the forwarder. The DNS forwarder will use the DNS
-    servers entered in System: General setup or those obtained via DHCP or PPP on WAN if the "Allow DNS server list
-    to be overridden by DHCP/PPP on WAN" is checked. If you don't use that option (or if you use a static IP address
-    on WAN), you must manually specify at least one DNS server on the System: General setup page.
-    </para></note>
+      <para><emphasis role="bold">Enabling the DNS Forwarder</emphasis> Check
+      the first checkbox, "Enable DNS forwarder", to enable the service on the
+      LAN interface. After enabling this, you will need to configure your
+      client machines to use the LAN IP address of your m0n0wall as their DNS
+      server.</para>
 
-    <para><emphasis role="bold">DNS Host Name Registration</emphasis></para>
-    <para>If your m0n0wall acts as the DHCP server for your LAN, and you need name resolution between hosts on the
-    LAN, check the "Register DHCP leases in DNS forwarder" box.  It will append the default domain in System:General
-    setup.  For example, if your machine name is my-pc and your default domain is example.com, it will register
-    my-pc.example.com with the IP address assigned from DHCP, so the other hosts on your LAN can locate your machine
-    by that name.
-    </para>
+      <para><emphasis role="bold">DNS Host Name Registration</emphasis></para>
 
-    <para><emphasis role="bold">DNS Forwarder Overrides</emphasis></para>
-    <para>If there are certain DNS host names you want to override for your internal DNS clients, add them under
-    DNS overrides on this page.  For example, if you want www.yourcompany.com to point to a different site internally
-    than it does from the internet, enter an override for www.yourcompany.com with the appropriate IP address.  This
-    can also be used as a rudimentary (and easy to bypass) filter on web sites LAN clients can visit, by assigning
-    the undesired host name to an invalid IP address.  For example, to block www.example.com, put in an override to
-    redirect it to an invalid IP address, such as 1.2.3.4.  Note that using a different DNS server or editing the hosts
-    file on the client machine gets around this restriction, but doing this is sufficient to block the site for the
-    vast majority of users. 
-    </para>
+      <para>If your m0n0wall acts as the DHCP server for your LAN, and you
+      need name resolution between hosts on the LAN, check the "Register DHCP
+      leases in DNS forwarder" box. It will append the default domain in
+      System:General setup to the host name of the computer that is requesting
+      a DHCP lease. For example, if your machine name is my-pc and your
+      default domain is example.com, it will register my-pc.example.com with
+      the IP address assigned from DHCP, so the other hosts on your LAN can
+      locate your machine by that name.</para>
 
+      <caution>
+        <para>Be sure that your computers have unique names.</para>
+      </caution>
+
+      <para><emphasis role="bold">DNS Forwarder Overrides</emphasis></para>
+
+      <para>If there are certain DNS host names you want to override for your
+      internal DNS clients, add them under DNS overrides on this page. For
+      example, if you want www.yourcompany.com to point to a different site
+      internally than it does from the internet, enter an override for
+      www.yourcompany.com with the appropriate IP address. This can also be
+      used as a rudimentary (and easy to bypass) filter on web sites LAN
+      clients can visit, by assigning the undesired host name to an invalid IP
+      address. For example, to block www.example.com, put in an override to
+      redirect it to an invalid IP address, such as 1.2.3.4. Note that using a
+      different DNS server or editing the hosts file on the client machine
+      gets around this restriction, but doing this is sufficient to block the
+      site for the vast majority of users.</para>
     </sect2>
 
     <sect2>
       <title>Dynamic DNS</title>
 
-      <para>
-        Dynamic DNS allows you to have a permanent host name that can be used to access your network, generally used
-        when your public IP address is assigned by DHCP and subject to change.  This allows you to run your own web
-        server, mail server, etc. using a DNS host name.    
-      </para>
-      <para>For links to providers of dynamic DNS services, visit the website of the dynamic DNS client used by
-      m0n0wall, <ulink url="http://www.ez-ipupdate.com/">ez-ipupdate.</ulink>
-      </para>  
-      <para>After you have signed up with one of the dynamic DNS providers listed, you can continue.
-      </para>
+      <para>Dynamic DNS allows you to have a permanent host name that can be
+      used to access your network, generally used when your public IP address
+      is assigned by DHCP and subject to change. This allows you to run your
+      own web server, mail server, etc. using a DNS host name.</para>
+
+      <para>For links to providers of dynamic DNS services, visit the website
+      of the dynamic DNS client used by m0n0wall, <ulink
+      url="http://www.ez-ipupdate.com/">ez-ipupdate.</ulink></para>
+
+      <para>After you have signed up with one of the dynamic DNS providers
+      listed, you can continue.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/dynamicdns.png" />
         </imageobject>
       </mediaobject>
 
-      <para><emphasis role="bold">Configuring the Dynamic DNS Client</emphasis></para>
-      <para>To start, first check the "Enable Dynamic DNS client" box at the top of the page.  </para>
+      <para><emphasis role="bold">Configuring the Dynamic DNS
+      Client</emphasis></para>
 
-      <para>In the "Service type" drop down box, select the service you signed up with above. </para>
+      <para>To start, first check the "Enable Dynamic DNS client" box at the
+      top of the page.</para>
 
-      <para>Some services support <link linkend="gloss.MX">MX DNS records</link> on dynamic DNS subdomains.  This helps
-      ensure you can get email to your host name.  If your service supports this (dyndns.org is one that does, others
-      do as well), fill in your mail server's host name in that field.  If you do not need an MX record or if your
-      provider does not support them, just leave the field blank.
-      </para>
+      <para>In the "Service type" drop down box, select the service you signed
+      up with above.</para>
 
-      <para><emphasis role="bold">Wildcards</emphasis> - If you want to enable wildcard on your dynamic DNS host name,
-      check this box.  This means all host names not specifically configured are redirected to your dynamic DNS name.
-      So if your dynamic DNS is example.homeip.net, and you enable wildcards, www.example.homeip.net,
-      mail.example.homeip.net, anything.example.homeip.net, etc. (i.e. *.example.homeip.net) will all resolve to
-      example.homeip.net.
-      </para>
-      <para> The next two boxes are for your username and password.  Enter your account information from the dynamic
-      DNS provider.
-      </para>
+      <para>Some services support <link linkend="gloss.MX">MX DNS
+      records</link> on dynamic DNS subdomains. This helps ensure you can get
+      email to your host name. If your service supports this (dyndns.org is
+      one that does, others do as well), fill in your mail server's host name
+      in that field. If you do not need an MX record or if your provider does
+      not support them, just leave the field blank.</para>
 
-      <para>Click Save.  Your dynamic DNS host name should immediately be updated with your WAN IP address.  To verify
-      this, ping your dynamic DNS host name.  It should resolve to the IP address of the WAN interface of your m0n0wall.
-      If not, check Diagnostics: System logs for information on why it failed. 
-      </para>
+      <para><emphasis role="bold">Wildcards</emphasis> - If you want to enable
+      wildcard on your dynamic DNS host name, check this box. This means all
+      host names not specifically configured are redirected to your dynamic
+      DNS name. So if your dynamic DNS is example.homeip.net, and you enable
+      wildcards, www.example.homeip.net, mail.example.homeip.net,
+      anything.example.homeip.net, etc. (i.e. *.example.homeip.net) will all
+      resolve to example.homeip.net.</para>
+
+      <para>The next two boxes are for your username and password. Enter your
+      account information from the dynamic DNS provider.</para>
+
+      <para>Click Save. Your dynamic DNS host name should immediately be
+      updated with your WAN IP address. To verify this, ping your dynamic DNS
+      host name. It should resolve to the IP address of the WAN interface of
+      your m0n0wall. If not, check Diagnostics: System logs for information on
+      why it failed.</para>
     </sect2>
 
     <sect2>
       <title>DHCP</title>
-      <para>This screen allows you to enable the DHCP server on enabled Ethernet interfaces other than WAN.</para>
-      
+
+      <para>This screen allows you to enable the DHCP server on enabled
+      Ethernet interfaces other than WAN.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/dhcp.png" />
         </imageobject>
       </mediaobject>
-      
+
       <para><emphasis role="bold">Enabling the DHCP Server</emphasis></para>
-      
-      <para>To enable the DHCP server on a particular interface, click on the appropriate tab for the interface and
-      check the "Enable DHCP server on interface" box.  </para>
-      
+
+      <para>To enable the DHCP server on a particular interface, click on the
+      appropriate tab for the interface and check the "Enable DHCP server on
+      interface" box.</para>
+
       <para><emphasis role="bold">Deny unknown clients</emphasis></para>
-      
-      <para>This option allows you to implement a more secure DHCP configuration.  Many companies suffer from worm
-      outbreaks and related security issues due to unauthorized machines being plugged into their network.  This option
-      will help ensure only authorized hosts can receive a lease from your DHCP server.  With this option enabled, only
-      hosts defined at the bottom of this page will receive a lease from DHCP.  </para>
-      
-      <para>The downside to this option is that it can be difficult to maintain when you have more than a handful of
-      hosts on your network.  Many will find the increased security worth the increase in maintenance.  Note that this
-      is only sufficient to stop the typical user that expects to be able to plug into your network and obtain a
-      DHCP lease to get on the internet.  Anyone with network and/or security expertise can easily bypass this.</para>
-      
-      <para>Subnet, Subnet Mask, and Available range are filled in from the IP and subnet information from that
-      particular interface.  </para>
+
+      <para>This option allows you to implement a more secure DHCP
+      configuration. Many companies suffer from worm outbreaks and related
+      security issues due to unauthorized machines being plugged into their
+      network. This option will help ensure only authorized hosts can receive
+      a lease from your DHCP server. With this option enabled, only hosts
+      defined at the bottom of this page will receive a lease from
+      DHCP.</para>
+
+      <para>The downside to this option is that it can be difficult to
+      maintain when you have more than a handful of hosts on your network.
+      Many will find the increased security worth the increase in maintenance.
+      Note that this is only sufficient to stop the typical user that expects
+      to be able to plug into your network and obtain a DHCP lease to get on
+      the internet. Anyone with network and/or security expertise can easily
+      bypass this.</para>
+
+      <para>Subnet, Subnet Mask, and Available range are filled in from the IP
+      and subnet information from that particular interface.</para>
+
       <para><emphasis role="bold">Range</emphasis></para>
-      <para>In the first box, enter the starting address of your DHCP range.  In the second box, enter the ending
-      address of the range.  Note that you don't want to make this the same as the available range, as this 
-      includes the subnet address and broadcast address, which are unusable, as well as the address of your m0n0wall
-      interface which also cannot be in the range.  </para>
+
+      <para>In the first box, enter the starting address of your DHCP range.
+      In the second box, enter the ending address of the range. Note that you
+      don't want to make this the same as the available range, as this
+      includes the subnet address and broadcast address, which are unusable,
+      as well as the address of your m0n0wall interface which also cannot be
+      in the range.</para>
+
       <para><emphasis role="bold">WINS Servers</emphasis></para>
-      <para>If you use an NT 4 domain, or have pre-Windows 2000 clients that need to access an Active Directory domain,
-      you will need to fill in your WINS server IP addresses in these boxes.  If you only have one WINS server, leave
-      the second box blank.</para>
-      
-      <para><emphasis role="bold">Default and Maximum Lease Time</emphasis></para>
-      
-      <para>The default lease time is the length of the DHCP lease on any clients that do not request a specific
-      expiration time on their DHCP lease.  The default is 7200 seconds, or two hours.  For the vast majority of network
-      environments, this is too low.  I would generally recommend setting this to a week, which is 604,800
-      seconds.</para>
-      
-      <para>The maximum lease time must be more than the default lease time.  Most networks will not use this value at
-      all.  In most instances, I set this to one second longer than the default lease time.  </para>
-      
-      <para>Click Save to save your changes, then click Apply to enable the DHCP server.</para>
-      
+
+      <para>If you use an NT 4 domain, or have pre-Windows 2000 clients that
+      need to access an Active Directory domain, you will need to fill in your
+      WINS server IP addresses in these boxes. If you only have one WINS
+      server, leave the second box blank.</para>
+
+      <para><emphasis role="bold">Default and Maximum Lease
+      Time</emphasis></para>
+
+      <para>The default lease time is the length of the DHCP lease on any
+      clients that do not request a specific expiration time on their DHCP
+      lease. The default is 7200 seconds, or two hours. For the vast majority
+      of network environments, this is too low. I would generally recommend
+      setting this to a week, which is 604,800 seconds.</para>
+
+      <para>The maximum lease time must be more than the default lease time.
+      Most networks will not use this value at all. In most instances, I set
+      this to one second longer than the default lease time.</para>
+
+      <para>Click Save to save your changes, then click Apply to enable the
+      DHCP server.</para>
+
       <para><emphasis role="bold">Static DHCP Mappings</emphasis></para>
-      
-      <para>Static DHCP mappings can be used to assign the same IP address every time to a particular host.  This can
-      be helpful if you define access rules on the firewall or on other hosts on your LAN based on IP address, but
-      still want to use DHCP.  Alternatively, you can keep the IP address box blank to assign an IP out of the available
-      range, when you are using the "Deny unknown clients" option.  </para>
-      
-      <para>Click the + icon at the bottom of the DHCP configuration page to add a static DHCP mapping.</para>
-      
+
+      <para>Static DHCP mappings can be used to assign the same IP address
+      every time to a particular host. This can be helpful if you define
+      access rules on the firewall or on other hosts on your LAN based on IP
+      address, but still want to use DHCP. Alternatively, you can keep the IP
+      address box blank to assign an IP out of the available range, when you
+      are using the "Deny unknown clients" option.</para>
+
+      <para>Click the + icon at the bottom of the DHCP configuration page to
+      add a static DHCP mapping.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/editstatic.png" />
         </imageobject>
       </mediaobject>
-      
-      <para>In the MAC address box, fill in the system's MAC address in the format xx:xx:xx:xx:xx:xx.  For Windows
-      NT/2000/XP clients, you can get determine the MAC address by opening up a command prompt and typing 'ipconfig'.
-      For Windows 95/98/ME clients, go to Start, Run, winipcfg.  For Unix clients, use ifconfig.  </para>
-      
-      <para>In the IP address box, fill in the IP address you want to be assigned to the client, or leave it blank to
-      automatically assign one from the available DHCP range.  If you put in a static IP address, it must not be within
-      the range of the DHCP server.</para>
-      
-      <para>It is recommended you fill in a description in the Description box to remind you what this entry is for,
-      though this is an optional value.  </para>
-      
-      <para>Click Save when you are finished and the mapping will be added.</para>
-      
-      <note><para>The DNS servers entered in System: General setup (or the DNS forwarder, if enabled) will be assigned to
-      clients by the DHCP server.</para>
 
-      <para>The DHCP lease table can be viewed on the Diagnostics: DHCP leases page.</para></note>
-      
-      
+      <para>In the MAC address box, fill in the system's MAC address in the
+      format xx:xx:xx:xx:xx:xx. For Windows NT/2000/XP clients, you can get
+      determine the MAC address by opening up a command prompt and typing
+      'ipconfig'. For Windows 95/98/ME clients, go to Start, Run, winipcfg.
+      For Unix clients, use ifconfig.</para>
+
+      <para>In the IP address box, fill in the IP address you want to be
+      assigned to the client, or leave it blank to automatically assign one
+      from the available DHCP range. If you put in a static IP address, it
+      must not be within the range of the DHCP server.</para>
+
+      <para>It is recommended you fill in a description in the Description box
+      to remind you what this entry is for, though this is an optional
+      value.</para>
+
+      <para>Click Save when you are finished and the mapping will be
+      added.</para>
+
+      <note>
+        <para>The DNS servers entered in System: General setup (or the DNS
+        forwarder, if enabled) will be assigned to clients by the DHCP
+        server.</para>
+
+        <para>The DHCP lease table can be viewed on the Diagnostics: DHCP
+        leases page.</para>
+      </note>
     </sect2>
 
     <sect2>
       <title>SNMP</title>
-      <para>You can enable SNMP on your LAN interface on this screen.  This is useful if you have a network management
-      or monitoring system that takes advantage of it.  </para>
-      
+
+      <para>You can enable SNMP on your LAN interface on this screen. This is
+      useful if you have a network management or monitoring system that takes
+      advantage of it.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/snmp.png" />
         </imageobject>
       </mediaobject>
-      
-      <para>The System location and System contact boxes can be left blank, but can assist you in determining which
-      device you are monitoring if you have several monitored hosts.</para>
-      
-      <para>The Community is generally set to public, but if you have any regard for security at all, you should set
-      this to something difficult to guess, containing numbers and letters.  This community name is still passed over
-      the network in clear text, so it could be intercepted, though the most anyone could get with that community
-      name is information on the setup and utilization of your firewall.  In most environments, this is likely of
-      little to no concern, but is something to keep in mind.</para>
-      
-      <para>After setting the values as you desire, click Save and your changes will be applied.</para>
-      
+
+      <para>The System location and System contact boxes can be left blank,
+      but can assist you in determining which device you are monitoring if you
+      have several monitored hosts.</para>
+
+      <para>The Community is generally set to public, but if you have any
+      regard for security at all, you should set this to something difficult
+      to guess, containing numbers and letters. This community name is still
+      passed over the network in clear text, so it could be intercepted,
+      though the most anyone could get with that community name is information
+      on the setup and utilization of your firewall. In most environments,
+      this is likely of little to no concern, but is something to keep in
+      mind.</para>
+
+      <para>After setting the values as you desire, click Save and your
+      changes will be applied.</para>
     </sect2>
 
     <sect2>
       <title>Proxy ARP</title>
 
-      <para>Proxy ARP can be used if you need m0n0wall to send ARP replies on the WAN interface for other IP addresses
-      than its own WAN IP address (e.g. for 1:1, advanced outbound or server NAT). It is not necessary if you have a
-      subnet routed to you or if you use PPPoE/PPTP, and it only works if the WAN interface is configured with a static
-      IP address or DHCP.</para>
+      <para>Proxy ARP can be used if you need m0n0wall to send ARP replies on
+      the WAN interface for other IP addresses than its own WAN IP address
+      (e.g. for 1:1, advanced outbound or server NAT). It is not necessary if
+      you have a subnet routed to you or if you use PPPoE/PPTP, and it only
+      works if the WAN interface is configured with a static IP address or
+      DHCP.</para>
 
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/proxyarp.png" />
         </imageobject>
       </mediaobject>
-      
-      <para>If you enable 1:1, server, or advanced outbound NAT, you may need to enable proxy ARP for the IP address(es)
-      being used by those translations.  To do so, click the + on this page.  </para>
-      
+
+      <para>If you enable 1:1, server, or advanced outbound NAT, you may need
+      to enable proxy ARP for the IP address(es) being used by those
+      translations. To do so, click the + on this page.</para>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/proxyarpedit.png" />
         </imageobject>
       </mediaobject>
-      
-      <para>Enter either a single IP address, or subnet or range of addresses, optionally add a description to remind
-      you why you made this entry, and click Save.  Then click "Apply changes" for m0n0wall to enable proxy ARP.</para>
-      
-      <para>For more information on when you do and do not need Proxy ARP, see <link linkend="Proxy.ARP">this page</link>.</para>
+
+      <para>Enter either a single IP address, or subnet or range of addresses,
+      optionally add a description to remind you why you made this entry, and
+      click Save. Then click "Apply changes" for m0n0wall to enable proxy
+      ARP.</para>
+
+      <para>For more information on when you do and do not need Proxy ARP, see
+      <link linkend="Proxy.ARP">this page</link>.</para>
     </sect2>
-    
+
     <sect2>
-        <title>Captive Portal</title>
-        
-        <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/captiveportal.png" />
-        </imageobject>
-      </mediaobject>
-            </para>
+      <title>Captive Portal</title>
 
-        <para><emphasis role="bold">What is Captive Portal?</emphasis> <emphasis>from wikipedia.org</emphasis></para>
-        <para>The captive portal technique forces a HTTP client on a network to see a special web page (usually for
-        Authentication) before surfing the Internet normally. This is done by intercepting all HTTP traffic, regardless
-        of address, until the user is allowed to exit the portal. You will see captive portals in use at most Wi-Fi hotspots.
-        It can be used to control wired access (e.g. apartment houses, business centers, "open" Ethernet jacks) as well.</para>
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/captiveportal.png" />
+          </imageobject>
+        </mediaobject></para>
 
-        <para>Check the "Enable captive portal" box to enable.</para>
+      <para><emphasis role="bold">What is Captive Portal?</emphasis>
+      <emphasis>from wikipedia.org</emphasis></para>
 
-        <para><emphasis role="bold">Interface</emphasis> - Select the interface on which you want to enable captive portal.
-        It can only run on one interface at a time.</para>
+      <para>The captive portal technique forces a HTTP client on a network to
+      see a special web page (usually for Authentication) before surfing the
+      Internet normally. This is done by intercepting all HTTP traffic,
+      regardless of address, until the user is allowed to exit the portal. You
+      will see captive portals in use at most Wi-Fi hotspots. It can be used
+      to control wired access (e.g. apartment houses, business centers, "open"
+      Ethernet jacks) as well.</para>
 
-        <para><emphasis role="bold">Idle timeout</emphasis> - Clients will be disconnected after this amount of inactivity.
-        They may log in again immediately, though. Leave this field blank for no idle timeout.
-        </para>
+      <para>Check the "Enable captive portal" box to enable.</para>
 
-        <para><emphasis role="bold">Hard timeout </emphasis>- Clients will be disconnected after this amount of time,
-        regardless of activity. They may log in again immediately, though. Leave this field blank for no hard timeout
-        (not recommended unless an idle timeout is set).</para>
+      <para><emphasis role="bold">Interface</emphasis> - Select the interface
+      on which you want to enable captive portal. It can only run on one
+      interface at a time.</para>
 
-        <para><emphasis role="bold">Logout popup window</emphasis> - If enabled, a popup window will appear when clients are 
-        allowed through the captive portal. This allows clients to explicitly disconnect themselves before the idle or hard
-        timeout occurs. When RADIUS accounting is enabled, this option is implied.</para>
-        
-        <para><note>Most any popup stopper will block this window. Worse, you cannot exclude a specific site, as this popup
-        appears to come from whatever server the user tried to go to prior to authentication. If you have a popup blocker,
-        you'll need to disable it prior to logging in, and then re-enable it after the logoff popup appears.</note></para>
-    
-        <para><emphasis role="bold">RADIUS server</emphasis> - Enter the IP address and port of the RADIUS server which users
-        of the captive portal have to authenticate against. Leave blank to disable RADIUS authentication. Leave port number
-        blank to use the default port (1812). Leave the RADIUS shared secret blank to not use a RADIUS shared secret.
-        RADIUS accounting packets will also be sent to port 1813 of the RADIUS server if RADIUS accounting is enabled.</para>
+      <para><emphasis role="bold">Idle timeout</emphasis> - Clients will be
+      disconnected after this amount of inactivity. They may log in again
+      immediately, though. Leave this field blank for no idle timeout.</para>
 
-        <para><emphasis role="bold">Portal page contents</emphasis> - Here you can upload an HTML file for the portal page
-        (leave blank to keep the current one, or the default if you have not uploaded one previously). </para>
-        
-        <para><emphasis role="bold">Authentication error page contents</emphasis> - The contents of the HTML file that you
-        upload here are displayed when a RADIUS authentication error occurs (generally because of an incorrect logon or
-        password).</para>
-    
+      <para><emphasis role="bold">Hard timeout </emphasis>- Clients will be
+      disconnected after this amount of time, regardless of activity. They may
+      log in again immediately, though. Leave this field blank for no hard
+      timeout (not recommended unless an idle timeout is set).</para>
+
+      <para><emphasis role="bold">Logout popup window</emphasis> - If enabled,
+      a popup window will appear when clients are allowed through the captive
+      portal. This allows clients to explicitly disconnect themselves before
+      the idle or hard timeout occurs. When RADIUS accounting is enabled, this
+      option is implied.</para>
+
+      <para><note>
+          <para>Most any popup stopper will block this window. Worse, you
+          cannot exclude a specific site, as this popup appears to come from
+          whatever server the user tried to go to prior to authentication. If
+          you have a popup blocker, you'll need to disable it prior to logging
+          in, and then re-enable it after the logoff popup appears.</para>
+        </note></para>
+
+      <para><emphasis role="bold">RADIUS server</emphasis> - Enter the IP
+      address and port of the RADIUS server which users of the captive portal
+      have to authenticate against. Leave blank to disable RADIUS
+      authentication. Leave port number blank to use the default port (1812).
+      Leave the RADIUS shared secret blank to not use a RADIUS shared secret.
+      RADIUS accounting packets will also be sent to port 1813 of the RADIUS
+      server if RADIUS accounting is enabled.</para>
+
+      <para><emphasis role="bold">Portal page contents</emphasis> - Here you
+      can upload an HTML file for the portal page (leave blank to keep the
+      current one, or the default if you have not uploaded one
+      previously).</para>
+
+      <para><emphasis role="bold">Authentication error page
+      contents</emphasis> - The contents of the HTML file that you upload here
+      are displayed when a RADIUS authentication error occurs (generally
+      because of an incorrect logon or password).</para>
     </sect2>
-    
+
     <sect2>
-        <title>Wake on LAN</title>
-        
+      <title>Wake on LAN</title>
+
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/wakeonlan.png" />
         </imageobject>
       </mediaobject>
-        
-        <para>This service can be used to wake up (power on) computers by sending special "Magic Packets". The NIC in
-        the computer that is to be woken up must support Wake on LAN and has to be configured properly (WOL cable,
-        BIOS settings). 
-        </para>
 
-        <para>This might be useful, for instance, if you access your home or corporate network remotely via VPN, and
-        need to access a machine that may not be powered on at all times.  You can log into the m0n0wall device at that
-        location and send a wake up packet.  
-        </para>
-        
-        <para>To power on a machine, just choose the appropriate interface, put the MAC address of the machine into
-        the MAC address box, and click "Send".
-        </para>
-        
-        <para>If you use this feature at all, you will probably want to create a list of the machines you want to
-        remotely power on.  If you click the + at the bottom of the screen, you can add a host to the list that is
-        displayed.  Once you have added the host to your list, you can simply click on the MAC address to power on the system.
-        </para>
+      <para>This service can be used to wake up (power on) computers by
+      sending special "Magic Packets". The NIC in the computer that is to be
+      woken up must support Wake on LAN and has to be configured properly (WOL
+      cable, BIOS settings).</para>
+
+      <para>This might be useful, for instance, if you access your home or
+      corporate network remotely via VPN, and need to access a machine that
+      may not be powered on at all times. You can log into the m0n0wall device
+      at that location and send a wake up packet.</para>
+
+      <para>To power on a machine, just choose the appropriate interface, put
+      the MAC address of the machine into the MAC address box, and click
+      "Send".</para>
+
+      <para>If you use this feature at all, you will probably want to create a
+      list of the machines you want to remotely power on. If you click the +
+      at the bottom of the screen, you can add a host to the list that is
+      displayed. Once you have added the host to your list, you can simply
+      click on the MAC address to power on the system.</para>
 
       <mediaobject>
         <imageobject>
           <imagedata fileref="screens/services/wakeonlanedit.png" />
         </imageobject>
       </mediaobject>
-
     </sect2>
   </sect1>
 
@@ -841,7 +946,7 @@
               <imagedata fileref="screens/status/system.png" />
             </imageobject>
           </mediaobject>
-      </figure></para>
+        </figure></para>
     </sect2>
 
     <sect2>
@@ -861,14 +966,14 @@
               <imagedata fileref="screens/status/trafficgraph.png" />
             </imageobject>
           </mediaobject>
-      </figure></para>
+        </figure></para>
 
-      <para>The traffic screen allows you to select an interface, and view real time throughput graphs on that
-      interface.  This feature was introduced in version 1.1.</para>
-      
-      <para>The Adobe SVG viewer is required to view the graphs.  This page has a link to the installation for this
-      viewer.</para>
-      
+      <para>The traffic screen allows you to select an interface, and view
+      real time throughput graphs on that interface. This feature was
+      introduced in version 1.1.</para>
+
+      <para>The Adobe SVG viewer is required to view the graphs. This page has
+      a link to the installation for this viewer.</para>
     </sect2>
 
     <sect2>
@@ -888,247 +993,282 @@
     <sect2>
       <title>System Logs</title>
 
-      <para>
-      <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/diagnostics/systemlogs-system.png" />
-            </imageobject>
-          </mediaobject>
-      </para>
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/systemlogs-system.png" />
+          </imageobject>
+        </mediaobject></para>
     </sect2>
 
     <sect2>
       <title>DHCP Leases</title>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/diagnostics/dhcpleases.png" />
-            </imageobject>
-          </mediaobject>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/diagnostics/dhcpleases.png" />
+        </imageobject>
+      </mediaobject>
 
-      <para>This screen can be used to view your active and/or expired DHCP leases.  Clicking the button
-      on this screen will switch between showing only active leases and showing both active and expired
-      leases.</para>
+      <para>This screen can be used to view your active and/or expired DHCP
+      leases. Clicking the button on this screen will switch between showing
+      only active leases and showing both active and expired leases.</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/diagnostics/dhcpleases-all.png" />
-            </imageobject>
-          </mediaobject>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/diagnostics/dhcpleases-all.png" />
+        </imageobject>
+      </mediaobject>
 
-        <para>Expired DHCP leases show up in gray text, while active ones are black.  (this screenshot from a system with only
-        expired leases)</para>
-      
+      <para>Expired DHCP leases show up in gray text, while active ones are
+      black. (this screenshot from a system with only expired leases)</para>
     </sect2>
 
     <sect2>
       <title>IPsec</title>
 
-    <para>IPsec maintains two databases with connection details.</para>
-    
-    <para><emphasis role="bold">Security Association Database</emphasis></para>
-    <para>First is the Security Association Database (SAD).  This
-    database maintains a list of all current IPsec Security Associations (SA's).  </para>
-    
-    <para><emphasis role="bold">Security Policy Database</emphasis></para>
-    <para>Second is the Security Policy Database (SPD).  This database maintains a list of all the IPsec policies on the system.
-    You will have two SPD entries for each IPsec VPN connection you have configured, regardless of whether the connection is up.
-    This database tells the system what traffic will pass over VPN, and specifically which tunnel it traverses.  </para>
-    
-    <para>
-        <table>
-            <title>The two entries for each VPN connection are as follows:</title>
-            <tgroup cols="5">
-            <thead>
+      <para>IPsec maintains two databases with connection details.</para>
+
+      <para><emphasis role="bold">Security Association
+      Database</emphasis></para>
+
+      <para>First is the Security Association Database (SAD). This database
+      maintains a list of all current IPsec Security Associations
+      (SA's).</para>
+
+      <para><emphasis role="bold">Security Policy Database</emphasis></para>
+
+      <para>Second is the Security Policy Database (SPD). This database
+      maintains a list of all the IPsec policies on the system. You will have
+      two SPD entries for each IPsec VPN connection you have configured,
+      regardless of whether the connection is up. This database tells the
+      system what traffic will pass over VPN, and specifically which tunnel it
+      traverses.</para>
+
+      <table>
+        <title></title>
+
+        <tgroup cols="2">
+          <thead>
             <row>
-            <entry>Source</entry>
-            <entry>Destination</entry>
-            <entry>Direction</entry>
-            <entry>Protocol</entry>
-            <entry>Tunnel Endpoints</entry>
+              <entry align="center"></entry>
+
+              <entry align="center"></entry>
             </row>
-            </thead>
-            <tbody>
+          </thead>
+
+          <tbody>
             <row>
-                <entry>local IP subnet for VPN connection</entry>
-                <entry>remote IP subnet for VPN connection</entry>
-                <entry>
-                    <mediaobject>
-                      <imageobject>
-                        <imagedata fileref="icons/out.gif" />
-                      </imageobject>
-                    </mediaobject>    
-                </entry>
-                <entry>protocol in use (ESP or AH)</entry>
-                <entry>Public IP address of local m0n0wall - Public IP address of remote endpoint</entry>
+              <entry></entry>
+
+              <entry></entry>
             </row>
-            </tbody>
-            <tbody>
+
             <row>
-                <entry>remote IP subnet for VPN connection</entry>
-                <entry>local IP subnet for VPN connection</entry>
-                <entry>
-                    <mediaobject>
-                      <imageobject>
-                        <imagedata fileref="icons/in.gif" />
-                      </imageobject>
-                    </mediaobject>
-                </entry>
-                <entry>protocol in use (ESP or AH)</entry>
-                <entry> Public IP address of remote endpoint - Public IP address of local m0n0wall</entry>
+              <entry></entry>
+
+              <entry></entry>
             </row>
-            </tbody>
+          </tbody>
         </tgroup>
-        </table>
-         
-    </para>
+      </table>
 
-      <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/ipsec-sad.png" />
-        </imageobject>
-      </mediaobject>
-      </para>
-      
-      <para>At this screen, you will see two entries for each IPsec connection that has been successfully negotiated.  One from
-      the local public IP to the remote endpoint's public IP, and one in the opposite direction.  This indicates that IPsec
-      negotiations were successful, and that traffic should now be passing your VPN connection if everything else is configured 
-      appropriately.  </para>
-      
-      <para>By clicking on the X, you can delete the SA.  m0n0wall will attempt to recreate it after deleting it.  If you have a
-      VPN connection with duplicate SA's (more than one from same src to same dst) and the connection has gone down, delete all
-      the SA's associated with the connection.  It should renegotiate and come back up within a few seconds.</para>
-            
-      <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/ipsec-spd.png" />
-        </imageobject>
-      </mediaobject>
-      </para>
+      <table>
+        <title>The two entries for each VPN connection are as follows:</title>
 
-    <para></para>
+        <tgroup cols="5">
+          <thead>
+            <row>
+              <entry>Source</entry>
 
+              <entry>Destination</entry>
+
+              <entry>Direction</entry>
+
+              <entry>Protocol</entry>
+
+              <entry>Tunnel Endpoints</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>local IP subnet for VPN connection</entry>
+
+              <entry>remote IP subnet for VPN connection</entry>
+
+              <entry><mediaobject>
+                  <imageobject>
+                    <imagedata fileref="icons/out.gif" />
+                  </imageobject>
+                </mediaobject></entry>
+
+              <entry>protocol in use (ESP or AH)</entry>
+
+              <entry>Public IP address of local m0n0wall - Public IP address
+              of remote endpoint</entry>
+            </row>
+
+            <row>
+              <entry>remote IP subnet for VPN connection</entry>
+
+              <entry>local IP subnet for VPN connection</entry>
+
+              <entry><mediaobject>
+                  <imageobject>
+                    <imagedata fileref="icons/in.gif" />
+                  </imageobject>
+                </mediaobject></entry>
+
+              <entry>protocol in use (ESP or AH)</entry>
+
+              <entry>Public IP address of remote endpoint - Public IP address
+              of local m0n0wall</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/ipsec-sad.png" />
+          </imageobject>
+        </mediaobject></para>
+
+      <para>At this screen, you will see two entries for each IPsec connection
+      that has been successfully negotiated. One from the local public IP to
+      the remote endpoint's public IP, and one in the opposite direction. This
+      indicates that IPsec negotiations were successful, and that traffic
+      should now be passing your VPN connection if everything else is
+      configured appropriately.</para>
+
+      <para>By clicking on the X, you can delete the SA. m0n0wall will attempt
+      to recreate it after deleting it. If you have a VPN connection with
+      duplicate SA's (more than one from same src to same dst) and the
+      connection has gone down, delete all the SA's associated with the
+      connection. It should renegotiate and come back up within a few
+      seconds.</para>
+
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/ipsec-spd.png" />
+          </imageobject>
+        </mediaobject></para>
+
+      <para></para>
     </sect2>
 
     <sect2>
       <title>Ping</title>
 
-	<para>FIXME - update for 1.2</para>
+      <para>FIXME - update for 1.2</para>
 
-      <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/ping.png" />
-        </imageobject>
-      </mediaobject>
-  
-      </para>
-      <para>This screen gives you a GUI to ping (send ICMP echo request) from the m0n0wall.  Fill in the IP address or
-      hostname of the machine to ping, choose the number of pings in the count drop down, and click the Ping button.
-      </para>
-      
-      <para><note>The m0n0wall ping screen cannot ping over VPN connections for the
-        same reason SNMP does not work over VPN out of the box.  See <link
-      linkend="FAQ.SNMPoverVPN">this FAQ entry</link> for more information.  So do
-    not use this screen as an indicator of whether your VPN is working.  </note></para>
-      
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/ping.png" />
+          </imageobject>
+        </mediaobject></para>
+
+      <para>This screen gives you a GUI to ping (send ICMP echo request) from
+      the m0n0wall. Fill in the IP address or hostname of the machine to ping,
+      choose the number of pings in the count drop down, and click the Ping
+      button.</para>
+
+      <para><note>
+          <para>The m0n0wall ping screen cannot ping over VPN connections for
+          the same reason SNMP does not work over VPN out of the box. See
+          <link linkend="FAQ.SNMPoverVPN">this FAQ entry</link> for more
+          information. So do not use this screen as an indicator of whether
+          your VPN is working. </para>
+        </note></para>
     </sect2>
 
     <sect2>
       <title>Reset State</title>
 
-      <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/resetstate.png" />
-        </imageobject>
-      </mediaobject>
-      </para>
-      
-      <para>This screen allows you to reset the state tables on your m0n0wall for the NAT and firewall state
-      tables.
-      </para>
-      
-      <para>Just check the boxes for the table(s) you want to clear, and click the Reset button.</para>
-      
-      <para> Resetting the state tables will remove all entries from the corresponding tables. This means that all
-      open connections will be broken and will have to be re-established. This may be necessary after making
-      substantial changes to the firewall and/or NAT rules, especially if there are IP protocol mappings
-      (e.g. for PPTP or IPv6) with open connections.
-      </para>
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/resetstate.png" />
+          </imageobject>
+        </mediaobject></para>
 
-      <para>The firewall will normally leave the state tables intact when changing rules.
-      </para>
+      <para>This screen allows you to reset the state tables on your m0n0wall
+      for the NAT and firewall state tables.</para>
 
-      <para>NOTE: If you reset the firewall state table, the browser session may appear to be hung after clicking
-      "Reset". Simply refresh the page to continue.</para>
-      
+      <para>Just check the boxes for the table(s) you want to clear, and click
+      the Reset button.</para>
+
+      <para>Resetting the state tables will remove all entries from the
+      corresponding tables. This means that all open connections will be
+      broken and will have to be re-established. This may be necessary after
+      making substantial changes to the firewall and/or NAT rules, especially
+      if there are IP protocol mappings (e.g. for PPTP or IPv6) with open
+      connections.</para>
+
+      <para>The firewall will normally leave the state tables intact when
+      changing rules.</para>
+
+      <para>NOTE: If you reset the firewall state table, the browser session
+      may appear to be hung after clicking "Reset". Simply refresh the page to
+      continue.</para>
     </sect2>
 
     <sect2>
       <title>Backup/Restore</title>
 
-    <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/backuprestore.png" />
-        </imageobject>
-      </mediaobject>
-    </para>
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/backuprestore.png" />
+          </imageobject>
+        </mediaobject></para>
 
+      <para>This screen allows you to backup your existing configuration, or
+      restore a previous backup file.</para>
 
-      <para>This screen allows you to backup your existing configuration, or restore a previous backup file.  
-      </para>
-      
-      <para>To backup your m0n0wall, click the "Download configuration" button.  This will download a file
-      called (by default) config.xml.  </para>
-      
-      <para>If you ever need to restore a previous backup file, go to this page, and under the "Restore configuration"
-      section, click Browse.  Locate the config.xml file you backed up above.</para>
-      
+      <para>To backup your m0n0wall, click the "Download configuration"
+      button. This will download a file called (by default) config.xml.</para>
+
+      <para>If you ever need to restore a previous backup file, go to this
+      page, and under the "Restore configuration" section, click Browse.
+      Locate the config.xml file you backed up above.</para>
     </sect2>
 
     <sect2>
       <title>Factory Defaults</title>
-    <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/factorydefaults.png" />
-        </imageobject>
-      </mediaobject>
-    </para>
 
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/factorydefaults.png" />
+          </imageobject>
+        </mediaobject></para>
 
-      <para>Clicking Yes on this page will reset m0n0wall to the default out of the box configuration options and clear
-      any configuration you have done on the device.  
-      </para>
-      
-      <para>If all else fails when trying to configure something on your m0n0wall, sometimes it is easiest to start
-      over from scratch on the entire configuration.  In that instance, use this feature to reload the default settings.
-      </para>
-      
+      <para>Clicking Yes on this page will reset m0n0wall to the default out
+      of the box configuration options and clear any configuration you have
+      done on the device.</para>
+
+      <para>If all else fails when trying to configure something on your
+      m0n0wall, sometimes it is easiest to start over from scratch on the
+      entire configuration. In that instance, use this feature to reload the
+      default settings.</para>
     </sect2>
 
     <sect2>
       <title>Reboot System</title>
-    <para>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/rebootsystem.png" />
-        </imageobject>
-      </mediaobject>
-    </para>
+
+      <para><mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/rebootsystem.png" />
+          </imageobject>
+        </mediaobject></para>
 
       <para>Click Yes on this page to reboot the system.</para>
-      
-      <para>As a general rule of thumb in m0n0wall and FreeBSD in general, rebooting probably isn't going to fix any
-      problems you are having.  But it is worth a shot in many circumstances.</para>
-      
-      <para>Unlike so many systems, rebooting isn't a suggested maintenance procedure on m0n0wall.  There is no need
-      to reboot the system unless you have a specific reason for doing so.</para>
-      
+
+      <para>As a general rule of thumb in m0n0wall and FreeBSD in general,
+      rebooting probably isn't going to fix any problems you are having. But
+      it is worth a shot in many circumstances.</para>
+
+      <para>Unlike so many systems, rebooting isn't a suggested maintenance
+      procedure on m0n0wall. There is no need to reboot the system unless you
+      have a specific reason for doing so.</para>
     </sect2>
   </sect1>
 </chapter>
