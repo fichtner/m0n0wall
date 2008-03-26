@@ -560,129 +560,189 @@
   <sect1>
     <title>Vouchers</title>
 
-    <para>Below are the following parameters that can be configured for
-    voucher use in the upcoming 1.3 m0n0wall). The Enable Vouchers checkbox
-    must activated for these parameters to be used.</para>
+    <para>Below is a quick howto from mwiget who added the Voucher feature to
+    m0n0wall.</para>
 
-    <note>
-      <para>Changing any Voucher parameter (apart from managing the list of
-      Rolls) on this page will render existing vouchers useless if they were
-      generated with different settings.</para>
-    </note>
+    <sect2>
+      <title>Quick Howto</title>
 
-    <table>
+      <para>To enable, create and manage voucher support via captive portal,
+      there is a new Tab under Services-&gt;Captive Portal: Voucher.</para>
+
+      <para>Enable captive portal first, upload a landing page that contains
+      an input field 'auth_voucher'. An example can be found on the the URL
+      above. Then enable Voucher support on the Voucher tab. Initially you can
+      leave all fields with its defaults. Every new install will create unique
+      encryption keys. </para>
+
+      <para>Now add at least one "Roll" by clicking '+' on the Vouchers page,
+      right to 'Voucher rolls': Specify a Roll Number, e.g. 0, how many
+      vouchers that roll shall contain, and how long each voucher allows
+      network access. Then generate the new vouchers by clicking on the paper
+      logo right to the newly added roll. This will generate a CSV file and
+      download via your browser.</para>
+
+      <para>Each of these generated vouchers can now be used by users for the
+      configured amount of minutes for that roll. Note that as soon as a
+      voucher has been activated, its timer will run down to zero and then
+      block access, no matter if the session is idle or got disconnected due
+      to logout or session termination.</para>
+
+      <para>To test the vouchers in the m0n0wall GUI, click on
+      Status-&gt;Captive Portal. New tabs, dedicated to voucher handling, show
+      up when voucher support is enabled. Click on status-&gt;captive
+      portal-&gt; Test Vouchers and enter one or more of the newly generated
+      vouchers from the downloaded CSV file and click submit. A message will
+      be shown with the validation and duration of each given voucher.</para>
+
+      <para>One can add multiple rolls, e.g. to have vouchers with different
+      time credit. It is also possible, to enter multiple vouchers, separated
+      by space, to gain the sum of time credit of all entered vouchers.
+      </para>
+
+      <para>There is more to it, read the comments to each config parameter on
+      the voucher page. </para>
+
+      <para>Note on the very short public/private RSA keys: I know, those can
+      be cracked easy and in no time, if one of the keys is known. The idea
+      here was to make it a little bit harder than simply adding a shared
+      password into the m0n0wall config file. Unfortunately I'm no expert on
+      encryption but I assume with such short encrypted vouchers, there is no
+      security difference between the used RSA keys and a symmetric
+      encryption. Anyhow, all that encryption/decryption stuff is done in a
+      newly added binary C program voucher.c, that is compiled and added into
+      the m0n0wall image, and can be modified to increase the usability and
+      security. </para>
+    </sect2>
+
+    <sect2>
       <title>Voucher Parameters</title>
 
-      <tgroup cols="2" tgroupstyle="Format D">
-        <colspec colname="col1" colnum="1" colwidth="1*" />
+      <para>Below are the following parameters that can be configured for
+      voucher use in the upcoming 1.3 m0n0wall). The Enable Vouchers checkbox
+      must activated for these parameters to be used.</para>
 
-        <colspec colname="col2" colnum="2" colwidth="2*" />
+      <note>
+        <para>Changing any Voucher parameter (apart from managing the list of
+        Rolls) on this page will render existing vouchers useless if they were
+        generated with different settings.</para>
+      </note>
 
-        <thead>
-          <row>
-            <entry valign="top">Parameter</entry>
+      <table>
+        <title>Voucher Parameters</title>
 
-            <entry valign="top">Description</entry>
-          </row>
-        </thead>
+        <tgroup cols="2" tgroupstyle="Format D">
+          <colspec colname="col1" colnum="1" colwidth="1*" />
 
-        <tbody>
-          <row>
-            <entry>Voucher Rolls</entry>
+          <colspec colname="col2" colnum="2" colwidth="2*" />
 
-            <entry>Create, generate and activate Rolls with Vouchers that
-            allow access through the captive portal for the configured time.
-            Once a voucher is activated, its clock is started and runs
-            uninterrupted until it expires. During that time, the voucher can
-            be re-used from the same or a different computer. If the voucher
-            is used again from another computer, the previous session is
-            stopped.</entry>
-          </row>
+          <thead>
+            <row>
+              <entry valign="top">Parameter</entry>
 
-          <row>
-            <entry>Voucher public key</entry>
+              <entry valign="top">Description</entry>
+            </row>
+          </thead>
 
-            <entry>Paste an RSA public key (64 Bit or smaller) in PEM format
-            here. This key is used to decrypt vouchers.</entry>
-          </row>
+          <tbody>
+            <row>
+              <entry>Voucher Rolls</entry>
 
-          <row>
-            <entry>Voucher private key</entry>
+              <entry>Create, generate and activate Rolls with Vouchers that
+              allow access through the captive portal for the configured time.
+              Once a voucher is activated, its clock is started and runs
+              uninterrupted until it expires. During that time, the voucher
+              can be re-used from the same or a different computer. If the
+              voucher is used again from another computer, the previous
+              session is stopped.</entry>
+            </row>
 
-            <entry>Paste an RSA private key (64 Bit or smaller) in PEM format
-            here. This key is only used to generate encrypted vouchers and
-            doesn't need to be available if the vouchers have been generated
-            offline.</entry>
-          </row>
+            <row>
+              <entry>Voucher public key</entry>
 
-          <row>
-            <entry>Character set</entry>
+              <entry>Paste an RSA public key (64 Bit or smaller) in PEM format
+              here. This key is used to decrypt vouchers.</entry>
+            </row>
 
-            <entry>Tickets are generated with the specified character set. It
-            should contain printable characters (numbers, lower case and upper
-            case letters) that are hard to confuse with others. Avoid e.g. 0/O
-            and l/1.</entry>
-          </row>
+            <row>
+              <entry>Voucher private key</entry>
 
-          <row>
-            <entry># of Roll Bits</entry>
+              <entry>Paste an RSA private key (64 Bit or smaller) in PEM
+              format here. This key is only used to generate encrypted
+              vouchers and doesn't need to be available if the vouchers have
+              been generated offline.</entry>
+            </row>
 
-            <entry>Reserves a range in each voucher to store the Roll# it
-            belongs to. Allowed range: 1..31. Sum of Roll+Ticket+Checksum bits
-            must be one Bit less than the RSA key size.</entry>
-          </row>
+            <row>
+              <entry>Character set</entry>
 
-          <row>
-            <entry># of Ticket Bits</entry>
+              <entry>Tickets are generated with the specified character set.
+              It should contain printable characters (numbers, lower case and
+              upper case letters) that are hard to confuse with others. Avoid
+              e.g. 0/O and l/1.</entry>
+            </row>
 
-            <entry>Reserves a range in each voucher to store the Ticket# it
-            belongs to. Allowed range: 1..16. Using 16 bits allows a roll to
-            have up to 65535 vouchers. A bit array, stored in RAM and in the
-            config, is used to mark if a voucher has been used. A bit array
-            for 65535 vouchers requires 8 KB of storage.</entry>
-          </row>
+            <row>
+              <entry># of Roll Bits</entry>
 
-          <row>
-            <entry># of Checksum Bits</entry>
+              <entry>Reserves a range in each voucher to store the Roll# it
+              belongs to. Allowed range: 1..31. Sum of Roll+Ticket+Checksum
+              bits must be one Bit less than the RSA key size.</entry>
+            </row>
 
-            <entry>Reserves a range in each voucher to store a simple checksum
-            over Roll# and Ticket#. Allowed range is 0..31.</entry>
-          </row>
+            <row>
+              <entry># of Ticket Bits</entry>
 
-          <row>
-            <entry>Magic Number</entry>
+              <entry>Reserves a range in each voucher to store the Ticket# it
+              belongs to. Allowed range: 1..16. Using 16 bits allows a roll to
+              have up to 65535 vouchers. A bit array, stored in RAM and in the
+              config, is used to mark if a voucher has been used. A bit array
+              for 65535 vouchers requires 8 KB of storage.</entry>
+            </row>
 
-            <entry>Magic number stored in every voucher. Verified during
-            voucher check. Size depends on how many bits are left by
-            Roll+Ticket+Checksum bits. If all bits are used, no magic number
-            will be used and checked.</entry>
-          </row>
+            <row>
+              <entry># of Checksum Bits</entry>
 
-          <row>
-            <entry>Save Interval</entry>
+              <entry>Reserves a range in each voucher to store a simple
+              checksum over Roll# and Ticket#. Allowed range is 0..31.</entry>
+            </row>
 
-            <entry>The list of active and used vouchers can be stored in the
-            system's configuration file once every x minutes to survive power
-            outages. No save is done if no new vouchers have been activated.
-            Enter 0 to never write runtime state to XML config.</entry>
-          </row>
+            <row>
+              <entry>Magic Number</entry>
 
-          <row>
-            <entry>Invalid Voucher Message</entry>
+              <entry>Magic number stored in every voucher. Verified during
+              voucher check. Size depends on how many bits are left by
+              Roll+Ticket+Checksum bits. If all bits are used, no magic number
+              will be used and checked.</entry>
+            </row>
 
-            <entry>Error message displayed for invalid vouchers on captive
-            portal error page ($PORTAL_MESSAGE$)</entry>
-          </row>
+            <row>
+              <entry>Save Interval</entry>
 
-          <row>
-            <entry>Expired Voucher Message</entry>
+              <entry>The list of active and used vouchers can be stored in the
+              system's configuration file once every x minutes to survive
+              power outages. No save is done if no new vouchers have been
+              activated. Enter 0 to never write runtime state to XML
+              config.</entry>
+            </row>
 
-            <entry>Error message displayed for expired vouchers on captive
-            portal error page ($PORTAL_MESSAGE$).</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+            <row>
+              <entry>Invalid Voucher Message</entry>
+
+              <entry>Error message displayed for invalid vouchers on captive
+              portal error page ($PORTAL_MESSAGE$)</entry>
+            </row>
+
+            <row>
+              <entry>Expired Voucher Message</entry>
+
+              <entry>Error message displayed for expired vouchers on captive
+              portal error page ($PORTAL_MESSAGE$).</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
 
     <sect2>
       <title>Voucher Rolls</title>
