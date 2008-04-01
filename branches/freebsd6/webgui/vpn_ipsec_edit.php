@@ -106,7 +106,10 @@ if (isset($id) && $a_ipsec[$id]) {
 	} else if (isset($a_ipsec[$id]['p1']['myident']['ufqdn'])) {
 		$pconfig['p1myidentt'] = 'user_fqdn';
 		$pconfig['p1myident'] = $a_ipsec[$id]['p1']['myident']['ufqdn'];
- 	}
+ 	} else if (isset($a_ipsec[$id]['p1']['myident']['asn1dn'])) {
+		$pconfig['p1myidentt'] = 'asn1dn';
+		$pconfig['p1myident'] = $a_ipsec[$id]['p1']['myident']['asn1dn'];
+	}
 	
 	$pconfig['p1ealgo'] = $a_ipsec[$id]['p1']['encryption-algorithm'];
 	$pconfig['p1halgo'] = $a_ipsec[$id]['p1']['hash-algorithm'];
@@ -231,6 +234,9 @@ if ($_POST) {
 				break;
 			case 'user_fqdn':
 				$ipsecent['p1']['myident']['ufqdn'] = $_POST['p1myident'];
+				break;
+			case 'asn1dn':
+				$ipsecent['p1']['myident']['asn1dn'] = $_POST['p1myident'];
 				break;
 		}
 		

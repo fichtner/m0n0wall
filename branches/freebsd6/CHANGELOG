@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added asn1dn option to IPsec identifier types to be compatible with what
+  Openswan expects when using certs instead of PSKs
+  (contributed by Wes Morgan)
+
 - allow fragmented ESP and NAT-T encapsulated IPsec packets when using the
   integrated IPsec support (should solve MTU issues)
 

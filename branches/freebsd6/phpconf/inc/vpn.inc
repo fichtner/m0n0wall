@@ -207,6 +207,9 @@ function vpn_ipsec_configure($ipchg = false) {
 				} else if (isset($tunnel['p1']['myident']['ufqdn'])) {
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
+				} else if (isset($tunnel['p1']['myident']['asn1dn'])) {
+					$myidentt = "asn1dn";
+					$myident = $tunnel['p1']['myident']['asn1dn'];
  				}
 					
 				$nattline = '';
@@ -335,6 +338,9 @@ EOD;
 				} else if (isset($tunnel['p1']['myident']['ufqdn'])) {
 					$myidentt = "user_fqdn";
 					$myident = $tunnel['p1']['myident']['ufqdn'];
+				} else if (isset($tunnel['p1']['myident']['asn1dn'])) {
+					$myidentt = "asn1dn";
+					$myident = $tunnel['p1']['myident']['asn1dn'];
  				}
 					
 				$nattline = '';
