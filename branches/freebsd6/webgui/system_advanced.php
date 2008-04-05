@@ -314,7 +314,7 @@ function enable_change(enable_over) {
                   <td width="78%" class="vtable"> 
                     <input name="preferoldsa_enable" type="checkbox" id="preferoldsa_enable" value="yes" <?php if ($pconfig['preferoldsa_enable']) echo "checked"; ?>>
                     <strong>Prefer old IPsec SAs</strong><br>
-					By default, if several SAs match, the newest one is preferred if it's at least 30 seconds old.
+					By default, if several SAs match, the newest one is preferred.
 					Select this option to always prefer old SAs over new ones.
 					</td>
                 </tr>

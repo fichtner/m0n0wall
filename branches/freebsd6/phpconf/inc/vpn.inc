@@ -67,9 +67,9 @@ function vpn_ipsec_configure($ipchg = false) {
 	/* mark enc0 interface as up to enable filtering of decapsulated IPsec packets */
 	mwexec("/sbin/ifconfig enc0 up");
 	
-	/* prefer old SAs only for 30 seconds, then use the new one */
+	/* prefer new or old SAs? */
 	if (!isset($ipseccfg['preferoldsa']))
-		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=-30");
+		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=0");
 	else
 		mwexec("/sbin/sysctl -w net.key.preferred_oldsa=1");
 	
@@ -272,7 +272,12 @@ function vpn_ipsec_configure($ipchg = false) {
 	peers_certfile "peer{$tunnelnumber}-signed.pem";
 EOD;
 					} 					
-				} 
+				}
+				
+				$dpddelay = 0;
+				if ($tunnel['dpddelay'])
+					$dpddelay = $tunnel['dpddelay'];
+				
 				$racoonconf .= <<<EOD
 remote {$rgip} \{
 	exchange_mode {$tunnel['p1']['mode']};
@@ -283,6 +288,7 @@ remote {$rgip} \{
 	initial_contact on;
 	support_proxy on;
 	proposal_check obey;
+	dpd_delay $dpddelay;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};
@@ -388,6 +394,11 @@ EOD;
 
 					$certline = "certificate_type x509 \"server-mobile{$tunnelnumber}-signed.pem\" \"server-mobile{$tunnelnumber}-key.pem\";";
 				}
+				
+				$dpddelay = 0;
+				if ($tunnel['dpddelay'])
+					$dpddelay = $tunnel['dpddelay'];
+				
 				$racoonconf .= <<<EOD
 remote anonymous \{
 	exchange_mode {$tunnel['p1']['mode']};
@@ -399,6 +410,7 @@ remote anonymous \{
 	generate_policy on;
 	support_proxy on;
 	proposal_check obey;
+	dpd_delay $dpddelay;
 
 	proposal \{
 		encryption_algorithm {$tunnel['p1']['encryption-algorithm']};

@@ -3,9 +3,24 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix IPsec "prefer old SA" option, specifically when it is disabled (in
+  which case old SAs were preferred anyway in 1.3b10 because
+  net.key.preferred_oldsa was set to -30, but that doesn't work with the
+  current implementation and is a relict from FreeBSD 4.11/m0n0wall 1.23,
+  where we used a more elaborate custom kernel patch for this that also
+  allowed a number of seconds to be specified)
+  
+- add DPD (Dead Peer Detection) option to IPsec tunnels (default off as before)
+
 - added asn1dn option to IPsec identifier types to be compatible with what
   Openswan expects when using certs instead of PSKs
   (contributed by Wes Morgan)
+
+- fix SVG SVG traffic/CPU graphs under IE7 (by Daniel S. Haischt)
+
+
+1.3b10
+------
 
 - allow fragmented ESP and NAT-T encapsulated IPsec packets when using the
   integrated IPsec support (should solve MTU issues)

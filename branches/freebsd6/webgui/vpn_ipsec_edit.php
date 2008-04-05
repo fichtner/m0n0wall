@@ -79,6 +79,7 @@ function pconfig_to_address(&$adr, $padr, $pmask) {
 if (isset($id) && $a_ipsec[$id]) {
 	$pconfig['disabled'] = isset($a_ipsec[$id]['disabled']);
 	$pconfig['natt'] = isset($a_ipsec[$id]['natt']);
+	$pconfig['dpddelay'] = $a_ipsec[$id]['dpddelay'];
 	//$pconfig['auto'] = isset($a_ipsec[$id]['auto']);
 
 	if (!isset($a_ipsec[$id]['local-subnet']))
@@ -173,6 +174,10 @@ if ($_POST) {
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
+	if (($_POST['dpddelay'] && !is_numeric($_POST['dpddelay']))) {
+		$input_errors[] = "The DPD interval must be an integer.";
+	}
+	
 	if (!is_specialnet($_POST['localnettype'])) {
 		if (($_POST['localnet'] && !is_ipaddr($_POST['localnet']))) {
 			$input_errors[] = "A valid local network IP address must be specified.";
@@ -214,6 +219,7 @@ if ($_POST) {
 	if (!$input_errors) {
 		$ipsecent['disabled'] = $_POST['disabled'] ? true : false;
 		//$ipsecent['auto'] = $_POST['auto'] ? true : false;
+		$ipsecent['dpddelay'] = $pconfig['dpddelay'];
 		$ipsecent['interface'] = $pconfig['interface'];
 		$ipsecent['natt'] = $_POST['natt'] ? true : false;
 		pconfig_to_address($ipsecent['local-subnet'], $_POST['localnet'], $_POST['localnetmask']);
@@ -354,6 +360,12 @@ function methodsel_change() {
                     <span class="vexpl">Set this option to enable the use of NAT-T (i.e. the encapsulation of ESP in UDP packets) if needed,
                     	which can help with clients that are behind restrictive firewalls.</span></td>
                 </tr>
+                <tr> 
+				  <td width="22%" valign="top" class="vncellreq">DPD interval</td>
+				  <td width="78%" class="vtable"> 
+					<input name="dpddelay" type="text" class="formfld" id="dpddelay" size="5" value="<?php echo htmlspecialchars($pconfig['dpddelay']); ?>"> seconds<br>
+					<span class="vexpl">Enter a value here to enable Dead Peer Detection (e.g. 60 seconds).</span></td>
+				</tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Local subnet</td>
                   <td width="78%" class="vtable"> 

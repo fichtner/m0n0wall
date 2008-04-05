@@ -488,6 +488,7 @@
 			<disabled/>
 			<auto/>
 			<descr></descr>
+			<dpddelay></dpddelay>
 			<interface>lan|wan|opt[n]</interface>
 			<local-subnet>
 				<address>xxx.xxx.xxx.xxx(/xx)</address>
@@ -521,6 +522,7 @@
 		</tunnel>
 		<mobileclients>
 			<enable/>
+			<dpddelay></dpddelay>
 			<p1>
 				<mode></mode>
 				<myident>
