@@ -211,6 +211,10 @@ function vpn_ipsec_configure($ipchg = false) {
 					$myidentt = "asn1dn";
 					$myident = $tunnel['p1']['myident']['asn1dn'];
  				}
+
+				if (!($myidentt == "asn1dn" && $myident == "")) {
+					$myident = " \"".$myident."\"";
+				}
 					
 				$nattline = '';
 				if (isset($tunnel['natt'])) {
@@ -281,7 +285,7 @@ EOD;
 				$racoonconf .= <<<EOD
 remote {$rgip} \{
 	exchange_mode {$tunnel['p1']['mode']};
-	my_identifier {$myidentt} "{$myident}";
+	my_identifier {$myidentt}{$myident};
 	{$nattline}
 	{$certline}
 	peers_identifier address {$rgip};
@@ -348,6 +352,10 @@ EOD;
 					$myidentt = "asn1dn";
 					$myident = $tunnel['p1']['myident']['asn1dn'];
  				}
+
+				if (!($myidentt == "asn1dn" && $myident == "")) {
+					$myident = " \"".$myident."\"";
+				}
 					
 				$nattline = '';
 				if (isset($tunnel['natt'])) {
@@ -402,7 +410,7 @@ EOD;
 				$racoonconf .= <<<EOD
 remote anonymous \{
 	exchange_mode {$tunnel['p1']['mode']};
-	my_identifier {$myidentt} "{$myident}";
+	my_identifier {$myidentt}{$myident};
 	{$nattline}
 	{$certline}
 	initial_contact on;
