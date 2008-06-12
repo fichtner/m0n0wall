@@ -16,7 +16,7 @@
   <para><ulink url="http://doc.m0n0.ch/quickstartpc/">PC Quick Start
   Guide</ulink></para>
 
-  <para><ulink url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick Start
+  <para><ulink url="http://doc.m0n0.ch/quickstartwrap/">WRAP/ALIX Quick Start
   Guide</ulink></para>
 
   <sect1 id="Config.Console">
@@ -369,7 +369,7 @@
             </row>
 
             <row>
-              <entry>IPsec DNS check interval (v1.3)</entry>
+              <entry>IPsec DNS check interval (firmware 1.3)</entry>
 
               <entry>If at least one IPsec tunnel has a host name (instead of
               an IP address) as the remote gateway, a DNS lookup is performed
@@ -944,7 +944,7 @@
       but can assist you in determining which device you are monitoring if you
       have several monitored hosts.</para>
 
-      <para>The Community is generally set to public, but if you have any
+      <para>The Community is generally set to "public", but if you have any
       regard for security at all, you should set this to something difficult
       to guess, containing numbers and letters. This community name is still
       passed over the network in clear text, so it could be intercepted,

@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Example.VPN">
   <?dbhtml filename="examplevpn.html"?>
+
   <title>Example Site to Site VPN Configurations</title>
-  
-  <para>m0n0wall can connect to any third party VPN device that supports standard
-  IPsec site to site VPN's, which includes most any VPN device and firewall with
-  IPsec VPN support.  </para>
-  
-  <para>This chapter will provide instructions on connecting m0n0wall with a number
-  of third party IPsec devices.  </para>
-  
-  <para>Have you configured a VPN between m0n0wall and a device not listed here?  Please
-  document how you accomplished this.  There is a <ulink url="http://wiki.m0n0.ch/wikka.php?wakka=ExampleVPNs">
-  section of the wiki</ulink> dedicated to configurations for this chapter.  </para>
-  
+
+  <para>m0n0wall can connect to any third party VPN device that supports
+  standard IPsec site to site VPN's, which includes most any VPN device and
+  firewall with IPsec VPN support.</para>
+
+  <para>This chapter will provide instructions on connecting m0n0wall with a
+  number of third party IPsec devices.</para>
+
+  <para>Have you configured a VPN between m0n0wall and a device not listed
+  here? Please document how you accomplished this. There is a <ulink
+  url="http://wiki.m0n0.ch/wikka.php?wakka=ExampleVPNs"> section of the
+  wiki</ulink> dedicated to configurations for this chapter.</para>
+
   <sect1>
     <title>Cisco PIX Firewall</title>
-    
-    <para>The following describes how to configure a site to site IPsec VPN tunnel
-    between a PIX Firewall and m0n0wall.</para>
-    
+
+    <para>The following describes how to configure a site to site IPsec VPN
+    tunnel between a PIX Firewall and m0n0wall.</para>
+
     <sect2>
-        <title>PIX Configuration</title>
-        
-        <para>First we need to make sure the PIX has 3DES enabled.</para>
-        
-        <blockquote>
-<literallayout class="monospaced">
+      <title>PIX Configuration</title>
+
+      <para>First we need to make sure the PIX has 3DES enabled.</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 pixfirewall# sh ver
 
 Cisco PIX Firewall Version 6.3(3)
@@ -47,18 +49,22 @@ Licensed Features:
 Failover: Disabled
 VPN-DES: Enabled
 VPN-3DES-AES: Enabled
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>If the "VPN-3DES-AES" line above does not show "Enabled", you need to install the
-    PIX 3DES key. This is now available free from Cisco <ulink url="http://www.cisco.com/pcgi-bin/Software/FormManager/formgenerator.pl">
-    here</ulink> for all PIX firewalls (click 3DES/AES Encryption License).  Do NOT use DES for a
-    VPN if you want it to be cryptographically secure.  DES is only slightly better than
-    transmitting in clear text.</para>
-    
-    <para>Next we'll see if any VPN configurations are in place on the PIX.</para>
-    
-        <blockquote>
-<literallayout class="monospaced">
+      <para>If the "VPN-3DES-AES" line above does not show "Enabled", you need
+      to install the PIX 3DES key. This is now available free from Cisco
+      <ulink
+      url="http://www.cisco.com/pcgi-bin/Software/FormManager/formgenerator.pl">
+      here</ulink> for all PIX firewalls (click 3DES/AES Encryption License).
+      Do NOT use DES for a VPN if you want it to be cryptographically secure.
+      DES is only slightly better than transmitting in clear text.</para>
+
+      <para>Next we'll see if any VPN configurations are in place on the
+      PIX.</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 pixfirewall# sh isakmp policy
 
 Default protection suite
@@ -67,144 +73,157 @@ hash algorithm: Secure Hash Standard
 authentication method: Rivest-Shamir-Adleman Signature
 Diffie-Hellman group: #1 (768 bit)
 lifetime: 86400 seconds, no volume limit
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>If you only see the default policy, there are no VPN's configured. This document
-    cannot be followed verbatim if you have current VPN's (though you should be able to
-    figure it out, just be careful not to break your existing VPN's with any duplicate names).
-    </para>
-    
-    <para>Allow IPSec connections to the PIX</para>
+      <para>If you only see the default policy, there are no VPN's configured.
+      This document cannot be followed verbatim if you have current VPN's
+      (though you should be able to figure it out, just be careful not to
+      break your existing VPN's with any duplicate names).</para>
 
-        <blockquote>
-<literallayout class="monospaced">
+      <para>Allow IPSec connections to the PIX</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 pixfirewall(config)# sysopt connection permit-ipsec
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Enable ISAKMP on the outside interface (where "outside" is the name of
-    the internet-facing interface)</para>
+      <para>Enable ISAKMP on the outside interface (where "outside" is the
+      name of the internet-facing interface)</para>
 
-        <blockquote>
-<literallayout class="monospaced">    
+      <blockquote>
+        <literallayout class="monospaced">    
 pixfirewall(config)# isakmp enable outside
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>isakmp policy command on PIX</para>
+      <para>isakmp policy command on PIX</para>
 
-        <blockquote>
-<literallayout class="monospaced">        
+      <blockquote>
+        <literallayout class="monospaced">        
 pixfirewall(config)# isakmp policy ?
 Usage: isakmp policy %lt;priority&gt; authen %lt;pre-share|rsa-sig&gt;
 isakmp policy %lt;priority&gt; encrypt %lt;aes|aes-192|aes-256|des|3des&gt;
 isakmp policy %lt;priority&gt; hash %lt;md5|sha&gt;
 isakmp policy %lt;priority&gt; group %lt;1|2|5&gt;
 isakmp policy %lt;priority&gt; lifetime %lt;seconds&gt;
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Now we need to configure the ISAKMP policy on the PIX. Enter the
-    following commands in configure mode:</para>
-    
-        <blockquote>
-<literallayout class="monospaced">        
+      <para>Now we need to configure the ISAKMP policy on the PIX. Enter the
+      following commands in configure mode:</para>
+
+      <blockquote>
+        <literallayout class="monospaced">        
 isakmp policy 10 authen pre-share
 isakmp policy 10 encrypt 3des
 isakmp policy 10 hash md5
 isakmp policy 10 group 2
 isakmp policy 10 lifetime 86400    
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>This policy uses pre-shared keys as authenticator, 3DES encryption,
-    md5 hashing, group 2, and 86400 second lifetime.</para>
+      <para>This policy uses pre-shared keys as authenticator, 3DES
+      encryption, md5 hashing, group 2, and 86400 second lifetime.</para>
 
-    <para>Now we need to define the pre-shared key for this connection. (1.1.1.1
-    = public IP address of m0n0wall, qwertyuiop is the shared key, randomly
-    generate something to use for your configuration)</para>
+      <para>Now we need to define the pre-shared key for this connection.
+      (1.1.1.1 = public IP address of m0n0wall, qwertyuiop is the shared key,
+      randomly generate something to use for your configuration)</para>
 
-        <blockquote>
-<literallayout class="monospaced">            
+      <blockquote>
+        <literallayout class="monospaced">            
 isakmp key qwertyuiop address 1.1.1.1 netmask 255.255.255.255
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Now we need to create an access list defining what traffic can cross
-    this tunnel. </para>
-    
-        <blockquote>
-<literallayout class="monospaced">
+      <para>Now we need to create an access list defining what traffic can
+      cross this tunnel.</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
 access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Define transform set for this connection called "monovpnset"</para>
-    
-        <blockquote>
-<literallayout class="monospaced">
+      <para>Define transform set for this connection called
+      "monovpnset"</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 crypto ipsec transform-set monovpnset esp-3des esp-md5-hmac
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Define security association lifetime</para>
+      <para>Define security association lifetime</para>
 
-    <blockquote>
-<literallayout class="monospaced">
+      <blockquote>
+        <literallayout class="monospaced">
 crypto ipsec security-association lifetime seconds 86400 kilobytes 50000
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Now to set up the actual connection, the crypto map "monovpnmap".
-    (where 1.1.1.1 is the public IP address of the m0n0wall device)</para>
-    
-    <blockquote>
-<literallayout class="monospaced">
+      <para>Now to set up the actual connection, the crypto map "monovpnmap".
+      (where 1.1.1.1 is the public IP address of the m0n0wall device)</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 crypto map monovpnmap 10 ipsec-isakmp
 crypto map monovpnmap 10 set peer 1.1.1.1
 crypto map monovpnmap 10 set transform-set monovpnset
 crypto map monovpnmap 10 match address monovpn
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>These lines specify type of VPN (ipsec-isakmp), peer IP address
-    (1.1.1.1), transform set to be used (monovpnset, defined above), and
-    that packets matching the access list "monovpn" created above should
-    traverse this VPN connection.</para>
-    
-    <para>Last step is to tell the PIX to not use NAT on the packets using
-    this VPN connection and route them instead.</para>
-    
-    <para>First we'll see if anything is currently routed. </para>
-    
-    <blockquote>
-<literallayout class="monospaced">
+      <para>These lines specify type of VPN (ipsec-isakmp), peer IP address
+      (1.1.1.1), transform set to be used (monovpnset, defined above), and
+      that packets matching the access list "monovpn" created above should
+      traverse this VPN connection.</para>
+
+      <para>Last step is to tell the PIX to not use NAT on the packets using
+      this VPN connection and route them instead.</para>
+
+      <para>First we'll see if anything is currently routed.</para>
+
+      <blockquote>
+        <literallayout class="monospaced">
 pixfirewall# sh nat
 nat (inside) 0 access-list no-nat
-</literallayout></blockquote>
+</literallayout>
+      </blockquote>
 
-    <para>Look for "nat (interface) 0 ..." commands. The above means any
-    traffic matching access list "no-nat" will routed, not translated.
-    In this instance, we are adding to a current access list (if you use
-    a DMZ, you likely have something similar to this set up).</para>
+      <para>Look for "nat (interface) 0 ..." commands. The above means any
+      traffic matching access list "no-nat" will routed, not translated. In
+      this instance, we are adding to a current access list (if you use a DMZ,
+      you likely have something similar to this set up).</para>
 
-    <blockquote>
-<literallayout class="monospaced">    
+      <blockquote>
+        <literallayout class="monospaced">    
 access-list no-nat permit ip 10.0.0.1 255.255.255.0 10.0.1.0 255.255.255.0
 access-list no-nat permit ip 10.0.1.0 255.255.255.0 10.0.0.0 255.255.255.0
-    </literallayout></blockquote>
-    
-    <para>If you do not have a "nat (interface) 0 ..." command in your "sh
-    nat" output, you can use the above two lines to create a "no-nat" access
-    list. You then have to apply it with the "nat (interface-name) 0
-    access-list no-nat" command (replacing "interface-name" with the name of
-    your LAN interface).</para>
-    
+    </literallayout>
+      </blockquote>
+
+      <para>If you do not have a "nat (interface) 0 ..." command in your "sh
+      nat" output, you can use the above two lines to create a "no-nat" access
+      list. You then have to apply it with the "nat (interface-name) 0
+      access-list no-nat" command (replacing "interface-name" with the name of
+      your LAN interface).</para>
     </sect2>
-    
+
     <sect2>
-        <title>m0n0wall Configuration</title>
-        
-        <para>Log into the m0n0wall web GUI, and under VPN, click IPSec.</para>
+      <title>m0n0wall Configuration</title>
 
-        <para>If the "Enable IPSec" box is not checked, check it and click Save.</para>
+      <para>Log into the m0n0wall web GUI, and under VPN, click IPSec.</para>
 
-        <para>Click the + button to add a VPN tunnel. On the "Edit tunnel" screen,
-        fill in as follows:</para>
+      <para>If the "Enable IPSec" box is not checked, check it and click
+      Save.</para>
 
-<literallayout>
+      <para>Click the + button to add a VPN tunnel. On the "Edit tunnel"
+      screen, fill in as follows:</para>
+
+      <literallayout>
 Leave "Disable this tunnel" box unchecked.
 Interface "WAN"
 Local subnet: Type: "LAN subnet"
@@ -213,7 +232,7 @@ Remote gateway: public IP address of PIX
 Description: add one to describe the connection (e.g. "PIX VPN")
 </literallayout>
 
-<literallayout>
+      <literallayout>
 <emphasis role="bold">Phase 1</emphasis>
 Negotiation mode: Aggressive
 My identifier: "My IP Address"
@@ -224,7 +243,7 @@ Lifetime: 86400
 Pre-shared key: qwertyuiop (enter exactly what you defined as your pre-shared key on the PIX earlier)
 </literallayout>
 
-<literallayout>
+      <literallayout>
 <emphasis role="bold">Phase 2</emphasis>
 Protocol: ESP
 Encryption algorithms: only 3DES checked
@@ -232,29 +251,34 @@ Hash algorithms: only MD5 checked
 PFS key group: 2
 Lifetime: 86400
 </literallayout>
-    
-    <note>In m0n0wall 1.2 beta versions, you may experience the connection dropping frequently with this
-    configuration.  If this happens, set the PFS key group in phase 2 to "off".</note>
-    
-    <note>If you don't specify a key lifetime in the m0n0wall config, the tunnel will work, but appear
-    to go insane after a while.  Supposedly Cisco's will negotiate a key lifetime, but I have not seen
-    this work in my experience. This is also true of a Cisco VPN Concentrator.  (anonymous wiki
-    contribution)</note>
-    
+
+      <note>
+        <para>In m0n0wall 1.2 beta versions, you may experience the connection
+        dropping frequently with this configuration. If this happens, set the
+        PFS key group in phase 2 to "off".</para>
+      </note>
+
+      <note>
+        <para>If you don't specify a key lifetime in the m0n0wall config, the
+        tunnel will work, but appear to go insane after a while. Supposedly
+        Cisco's will negotiate a key lifetime, but I have not seen this work
+        in my experience. This is also true of a Cisco VPN Concentrator.
+        (anonymous wiki contribution)</para>
+      </note>
     </sect2>
-    
   </sect1>
-  
+
   <sect1>
     <?dbhtml filename="examplevpn-smoothwall.html"?>
-    <title>Smoothwall</title>
-    
-    <para>Rev. Tig posted the following information on connecting Smoothwall and m0n0wall via IPsec
-    VPN in a post on the mailing list on September 30, 2004.</para>
 
+    <title>Smoothwall</title>
+
+    <para>Rev. Tig posted the following information on connecting Smoothwall
+    and m0n0wall via IPsec VPN in a post on the mailing list on September 30,
+    2004.</para>
 
     <blockquote>
-<literallayout class="monospaced">    
+      <literallayout class="monospaced">    
 I could not find a working solution in the mailing list archives but
 here is how I have managed to create a VPN between Smoothwall Corporate
 with Smoothtunnel and m0n0wall and I thought I would share it here to
@@ -353,18 +377,21 @@ Lifetime : (blank)
 
 That is it, your can now bring the link up from Smoothwall by going
 into the VPN control tab and clicking UP!
-</literallayout></blockquote>
+</literallayout>
+    </blockquote>
+  </sect1>
 
-    </sect1>
-      
-    <sect1>
+  <sect1>
     <?dbhtml filename="examplevpn-freeswan.html"?>
+
     <title>FreeS/WAN</title>
-    
+
     <para>Josh McAllister provided the following sample ipsec.conf, which can
-    be used to connect m0n0wall with FreeS/WAN in a site to site IPsec configuration.</para>
-    
-        <blockquote><literallayout class="monospaced">
+    be used to connect m0n0wall with FreeS/WAN in a site to site IPsec
+    configuration.</para>
+
+    <blockquote>
+      <literallayout class="monospaced">
 # /etc/ipsec.conf - FreeS/WAN IPsec configuration file
 
 version 2.0     # conforms to second version of ipsec.conf specification
@@ -427,48 +454,52 @@ Protocol = ESP
 Uncheck all Enc. Alg. Except 3des
 Hash alg = md5
 PFS key group = off
-  </literallayout></blockquote>
+  </literallayout>
+    </blockquote>
   </sect1>
-  
+
   <sect1>
     <?dbhtml filename="examplevpn-sonicwall.html"?>
+
     <title>Sonicwall</title>
-    
+
     <para><emphasis>Contributed by Dino Bijedic &lt; dino.bijedic (at)
     eracom-tech (dot) com&gt;</emphasis></para>
-    
-    <para>The following describes how to configure a site to site IPSec
-    VPN tunnel between a Sonicwall (PRO 300) and m0n0wall.</para>
-    
-    <para>Editor's note:  I would suggest using Main mode rather than
+
+    <para>The following describes how to configure a site to site IPSec VPN
+    tunnel between a Sonicwall (PRO 300) and m0n0wall.</para>
+
+    <para>Editor's note: I would suggest using Main mode rather than
     Aggressive.</para>
-    
-      <figure>
-        <title>Network diagram</title>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="networkdiagrams/sonicwallvpn.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    
+    <figure>
+      <title>Network diagram</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="networkdiagrams/sonicwallvpn.png" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+
     <sect2>
-        <title>Sonicwall Configuration</title>
+      <title>Sonicwall Configuration</title>
 
-    <para>Log in to Sonicwall</para>
+      <para>Log in to Sonicwall</para>
 
-    <para>Click <emphasis role="bold">VPN -> Configure</emphasis></para>
+      <para>Click <emphasis role="bold">VPN -&gt; Configure</emphasis></para>
 
-    <para>Add/Modify IPSec Security Association</para>
-    <literallayout>
-In Configure, select Security Association -> Add New SA
+      <para>Add/Modify IPSec Security Association</para>
+
+      <literallayout>
+In Configure, select Security Association -&gt; Add New SA
 Name: Name of connection  (Monowall test)
 IPSec Gateway Name or Address: Type IP address of your m0n0wall (203.49.X.117)
 </literallayout>
 
-    <para>Security Policy</para>
-    <literallayout>
+      <para>Security Policy</para>
+
+      <literallayout>
 Exchange: Aggressive Mode
 Phase 1 DH Group: Group2
 SA Life time (secs): 28800
@@ -477,40 +508,38 @@ Phase 2 Encryption/Authentication: Strong Encryption and Authentication (ESP 3DE
 Share Secret: type your share secret (novitest)
     </literallayout>
 
-    <para><emphasis role="bold">Destination Networks</emphasis></para>
+      <para><emphasis role="bold">Destination Networks</emphasis></para>
 
-    <para>Select "Specify destination network below".</para>
-    
-    <para>The following screenshot shows what this screen will look like. </para>
-    
-    <para>
-        <mediaobject>
+      <para>Select "Specify destination network below".</para>
+
+      <para>The following screenshot shows what this screen will look
+      like.</para>
+
+      <para><mediaobject>
           <imageobject>
             <imagedata fileref="screens/examplevpn/sonicwall1.png" />
           </imageobject>
-        </mediaobject>
-    </para>
-    
-    <para>Click <emphasis role="bold">Add New Network</emphasis></para>
-    
-    <para>You will get: <emphasis role="bold">Edit VPN Destination Network</emphasis>
-    (Note: This is Popup window – enable Popup in your browser)</para>
-    
-    <literallayout>    
+        </mediaobject></para>
+
+      <para>Click <emphasis role="bold">Add New Network</emphasis></para>
+
+      <para>You will get: <emphasis role="bold">Edit VPN Destination
+      Network</emphasis> (Note: This is Popup window – enable Popup in your
+      browser)</para>
+
+      <literallayout>    
     Network: type your destination network (192.168.200.0)
     Subnet mask: Type destination subnet mask (255.255.255.0)
     </literallayout>
 
-    <para>
-        <mediaobject>
+      <para><mediaobject>
           <imageobject>
             <imagedata fileref="screens/examplevpn/sonicwall2.png" />
           </imageobject>
-        </mediaobject>
-    </para>
-    
-    <para>Click Update</para>
-    
+        </mediaobject></para>
+
+      <para>Click Update</para>
+
       <figure>
         <title>Example of Sonicwall configuration</title>
 
@@ -520,15 +549,14 @@ Share Secret: type your share secret (novitest)
           </imageobject>
         </mediaobject>
       </figure>
-      
-      </sect2>
-      
-      <sect2>
-        <title>m0n0wall Configuration</title>
-        
-        <para>Configure m0n0wall IPsec Edit Tunnel screen as follows.</para>
-        
-        <literallayout>
+    </sect2>
+
+    <sect2>
+      <title>m0n0wall Configuration</title>
+
+      <para>Configure m0n0wall IPsec Edit Tunnel screen as follows.</para>
+
+      <literallayout>
         <emphasis role="bold">Interface:</emphasis> WAN
         <emphasis role="bold">Local subnet:</emphasis> LAN subnet
         <emphasis role="bold">Remote subnet:</emphasis> 192.168.2.0/24
@@ -547,25 +575,21 @@ Share Secret: type your share secret (novitest)
         <emphasis role="bold">PFS key group:</emphasis> off
         <emphasis role="bold">Lifetime:</emphasis> 28800
         </literallayout>
-        
-        <para>Click Save at the bottom of the page to complete the VPN
-        configuration.</para>
-        
-      </sect2>
 
+      <para>Click Save at the bottom of the page to complete the VPN
+      configuration.</para>
+    </sect2>
   </sect1>
-  
+
   <sect1>
     <?dbhtml filename="examplevpn-nortel.html"?>
+
     <title>Nortel</title>
-    
-    <para>If you go to Nortel's support site, they have a number of
-    documents available on setting up peer to peer IPsec
-    tunnels using pre-shared key authentication.  Find the appropriate
-    one for your device, and set up the m0n0wall end with the appropriate
-    settings as described in the Nortel documentation.</para>
-    
+
+    <para>If you go to Nortel's support site, they have a number of documents
+    available on setting up peer to peer IPsec tunnels using pre-shared key
+    authentication. Find the appropriate one for your device, and set up the
+    m0n0wall end with the appropriate settings as described in the Nortel
+    documentation.</para>
   </sect1>
-    
-  
 </chapter>

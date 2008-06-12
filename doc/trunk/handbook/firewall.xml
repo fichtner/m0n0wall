@@ -4,105 +4,94 @@
 
   <title>The Firewall Screens</title>
 
+  <para></para>
+
+  <sect1>
+    <?dbhtml filename="firewall-rules.html"?>
+
+    <title>Rules</title>
+
     <para></para>
+  </sect1>
 
-    <sect1>
-      <?dbhtml filename="firewall-rules.html"?>
-      <title>Rules</title>
+  <sect1>
+    <?dbhtml filename="firewall-aliases.html"?>
 
-      <para></para>
-    </sect1>
+    <title>Aliases</title>
 
-    <sect1>
-      <?dbhtml filename="firewall-aliases.html"?>
-      <title>Aliases</title>
+    <para>You may have noticed throughout the webGUI there are some address
+    boxes with a blue background. This blue background indicates you can use
+    aliases in this field. The source and destination boxes on the Firewall
+    Rules Edit screen are two examples of this.</para>
 
-      <para>You may have noticed throughout the webGUI there are some address boxes with
-      a blue background.  This blue background indicates you can use aliases in this
-      field.  The source and destination boxes on the Firewall Rules Edit screen are
-      two examples of this.</para>
+    <para><mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/firewall/rules/blueboxes.png" />
+        </imageobject>
+      </mediaobject></para>
 
-        <para>  
-         <mediaobject>
-	   <imageobject>
-             <imagedata fileref="screens/firewall/rules/blueboxes.png" />
-           </imageobject>
-         </mediaobject>
-        </para>
-        
-        <para>Aliases act as placeholders for real IP addresses and can be used to
-        minimize the number of changes that have to be made if a host or network address
-        changes.  You can enter the name of an alias instead of an IP address in all
-        address fields that have a blue background.  The alias will be resolved to its
-        current address according to the defined alias list. If an alias cannot be
-        resolved (e.g. because you deleted it), the corresponding element (e.g. filter/NAT/shaper
-        rule) will be considered invalid and skipped.</para>
-        
-       <sect2>
-        <title>Adding an Alias</title>
-        
-        <para>Go to the Firewall -&gt; Alias screen and click the <imageobject>
-          <imagedata fileref="icons/plus.gif" /></imageobject> to add an alias.
-        </para>
-        
-        <para>  
-         <mediaobject>
-	   <imageobject>
-             <imagedata fileref="screens/firewall/add-alias.png" />
-           </imageobject>
-         </mediaobject>
-        </para>
-        
-        <sect3>
-          <title>Name</title>
-          
-          <para>The name of the alias - you'll use this in the blue boxes throughout
-          the system.</para>
-          
-        </sect3>
-        
-        <sect3>
-          <title>Type</title>
-          
-          <para>Either a reference to a single host, or a network.</para>
-          
-        </sect3>
-        
-        <sect3>
-          <title>Address</title>
-          
-          <para>This is the IP address or subnet that this alias represents.</para>
-          
-        </sect3>
-        
-        <sect3>
-          <title>Description</title>
-          
-          <para>As always, optional, but recommended.</para>
-          
-        </sect3>
-        
-        <para>After verifying your entries, click Save, and Apply changes.</para>
+    <para>Aliases act as placeholders for real IP addresses and can be used to
+    minimize the number of changes that have to be made if a host or network
+    address changes. You can enter the name of an alias instead of an IP
+    address in all address fields that have a blue background. The alias will
+    be resolved to its current address according to the defined alias list. If
+    an alias cannot be resolved (e.g. because you deleted it), the
+    corresponding element (e.g. filter/NAT/shaper rule) will be considered
+    invalid and skipped.</para>
 
-        <para>  
-         <mediaobject>
-	   <imageobject>
-             <imagedata fileref="screens/firewall/alias-added.png" />
-           </imageobject>
-         </mediaobject>
-        </para>
-        
-      </sect2>
-      
-      <sect2>
-        <title>Using Aliases</title>
-        
-        <para>Now that you have entered an alias, you can use it in any of the boxes
-        with blue backgrounds by selecting type "Single host or alias" and typing in
-        the alias name in the "Address" box.  </para>
-        
-      </sect2>
-      
-    </sect1>
-    
+    <sect2>
+      <title>Adding an Alias</title>
+
+      <para>Go to the Firewall -&gt; Alias screen and click the
+      <inlinemediaobject>
+          <imageobject>
+            <imagedata fileref="icons/plus.gif" />
+          </imageobject>
+        </inlinemediaobject> to add an alias.</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/firewall/add-alias.png" />
+        </imageobject>
+      </mediaobject>
+
+      <procedure>
+        <step>
+          <para>Name: The name of the alias - you'll use this in the blue
+          boxes throughout the system.</para>
+        </step>
+
+        <step>
+          <para>Type: Either a reference to a single host, or a
+          network.</para>
+        </step>
+
+        <step>
+          <para>Address: This is the IP address or subnet that this alias
+          represents.</para>
+        </step>
+
+        <step>
+          <para>Description: As always, optional, but recommended.</para>
+        </step>
+
+        <step>
+          <para>After verifying your entries, click Save, and Apply
+          changes.<mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/firewall/alias-added.png" />
+              </imageobject>
+            </mediaobject></para>
+        </step>
+      </procedure>
+    </sect2>
+
+    <sect2>
+      <title>Using Aliases</title>
+
+      <para>Now that you have entered an alias, you can use it in any of the
+      boxes with blue backgrounds by selecting type "Single host or alias" and
+      typing in the alias name in the "Address" box.</para>
+    </sect2>
+  </sect1>
 </chapter>
