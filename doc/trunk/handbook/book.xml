@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: book.xml,v 1.4 2005/09/27 23:42:13 chris Exp $ -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY __intro__dqw7kgl9 SYSTEM "intro.xml">
 <!ENTITY __hardware__dqw7kgm0 SYSTEM "hardware.xml">
 <!ENTITY __setup__dqw7kofo SYSTEM "setup.xml">
