@@ -128,7 +128,7 @@
         <para>Check the link lights on the network ports on the WRAP.
         Connected interfaces must have a link light or they will not work. If
         you do not have a link light, check the "no link light"
-        troubleshooting section of this guide. </para>
+        troubleshooting section of this guide.</para>
       </listitem>
 
       <listitem>
@@ -137,17 +137,17 @@
         connected to your LAN hub or switch. On the three NIC models, the
         middle interface is WAN, and on the two NIC models, the interface
         closest to the serial port is WAN. The WAN port must be plugged into
-        your Internet connection (cable or DSL modem, router, etc.). </para>
+        your Internet connection (cable or DSL modem, router, etc.).</para>
       </listitem>
 
       <listitem>
-        <para>Try to ping the LAN IP of m0n0wall. </para>
+        <para>Try to ping the LAN IP of m0n0wall.</para>
       </listitem>
 
       <listitem>
         <para>Check the IP configuration of the machine you are using. Its IP
         address must be within the same subnet as your m0n0wall's LAN
-        interface, and must be using the same subnet mask. </para>
+        interface, and must be using the same subnet mask.</para>
       </listitem>
     </orderedlist>
   </sect1>
@@ -161,11 +161,15 @@
     issue. Each step is numbered with the section of this document that
     addresses troubleshooting this particular issue.</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="flowcharts/no-internet-from-LAN.png" />
-      </imageobject>
-    </mediaobject>
+    <figure>
+      <title>Trobleshooting Internet Access</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="flowcharts/no-internet-from-LAN.png" />
+        </imageobject>
+      </mediaobject>
+    </figure>
 
     <sect2>
       <title>Ping m0n0wall LAN IP</title>
