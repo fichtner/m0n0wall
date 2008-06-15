@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: license.xml,v 1.1 2005/07/05 00:43:50 chris Exp $ -->
 <appendix>
   <?dbhtml filename="license.html"?>
 
   <title>License</title>
 
-  <para><emphasis role="bold">m0n0wall is Copyright © 2002-2004 by Manuel
+  <para><emphasis role="bold">m0n0wall is Copyright © 2002-2008 by Manuel
   Kasper <email>mk@neon1.net</email>. All rights reserved.</emphasis></para>
 
   <para>Redistribution and use in source and binary forms, with or without
