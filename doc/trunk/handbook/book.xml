@@ -25,24 +25,18 @@
 <!ENTITY __glossary__du5ss10h SYSTEM "glossary.xml">
 <!ENTITY __license__dul42vek SYSTEM "license.xml">
 ]>
-<book>
+<book id="bkstart" lang="en">
   <bookinfo>
     <title>m0n0wall Handbook</title>
-
     <authorgroup>
-
       <author>
         <firstname>Chris</firstname>
-
         <surname>Buechler</surname>
       </author>
-
       <author>
         <firstname>Manuel</firstname>
-
         <surname>Kasper</surname>
       </author>
-
       <othercredit>
         <othername>m0n0wall written by <ulink url="http://neon1.net">Manuel Kasper</ulink>.  Most
         documentation written by <ulink url="http://chrisbuechler.com">Chris Buechler</ulink>.
@@ -53,12 +47,12 @@
     </authorgroup>
 
     <copyright>
-      <year>2005</year>
+      <year>2008</year>
 
       <holder>m0n0wall Documentation Project</holder>
     </copyright>
 
-    <pubdate>September 2005</pubdate>
+    <pubdate>June 2008</pubdate>
 
     <abstract>
       <para>A freely-redistributable complete embedded firewall software
@@ -71,7 +65,7 @@
         </mediaobject></para>
     </abstract>
 
-    <releaseinfo>m0n0wall Version 1.2</releaseinfo>
+    <releaseinfo>m0n0wall Version 1.2 and 1.3b</releaseinfo>
 
     <legalnotice>
       <para>All rights reserved.</para>
@@ -151,5 +145,5 @@
   &__glossary__du5ss10h;
 
   &__license__dul42vek;
-  
+  <index></index>
 </book>

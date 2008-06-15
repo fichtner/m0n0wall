@@ -1,14 +1,14 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: book.xml,v 1.6 2005/09/26 00:54:02 chris Exp $ -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 
 <!ENTITY __imageguide__dev SYSTEM "image-guide.xml">
 <!ENTITY __hackersguide__dev SYSTEM "hackersguide.xml">
 <!ENTITY __otherdoc__dev SYSTEM "otherdoc.xml">
 <!ENTITY __faq__dev SYSTEM "faq.xml">
 ]>
-<book>
+<book id="bkstart" lang="en">
   <bookinfo>
     <title>m0n0wall Developers' Handbook</title>
 
