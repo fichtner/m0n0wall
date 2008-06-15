@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: intro.xml,v 1.4 2005/10/04 02:53:27 chris Exp $ -->
 <chapter>
   <?dbhtml filename="intro.html"?>
@@ -31,15 +31,17 @@
     <para>m0n0wall is a firewall, and the purpose of a firewall is to provide
     security. The more functionality is added, the greater the chance that a
     vulnerability in that additional functionality will compromise the
-    security of the firewall.  It is the opinion of the m0n0wall founder and core
-    contributors that anything outside the base services of a layer 3 and 4 firewall
-    do not belong in m0n0wall.  Some services that may be appropriate are very CPU-intensive and
-    memory hungry, and m0n0wall is focused towards embedded devices with limited CPU and
-    memory resources.  The non-persistant filesystem due to our focus on Compact Flash
-    installations is another limiting factor.  Lastly, image size constraints eliminate
-    other possibilities.</para>
-    
-    <para>We feel these services should be run on another server, and are intentionally not part of m0n0wall:</para>
+    security of the firewall. It is the opinion of the m0n0wall founder and
+    core contributors that anything outside the base services of a layer 3 and
+    4 firewall do not belong in m0n0wall. Some services that may be
+    appropriate are very CPU-intensive and memory hungry, and m0n0wall is
+    focused towards embedded devices with limited CPU and memory resources.
+    The non-persistant filesystem due to our focus on Compact Flash
+    installations is another limiting factor. Lastly, image size constraints
+    eliminate other possibilities.</para>
+
+    <para>We feel these services should be run on another server, and are
+    intentionally not part of m0n0wall:</para>
 
     <itemizedlist>
       <listitem>
@@ -75,7 +77,6 @@
     login prompt at the console (it displays a <link
     linkend="Config.Console">menu</link> instead), and no telnet or ssh
     daemon.</para>
-    
   </sect1>
 
   <sect1>
@@ -110,13 +111,13 @@
     </blockquote>
 
     <para>The first public beta release of m0n0wall was on February 15, 2003.
-    Version 1.0 was released exactly one year later, on February 15, 2004.  
+    Version 1.0 was released exactly one year later, on February 15, 2004.
     Between those two were an additional 26 public beta releases, an average
-    of one release every two weeks.  Version 1.1 was released in August 2004, 
-    with 1.11 released with a security update for m0n0wall's dynamic DNS 
-    component ez-ipupdate on November 11, 2004.  Version 1.2 has been in beta 
-    since, with a final release in October 2005.  A complete list of changes for each
-    version can be found on the m0n0wall web site under <ulink
+    of one release every two weeks. Version 1.1 was released in August 2004,
+    with 1.11 released with a security update for m0n0wall's dynamic DNS
+    component ez-ipupdate on November 11, 2004. Version 1.2 has been in beta
+    since, with a final release in October 2005. A complete list of changes
+    for each version can be found on the m0n0wall web site under <ulink
     url="http://www.m0n0.ch/wall/changelog.php">Change Log</ulink>.</para>
   </sect1>
 
@@ -126,7 +127,8 @@
     <title>Features</title>
 
     <para>m0n0wall provides many of the features of expensive commercial
-    firewalls, and some you won't find in any commercial firewalls, including:</para>
+    firewalls, and some you won't find in any commercial firewalls,
+    including:</para>
 
     <itemizedlist>
       <listitem>
@@ -302,7 +304,7 @@
 
     <title>Software Copyright and Distribution (Licenses)</title>
 
-    <para><emphasis role="bold">m0n0wall is Copyright © 2002-2004 by Manuel
+    <para><emphasis role="bold">m0n0wall is Copyright © 2002-2008 by Manuel
     Kasper. All rights reserved.</emphasis></para>
 
     <para>Redistribution and use in source and binary forms, with or without
@@ -437,21 +439,26 @@
 
       <para>Peter Allgeyer (allgeyer at web dot de): "reject" type filter
       rules</para>
-      
-      <para>Thierry Lechat (dev at lechat dot org): SVG-based traffic grapher</para>
 
-      <para>Steven Honson (steven at honson dot org): per-user IP address assignments for PPTP VPN</para>
+      <para>Thierry Lechat (dev at lechat dot org): SVG-based traffic
+      grapher</para>
 
-      <para>Kurt Inge Smådal (kurt at emsp dot no): NAT on optional interfaces</para>
+      <para>Steven Honson (steven at honson dot org): per-user IP address
+      assignments for PPTP VPN</para>
 
-      <para>Dinesh Nair (dinesh at alphaque dot com): captive portal: pass-through MAC/IP addresses, RADIUS authentication
-      HTTP server concurrency limit</para>
+      <para>Kurt Inge Smådal (kurt at emsp dot no): NAT on optional
+      interfaces</para>
 
-      <para>Justin Ellison (justin at techadvise dot com): traffic shaper TOS matching; magic shaper; DHCP deny unknown clients;
-      IPsec user FQDNs</para>
+      <para>Dinesh Nair (dinesh at alphaque dot com): captive portal:
+      pass-through MAC/IP addresses, RADIUS authentication HTTP server
+      concurrency limit</para>
 
-      <para>Fred Wright (fw at well dot com): ipfilter window scaling fix; ipnat ICMP checksum adjustment fix </para>
-      
+      <para>Justin Ellison (justin at techadvise dot com): traffic shaper TOS
+      matching; magic shaper; DHCP deny unknown clients; IPsec user
+      FQDNs</para>
+
+      <para>Fred Wright (fw at well dot com): ipfilter window scaling fix;
+      ipnat ICMP checksum adjustment fix</para>
     </sect2>
 
     <sect2>
@@ -462,7 +469,8 @@
       <para>The following persons have contributed documentation to
       m0n0wall:</para>
 
-      <para>Chris Buechler (m0n0wall at chrisbuechler.com):  Editor, numerous contributions throughout.</para>
+      <para>Chris Buechler (m0n0wall at chrisbuechler.com): Editor, numerous
+      contributions throughout.</para>
 
       <para>Jim McBeath (monowall at j dot jimmc dot org): Users Guide
       outline, editing</para>
@@ -477,14 +485,16 @@
       linkend="IPsec">IPsec</link> and <link linkend="PPTP">PPTP</link>
       chapters.</para>
 
-      <para>Fred Wright (fw at well dot com):  Suggestions and review.</para>
-      
-      <para>Axel Eble (axel+m0n0-0001 at balrog dot de): Help with the wiki, ddclient howto contribution.</para>
-      
-      <para>Brian Zushi (brian at ricerage dot org): Linux CD burning instructions, documentation review and suggestions.</para>
+      <para>Fred Wright (fw at well dot com): Suggestions and review.</para>
 
-      <para>Dino Bijedic (dino.bijedic at eracom-tech dot com): Sonicwall example VPN contribution.</para>
-      
+      <para>Axel Eble (axel+m0n0-0001 at balrog dot de): Help with the wiki,
+      ddclient howto contribution.</para>
+
+      <para>Brian Zushi (brian at ricerage dot org): Linux CD burning
+      instructions, documentation review and suggestions.</para>
+
+      <para>Dino Bijedic (dino.bijedic at eracom-tech dot com): Sonicwall
+      example VPN contribution.</para>
     </sect2>
   </sect1>
 </chapter>

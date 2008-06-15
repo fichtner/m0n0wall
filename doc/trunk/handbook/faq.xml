@@ -32,11 +32,13 @@
           <para>Configure the settings as shown in the following
           picture:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-6.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-6.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
 
           <para>You <emphasis role="bold">must</emphasis> use aggressive mode,
           as only IP addresses can be used as identifiers in main mode.</para>
@@ -83,11 +85,13 @@
         <listitem>
           <para>Configure the connection properties as follows:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-1.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-1.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
 
           <para>Insert your LAN subnet + mask and enter the external IP
           address (or hostname) of your m0n0wall instead of
@@ -98,21 +102,25 @@
           <para>Select "Security Policy" and use the following
           settings:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-3.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-3.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
         </listitem>
 
         <listitem>
           <para>Select "My Identity" and use the following settings:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-2.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-2.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
 
           <para>Enter the user's e-mail address, then click the button
           "Pre-Shared Key" and enter the pre-shared key. The e-mail address
@@ -124,22 +132,26 @@
           <para>Select "Authentication (Phase 1) -&gt; Proposal 1" and use the
           following settings:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-4.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-4.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
         </listitem>
 
         <listitem>
           <para>Select "Key Exchange (Phase 1) -&gt; Proposal 1" and use the
           following settings:</para>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/muvpn/srlt-5.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-5.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
 
           <para>If you have a crypto accelerator card in your m0n0wall, you
           may want to use Triple DES instead of AES-256 as the encryption
@@ -630,8 +642,8 @@ Manuel</literallayout>
         disconnected because they were "taking up all the DHCP addresses."
         Technically you aren't taking all the leases, you're just answering
         ARP on all of them which is just as bad. This is typically only an
-        issue when your WAN is an Ethernet network, but don't ever do it.
-        </para>
+        issue when your WAN is an Ethernet network, but don't ever do
+        it.</para>
       </note>
 
       <para>Note that it is never necessary <emphasis role="bold">(and
@@ -881,11 +893,13 @@ packet to the tunnel elicits a no-change ICMP Redirect.
       system you wish to use to administer your m0n0wall, and 64.22.12.25 with
       the public IP of your m0n0wall.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/firewall/rules/remoteadmin.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/firewall/rules/remoteadmin.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
     </sect2>
 
     <sect2>
@@ -1068,7 +1082,7 @@ months or so if you can.
       rule and have to be dealt with. You'll often see the last packet of a
       session being closed get logged because the keep state code has already
       torn down the connection before the last packet has had a chance to make
-      it to your firewall. This is normal, do not be alarmed. </para>
+      it to your firewall. This is normal, do not be alarmed.</para>
     </blockquote>
   </sect1>
 
@@ -1439,7 +1453,7 @@ that issue is settled as far as I'm concerned.
       <listitem>
         <para>Failure message on captive portal login error page, plus logging
         to the captive portal log on why authentication failed (user account
-        exceeded bandwidth limit, bad password, etc.). </para>
+        exceeded bandwidth limit, bad password, etc.).</para>
       </listitem>
 
       <listitem>

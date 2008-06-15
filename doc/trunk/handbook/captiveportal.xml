@@ -561,26 +561,47 @@
     <title>Vouchers</title>
 
     <para>Below is a quick howto from mwiget who added the Voucher feature to
-    m0n0wall.</para>
+    m0n0wall. Vouchers are only available in the upcoming 1.3 firmwar release
+    and are currently part of the beta version of the firmware.</para>
 
     <sect2>
       <title>Quick Howto</title>
 
-      <para>To enable, create and manage voucher support via captive portal,
-      there is a new Tab under Services-&gt;Captive Portal: Voucher.</para>
+      <para>Below are the steps to quickly setup and use the voucher
+      functionality of m0n0wall's Captive Portal.</para>
 
-      <para>Enable captive portal first, upload a landing page that contains
-      an input field 'auth_voucher'. An example can be found on the the URL
-      above. Then enable Voucher support on the Voucher tab. Initially you can
-      leave all fields with its defaults. Every new install will create unique
-      encryption keys. </para>
+      <procedure>
+        <step>
+          <para>To enable, create and manage voucher support via captive
+          portal, there is a new Tab under Services-&gt;Captive Portal:
+          Voucher.</para>
+        </step>
 
-      <para>Now add at least one "Roll" by clicking '+' on the Vouchers page,
-      right to 'Voucher rolls': Specify a Roll Number, e.g. 0, how many
-      vouchers that roll shall contain, and how long each voucher allows
-      network access. Then generate the new vouchers by clicking on the paper
-      logo right to the newly added roll. This will generate a CSV file and
-      download via your browser.</para>
+        <step>
+          <para>Enable captive portal first, upload a landing page that
+          contains an input field 'auth_voucher'. An example can be found on
+          the the URL above. </para>
+        </step>
+
+        <step>
+          <para>Then enable Voucher support on the Voucher tab. Initially you
+          can leave all fields with its defaults. Every new install will
+          create unique encryption keys.</para>
+        </step>
+
+        <step>
+          <para>Now add at least one "Roll" by clicking '+' on the Vouchers
+          page, right to 'Voucher rolls': Specify a Roll Number, e.g. 0, how
+          many vouchers that roll shall contain, and how long each voucher
+          allows network access. </para>
+        </step>
+
+        <step>
+          <para>Then generate the new vouchers by clicking on the paper logo
+          right to the newly added roll. This will generate a CSV file and
+          download via your browser.</para>
+        </step>
+      </procedure>
 
       <para>Each of these generated vouchers can now be used by users for the
       configured amount of minutes for that roll. Note that as soon as a
@@ -597,11 +618,10 @@
 
       <para>One can add multiple rolls, e.g. to have vouchers with different
       time credit. It is also possible, to enter multiple vouchers, separated
-      by space, to gain the sum of time credit of all entered vouchers.
-      </para>
+      by space, to gain the sum of time credit of all entered vouchers.</para>
 
       <para>There is more to it, read the comments to each config parameter on
-      the voucher page. </para>
+      the voucher page.</para>
 
       <para>Note on the very short public/private RSA keys: I know, those can
       be cracked easy and in no time, if one of the keys is known. The idea
@@ -612,7 +632,7 @@
       encryption. Anyhow, all that encryption/decryption stuff is done in a
       newly added binary C program voucher.c, that is compiled and added into
       the m0n0wall image, and can be modified to increase the usability and
-      security. </para>
+      security.</para>
     </sect2>
 
     <sect2>

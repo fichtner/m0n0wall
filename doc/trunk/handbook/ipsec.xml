@@ -179,12 +179,13 @@
     <para>Log into your m0n0wall and click <emphasis role="bold">IPsec
     </emphasis>, under <emphasis role="bold">VPN</emphasis>.</para>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata depth="3.5902in" fileref="screens/ipsec/vpn-ipsec.png"
-                     width="5.9945in" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/ipsec/vpn-ipsec.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Ok now we need to add a VPN connection, to do this click on the
     <inlinemediaobject>
@@ -200,13 +201,13 @@
     <para>The first area is the one you use to establish what network ranges
     will use this IPSEC tunnel.</para>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata depth="3.6193in"
-                     fileref="screens/ipsec/vpn-ipsec-edit.png"
-                     width="5.9965in" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/ipsec/vpn-ipsec-edit.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>This is the first set of fields that we need to concentrate on.
     Later, when testing your tunnel, you can actually fail to establish level
@@ -272,12 +273,13 @@
     <para>Ok all the basic for the routing have been established. Now we move
     on to phase 1 of the VPN authentication process.</para>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata depth="3.3783in" fileref="screens/ipsec/phase1.png"
-                     width="5.9929in" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/ipsec/phase1.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Okay the easy part of the VPN tunnel. The trick here, and even in
     phase 2, is to make sure that both VPN servers have EXACTLY THE SAME
@@ -352,12 +354,13 @@
     same all should be good for phase 1. We really don’t want to stop here, so
     let’s go right into phase 2.</para>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata depth="4.3366in" fileref="screens/ipsec/phase2.png"
-                     width="5.9917in" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/ipsec/phase2.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Phase 2 is what builds the actual tunnel, sets the protocol to use,
     and sets the length of time to keep the tunnel up when there is no traffic

@@ -21,11 +21,13 @@
     <para>You will be prompted for a username and password. Enter username
     admin and password mono. You are now logged into the webGUI.</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="screens/webgui/firstscreen.png" />
-      </imageobject>
-    </mediaobject>
+    <screenshot>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/webgui/firstscreen.png" />
+        </imageobject>
+      </mediaobject>
+    </screenshot>
   </sect1>
 
   <sect1>
@@ -35,11 +37,13 @@
 
     <para>First click "General Setup".</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="screens/webgui/generalsetup.png" />
-      </imageobject>
-    </mediaobject>
+    <screenshot>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/webgui/generalsetup.png" />
+        </imageobject>
+      </mediaobject>
+    </screenshot>
 
     <para><emphasis role="bold">Hostname and Domain</emphasis></para>
 
@@ -125,11 +129,13 @@
     <sect2>
       <title>WAN configuration screen</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/webgui/wan.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/webgui/wan.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
     </sect2>
 
     <sect2>

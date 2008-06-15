@@ -217,11 +217,13 @@
     <para>Below is a screenshot of the wireless interface configuration screen
     of 1.2.x m0n0wall.</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="screens/interfaces/wlan.png" />
-      </imageobject>
-    </mediaobject>
+    <screenshot>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/interfaces/wlan.png" />
+        </imageobject>
+      </mediaobject>
+    </screenshot>
   </sect1>
 
   <sect1>
@@ -367,11 +369,13 @@
     <para>Below is a screenshot of the wireless interface configuration screen
     of 1.3.x m0n0wall.</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="screens/interfaces/wlan_1.3.png" />
-      </imageobject>
-    </mediaobject>
+    <screenshot>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/interfaces/wlan_1.3.png" />
+        </imageobject>
+      </mediaobject>
+    </screenshot>
   </sect1>
 
   <sect1>
@@ -379,10 +383,12 @@
 
     <para></para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="screens/status/wireless.png" />
-      </imageobject>
-    </mediaobject>
+    <screenshot>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="screens/status/wireless.png" />
+        </imageobject>
+      </mediaobject>
+    </screenshot>
   </sect1>
 </chapter>

@@ -89,11 +89,13 @@
       <figure>
         <title>The General Setup screen</title>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/system/setup.png" />
-          </imageobject>
-        </mediaobject>
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/system/setup.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
       </figure>
 
       <para>The General Setup screen allows you to change the following
@@ -291,11 +293,13 @@
       <figure>
         <title>The Firmware screen</title>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/system/firmware.png" />
-          </imageobject>
-        </mediaobject>
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/system/firmware.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
       </figure>
     </sect2>
 
@@ -506,11 +510,13 @@
 
       <!--imported Drupal contribution from Fabrizio Fioravanti <fabrizio.fioravanti@finsystem.net>-->
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/interfaces/wan.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/interfaces/wan.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>In the WAN sub section, it is possible to set up all the
       parameters for WAN interface. The WAN Interface can be a Static IP
@@ -636,16 +642,18 @@
           configure your m0n0wall with the WAN interface on a private subnet
           of another LAN, for example, you need to disable this option. Also,
           some ISP's assign customers private IP's, in which case you'll also
-          need to disable this optio<note>
-              <para>You do <emphasis>not</emphasis> need to disable this
-              option if you are using IPsec VPN tunnels with private IP
-              addresses. When the VPN packets come into the WAN interface,
-              they will be coming from source IP of the WAN interface of the
-              remote VPN device, not from the private IP subnet on the remote
-              side.</para>
-            </note></para>
+          need to disable this option</para>
         </listitem>
       </itemizedlist>
+
+      <note>
+        <para>You do <emphasis>not</emphasis> need to disable the Block
+        Private Networks option if you are using IPsec VPN tunnels with
+        private IP addresses. When the VPN packets come into the WAN
+        interface, they will be coming from source IP of the WAN interface of
+        the remote VPN device, not from the private IP subnet on the remote
+        side.</para>
+      </note>
     </sect2>
 
     <sect2>
@@ -712,11 +720,13 @@
       <para>The DNS forwarder screen contains configuration options relevant
       to the DNS forwarding server on your m0n0wall.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/dnsforwarder.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/dnsforwarder.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para><emphasis role="bold">Enabling the DNS Forwarder</emphasis> Check
       the first checkbox, "Enable DNS forwarder", to enable the service on the
@@ -770,11 +780,13 @@
       <para>After you have signed up with one of the dynamic DNS providers
       listed, you can continue.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/dynamicdns.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/dynamicdns.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para><emphasis role="bold">Configuring the Dynamic DNS
       Client</emphasis></para>
@@ -816,11 +828,13 @@
       <para>This screen allows you to enable the DHCP server on enabled
       Ethernet interfaces other than WAN.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/dhcp.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/dhcp.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para><emphasis role="bold">Enabling the DHCP Server</emphasis></para>
 
@@ -893,11 +907,13 @@
       <para>Click the + icon at the bottom of the DHCP configuration page to
       add a static DHCP mapping.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/editstatic.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/editstatic.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>In the MAC address box, fill in the system's MAC address in the
       format xx:xx:xx:xx:xx:xx. For Windows NT/2000/XP clients, you can get
@@ -934,11 +950,13 @@
       useful if you have a network management or monitoring system that takes
       advantage of it.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/snmp.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/snmp.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>The System location and System contact boxes can be left blank,
       but can assist you in determining which device you are monitoring if you
@@ -967,21 +985,25 @@
       works if the WAN interface is configured with a static IP address or
       DHCP.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/proxyarp.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/proxyarp.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>If you enable 1:1, server, or advanced outbound NAT, you may need
       to enable proxy ARP for the IP address(es) being used by those
       translations. To do so, click the + on this page.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/proxyarpedit.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/proxyarpedit.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>Enter either a single IP address, or subnet or range of addresses,
       optionally add a description to remind you why you made this entry, and
@@ -995,11 +1017,13 @@
     <sect2>
       <title>Captive Portal</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/services/captiveportal.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/services/captiveportal.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para><emphasis role="bold">What is Captive Portal?</emphasis>
       <emphasis>from wikipedia.org</emphasis></para>
@@ -1063,11 +1087,13 @@
     <sect2>
       <title>Wake on LAN</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/wakeonlan.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/wakeonlan.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>This service can be used to wake up (power on) computers by
       sending special "Magic Packets". The NIC in the computer that is to be
@@ -1089,11 +1115,13 @@
       displayed. Once you have added the host to your list, you can simply
       click on the MAC address to power on the system.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/services/wakeonlanedit.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/services/wakeonlanedit.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
     </sect2>
 
     <sect2>
@@ -1178,11 +1206,13 @@
       <para><figure>
           <title>The System Status screen</title>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/status/system_1.3.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/status/system_1.3.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
         </figure></para>
     </sect2>
 
@@ -1198,11 +1228,13 @@
       <para><figure>
           <title>The Traffic Graph screen</title>
 
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="screens/status/trafficgraph.png" />
-            </imageobject>
-          </mediaobject>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/status/trafficgraph.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
         </figure></para>
 
       <para>The traffic screen allows you to select an interface, and view
@@ -1216,11 +1248,13 @@
     <sect2>
       <title>Wireless</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/status/wireless.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/status/wireless.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>More information on wireless features can be found in the Wireless
       chapter.</para>
@@ -1271,11 +1305,13 @@
         remote syslog server on the Diagnostic Log Setings page.</para>
       </caution>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/systemlogs-system_1.3.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/systemlogs-system_1.3.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>System log settings can also be configured on this page by
       clicking on the Settings tab. Syslog sends UDP datagrams to port 514 on
@@ -1357,21 +1393,25 @@
     <sect2>
       <title>DHCP Leases</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/dhcpleases.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/dhcpleases.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>This screen can be used to view your active and/or expired DHCP
       leases. Clicking the button on this screen will switch between showing
       only active leases and showing both active and expired leases.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/dhcpleases-all.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/dhcpleases-all.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>Expired DHCP leases show up in gray text, while active ones are
       black. (this screenshot from a system with only expired leases)</para>
@@ -1454,11 +1494,13 @@
         </tgroup>
       </table>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/ipsec-sad.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/ipsec-sad.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>At this screen, you will see two entries for each IPsec connection
       that has been successfully negotiated. One from the local public IP to
@@ -1474,11 +1516,13 @@
       connection. It should renegotiate and come back up within a few
       seconds.</para>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/ipsec-spd.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/ipsec-spd.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para></para>
     </sect2>
@@ -1486,11 +1530,13 @@
     <sect2>
       <title>Ping/Traceroute</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/ping_1.3.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/ping_1.3.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>This screen gives you a GUI to ping (send ICMP echo request) from
       the m0n0wall. Fill in the IP address or hostname of the machine to ping,
@@ -1505,11 +1551,13 @@
           your VPN is working.</para>
         </note></para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/diagnostics/traceroute_1.3.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/diagnostics/traceroute_1.3.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>This screen gives you a GUI to traceroute from the m0n0wall. Fill
       in the IP address or hostname of the machine whose route you want to
@@ -1528,11 +1576,13 @@
     <sect2>
       <title>ARP Table</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/arp_1.3.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/arp_1.3.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>This page shows the current ARP table of the m0n0wall
       device.</para>
@@ -1541,11 +1591,13 @@
     <sect2>
       <title>Firewall State</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/firewall_1.3.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/firewall_1.3.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>This page shows the current Firewall state table. Optionally take
       a snapshot of the state stable and compare it to the current
@@ -1555,11 +1607,13 @@
     <sect2>
       <title>Reset State</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/resetstate.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/resetstate.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>This screen allows you to reset the state tables on your m0n0wall
       for the NAT and firewall state tables.</para>
@@ -1585,11 +1639,13 @@
     <sect2>
       <title>Backup/Restore</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/backuprestore.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/backuprestore.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>This screen allows you to backup your existing configuration, or
       restore a previous backup file. These files are text based XML
@@ -1606,11 +1662,13 @@
     <sect2>
       <title>Factory Defaults</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/factorydefaults.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/factorydefaults.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Clicking Yes on this page will reset m0n0wall to the default out
       of the box configuration options and clear any configuration you have
@@ -1625,11 +1683,13 @@
     <sect2>
       <title>Reboot System</title>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/diagnostics/rebootsystem.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/diagnostics/rebootsystem.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Click Yes on this page to reboot the system.</para>
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: pptp.xml,v 1.1 2005/07/05 00:43:50 chris Exp $ -->
 <chapter id="PPTP">
   <?dbhtml filename="pptp.html"?>
@@ -147,11 +147,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/vpn-pptp.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/vpn-pptp.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <orderedlist continuation="continues" numeration="arabic">
       <listitem>
@@ -255,11 +257,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/vpn-pptp-users.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/vpn-pptp-users.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Now we need to setup a firewall rule so people using the PPTP
     connection can do something with it when they connect.</para>
@@ -289,11 +293,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/firewall1.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/firewall1.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>As stated we are going to allow all our PPTP users to access all
     parts of the LAN, WAN, etc. If you wish to limit this access then you will
@@ -334,11 +340,13 @@
       PPTP network to use SSH on a LAN server with the IP address
       192.168.1.151:</para>
 
-      <para><inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="screens/pptp/firewall2.png" />
-          </imageobject>
-        </inlinemediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/pptp/firewall2.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Save and Apply these rules as needed. Test them all to make sure
       they are working as designed. Most networks are compromised because no
@@ -371,11 +379,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/wizard-new.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/wizard-new.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <orderedlist continuation="continues" numeration="arabic">
       <listitem>
@@ -384,11 +394,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/wizard-type.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/wizard-type.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <orderedlist continuation="continues" numeration="arabic">
       <listitem>
@@ -397,11 +409,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/wizard-network.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/wizard-network.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <orderedlist continuation="continues" numeration="arabic">
       <listitem>
@@ -416,11 +430,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/wizard-vpn.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/wizard-vpn.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <orderedlist continuation="continues" numeration="arabic">
       <listitem>
@@ -445,11 +461,13 @@
       </listitem>
     </orderedlist>
 
-    <para><inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="screens/pptp/wizard-connect.png" />
-        </imageobject>
-      </inlinemediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/pptp/wizard-connect.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <sect2>
       <title>Testing our PPTP Connection in Windows ™</title>
@@ -465,11 +483,13 @@
         </listitem>
       </orderedlist>
 
-      <para><inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="screens/pptp/dos-ipconfig.png" />
-          </imageobject>
-        </inlinemediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/pptp/dos-ipconfig.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>As you hopefully will see you have the settings for your physical
       adapter (in my case I renamed it to ETH0)</para>
@@ -485,11 +505,13 @@
       right, <emphasis role="strong">Figure 6</emphasis>, displays a full
       ipconfig on the virtual adapter.</para>
 
-      <para><inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="screens/pptp/dos-pppconf.png" />
-          </imageobject>
-        </inlinemediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/pptp/dos-pppconf.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <orderedlist continuation="continues" numeration="arabic">
         <listitem>
@@ -515,11 +537,13 @@
         </listitem>
       </orderedlist>
 
-      <para><inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="screens/pptp/dos-ping.png" />
-          </imageobject>
-        </inlinemediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/pptp/dos-ping.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <orderedlist continuation="continues" numeration="arabic">
         <listitem>
@@ -531,11 +555,13 @@
         </listitem>
       </orderedlist>
 
-      <para><inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="screens/pptp/dos-tracert.png" />
-          </imageobject>
-        </inlinemediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/pptp/dos-tracert.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>As seen in the last figure, the first hop is the PPTP “Server
       Address” as this is the gateway/interface for the PPTP Network.</para>
@@ -555,9 +581,10 @@
 
     <itemizedlist>
       <listitem>
-        <para>NAT sometimes does not play nice with PPTP. Though m0n0wall seems
-        to have this licked, and it works rather well.</para>
+        <para>NAT sometimes does not play nice with PPTP. Though m0n0wall
+        seems to have this licked, and it works rather well.</para>
       </listitem>
+
       <listitem>
         <para>Major “Gotcha!” If you are visiting a remote network where the
         network range is the same as the network range on the PPTP Network
@@ -573,21 +600,24 @@
         also help when you setup IPSEC tunnels between your house and say your
         friend’s house.</para>
       </listitem>
-      
+
       <listitem>
-        <para>Some ISP's use unreasonably short DHCP lease times, like one hour.  If the PPTP client
-        machine gets a short lease from DHCP, it will lose internet connectivity after the lease
-        expires.  This is because all network traffic, including your DHCP renewal requests, are going across
-        the VPN.  Since it can't hit the local DHCP server through the VPN, when the lease expires your
-        machine will release its IP address.  This causes the loss of all connectivity.  You have to
-        disconnect from the PPTP (if it doesn't disconnect itself), renew your IP address, and reconnect.
-        This is common on Windows hosts, and likely other OS's as well.  If this happens, contact the
-        administrator of your DHCP server (likely the client machine's ISP) and get the lease time lengthened.
-        </para>
-        <para>
-            The author has seen this situation numerous times, and in every case, the ISP was willing to help
-            and resolved the problem.  Your mileage may vary.
-        </para>
+        <para>Some ISP's use unreasonably short DHCP lease times, like one
+        hour. If the PPTP client machine gets a short lease from DHCP, it will
+        lose internet connectivity after the lease expires. This is because
+        all network traffic, including your DHCP renewal requests, are going
+        across the VPN. Since it can't hit the local DHCP server through the
+        VPN, when the lease expires your machine will release its IP address.
+        This causes the loss of all connectivity. You have to disconnect from
+        the PPTP (if it doesn't disconnect itself), renew your IP address, and
+        reconnect. This is common on Windows hosts, and likely other OS's as
+        well. If this happens, contact the administrator of your DHCP server
+        (likely the client machine's ISP) and get the lease time
+        lengthened.</para>
+
+        <para>The author has seen this situation numerous times, and in every
+        case, the ISP was willing to help and resolved the problem. Your
+        mileage may vary.</para>
       </listitem>
 
       <listitem>
@@ -600,11 +630,11 @@
         software and DVRs.)</para>
       </listitem>
 
-       <listitem>
-        <para>Network Neighborhood in Windows does not work over PPTP connections because broadcasts are not forwarded across the PPTP
+      <listitem>
+        <para>Network Neighborhood in Windows does not work over PPTP
+        connections because broadcasts are not forwarded across the PPTP
         connection.</para>
-    </listitem>
-
+      </listitem>
     </itemizedlist>
 
     <para>I haven’t really beaten the PPTP tunnel that much yet, so if you

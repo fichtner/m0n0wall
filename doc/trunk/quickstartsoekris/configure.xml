@@ -81,11 +81,13 @@
       <para>After opening HyperTerminal, you will see the New Connection
       screen.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/hyperterminal/newconnection.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/hyperterminal/newconnection.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>Type in something for the connection name and click OK.</para>
 
@@ -95,21 +97,25 @@
       COM1, and try other ports if necessary. In this case, I know my serial
       port is COM1.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/hyperterminal/connectto.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/hyperterminal/connectto.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>Now you'll see the Connection Properties screen. If you have
       changed the console speed on your Soekris, you will need to change the
       "Bits per second" field accordingly.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/hyperterminal/connectionproperties.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/hyperterminal/connectionproperties.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <para>Click OK after filling in the Connection Properties appropriately,
       and you will have a blank HyperTerminal screen. Now power on your
@@ -117,7 +123,7 @@
 
       <para>MacOSX users can use Terminal Emuation software such as <ulink
       url="http://homepage.mac.com/dalverson/zterm/">Zterm</ulink> to access
-      the console settings. </para>
+      the console settings.</para>
     </sect2>
   </sect1>
 

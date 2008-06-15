@@ -90,11 +90,15 @@
           configuration.</para>
         </formalpara>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="networkdiagrams/example-dmz.png" />
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Typical DMZ Network</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="networkdiagrams/example-dmz.png" />
+            </imageobject>
+          </mediaobject>
+        </figure>
       </glossdef>
     </glossentry>
 

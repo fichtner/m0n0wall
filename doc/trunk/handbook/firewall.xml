@@ -24,11 +24,13 @@
     aliases in this field. The source and destination boxes on the Firewall
     Rules Edit screen are two examples of this.</para>
 
-    <para><mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/firewall/rules/blueboxes.png" />
-        </imageobject>
-      </mediaobject></para>
+    <para><screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/firewall/rules/blueboxes.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot></para>
 
     <para>Aliases act as placeholders for real IP addresses and can be used to
     minimize the number of changes that have to be made if a host or network
@@ -49,11 +51,13 @@
           </imageobject>
         </inlinemediaobject> to add an alias.</para>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/firewall/add-alias.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/firewall/add-alias.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
 
       <procedure>
         <step>
@@ -77,11 +81,13 @@
 
         <step>
           <para>After verifying your entries, click Save, and Apply
-          changes.<mediaobject>
-              <imageobject>
-                <imagedata fileref="screens/firewall/alias-added.png" />
-              </imageobject>
-            </mediaobject></para>
+          changes.<screenshot>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="screens/firewall/alias-added.png" />
+                </imageobject>
+              </mediaobject>
+            </screenshot></para>
         </step>
       </procedure>
     </sect2>

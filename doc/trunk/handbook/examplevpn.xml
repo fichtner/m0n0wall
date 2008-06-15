@@ -475,11 +475,13 @@ PFS key group = off
     <figure>
       <title>Network diagram</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="networkdiagrams/sonicwallvpn.png" />
-        </imageobject>
-      </mediaobject>
+      <screenshot>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="networkdiagrams/sonicwallvpn.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
     </figure>
 
     <sect2>
@@ -515,11 +517,13 @@ Share Secret: type your share secret (novitest)
       <para>The following screenshot shows what this screen will look
       like.</para>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/examplevpn/sonicwall1.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/examplevpn/sonicwall1.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Click <emphasis role="bold">Add New Network</emphasis></para>
 
@@ -532,22 +536,26 @@ Share Secret: type your share secret (novitest)
     Subnet mask: Type destination subnet mask (255.255.255.0)
     </literallayout>
 
-      <para><mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/examplevpn/sonicwall2.png" />
-          </imageobject>
-        </mediaobject></para>
+      <para><screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/examplevpn/sonicwall2.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot></para>
 
       <para>Click Update</para>
 
       <figure>
         <title>Example of Sonicwall configuration</title>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="screens/examplevpn/sonicwall3.png" />
-          </imageobject>
-        </mediaobject>
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/examplevpn/sonicwall3.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
       </figure>
     </sect2>
 
