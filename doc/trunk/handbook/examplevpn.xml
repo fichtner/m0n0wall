@@ -2,7 +2,7 @@
 <chapter id="Example.VPN">
   <?dbhtml filename="examplevpn.html"?>
 
-  <title>Example Site to Site VPN Configurations</title>
+  <title>Example IPSec VPN Configurations</title>
 
   <para>m0n0wall can connect to any third party VPN device that supports
   standard IPsec site to site VPN's, which includes most any VPN device and
@@ -16,6 +16,31 @@
   url="http://wiki.m0n0.ch/wikka.php?wakka=ExampleVPNs"> section of the
   wiki</ulink> dedicated to configurations for this chapter.</para>
 
+  <para>Below you will find sample configurations for the following
+  devices.</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Cisco PIX Firewall</para>
+    </listitem>
+
+    <listitem>
+      <para>Smoothwall</para>
+    </listitem>
+
+    <listitem>
+      <para>FreeS/WAN</para>
+    </listitem>
+
+    <listitem>
+      <para>Sonicwall</para>
+    </listitem>
+
+    <listitem>
+      <para>Nortel</para>
+    </listitem>
+  </itemizedlist>
+
   <sect1>
     <title>Cisco PIX Firewall</title>
 
@@ -28,8 +53,7 @@
       <para>First we need to make sure the PIX has 3DES enabled.</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-pixfirewall# sh ver
+        <literallayout class="monospaced">pixfirewall# sh ver
 
 Cisco PIX Firewall Version 6.3(3)
 Cisco PIX Device Manager Version 2.0(2)
@@ -64,8 +88,7 @@ VPN-3DES-AES: Enabled
       PIX.</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-pixfirewall# sh isakmp policy
+        <literallayout class="monospaced">pixfirewall# sh isakmp policy
 
 Default protection suite
 encryption algorithm: DES - Data Encryption Standard (56 bit keys).
@@ -84,8 +107,7 @@ lifetime: 86400 seconds, no volume limit
       <para>Allow IPSec connections to the PIX</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-pixfirewall(config)# sysopt connection permit-ipsec
+        <literallayout class="monospaced">pixfirewall(config)# sysopt connection permit-ipsec
 </literallayout>
       </blockquote>
 
@@ -93,16 +115,14 @@ pixfirewall(config)# sysopt connection permit-ipsec
       name of the internet-facing interface)</para>
 
       <blockquote>
-        <literallayout class="monospaced">    
-pixfirewall(config)# isakmp enable outside
+        <literallayout class="monospaced">pixfirewall(config)# isakmp enable outside
 </literallayout>
       </blockquote>
 
       <para>isakmp policy command on PIX</para>
 
       <blockquote>
-        <literallayout class="monospaced">        
-pixfirewall(config)# isakmp policy ?
+        <literallayout class="monospaced">pixfirewall(config)# isakmp policy ?
 Usage: isakmp policy %lt;priority&gt; authen %lt;pre-share|rsa-sig&gt;
 isakmp policy %lt;priority&gt; encrypt %lt;aes|aes-192|aes-256|des|3des&gt;
 isakmp policy %lt;priority&gt; hash %lt;md5|sha&gt;
@@ -115,8 +135,7 @@ isakmp policy %lt;priority&gt; lifetime %lt;seconds&gt;
       following commands in configure mode:</para>
 
       <blockquote>
-        <literallayout class="monospaced">        
-isakmp policy 10 authen pre-share
+        <literallayout class="monospaced">isakmp policy 10 authen pre-share
 isakmp policy 10 encrypt 3des
 isakmp policy 10 hash md5
 isakmp policy 10 group 2
@@ -132,8 +151,7 @@ isakmp policy 10 lifetime 86400
       randomly generate something to use for your configuration)</para>
 
       <blockquote>
-        <literallayout class="monospaced">            
-isakmp key qwertyuiop address 1.1.1.1 netmask 255.255.255.255
+        <literallayout class="monospaced">isakmp key qwertyuiop address 1.1.1.1 netmask 255.255.255.255
 </literallayout>
       </blockquote>
 
@@ -141,8 +159,7 @@ isakmp key qwertyuiop address 1.1.1.1 netmask 255.255.255.255
       cross this tunnel.</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
+        <literallayout class="monospaced">access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
 access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
 </literallayout>
       </blockquote>
@@ -151,16 +168,14 @@ access-list monovpn permit ip 10.0.0.0 255.255.255.0 10.0.1.0 255.255.255.0
       "monovpnset"</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-crypto ipsec transform-set monovpnset esp-3des esp-md5-hmac
+        <literallayout class="monospaced">crypto ipsec transform-set monovpnset esp-3des esp-md5-hmac
 </literallayout>
       </blockquote>
 
       <para>Define security association lifetime</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-crypto ipsec security-association lifetime seconds 86400 kilobytes 50000
+        <literallayout class="monospaced">crypto ipsec security-association lifetime seconds 86400 kilobytes 50000
 </literallayout>
       </blockquote>
 
@@ -168,8 +183,7 @@ crypto ipsec security-association lifetime seconds 86400 kilobytes 50000
       (where 1.1.1.1 is the public IP address of the m0n0wall device)</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-crypto map monovpnmap 10 ipsec-isakmp
+        <literallayout class="monospaced">crypto map monovpnmap 10 ipsec-isakmp
 crypto map monovpnmap 10 set peer 1.1.1.1
 crypto map monovpnmap 10 set transform-set monovpnset
 crypto map monovpnmap 10 match address monovpn
@@ -187,8 +201,7 @@ crypto map monovpnmap 10 match address monovpn
       <para>First we'll see if anything is currently routed.</para>
 
       <blockquote>
-        <literallayout class="monospaced">
-pixfirewall# sh nat
+        <literallayout class="monospaced">pixfirewall# sh nat
 nat (inside) 0 access-list no-nat
 </literallayout>
       </blockquote>
@@ -199,10 +212,9 @@ nat (inside) 0 access-list no-nat
       you likely have something similar to this set up).</para>
 
       <blockquote>
-        <literallayout class="monospaced">    
-access-list no-nat permit ip 10.0.0.1 255.255.255.0 10.0.1.0 255.255.255.0
+        <literallayout class="monospaced">access-list no-nat permit ip 10.0.0.1 255.255.255.0 10.0.1.0 255.255.255.0
 access-list no-nat permit ip 10.0.1.0 255.255.255.0 10.0.0.0 255.255.255.0
-    </literallayout>
+</literallayout>
       </blockquote>
 
       <para>If you do not have a "nat (interface) 0 ..." command in your "sh
@@ -223,17 +235,18 @@ access-list no-nat permit ip 10.0.1.0 255.255.255.0 10.0.0.0 255.255.255.0
       <para>Click the + button to add a VPN tunnel. On the "Edit tunnel"
       screen, fill in as follows:</para>
 
-      <literallayout>
-Leave "Disable this tunnel" box unchecked.
+      <blockquote>
+        <literallayout>Leave "Disable this tunnel" box unchecked.
 Interface "WAN"
 Local subnet: Type: "LAN subnet"
 Remote subnet: 10.0.0.0 /24 (fill in the subnet of the network behind the PIX here, rather than the made-up 10.0.0.0/24)
 Remote gateway: public IP address of PIX
 Description: add one to describe the connection (e.g. "PIX VPN")
 </literallayout>
+      </blockquote>
 
-      <literallayout>
-<emphasis role="bold">Phase 1</emphasis>
+      <blockquote>
+        <literallayout><emphasis role="bold">Phase 1</emphasis>
 Negotiation mode: Aggressive
 My identifier: "My IP Address"
 Encryption algorithm: 3DES
@@ -242,15 +255,17 @@ DH key group: 2
 Lifetime: 86400
 Pre-shared key: qwertyuiop (enter exactly what you defined as your pre-shared key on the PIX earlier)
 </literallayout>
+      </blockquote>
 
-      <literallayout>
-<emphasis role="bold">Phase 2</emphasis>
+      <blockquote>
+        <literallayout><emphasis role="bold">Phase 2</emphasis>
 Protocol: ESP
 Encryption algorithms: only 3DES checked
 Hash algorithms: only MD5 checked
 PFS key group: 2
 Lifetime: 86400
 </literallayout>
+      </blockquote>
 
       <note>
         <para>In m0n0wall 1.2 beta versions, you may experience the connection
@@ -278,8 +293,7 @@ Lifetime: 86400
     2004.</para>
 
     <blockquote>
-      <literallayout class="monospaced">    
-I could not find a working solution in the mailing list archives but
+      <literallayout class="monospaced">I could not find a working solution in the mailing list archives but
 here is how I have managed to create a VPN between Smoothwall Corporate
 with Smoothtunnel and m0n0wall and I thought I would share it here to
 same people going through the same headbashing experience I did :) This
@@ -391,8 +405,7 @@ into the VPN control tab and clicking UP!
     configuration.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-# /etc/ipsec.conf - FreeS/WAN IPsec configuration file
+      <literallayout class="monospaced"># /etc/ipsec.conf - FreeS/WAN IPsec configuration file
 
 version 2.0     # conforms to second version of ipsec.conf specification
 
@@ -454,7 +467,7 @@ Protocol = ESP
 Uncheck all Enc. Alg. Except 3des
 Hash alg = md5
 PFS key group = off
-  </literallayout>
+</literallayout>
     </blockquote>
   </sect1>
 
@@ -493,22 +506,24 @@ PFS key group = off
 
       <para>Add/Modify IPSec Security Association</para>
 
-      <literallayout>
-In Configure, select Security Association -&gt; Add New SA
+      <blockquote>
+        <literallayout>In Configure, select Security Association -&gt; Add New SA
 Name: Name of connection  (Monowall test)
 IPSec Gateway Name or Address: Type IP address of your m0n0wall (203.49.X.117)
 </literallayout>
+      </blockquote>
 
       <para>Security Policy</para>
 
-      <literallayout>
-Exchange: Aggressive Mode
+      <blockquote>
+        <literallayout>Exchange: Aggressive Mode
 Phase 1 DH Group: Group2
 SA Life time (secs): 28800
 Phase 1 Encryption/Authentication: 3DES &amp; MD5
 Phase 2 Encryption/Authentication: Strong Encryption and Authentication (ESP 3DES HMAC MD5)
 Share Secret: type your share secret (novitest)
-    </literallayout>
+</literallayout>
+      </blockquote>
 
       <para><emphasis role="bold">Destination Networks</emphasis></para>
 
@@ -531,10 +546,10 @@ Share Secret: type your share secret (novitest)
       Network</emphasis> (Note: This is Popup window – enable Popup in your
       browser)</para>
 
-      <literallayout>    
-    Network: type your destination network (192.168.200.0)
-    Subnet mask: Type destination subnet mask (255.255.255.0)
-    </literallayout>
+      <blockquote>
+        <literallayout>    Network: type your destination network (192.168.200.0)
+    Subnet mask: Type destination subnet mask (255.255.255.0)    </literallayout>
+      </blockquote>
 
       <para><screenshot>
           <mediaobject>
@@ -564,25 +579,26 @@ Share Secret: type your share secret (novitest)
 
       <para>Configure m0n0wall IPsec Edit Tunnel screen as follows.</para>
 
-      <literallayout>
-        <emphasis role="bold">Interface:</emphasis> WAN
-        <emphasis role="bold">Local subnet:</emphasis> LAN subnet
-        <emphasis role="bold">Remote subnet:</emphasis> 192.168.2.0/24
-        <emphasis role="bold">Remote gateway:</emphasis> 61.95.x.99
-        <emphasis role="bold">Description:</emphasis> Sonicwall
-        <emphasis role="bold">Negotiation mode:</emphasis> Aggressive
-        <emphasis role="bold">My identifier:</emphasis> My IP address
-        <emphasis role="bold">Encryption algorithm:</emphasis> 3DES
-        <emphasis role="bold">Hash algorithm:</emphasis> MD5
-        <emphasis role="bold">DH key group:</emphasis> 2
-        <emphasis role="bold">Lifetime:</emphasis> 28800
-        <emphasis role="bold">Pre-shared key:</emphasis> novitest
-        <emphasis role="bold">Protocol:</emphasis> ESP
-        <emphasis role="bold">Encryption algorithms:</emphasis> 3DES
-        <emphasis role="bold">Hash algorithms:</emphasis> MD5
-        <emphasis role="bold">PFS key group:</emphasis> off
-        <emphasis role="bold">Lifetime:</emphasis> 28800
-        </literallayout>
+      <blockquote>
+        <literallayout><emphasis role="bold">Interface:</emphasis> WAN
+<emphasis role="bold">Local subnet:</emphasis> LAN subnet
+<emphasis role="bold">Remote subnet:</emphasis> 192.168.2.0/24
+<emphasis role="bold">Remote gateway:</emphasis> 61.95.x.99
+<emphasis role="bold">Description:</emphasis> Sonicwall
+<emphasis role="bold">Negotiation mode:</emphasis> Aggressive
+<emphasis role="bold">My identifier:</emphasis> My IP address
+<emphasis role="bold">Encryption algorithm:</emphasis> 3DES
+<emphasis role="bold">Hash algorithm:</emphasis> MD5
+<emphasis role="bold">DH key group:</emphasis> 2
+<emphasis role="bold">Lifetime:</emphasis> 28800
+<emphasis role="bold">Pre-shared key:</emphasis> novitest
+<emphasis role="bold">Protocol:</emphasis> ESP
+<emphasis role="bold">Encryption algorithms:</emphasis> 3DES
+<emphasis role="bold">Hash algorithms:</emphasis> MD5
+<emphasis role="bold">PFS key group:</emphasis> off
+<emphasis role="bold">Lifetime:</emphasis> 28800
+</literallayout>
+      </blockquote>
 
       <para>Click Save at the bottom of the page to complete the VPN
       configuration.</para>
@@ -599,5 +615,180 @@ Share Secret: type your share secret (novitest)
     authentication. Find the appropriate one for your device, and set up the
     m0n0wall end with the appropriate settings as described in the Nortel
     documentation.</para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="faq-muvpn.html"?>
+
+    <title>Mobile User VPN with IPsec?</title>
+
+    <para>This tutorial tries to explain how to setup mobile user IPsec VPN
+    with m0n0wall and Windows clients that use SafeNet SoftRemoteLT, a popular
+    IPsec VPN client. You need m0n0wall pb25 or later for mobile user
+    VPN.</para>
+
+    <sect2>
+      <title>m0n0wall setup</title>
+
+      <orderedlist>
+        <listitem>
+          <para>Log into your m0n0wall and go to the IPsec: Mobile clients
+          page.</para>
+        </listitem>
+
+        <listitem>
+          <para>Configure the settings as shown in the following
+          picture:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-6.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+
+          <para>You <emphasis role="bold">must</emphasis> use aggressive mode,
+          as only IP addresses can be used as identifiers in main mode.</para>
+        </listitem>
+
+        <listitem>
+          <para>Click "Save", then go to the IPsec: Pre-shared keys
+          page.</para>
+        </listitem>
+
+        <listitem>
+          <para>Add a new key for each mobile user (use different keys, and at
+          least 8 characters!). Use the e-mail address of the corresponding
+          user as the identifier.</para>
+        </listitem>
+
+        <listitem>
+          <para>Go to the IPsec: Tunnels page, check "Enable IPsec" and click
+          "Save".</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+
+    <sect2>
+      <title>Client setup</title>
+
+      <para>This example assumes version 10 of SafeNet SoftRemoteLT.</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Install SafeNet SoftRemoteLT, if not already installed, and
+          reboot.</para>
+        </listitem>
+
+        <listitem>
+          <para>Right-click on the SoftRemote icon next to the clock and
+          select "Security Policy Editor".</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose Edit -&gt; Add -&gt; Connection.</para>
+        </listitem>
+
+        <listitem>
+          <para>Configure the connection properties as follows:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-1.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+
+          <para>Insert your LAN subnet + mask and enter the external IP
+          address (or hostname) of your m0n0wall instead of
+          "12.34.56.78".</para>
+        </listitem>
+
+        <listitem>
+          <para>Select "Security Policy" and use the following
+          settings:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-3.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </listitem>
+
+        <listitem>
+          <para>Select "My Identity" and use the following settings:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-2.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+
+          <para>Enter the user's e-mail address, then click the button
+          "Pre-Shared Key" and enter the pre-shared key. The e-mail address
+          (and pre-shared key) must correspond with an entry on the IPsec:
+          Pre-shared keys page on m0n0wall.</para>
+        </listitem>
+
+        <listitem>
+          <para>Select "Authentication (Phase 1) -&gt; Proposal 1" and use the
+          following settings:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-4.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+        </listitem>
+
+        <listitem>
+          <para>Select "Key Exchange (Phase 1) -&gt; Proposal 1" and use the
+          following settings:</para>
+
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="screens/muvpn/srlt-5.png" />
+              </imageobject>
+            </mediaobject>
+          </screenshot>
+
+          <para>If you have a crypto accelerator card in your m0n0wall, you
+          may want to use Triple DES instead of AES-256 as the encryption
+          algorithm (some crypto accelerators do not support AES).</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose File -&gt; Save.</para>
+        </listitem>
+
+        <listitem>
+          <para>If you have a crypto accelerator card in your m0n0wall, you
+          may want to use Triple DES instead of AES-256 as the encryption
+          algorithm (some crypto accelerators do not support AES).</para>
+        </listitem>
+
+        <listitem>
+          <para>Choose File -&gt; Save.</para>
+        </listitem>
+
+        <listitem>
+          <para>Make sure that the Internet connection is established. Try to
+          ping a host on your LAN (e.g. your m0n0wall's LAN IP address). The
+          first few pings will time out as it takes a few seconds for the
+          IPsec tunnel to be established. Use SoftRemote's log viewer and
+          connection monitor to tell you what's going on (right-click on the
+          SoftRemote icon next to the clock to open them).</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
   </sect1>
 </chapter>

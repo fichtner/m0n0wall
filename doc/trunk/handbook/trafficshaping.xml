@@ -4,67 +4,64 @@
 
   <title>Traffic Shaper</title>
 
-  <para>m0n0wall's traffic shaper uses FreeBSD's dummynet and ipfw.  
-  Little documentation on the traffic shaper exists because Chris 
-  Buechler, author of the majority of this documentation, has not 
-  taken the time to figure it out to the extent that it can be 
-  documented.  Documentation contributions would be much appreciated.  
-  Please email any contributions to <ulink url="mailto:cbuechler@gmail.com">
-  Chris</ulink>.  
-  </para>
+  <para>m0n0wall's traffic shaper uses FreeBSD's dummynet and ipfw. Little
+  documentation on the traffic shaper exists because Chris Buechler, author of
+  the majority of this documentation, has not taken the time to figure it out
+  to the extent that it can be documented. Documentation contributions would
+  be much appreciated. Please email any contributions to <ulink
+  url="mailto:cbuechler@gmail.com"> Chris</ulink>.</para>
 
   <para><emphasis role="bold">Suggested Resources</emphasis></para>
 
-  <para>Adam Nellemann's <ulink 
-  url="http://m0n0.ch/wall/list/showmsg.php?id=35/88">
-  "Traffic shaper 'manual' (alpha)"</ulink> post to the 
-  mailing list back in February 2004 is the closest thing to any traffic 
-  shaping documentation that is currently available.  </para>
+  <para>Adam Nellemann's <ulink
+  url="http://m0n0.ch/wall/list/showmsg.php?id=35/88"> "Traffic shaper
+  'manual' (alpha)"</ulink> post to the mailing list back in February 2004 is
+  the closest thing to any traffic shaping documentation that is currently
+  available.</para>
 
-  <para>Resources on ipfw and dummynet may be useful, for the information 
-  they provide on pipes and queues.
-  </para>
+  <para>Resources on ipfw and dummynet may be useful, for the information they
+  provide on pipes and queues.</para>
 
-  <para><ulink url="http://ai3.asti.dost.gov.ph/sat/dummynet.html">Dummynet</ulink>
-  paper from the Philippines Department of Science and Technology</para>
+  <para><ulink
+  url="http://ai3.asti.dost.gov.ph/sat/dummynet.html">Dummynet</ulink> paper
+  from the Philippines Department of Science and Technology</para>
 
-  <para><ulink url="http://www.bsdnews.org/02/dummynet.php">BSDnews Using Dummynet 
-  for Traffic Shaping on FreeBSD</ulink></para>
+  <para><ulink url="http://www.bsdnews.org/02/dummynet.php">BSDnews Using
+  Dummynet for Traffic Shaping on FreeBSD</ulink> (not currently
+  available)</para>
 
-  <para>The following from the <ulink 
-   url="http://tinyurl.com/aqtgt">dummynet man page</ulink> may 
-   also be helpful.</para>
+  <para>The following from the <ulink url="http://tinyurl.com/aqtgt">dummynet
+  man page</ulink> may also be helpful.</para>
 
-	<literallayout class="monospaced">
-     dummynet operates by first using the firewall to classify packets and
-     divide them into flows, using any match pattern that can be used in ipfw
-     rules.  Depending on local policies, a flow can contain packets for a
-     single TCP connection, or from/to a given host, or entire subnet, or a
-     protocol type, etc.
+  <blockquote>
+    <literallayout class="monospaced">dummynet operates by first using the firewall to classify packets and
+divide them into flows, using any match pattern that can be used in ipfw
+rules.  Depending on local policies, a flow can contain packets for a
+single TCP connection, or from/to a given host, or entire subnet, or a
+protocol type, etc.
 
-     Packets belonging to the same flow are then passed to either of two dif-
-     ferent objects, which implement the traffic regulation:
+Packets belonging to the same flow are then passed to either of two dif-
+ferent objects, which implement the traffic regulation:
 
-	 pipe	 A pipe emulates a link with given bandwidth, propagation
-		 delay, queue size and packet loss rate.  Packets are queued
-		 in front of the pipe as they come out from the classifier,
-		 and then transferred to the pipe according to the pipe's
-		 parameters.
+  pipe  A pipe emulates a link with given bandwidth, propagation
+         delay, queue size and packet loss rate.  Packets are queued
+         in front of the pipe as they come out from the classifier,
+         and then transferred to the pipe according to the pipe's
+         parameters.
 
-	 queue	 A queue is an abstraction used to implement the WF2Q+ (Worst-
-		 case Fair Weighted Fair Queueing) policy, which is an effi-
-		 cient variant of the WFQ policy.
-		 The queue associates a weight and a reference pipe to each
-		 flow, and then all backlogged (i.e., with packets queued)
-		 flows linked to the same pipe share the pipe's bandwidth pro-
-		 portionally to their weights.	Note that weights are not pri-
-		 orities; a flow with a lower weight is still guaranteed to
-		 get its fraction of the bandwidth even if a flow with a
-		 higher weight is permanently backlogged.
+  queue  A queue is an abstraction used to implement the WF2Q+ (Worst-
+         case Fair Weighted Fair Queueing) policy, which is an effi-
+         cient variant of the WFQ policy.
+         The queue associates a weight and a reference pipe to each
+         flow, and then all backlogged (i.e., with packets queued)
+         flows linked to the same pipe share the pipe's bandwidth pro-
+         portionally to their weights.  Note that weights are not pri-
+         orities; a flow with a lower weight is still guaranteed to
+         get its fraction of the bandwidth even if a flow with a
+         higher weight is permanently backlogged.
 
-     In practice, pipes can be used to set hard limits to the bandwidth that a
-     flow can use, whereas queues can be used to determine how different flow
-     share the available bandwidth.
-	</literallayout>
-
+In practice, pipes can be used to set hard limits to the bandwidth that a
+flow can use, whereas queues can be used to determine how different flow
+share the available bandwidth.</literallayout>
+  </blockquote>
 </chapter>

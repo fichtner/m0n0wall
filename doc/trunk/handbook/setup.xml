@@ -1,19 +1,19 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: setup.xml,v 1.3 2005/10/08 22:56:11 chris Exp $ -->
 <chapter>
   <?dbhtml filename="setup.html"?>
 
   <title>Setup</title>
 
-  <para>This chapter acts as a quick reference for those who are familiar 
-  with installing and configuring m0n0wall.  If you need more than a quick
-  reference on what commands to use to write a CD, CF, HD, etc. please see 
-  the Quick Start Guide appropriate to your platform.</para>
+  <para>This chapter acts as a quick reference for those who are familiar with
+  installing and configuring m0n0wall. If you need more than a quick reference
+  on what commands to use to write a CD, CF, HD, etc. please see the Quick
+  Start Guide appropriate to your platform.</para>
 
-  <para><ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick 
-  Start Guide</ulink></para>
+  <para><ulink url="http://doc.m0n0.ch/quickstartsoekris/">Soekris Quick Start
+  Guide</ulink></para>
 
-  <para><ulink url="http://doc.m0n0.ch/quickstartpc/">PC Quick Start 
+  <para><ulink url="http://doc.m0n0.ch/quickstartpc/">PC Quick Start
   Guide</ulink></para>
 
   <para><ulink url="http://doc.m0n0.ch/quickstartwrap/">WRAP Quick Start
@@ -25,11 +25,12 @@
     <title id="Setup.Getting.title">Getting the Software</title>
 
     <para>There are ready-made binary images for the net45xx/net48xx
-    communication computers from <ulink url="http://www.soekris.com">Soekris Engineering</ulink> and the <ulink url="http://www.pcengines.ch/wrap.htm">
-     Wireless Router Application Platform</ulink> (WRAP) from <ulink url="http://www.pcengines.ch/">PC Engines</ulink>, a CF/IDE HD image for most standard
-    PCs (embedded ones may work, too), a CD-ROM (ISO) image for standard PCs
-    as well as a tarball of the root filesystem.</para>
-
+    communication computers from <ulink url="http://www.soekris.com">Soekris
+    Engineering</ulink> and the <ulink url="http://www.pcengines.ch/wrap.htm">
+    Wireless Router Application Platform</ulink> (WRAP) from <ulink
+    url="http://www.pcengines.ch/">PC Engines</ulink>, a CF/IDE HD image for
+    most standard PCs (embedded ones may work, too), a CD-ROM (ISO) image for
+    standard PCs as well as a tarball of the root filesystem.</para>
 
     <para>To download the software for your platform, point your web browser
     at <ulink
@@ -72,25 +73,31 @@
           <itemizedlist>
             <listitem>
               <para>FreeBSD (ATAPI recorder):</para>
+
               <programlisting>burncd -s max -e data cdrom-xxx.iso fixate</programlisting>
             </listitem>
+
             <listitem>
-                <para>Linux (ATAPI w/ SCSI emulation):</para>
-                <para>First, determine your burning device's SCSI ID/LUN with the
-                following command:</para>
-                <programlisting>linuxbox# cdrecord --scanbus
+              <para>Linux (ATAPI w/ SCSI emulation):</para>
+
+              <para>First, determine your burning device's SCSI ID/LUN with
+              the following command:</para>
+
+              <programlisting>linuxbox# cdrecord --scanbus
 Cdrecord-Clone 2.01 (i686-pc-linux-gnu) Copyright (C) 1995-2004 Jörg Schilling
 Linux sg driver version: 3.1.25
 Using libscg version 'schily-0.8'.
 scsibus0:
     0,0,0   100) 'LITE-ON ' 'COMBO LTC-48161H' 'KH0F' Removable CD-ROM
-                 </programlisting>   
-    
-                <para>Note the SCSI ID/LUN is 0,0,0. Burn the image as in the following
-                example (replacing &lt;max speed&gt; with the speed of your burner):</para>
-                <programlisting>cdrecord --dev=0,0,0 --speed=&lt;max speed&gt; cdrom-xxx.iso</programlisting>
+</programlisting>
+
+              <para>Note the SCSI ID/LUN is 0,0,0. Burn the image as in the
+              following example (replacing &lt;max speed&gt; with the speed of
+              your burner):</para>
+
+              <programlisting>cdrecord --dev=0,0,0 --speed=&lt;max speed&gt; cdrom-xxx.iso</programlisting>
             </listitem>
-    
+
             <listitem>
               <para>Windows: use your favorite burning program (e.g. Nero) to
               record the ISO image (2048 bytes/sector, Mode-1)</para>
@@ -188,10 +195,11 @@ scsibus0:
               page</ulink>. Use the -u flag (without the square brackets) if
               the target disk is &gt; 800 MB - make very sure you've selected
               the right disk!!</para>
-              
-              <para>To ensure you have selected the appropriate disk, run physdiskwrite prior to inserting the media
-              you're planning to write, and make note of its output.</para>
-              
+
+              <para>To ensure you have selected the appropriate disk, run
+              physdiskwrite prior to inserting the media you're planning to
+              write, and make note of its output.</para>
+
               <programlisting>physdiskwrite v0.5 by Manuel Kasper &lt;mk@neon1.net&gt;
 
 Searching for physical drives...
@@ -204,30 +212,27 @@ Information for \\.\PhysicalDrive0:
       Model:         ST3120026A
       Serial number: 3JT1V2FS
       Firmware rev.: 3.06</programlisting>
-              
-            <para>You now know the drives currently in the system, so you know which
-            you don't want to use.  Make note of the model and serial number.
-            Add the drive or CompactFlash card you wish
-            to write to, and run physdiskwrite again.  You'll now see an additional
-            drive in the output, and by referring back to when you ran the command
-            earlier, you will know by process of elimination which drive is the one
-            you want to write.  </para>
-              
+
+              <para>You now know the drives currently in the system, so you
+              know which you don't want to use. Make note of the model and
+              serial number. Add the drive or CompactFlash card you wish to
+              write to, and run physdiskwrite again. You'll now see an
+              additional drive in the output, and by referring back to when
+              you ran the command earlier, you will know by process of
+              elimination which drive is the one you want to write.</para>
             </listitem>
           </itemizedlist>
         </listitem>
       </itemizedlist>
     </sect2>
-    
+
     <sect2>
-        <title>Alternative means of installation</title>
-        
-        <para>For alternative means of installing m0n0wall, see the <link linkend="OtherDoc.Installation">
-            Installation section</link> of the Other Documentation chapter.
-        </para>
-            
+      <title>Alternative means of installation</title>
+
+      <para>For alternative means of installing m0n0wall, see the <link
+      linkend="OtherDoc.Installation"> Installation section</link> of the
+      Other Documentation chapter.</para>
     </sect2>
-    
   </sect1>
 
   <sect1>
@@ -246,8 +251,8 @@ Information for \\.\PhysicalDrive0:
         <para>Insert the m0n0wall CD, CF or disk you prepared according to the
         instructions <link linkend="Setup.Installing">above</link>. On a CD
         system, also insert the formatted and blank floppy disk. Make sure the
-        floppy is writable (not write-protected) and formatted with the FAT file
-        system.</para>
+        floppy is writable (not write-protected) and formatted with the FAT
+        file system.</para>
       </listitem>
 
       <listitem>

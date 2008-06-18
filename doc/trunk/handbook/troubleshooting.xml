@@ -179,8 +179,7 @@
 
       <para>A successful ping will look like the following.</para>
 
-      <literallayout class="monospaced">
-C:\&gt;ping 192.168.1.1
+      <literallayout class="monospaced">C:\&gt;ping 192.168.1.1
 
 Pinging 192.168.1.1 with 32 bytes of data:
 
@@ -193,12 +192,11 @@ Ping statistics for 192.168.1.1:
     Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
 Approximate round trip times in milli-seconds:
     Minimum = 0ms, Maximum = 0ms, Average = 0ms
-        </literallayout>
+</literallayout>
 
       <para>An unsuccessful ping will look like this.</para>
 
-      <literallayout class="monospaced">
-C:\&gt;ping 192.168.1.1
+      <literallayout class="monospaced">C:\&gt;ping 192.168.1.1
 
 Pinging 192.168.1.1 with 32 bytes of data:
 
@@ -209,7 +207,7 @@ Request timed out.
 
 Ping statistics for 192.168.1.1:
     Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
-        </literallayout>
+</literallayout>
 
       <para>See <link linkend="Cannot.Access.webGUI">Cannot Access
       webGUI</link> as if you cannot ping, you won't be able to get into the
@@ -409,11 +407,10 @@ Ping statistics for 192.168.1.1:
       This includes your NIC's as well as other devices like serial and
       parallel ports, etc. An example of some dmesg output follows.</para>
 
-      <literallayout class="monospaced">
-sis0: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe000-0xe0ff mem 0xa0001000-0xa0001fff irq 11 at device 18.0 on pci0
+      <literallayout class="monospaced">sis0: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe000-0xe0ff mem 0xa0001000-0xa0001fff irq 11 at device 18.0 on pci0
 sis1: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe100-0xe1ff mem 0xa0002000-0xa0002fff irq 5 at device 19.0 on pci0
 sis2: &lt;NatSemi DP83815 10/100BaseTX&gt; port 0xe200-0xe2ff mem 0xa0003000-0xa0003fff irq 9 at device 20.0 on pci0
-            </literallayout>
+</literallayout>
 
       <para>The above example shows three NIC's with IRQ's 11, 5, and
       9.</para>

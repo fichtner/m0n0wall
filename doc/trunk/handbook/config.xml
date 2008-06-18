@@ -1442,6 +1442,16 @@
         <title>The two entries for each VPN connection are as follows:</title>
 
         <tgroup cols="5">
+          <colspec colname="col1" colnum="1" colwidth="2*" />
+
+          <colspec colname="col2" colnum="2" colwidth="2*" />
+
+          <colspec colname="col3" colnum="3" colwidth="1*" />
+
+          <colspec colname="col4" colnum="4" colwidth="1*" />
+
+          <colspec colname="col5" colnum="5" colwidth="3*" />
+
           <thead>
             <row>
               <entry>Source</entry>
@@ -1464,11 +1474,11 @@
 
               <entry><mediaobject>
                   <imageobject>
-                    <imagedata fileref="icons/out.gif" />
+                    <imagedata align="center" fileref="icons/out.gif" />
                   </imageobject>
                 </mediaobject></entry>
 
-              <entry>protocol in use (ESP or AH)</entry>
+              <entry>ESP or AH</entry>
 
               <entry>Public IP address of local m0n0wall - Public IP address
               of remote endpoint</entry>
@@ -1481,11 +1491,11 @@
 
               <entry><mediaobject>
                   <imageobject>
-                    <imagedata fileref="icons/in.gif" />
+                    <imagedata align="center" fileref="icons/in.gif" />
                   </imageobject>
                 </mediaobject></entry>
 
-              <entry>protocol in use (ESP or AH)</entry>
+              <entry>ESP or AH</entry>
 
               <entry>Public IP address of remote endpoint - Public IP address
               of local m0n0wall</entry>

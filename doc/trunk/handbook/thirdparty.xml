@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter>
+<appendix>
   <?dbhtml filename="thirdparty.html"?>
 
-  <title>Using Third Party Software with m0n0wall</title>
+  <title>Third Party Software</title>
 
   <sect1>
     <title>Introduction</title>
@@ -74,18 +74,16 @@
     <para>From binary packages</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# pkg_add -r ifgraph
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# pkg_add -r ifgraph
+</literallayout>
     </blockquote>
 
     <para>Compiling yourself</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# cd /usr/ports/net-mgmt/ifgraph
-    su-2.05b# make install clean
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# cd /usr/ports/net-mgmt/ifgraph
+su-2.05b# make install clean
+</literallayout>
     </blockquote>
 
     <para><emphasis role="bold">2. Query for interfaces</emphasis></para>
@@ -96,24 +94,23 @@
     community of your firewall.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# /usr/local/bin/find-if.pl -mi 192.168.1.1 public
-    OK: session created, getting info from 192.168.1.1
-    Showing up interfaces of: 192.168.1.1
-    Interface total: 8
-    OK: Collecting info on each interface, wait...
-    Warn: Could NOT get ifPhysAddress table
-    OK: Data collected
-    System Description: FreeBSD m0n0wall.local 4.10-RELEASE FreeBSD 4.10-RELEASE #0: Fri Au i386
-    System Uptime: 3 days, 06:10:58.33
-    | If #    | Description | Stat | Octets In     | Errors  | Octets Out    | Errors  | IP Address       | MAC Address     |
-    | ------- | ----------- | ---- | ------------- | ------- | ------------- | ------- | ---------------- | --------------- |
-    | (1)     | wi0         | up   | 0             | 0       | 11538828      | 0       | not set          | not set         |
-    | (2)     | sis0        | up   | 3234568017    | 0       | 1783247523    | 0       | 62.22.130.150    | not set         |
-    | (3)     | sis1        | up   | 0             | 0       | 42            | 0       | 10.1.0.1         | not set         |
-    | (4)     | sis2        | up   | 1743313091    | 0       | 3020545424    | 0       | 192.168.1.1      | not set         |
-    | (5)     | lo0         | up   | 732           | 0       | 732           | 0       | 127.0.0.1        | not set         |
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# /usr/local/bin/find-if.pl -mi 192.168.1.1 public
+OK: session created, getting info from 192.168.1.1
+Showing up interfaces of: 192.168.1.1
+Interface total: 8
+OK: Collecting info on each interface, wait...
+Warn: Could NOT get ifPhysAddress table
+OK: Data collected
+System Description: FreeBSD m0n0wall.local 4.10-RELEASE FreeBSD 4.10-RELEASE #0: Fri Au i386
+System Uptime: 3 days, 06:10:58.33
+| If #    | Description | Stat | Octets In     | Errors  | Octets Out    | Errors  | IP Address       | MAC Address     |
+| ------- | ----------- | ---- | ------------- | ------- | ------------- | ------- | ---------------- | --------------- |
+| (1)     | wi0         | up   | 0             | 0       | 11538828      | 0       | not set          | not set         |
+| (2)     | sis0        | up   | 3234568017    | 0       | 1783247523    | 0       | 62.22.130.150    | not set         |
+| (3)     | sis1        | up   | 0             | 0       | 42            | 0       | 10.1.0.1         | not set         |
+| (4)     | sis2        | up   | 1743313091    | 0       | 3020545424    | 0       | 192.168.1.1      | not set         |
+| (5)     | lo0         | up   | 732           | 0       | 732           | 0       | 127.0.0.1        | not set         |
+</literallayout>
     </blockquote>
 
     <para>You'll see the names of your interfaces under the description
@@ -126,9 +123,8 @@
     ifgraph.conf.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# cp /usr/local/etc/ifgraph.conf.sample /usr/local/etc/ifgraph.conf
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# cp /usr/local/etc/ifgraph.conf.sample /usr/local/etc/ifgraph.conf
+</literallayout>
     </blockquote>
 
     <para>Use the following ifgraph.conf as a template. You will need to
@@ -137,108 +133,103 @@
     line to the number of the interface to be graphed.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    # [global] target
-    # This target is mandatory
-    # The directives of this target are:
-    # rrdtool = /path/to/rrdtool - full path to rrdtool
-    # rrddir = /path/to/rrddir - full path to a writeable dir, where
-    #                     rrd files and logs will be created
-    # graphdir = /path/to/public_html - full path to a writeable dir,
-    #                     where png and html will be created
-    # template = /path/to/template_dir - full path to a directory
-    #                     containing template files
-    # imgformat = the image format. You may choose:
-    #               PNG - Portable Network Graphics
-    #               GIF - Graphics Interchange Format
-    #               iGIF - Interlaced GIF
-    #               GD - Boutell GD
-    # Defaults: You can define default configurations in the global
-    # target, but, for this to work, it must be the first target always.
-    # If [global] is after another target, default configurations
-    # will not work as expected.
+      <literallayout class="monospaced"># [global] target
+# This target is mandatory
+# The directives of this target are:
+# rrdtool = /path/to/rrdtool - full path to rrdtool
+# rrddir = /path/to/rrddir - full path to a writeable dir, where
+#                     rrd files and logs will be created
+# graphdir = /path/to/public_html - full path to a writeable dir,
+#                     where png and html will be created
+# template = /path/to/template_dir - full path to a directory
+#                     containing template files
+# imgformat = the image format. You may choose:
+#               PNG - Portable Network Graphics
+#               GIF - Graphics Interchange Format
+#               iGIF - Interlaced GIF
+#               GD - Boutell GD
+# Defaults: You can define default configurations in the global
+# target, but, for this to work, it must be the first target always.
+# If [global] is after another target, default configurations
+# will not work as expected.
     
-    [global]
-    rrdtool = /usr/local/bin/rrdtool
-    rrddir = /usr/local/var/ifgraph
-    graphdir = /usr/local/ifgraph/htdocs
-    template = /usr/local/ifgraph/templates/en
-    imgformat=PNG
-    # those are the default configurations, should be
-    # overriden in each target
+[global]
+rrdtool = /usr/local/bin/rrdtool
+rrddir = /usr/local/var/ifgraph
+graphdir = /usr/local/ifgraph/htdocs
+template = /usr/local/ifgraph/templates/en
+imgformat=PNG
+# those are the default configurations, should be
+# overriden in each target
     
-    host = your.main.router.com
-    community = public
-    port =161
-    max=100M
-    dimension=550x200
-    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
-    options=noerror
-    hbeat=600
-    retry=2
-    timeout=5
+host = your.main.router.com
+community = public
+port =161
+max=100M
+dimension=550x200
+colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+options=noerror
+hbeat=600
+retry=2
+timeout=5
     
-
-    [m0n0wall-wan]
-    host=192.168.1.1
-    community=public
-    port=161
-    interface=2
-    max=100M
-    dimension=550x200
-    title=In/Out data for m0n0wall WAN interface
-    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
-    options=noerror
-    ylegend=kbits per second
-    legends=kbits entering our network,kbits leaving our network
-    shortlegend=kbits/sec
-    hbeat=600
-    retry=2
-    timeout=5
-    step = 300
-    periods = -1day, -1week, -1month, -1year
+[m0n0wall-wan]
+host=192.168.1.1
+community=public
+port=161
+interface=2
+max=100M
+dimension=550x200
+title=In/Out data for m0n0wall WAN interface
+colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+options=noerror
+ylegend=kbits per second
+legends=kbits entering our network,kbits leaving our network
+shortlegend=kbits/sec
+hbeat=600
+retry=2
+timeout=5
+step = 300
+periods = -1day, -1week, -1month, -1year
     
+[m0n0wall-dmz]
+host=192.168.1.1
+community=public
+port=161
+interface=3
+max=100M
+dimension=550x200
+title=In/Out data for m0n0wall DMZ interface
+colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+options=noerror
+ylegend=kbits per second
+legends=kbits entering DMZ network,kbits leaving DMZ network
+shortlegend=kbits/sec
+hbeat=600
+retry=2
+timeout=5
+step = 300
+periods = -1day, -1week, -1month, -1year
     
-    [m0n0wall-dmz]
-    host=192.168.1.1
-    community=public
-    port=161
-    interface=3
-    max=100M
-    dimension=550x200
-    title=In/Out data for m0n0wall DMZ interface
-    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
-    options=noerror
-    ylegend=kbits per second
-    legends=kbits entering DMZ network,kbits leaving DMZ network
-    shortlegend=kbits/sec
-    hbeat=600
-    retry=2
-    timeout=5
-    step = 300
-    periods = -1day, -1week, -1month, -1year
-    
-    
-
-    [m0n0wall-lan]
-    host=192.168.1.1
-    community=public
-    port=161
-    interface=4
-    max=100M
-    dimension=550x200
-    title=In/Out data for m0n0wall LAN interface
-    colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
-    options=noerror
-    ylegend=kbits per second
-    legends=kbits entering our LAN network,kbits leaving our LAN network
-    shortlegend=kbits/sec
-    hbeat=600
-    retry=2
-    timeout=5
-    step = 300
-    periods = -1day, -1week, -1month, -1year
-    </literallayout>
+[m0n0wall-lan]
+host=192.168.1.1
+community=public
+port=161
+interface=4
+max=100M
+dimension=550x200
+title=In/Out data for m0n0wall LAN interface
+colors=back#000000,font#FFFFFF,shadea#212121,canvas#232323,mgrid#FF0000,out#FFFFFF
+options=noerror
+ylegend=kbits per second
+legends=kbits entering our LAN network,kbits leaving our LAN network
+shortlegend=kbits/sec
+hbeat=600
+retry=2
+timeout=5
+step = 300
+periods = -1day, -1week, -1month, -1year
+</literallayout>
     </blockquote>
 
     <para><emphasis role="bold">4. Run tests.</emphasis></para>
@@ -247,32 +238,29 @@
     three times, and wait a few seconds in between runs.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# ifgraph.pl -c /usr/local/etc/ifgraph.conf 
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# ifgraph.pl -c /usr/local/etc/ifgraph.conf 
+</literallayout>
     </blockquote>
 
     <para>Now we'll run makegraph.pl to make the html pages and graphs.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# makegraph.pl -c /usr/local/etc/ifgraph.conf
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# makegraph.pl -c /usr/local/etc/ifgraph.conf
+</literallayout>
     </blockquote>
 
     <para>Check the ifgraph htdocs directory to make sure it contains the png
     and html files.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# ls /usr/local/ifgraph/htdocs
-    index.html m0n0wall-lan-1day.png m0n0wall-wan-1month.png
-    m0n0wall-dmz-1day.png m0n0wall-lan-1month.png m0n0wall-wan-1week.png
-    m0n0wall-dmz-1month.png m0n0wall-lan-1week.png m0n0wall-wan-1year.png
-    m0n0wall-dmz-1week.png m0n0wall-lan-1year.png m0n0wall-wan.html
-    m0n0wall-dmz-1year.png m0n0wall-lan.html
-    m0n0wall-dmz.html m0n0wall-wan-1day.png
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# ls /usr/local/ifgraph/htdocs
+index.html m0n0wall-lan-1day.png m0n0wall-wan-1month.png
+m0n0wall-dmz-1day.png m0n0wall-lan-1month.png m0n0wall-wan-1week.png
+m0n0wall-dmz-1month.png m0n0wall-lan-1week.png m0n0wall-wan-1year.png
+m0n0wall-dmz-1week.png m0n0wall-lan-1year.png m0n0wall-wan.html
+m0n0wall-dmz-1year.png m0n0wall-lan.html
+m0n0wall-dmz.html m0n0wall-wan-1day.png
+</literallayout>
     </blockquote>
 
     <para><emphasis role="bold">5. Edit Apache config</emphasis></para>
@@ -281,17 +269,15 @@
     (/usr/local/etc/apache/httpd.conf in FreeBSD)</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    Alias /ifgraph/ "/usr/local/ifgraph/htdocs/"
-    </literallayout>
+      <literallayout class="monospaced">Alias /ifgraph/ "/usr/local/ifgraph/htdocs/"
+</literallayout>
     </blockquote>
 
     <para>Restart Apache for the changes to take effect.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# apachectl restart
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# apachectl restart
+</literallayout>
     </blockquote>
 
     <para><emphasis role="bold">6. Open web browser to view
@@ -310,10 +296,9 @@
     lines to the bottom of this file.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    * * * * * root /usr/local/bin/ifgraph.pl -c /usr/local/etc/ifgraph.conf &gt; /dev/null
-    */5 * * * * root /usr/local/bin/makegraph.pl -c /usr/local/etc/ifgraph.conf &gt; /dev/null
-    </literallayout>
+      <literallayout class="monospaced">* * * * * root /usr/local/bin/ifgraph.pl -c /usr/local/etc/ifgraph.conf &gt; /dev/null
+*/5 * * * * root /usr/local/bin/makegraph.pl -c /usr/local/etc/ifgraph.conf &gt; /dev/null
+</literallayout>
     </blockquote>
 
     <para>This will run the data collection every minute, and make the graphs
@@ -327,9 +312,8 @@
     <para>Make cron re-read its configuration files:</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    su-2.05b# killall -HUP cron
-    </literallayout>
+      <literallayout class="monospaced">su-2.05b# killall -HUP cron
+</literallayout>
     </blockquote>
   </sect1>
 
@@ -365,31 +349,29 @@
     <para>The config is pretty easy:</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    # Configuration file for ddclient generated by debconf
-    #
-    # /etc/ddclient.conf
+      <literallayout class="monospaced"># Configuration file for ddclient generated by debconf
+#
+# /etc/ddclient.conf
     
-    pid=/var/run/ddclient.pid 
-    protocol=dyndns2 
-    server=members.dyndns.org 
-    login=YourDynDNSLogin
-    password=YourDynDNSPassword 
-    fw-login=admin 
-    fw-password=Yourm0n0Password
-    use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
-    custom=yes
-    yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
-    </literallayout>
+pid=/var/run/ddclient.pid 
+protocol=dyndns2 
+server=members.dyndns.org 
+login=YourDynDNSLogin
+password=YourDynDNSPassword 
+fw-login=admin 
+fw-password=Yourm0n0Password
+use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
+custom=yes
+yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
+</literallayout>
     </blockquote>
 
     <para>If you only want to update Dynamic DNS entries with DynDNS, remove
     the</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    custom=yes
-    </literallayout>
+      <literallayout class="monospaced">custom=yes
+</literallayout>
     </blockquote>
 
     <para>directive. If you want to update a DynDNS <ulink
@@ -397,17 +379,15 @@
     replace the</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    custom=yes
-    </literallayout>
+      <literallayout class="monospaced">custom=yes
+</literallayout>
     </blockquote>
 
     <para>with</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    static=yes
-    </literallayout>
+      <literallayout class="monospaced">static=yes
+</literallayout>
     </blockquote>
 
     <para>If you manage your m0n0wall with TLS, the setup is slightly
@@ -415,33 +395,31 @@
     page:</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    # Configuration file for ddclient generated by debconf
-    #
-    # /etc/ddclient.conf
+      <literallayout class="monospaced"># Configuration file for ddclient generated by debconf
+#
+# /etc/ddclient.conf
     
-    pid=/var/run/ddclient.pid 
-    protocol=dyndns2 
-    server=members.dyndns.org 
-    login=YourDynDNSLogin
-    password=YourDynDNSPassword 
-    # fw-login=admin 
-    # fw-password=Password
-    # use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
-    use=cmd
-    cmd='curl -k -s https://admin:Yourm0n0Password@Yourm0n0IPOrPassword/status_interfaces.php'
-    custom=yes
-    yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
-    </literallayout>
+pid=/var/run/ddclient.pid 
+protocol=dyndns2 
+server=members.dyndns.org 
+login=YourDynDNSLogin
+password=YourDynDNSPassword 
+# fw-login=admin 
+# fw-password=Password
+# use=fw,  fw=http://Yourm0n0IPOrHostname/status_interfaces.php 
+use=cmd
+cmd='curl -k -s https://admin:Yourm0n0Password@Yourm0n0IPOrPassword/status_interfaces.php'
+custom=yes
+yourdomain.org,mail.yourdomain.org,somehost.yourdomain.org,yourdomain.com
+</literallayout>
     </blockquote>
 
     <para>Now setup ddclient to run as a daemon. Mine checks the status page
     every 5 minutes and updates the DynDNS records if necessary.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    /usr/sbin/ddclient -daemon 300 -syslog
-    </literallayout>
+      <literallayout class="monospaced">/usr/sbin/ddclient -daemon 300 -syslog
+</literallayout>
     </blockquote>
   </sect1>
 
@@ -522,8 +500,7 @@
     the internet.</para>
 
     <blockquote>
-      <literallayout class="monospaced">
-    NameVirtualHost 192.168.1.12
+      <literallayout class="monospaced">    NameVirtualHost 192.168.1.12
 
     &lt;VirtualHost 192.168.1.12&gt;
         UseCanonicalName off
@@ -542,7 +519,7 @@
         ServerName www.example.net
         Redirect / http://www.example.net:82
     &lt;/VirtualHost&gt;
-    </literallayout>
+</literallayout>
     </blockquote>
 
     <para>That configuration will keep www.example.com local, with the site's
@@ -637,7 +614,7 @@ cvs -Q commit -m "backup of config.xml [$NOW]"
 
 cd /tmp
 rm -rf $TMPDIR
-    </literallayout>
+</literallayout>
       </blockquote>
     </sect2>
 
@@ -655,7 +632,7 @@ PROTO=http
 M0N0IP=192.168.1.1
 NOW=`date +%Y-%m-%d@%H:%M`
 curl -s -o ${NOW}-config.xml -F Submit=download -u ${USER}:${PASS} ${PROTO}://$M0N0IP/diag_backup.php
-        </literallayout>
+</literallayout>
       </blockquote>
     </sect2>
   </sect1>
@@ -674,4 +651,4 @@ curl -s -o ${NOW}-config.xml -F Submit=download -u ${USER}:${PASS} ${PROTO}://$M
     <para>Before starting that guide, you must enable SNMP on your m0n0wall on
     the Services -&gt; SNMP screen.</para>
   </sect1>
-</chapter>
+</appendix>

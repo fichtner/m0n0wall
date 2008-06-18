@@ -123,14 +123,13 @@
       <para><emphasis role="bold">Specifications</emphasis></para>
 
       <blockquote>
-        <literallayout class="monospaced">
-    net4501-30: 133 Mhz CPU, 64 Mbyte SDRAM, 3 Ethernet, 2 Serial, CF socket, 1 Mini-PCI socket, 3.3V PCI connector.
-    net4511-30: 100 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Single PC-Card socket, PoE.
-    net4521-30: 133 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Dual PC-Card socket, PoE.
-    net4526-20: 100 Mhz CPU, 32 Mbyte SDRAM, 1 Ethernet, 1 Serial, 16 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
-    net4526-30: 133 Mhz CPU, 64 Mbyte SDRAM, 1 Ethernet, 1 Serial, 64 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
-    net4801-50: 266 Mhz CPU, 128 Mbyte SDRAM, 3 Ethernet, 2 serial, USB connector, CF socket, 44 pins IDE connector, 1 Mini-PCI socket, 3.3V PCI connector.
-    </literallayout>
+        <literallayout class="monospaced">net4501-30: 133 Mhz CPU, 64 Mbyte SDRAM, 3 Ethernet, 2 Serial, CF socket, 1 Mini-PCI socket, 3.3V PCI connector.
+net4511-30: 100 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Single PC-Card socket, PoE.
+net4521-30: 133 Mhz CPU, 64 Mbyte SDRAM, 2 Ethernet, 1 Serial, CF socket, 1 Mini-PCI socket, Dual PC-Card socket, PoE.
+net4526-20: 100 Mhz CPU, 32 Mbyte SDRAM, 1 Ethernet, 1 Serial, 16 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
+net4526-30: 133 Mhz CPU, 64 Mbyte SDRAM, 1 Ethernet, 1 Serial, 64 Mbyte CF Flash, 2 Mini-PCI sockets, PoE.
+net4801-50: 266 Mhz CPU, 128 Mbyte SDRAM, 3 Ethernet, 2 serial, USB connector, CF socket, 44 pins IDE connector, 1 Mini-PCI socket, 3.3V PCI connector.
+</literallayout>
       </blockquote>
 
       <para>For a detailed walk-through of getting up and running with
@@ -162,25 +161,23 @@
 
       <para><emphasis role="bold">IP110, 120 and 130</emphasis></para>
 
-      <literallayout>
-            Three 10/100 Ethernet interfaces
+      <literallayout>            Three 10/100 Ethernet interfaces
             National GX1 300 MHz processor
             64 MB RAM on 110, 128 MB on 120, 256 MB on 130
             5 GB hard drive
             Two serial ports (auxiliary and console)
             Quiet - hard drive is only moving component, no fans
-        </literallayout>
+</literallayout>
 
       <para><emphasis role="bold">IP330</emphasis></para>
 
-      <literallayout>
-            Three 10/100 Ethernet interfaces
+      <literallayout>            Three 10/100 Ethernet interfaces
             National GX1 300 MHz processor
             RAM typically between 64 MB and 256 MB
             Hard drive typically ranging from 4-20 GB
             Two serial ports (auxiliary and console)
             Has case fans, so not quiet like the IP1xx
-        </literallayout>
+</literallayout>
 
       <para><emphasis role="bold">IP440, 530, 650, 740</emphasis></para>
 
@@ -204,11 +201,12 @@
       <title>NexCom NexGate Appliances</title>
 
       <para><ulink url="http://nexcom.com">NexCom's</ulink> <ulink
-      url="http://nsa.nexcom.com.tw/index.jsp">Nexgate</ulink> line of
-      appliances all support m0n0wall. These are much more high end than the
-      WRAP and Soekris platforms, and hence are much more costly. There are a
-      number of different configurations available, with prices starting over
-      $500 USD for the most basic model. Contact NexCom for pricing.</para>
+      url="http://www.nexcom.com/SiteSearch.aspx?k=nsa">Nexgate</ulink> line
+      of appliances all support m0n0wall. These are much more high end than
+      the WRAP and Soekris platforms, and hence are much more costly. There
+      are a number of different configurations available, with prices starting
+      over $500 USD for the most basic model. Contact NexCom for
+      pricing.</para>
     </sect2>
   </sect1>
 
