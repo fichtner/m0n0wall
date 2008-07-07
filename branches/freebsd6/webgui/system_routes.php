@@ -29,14 +29,22 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("System", "Static routes");
 require("guiconfig.inc");
 
-if (!is_array($config['staticroutes']['route']))
-	$config['staticroutes']['route'] = array();
+if ($ipv6routes = ($_GET['type'] == 'ipv6')) {
+	$configname = 'route6';
+	$typelink = '&type=ipv6';
+} else {
+	$configname = 'route';
+	$typelink = '';
+}
+$pgtitle = array("System", ipv6enabled() ? ($ipv6routes ? 'IPv6 Static routes' : 'IPv4 Static routes') : 'Static routes');
+
+if (!is_array($config['staticroutes'][$configname]))
+	$config['staticroutes'][$configname] = array();
 
 staticroutes_sort();
-$a_routes = &$config['staticroutes']['route'];
+$a_routes = &$config['staticroutes'][$configname];
 
 if ($_POST) {
 
@@ -64,13 +72,13 @@ if ($_GET['act'] == "del") {
 		unset($a_routes[$_GET['id']]);
 		write_config();
 		touch($d_staticroutesdirty_path);
-		header("Location: system_routes.php");
+		header("Location: system_routes.php?{$typelink}");
 		exit;
 	}
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<form action="system_routes.php" method="post">
+<form action="system_routes.php?<?=$typelink?>" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_staticroutesdirty_path)): ?><p>
 <?php print_info_box_np("The static route configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
@@ -88,7 +96,9 @@ if ($_GET['act'] == "del") {
                 <tr>
                   <td class="listlr">
                     <?php
-				  $iflabels = array('lan' => 'LAN', 'wan' => 'WAN', 'pptp' => 'PPTP');
+				  $iflabels = array('lan' => 'LAN', 'wan' => 'WAN');
+				  if (!$ipv6routes)
+					$iflabels['pptp'] = "PPTP";
 				  for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++)
 				  	$iflabels['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 				  echo htmlspecialchars($iflabels[$route['interface']]); ?>
@@ -102,13 +112,13 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($route['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="system_routes_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit route" width="17" height="17" border="0" alt="edit route"></a>
-                     &nbsp;<a href="system_routes.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this route?')"><img src="x.gif" title="delete route" width="17" height="17" border="0" alt="delete route"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="system_routes_edit.php?id=<?=$i;?><?=$typelink?>"><img src="e.gif" title="edit route" width="17" height="17" border="0" alt="edit route"></a>
+                     &nbsp;<a href="system_routes.php?act=del&amp;id=<?=$i;?><?=$typelink?>" onclick="return confirm('Do you really want to delete this route?')"><img src="x.gif" title="delete route" width="17" height="17" border="0" alt="delete route"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="4"></td>
-                  <td class="list"> <a href="system_routes_edit.php"><img src="plus.gif" title="add route" width="17" height="17" border="0" alt="add route"></a></td>
+                  <td class="list"> <a href="system_routes_edit.php?<?=$typelink?>"><img src="plus.gif" title="add route" width="17" height="17" border="0" alt="add route"></a></td>
 				</tr>
               </table>
             </form>

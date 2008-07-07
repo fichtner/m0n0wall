@@ -48,6 +48,7 @@
 		<!-- <harddiskstandby></harddiskstandby> -->
 		<!-- <polling/> -->
 		<!-- <notes></notes> -->
+		<!-- <enableipv6/> -->
 	</system>
 	<interfaces>
 		<lan>
@@ -57,6 +58,9 @@
 			<media></media>
 			<mediaopt></mediaopt>
 			<!--
+			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4</ipaddr6>
+			<subnet6></subnet6>
+			<ipv6ra />
 			<wireless>
 				*see below (opt[n])*
 			</wireless>
@@ -65,7 +69,7 @@
 		<wan>
 			<if>sis1</if>
 			<ipaddr>dhcp</ipaddr>
-			<!-- *or* ipv4-address *or* 'pppoe' *or* 'pptp' *or* 'bigpond' -->
+			<!-- *or* ipv4-address *or* 'pppoe' *or* 'pptp' -->
 			<subnet></subnet>
 			<gateway></gateway>
 			<blockpriv/>
@@ -73,6 +77,9 @@
 			<media></media>
 			<mediaopt></mediaopt>
 			<!--
+			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4</ipaddr6>
+			<subnet6></subnet6>
+			<gateway6></gateway6>
 			<ispointtopoint/>
 			<wireless>
 				*see below (opt[n])*
@@ -86,6 +93,9 @@
 			<if></if>
 			<ipaddr></ipaddr>
 			<subnet></subnet>
+			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4</ipaddr6>
+			<subnet6></subnet6>
+			<ipv6ra />
 			<media></media>
 			<mediaopt></mediaopt>
 			<bridge>lan|wan|opt[n]</bridge>
@@ -135,6 +145,12 @@
 			<gateway>xxx.xxx.xxx.xxx</gateway>
 			<descr></descr>
 		</route>
+		<route6>
+			<interface>lan|opt[n]</interface>
+			<network>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/xx</network>
+			<gateway>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx</gateway>
+			<descr></descr>
+		</route6>
 		-->
 	</staticroutes>
 	<pppoe>
@@ -142,8 +158,6 @@
 		<password></password>
 		<provider></provider>
 		<!--
-		<ondemand/>
-		<timeout></timeout>
 		<dnsnosec/>
 		-->
 	</pppoe>
@@ -154,19 +168,10 @@
 		<subnet></subnet>
 		<remote></remote>
 		<!--
-		<ondemand/>
 		<local-ip></local-ip>
 		<remote-ip></remote-ip>
-		<timeout></timeout>
 		-->
 	</pptp>
-	<bigpond>
-		<username></username>
-		<password></password>
-		<authserver></authserver>
-		<authdomain></authdomain>
-		<minheartbeatinterval></minheartbeatinterval>
-	</bigpond>
 	<dyndns>
 		<!-- <enable/> -->
 		<type>dyndns</type>
@@ -264,10 +269,6 @@
 		<!-- <bindlan/> -->
 	</snmpd>
 	<diag>
-		<ipv6nat>
-			<!-- <enable/> -->
-			<ipaddr></ipaddr>
-		</ipv6nat>
 		<!-- <ipfstatentries></ipfstatentries> -->
 	</diag>
 	<bridge>
@@ -406,7 +407,7 @@
 			</destination>
 		</rule>
 		<!-- rule syntax:
-		<rule>
+		<rule/rule6>
 			<disabled/>
 			<type>pass|block|reject</type>
 			<descr>...</descr>
@@ -429,7 +430,7 @@
 			</destination>
 			<frags/>
 			<log/>
-		</rule>
+		</rule/rule6>
 		-->
 	</filter>
 	<shaper>

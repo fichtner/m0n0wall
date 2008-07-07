@@ -101,6 +101,8 @@ function interfaces_lan_configure() {
 	mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " " . 
 		escapeshellarg($lancfg['ipaddr'] . "/" . $lancfg['subnet']) . $addflags);
 	
+	interfaces_lan_configure6();
+	
 	if (!$g['booting']) {
 		/* make new hosts file */
 		system_hosts_generate();
@@ -136,6 +138,32 @@ function interfaces_lan_configure() {
 	return 0;
 }
 
+function interfaces_lan_configure6() {
+	global $config, $g;
+	
+	$lancfg = $config['interfaces']['lan'];
+	remove_all_ipv6_addresses($lancfg['if']);
+
+	if (ipv6enabled()) {
+		if ($lancfg['ipaddr6'] == "6to4") {
+			/* take second /64 from 6to4 prefix on WAN interface */
+			$v6addr = calc_6to4_address("lan");
+			if ($v6addr)
+				mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " inet6 $v6addr prefixlen 64 alias");
+		} else if ($lancfg['ipaddr6'] && $lancfg['subnet6']) {
+			mwexec('/sbin/ifconfig ' . escapeshellarg($lancfg['if']) .
+				' inet6 ' . escapeshellarg($lancfg['ipaddr6']) .
+				' prefixlen ' . escapeshellarg($lancfg['subnet6'] . ' alias')
+			);
+		}
+	}
+	
+	if (!$g['booting']) {
+		/* reload rtadvd */
+		interfaces_rtadvd_configure();
+	}
+}
+
 function interfaces_optional_configure() {
 	global $config, $g;
 	global $bridgeconfig;
@@ -146,6 +174,8 @@ function interfaces_optional_configure() {
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 		interfaces_optional_configure_if($i);
 	}
+	
+	interfaces_optional_configure6();
 	
 	if ($bridgeconfig) {
 		/* Set the system bridge configuration and enable bridging. */
@@ -180,6 +210,21 @@ function interfaces_optional_configure() {
 		
 		/* restart dnsmasq */
 		services_dnsmasq_configure();
+	}
+	
+	return 0;
+}
+
+function interfaces_optional_configure6() {
+	global $config, $g;
+	
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+		interfaces_optional_configure_if6($i);
+	}
+	
+	if (!$g['booting']) {
+		/* reload rtadvd */
+		interfaces_rtadvd_configure();
 	}
 	
 	return 0;
@@ -223,7 +268,7 @@ function interfaces_optional_configure_if($opti) {
 			$addflags .= " link0";
 		
 		if (isset($config['system']['polling']))
-			mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) .  " polling") ;
+			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) .  " polling");
 	
 		/* bridged? */
 		if ($optcfg['bridge']) {
@@ -251,6 +296,31 @@ function interfaces_optional_configure_if($opti) {
 	
 	if ($g['booting'])
 		echo "done\n";
+	
+	return 0;
+}
+
+function interfaces_optional_configure_if6($opti) {
+	global $config, $g;
+	
+	$optcfg = $config['interfaces']['opt' . $opti];
+	
+	if (isset($optcfg['enable'])) {
+		remove_all_ipv6_addresses($optcfg['if']);
+		
+		if (ipv6enabled()) {
+			if ($optcfg['ipaddr6'] == "6to4") {
+				$v6addr = calc_6to4_address("opt" . $opti);
+				if ($v6addr)
+					mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " inet6 $v6addr prefixlen 64 alias");
+			} else if ($optcfg['ipaddr6'] && $optcfg['subnet6']) {
+				mwexec('/sbin/ifconfig ' . escapeshellarg($optcfg['if']) .
+					' inet6 ' . escapeshellarg($optcfg['ipaddr6']) .
+					' prefixlen ' . escapeshellarg($optcfg['subnet6'] . ' alias')
+				);
+			}
+		}
+	}
 	
 	return 0;
 }
@@ -391,7 +461,7 @@ function interfaces_wan_configure() {
 	/* remove all addresses first */
 	while (mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " -alias") == 0);
 	mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " down");
-		
+	
 	/* wireless configuration? */
 	if (is_array($wancfg['wireless']))
 		interfaces_wireless_configure($wancfg['if'], $wancfg['wireless']);
@@ -431,11 +501,6 @@ function interfaces_wan_configure() {
 			interfaces_wan_pptp_configure();
 			break;
 			
-		case 'bigpond':
-			/* just configure DHCP for now; fire up bpalogin when we've got the lease */
-			interfaces_wan_dhcp_configure();
-			break;
-			
 		default:
 			if (isset($wancfg['ispointtopoint']) && $wancfg['pointtopoint']) {
 				mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " " . 
@@ -453,6 +518,8 @@ function interfaces_wan_configure() {
 			/* resync ipfilter (done automatically for DHCP/PPPoE/PPTP) */
 			filter_resync();
 	}
+	
+	interfaces_wan_configure6();
 	
 	if (!$g['booting']) {
 		/* reconfigure static routes (kernel may have deleted them) */
@@ -481,6 +548,49 @@ function interfaces_wan_configure() {
 		echo "done\n";
 	
 	return 0;
+}
+
+function interfaces_wan_configure6() {
+	global $config, $g;
+	
+	$wancfg = $config['interfaces']['wan'];
+	
+	remove_all_ipv6_addresses($wancfg['if']);
+	remove_all_ipv6_addresses("stf0");
+	
+	if (ipv6enabled()) {
+		if ($wancfg['ipaddr6'] == "6to4") {
+			/* obtain current IPv4 address and make a 6to4 address out of it */
+			$v6addr = calc_6to4_address("wan");
+			
+			if ($v6addr) {
+				mwexec("/sbin/ifconfig stf0 create");
+				mwexec("/sbin/ifconfig stf0 inet6 $v6addr prefixlen 16 alias");
+				mwexec('/sbin/route delete -inet6 default');
+		
+				/* always use 6to4 anycast address 192.88.99.1 for now */
+				mwexec('/sbin/route add -inet6 default 2002:c058:6301::');
+			
+				if (!$g['booting']) {
+					/* a changed 6to4 prefix on WAN means we may also need to change the
+					   IPv6 prefix on LAN/OPT */
+					interfaces_lan_configure6();
+					interfaces_optional_configure6();
+				}
+			}
+		} else {
+			if ($wancfg['ipaddr6'] && $wancfg['subnet6'] && $wancfg['gateway6']) {
+				mwexec('/sbin/ifconfig ' . escapeshellarg($wancfg['if']) .
+					' inet6 ' . escapeshellarg($wancfg['ipaddr6']) .
+					' prefixlen ' . escapeshellarg($wancfg['subnet6'] . ' alias')
+				);
+				/* default route */
+				mwexec('/sbin/route delete -inet6 default');
+				mwexec('/sbin/route add -inet6 default ' .
+					escapeshellarg($wancfg['gateway6']));
+			}
+		}
+	}
 }
 
 function interfaces_wan_dhcp_configure() {
@@ -542,42 +652,18 @@ function interfaces_wan_pppoe_configure() {
 		return 1;
 	}
 	
-	$idle = 0;
-	
-	if (isset($pppoecfg['ondemand'])) {
-		$ondemand = "enable";
-		if ($pppoecfg['timeout'])
-			$idle = $pppoecfg['timeout'];
-	} else {
-		$ondemand = "disable";
-	}
-	
 	$mpdconf = <<<EOD
 startup:
 
 pppoe:
 	new -i ng0 pppoe pppoe
 	set iface route default
-	set iface {$ondemand} on-demand
-	set iface idle {$idle}
+	set iface disable on-demand
+	set iface idle 0
 	set iface up-script /usr/local/sbin/ppp-linkup
 	set iface enable tcpmssfix
 
 EOD;
-	
-	if (isset($pppoecfg['ondemand'])) {
-		if (isset($pppoecfg['local-ip']) && isset($pppoecfg['remote-ip'])) {
-			$mpdconf .= <<<EOD
-	set iface addrs {$pppoecfg['local-ip']} {$pppoecfg['remote-ip']}
-
-EOD;
-		} else {
-			$mpdconf .= <<<EOD
-	set iface addrs 192.0.2.112 192.0.2.113
-
-EOD;
-		}
-	}
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
@@ -608,10 +694,7 @@ EOD;
 		}
 	}
 
-	if (isset($pppoecfg['ondemand']))
-		$mpdconf .= "\topen iface\n";
-	else
-		$mpdconf .= "\topen\n";
+	$mpdconf .= "\topen\n";
 
 	fwrite($fd, $mpdconf);
 	fclose($fd);
@@ -668,16 +751,6 @@ function interfaces_wan_pptp_configure() {
 		echo("Error: cannot open mpd.conf in interfaces_wan_pptp_configure().\n");
 		return 1;
 	}
-	
-	$idle = 0;
-	
-	if (isset($pptpcfg['ondemand'])) {
-		$ondemand = "enable";
-		if ($pptpcfg['timeout'])
-			$idle = $pptpcfg['timeout'];
-	} else {
-		$ondemand = "disable";
-	}
 		
 	$mpdconf = <<<EOD
 startup:
@@ -685,18 +758,11 @@ startup:
 pptp:
 	new -i ng0 pptp pptp
 	set iface route default
-	set iface {$ondemand} on-demand
-	set iface idle {$idle}
+	set iface disable on-demand
+	set iface idle 0
 	set iface up-script /usr/local/sbin/ppp-linkup
 
 EOD;
-	
-	if (isset($pptpcfg['ondemand'])) {
-		$mpdconf .= <<<EOD
-	set iface addrs 10.0.0.1 10.0.0.2
-
-EOD;
-	}
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
@@ -721,10 +787,7 @@ EOD;
 EOD;
 	}
 	
-	if (isset($pptpcfg['ondemand']))
-		$mpdconf .= "\topen iface\n";
-	else
-		$mpdconf .= "\topen\n";
+	$mpdconf .= "\topen\n";
 
 	fwrite($fd, $mpdconf);
 	fclose($fd);
@@ -773,99 +836,137 @@ function interfaces_wan_pptp_up() {
 	sleep(3);
 }
 
-function interfaces_wan_bigpond_configure($curwanip) {
+function interfaces_rtadvd_configure() {
 	global $config, $g;
-	
-	$bpcfg = $config['bigpond'];
-	
-	if (!$curwanip) {
-		/* IP address not configured yet, exit */
+
+	/* kill any running rtadvd */
+	killbyname('rtadvd');
+
+	$wasrunning = file_exists("{$g['varrun_path']}/rtadvd.pid");
+
+	mwexec('/sbin/sysctl net.inet6.ip6.accept_rtadv=0');
+
+	if (!ipv6enabled())
 		return 0;
-	}
-		
-	/* kill bpalogin */
-	killbyname("bpalogin");
+
+	/* rtadvd enabled on any interfaces? */
+	$rtadvdifs = '';
+	$rtadvdconf = '';
 	
-	/* wait a moment */
-	sleep(1);
-	
-	/* get the default domain */
-	$nfd = @fopen("{$g['varetc_path']}/defaultdomain.conf", "r");
-	if ($nfd) {
-		$defaultdomain = trim(fgets($nfd));
-		fclose($nfd);
+	if (isset($config['interfaces']['lan']['ipv6ra'])) {
+		$rtadvdifs .= ' ' . $config['interfaces']['lan']['if'];
+		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":maxinterval#10:mininterval#4\n";
 	}
 	
-	/* generate bpalogin.conf */
-	$fd = fopen("{$g['varetc_path']}/bpalogin.conf", "w");
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+		$optcfg = $config['interfaces']['opt' . $i];
+		if (isset($optcfg['ipv6ra']) && isset($optcfg['enable']) &&
+			$optcfg['if'] && !$optcfg['bridge']) {
+			
+			$rtadvdifs .= ' ' . $optcfg['if'];
+			/* maybe this can be configurable in the future */
+			$rtadvdconf .= $optcfg['if'] . ":maxinterval#10:mininterval#4\n";
+		}
+	}
+
+	if (!$rtadvdifs)
+		return 0;
+
+	if ($g['booting'])
+		echo 'Starting IPv6 router advertisement service... ';
+	else if ($wasrunning) {
+		/* rtadvd first sends out advertisements that
+			there are no longer routes before effectively exiting
+			(look at die() in rtadvd.c); this can take up to 10 seconds, but we
+			don't want to wait that long - just give it time to send out one
+			such advertisement */
+		sleep(1);
+		sigkillbyname('rtadvd', 'KILL');
+	}
+
+	/* this file is deleted here because we might create a race condition
+		when deleting it earlier */
+	unlink_if_exists("{$g['varrun_path']}/rtadvd.pid");
+
+	/* write rtadvd.conf */
+	$fd = fopen("{$g['varetc_path']}/rtadvd.conf", 'w');
 	if (!$fd) {
-		echo("Error: cannot open bpalogin.conf in interfaces_wan_bigpond_configure().\n");
+		printf("Error: cannot open rtadvd.conf in interfaces_rtadvd_configure().\n");
 		return 1;
 	}
-	
-	if (!$bpcfg['authserver'])
-		$bpcfg['authserver'] = "dce-server";
-	if (!$bpcfg['authdomain'])
-		$bpcfg['authdomain'] = $defaultdomain;
-		
-	$bpconf = <<<EOD
-username {$bpcfg['username']}
-password {$bpcfg['password']}
-authserver {$bpcfg['authserver']}
-authdomain {$bpcfg['authdomain']}
-localport 5050
-
-EOD;
-
-	if ($bpcfg['minheartbeatinterval'])
-		$bpconf .= "minheartbeatinterval {$bpcfg['minheartbeatinterval']}\n";
-
-	fwrite($fd, $bpconf);
+	fwrite($fd, $rtadvdconf);
 	fclose($fd);
-	
-	/* fire up bpalogin */
-	mwexec("/usr/local/sbin/bpalogin -c {$g['varetc_path']}/bpalogin.conf");
-	
+
+	/* fire up rtadvd */
+	mwexec("/usr/sbin/rtadvd -D -c {$g['varetc_path']}/rtadvd.conf $rtadvdifs 2>&1 & " .
+		"echo \"$!\" > {$g['varrun_path']}/rtadvd.pid");
+
+	if (!$g['booting']) {
+		filter_configure();
+	} else
+		echo "done\n";
+
 	return 0;
 }
 
-function get_real_wan_interface() {
+function get_real_wan_interface($ipv6 = false) {
 	global $config, $g;
 	
 	$wancfg = $config['interfaces']['wan'];
 	
 	$wanif = $wancfg['if'];
-	if (($wancfg['ipaddr'] == "pppoe") || ($wancfg['ipaddr'] == "pptp")) {
-		$wanif = $g['pppoe_interface'];
+	if ($ipv6) {
+		if ($wancfg['ipaddr6'] == "6to4")
+			$wanif = "stf0";
+	} else {
+		if (($wancfg['ipaddr'] == "pppoe") || ($wancfg['ipaddr'] == "pptp")) {
+			$wanif = $g['pppoe_interface'];
+		}
 	}
 	
 	return $wanif;
 }
 
-function get_current_wan_address() {
+function get_current_wan_address($ipv6 = false) {
 	global $config, $g;
 	
 	$wancfg = $config['interfaces']['wan'];
 	
-	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp','bigpond'))) {
+	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp'))) {
 		/* dynamic WAN IP address, find out which one */
-		$wanif = get_real_wan_interface();
+		$wanif = get_real_wan_interface($ipv6);
 		
-		/* get interface info with netstat */
-		exec("/usr/bin/netstat -nWI " . escapeshellarg($wanif) . " -f inet", $ifinfo);
-		
-		if (isset($ifinfo[1])) {
-			$aif = preg_split("/\s+/", $ifinfo[1]);
-			$curwanip = chop($aif[3]);
+		if ($ipv6) {
+			/* if the IPv4 address is dynamic, then the IPv6 address could also be
+			   (in case we're using 6to4) */
 			
-			if ($curwanip && is_ipaddr($curwanip) && ($curwanip != "0.0.0.0"))
-				return $curwanip;
+			/* can't use netstat for IPv6, as it will always truncate addresses, even if -W is used :( */
+			exec("/sbin/ifconfig " . escapeshellarg($wanif) . " 2>/dev/null", $ifinfo);
+			
+			foreach ($ifinfo as $line) {
+				if (preg_match("/inet6 ([0-9a-f:]+) /", $line, $matches)) {
+					if (is_ipaddr6($matches[1]))
+						return $matches[1];
+				}
+			}
+			
+		} else {
+			/* get interface info with netstat */
+			exec("/usr/bin/netstat -nWI " . escapeshellarg($wanif) . " -f inet", $ifinfo);
+
+			if (isset($ifinfo[1])) {
+				$aif = preg_split("/\s+/", $ifinfo[1]);
+				$curwanip = chop($aif[3]);
+
+				if ($curwanip && is_ipaddr($curwanip) && ($curwanip != "0.0.0.0"))
+					return $curwanip;
+			}
 		}
 		
 		return null;
 	} else {
 		/* static WAN IP address */
-		return $wancfg['ipaddr'];
+		return $wancfg[$ipv6 ? 'ipaddr6' : 'ipaddr'];
 	}
 }
 
@@ -927,6 +1028,47 @@ EOD;
 		$config .= "wpa_pairwise=TKIP CCMP\n";
 	
 	return $config;
+}
+
+function get_interface_ipv6_adresses($if) {
+	$addresses = array();
+	unset($ifc);
+	exec('/sbin/ifconfig ' . escapeshellarg($if) . ' 2>/dev/null', $ifc);
+
+	foreach ($ifc as $i) {
+		if (preg_match('/inet6 (.+) prefixlen (\d+)/', $i, $matches)) {
+			$ip6 = preg_replace('/%.*$/', '', trim($matches[1]));
+			array_push($addresses, array($ip6, (int)$matches[2]));
+		}
+	}
+
+	return $addresses;
+}
+
+function remove_all_ipv6_addresses($if) {
+	$addresses = get_interface_ipv6_adresses($if);
+
+	foreach ($addresses as $adr) {
+		if (!preg_match('/^fe80:/', $adr[0])) {
+			mwexec('/sbin/ifconfig ' . escapeshellarg($if) .
+				' inet6 ' . escapeshellarg($adr[0]) . ' -alias');
+		}
+	}
+}
+
+function calc_6to4_address($if) {
+	$wan_v6nibbles = convert_to_6to4_nibbles(get_current_wan_address(false));
+	if ($wan_v6nibbles) {
+		if ($if == "wan")
+			$nth = 0;
+		else if ($if == "lan")
+			$nth = 1;
+		else if (preg_match('/^opt(\d+)$/', $if, $matches))
+			$nth = $matches[1] + 1;
+		
+		return "2002:{$wan_v6nibbles}:{$nth}::1";
+	}
+	return false;
 }
 
 ?>

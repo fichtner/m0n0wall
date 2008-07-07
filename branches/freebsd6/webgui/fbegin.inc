@@ -99,7 +99,12 @@ if ((!is_array($allowed)) and
 }
 
 $menu['System']['General setup'] = array('system.php');
-$menu['System']['Static routes'] = array('system_routes.php');
+if (ipv6enabled()) {
+	$menu['System']['IPv4 Static routes'] = array('system_routes.php');
+	$menu['System']['IPv6 Static routes'] = array('system_routes.php?type=ipv6');
+} else {
+	$menu['System']['Static routes'] = array('system_routes.php');
+}
 $menu['System']['Firmware']      = array('system_firmware.php');
 $menu['System']['Advanced']      = array('system_advanced.php');
 if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
@@ -109,7 +114,12 @@ else {
 	$menu['System']['User password']  = array('system_usermanager.php');
 }
 
-$menu['Firewall']['Rules']          = array('firewall_rules.php');
+if (ipv6enabled()) {
+	$menu['Firewall']['IPv4 Rules']          = array('firewall_rules.php');
+	$menu['Firewall']['IPv6 Rules']          = array('firewall_rules.php?type=ipv6');
+} else {
+	$menu['Firewall']['Rules']          = array('firewall_rules.php');
+}
 $menu['Firewall']['NAT']            = array('firewall_nat.php',
 											'firewall_nat_server.php',
 							  				'firewall_nat_1to1.php',

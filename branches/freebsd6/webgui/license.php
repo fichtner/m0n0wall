@@ -136,6 +136,7 @@ require("guiconfig.inc");
 			  <br>
               Michael Hanselmann (<a href="mailto:m0n0@hansmi.ch">m0n0@hansmi.ch</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IDE hard disk standby; exec.php arrow keys</font></em><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPv6 support</font></em><br>
 			  <br>
               Audun Larsen (<a href="mailto:larsen@xqus.com">larsen@xqus.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CPU/memory usage display</font></em><br>
@@ -226,9 +227,6 @@ All rights reserved.<br>
 			  Copyright
 &copy; 2002 Thomas Quinot (thomas@cuivre.fr.eu.org)<br>
               <br>
-              BPALogin (<a href="http://bpalogin.sourceforge.net/" target="_blank">http://bpalogin.sourceforge.net</a>) - lightweight portable BIDS2 login client<br>
-              Copyright &copy; 2001-3 Shane Hyde, and others.<br>
-			  <br>
 			  wol (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br>
 			  Copyright &copy; 2000,2001,2002,2003,2004 Thomas Krennwallner &lt;krennwallner@aon.at&gt;<br>
               <br>

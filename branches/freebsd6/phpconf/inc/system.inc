@@ -129,48 +129,97 @@ function system_hostname_configure() {
 function system_routing_configure() {
 	global $config, $g;
 	
-	/* clear out old routes, if necessary */
-	if (file_exists("{$g['vardb_path']}/routes.db")) {
-		$fd = fopen("{$g['vardb_path']}/routes.db", "r");
-		if (!$fd) {
-			printf("Error: cannot open routes DB file in system_routing_configure().\n");
-			return 1;		
+	foreach (array(false, true) as $ipv6) {
+		$routes_db = $g['vardb_path'] . '/routes' . ($ipv6 ? '6' : '') . '.db';
+		$inet = ($ipv6 ? '-inet6' : '');
+		$strtconf = 'route' . ($ipv6 ? '6' : '');
+		
+		/* clear out old routes, if necessary */
+		if (file_exists($routes_db)) {
+			$fd = fopen($routes_db, "r");
+			if (!$fd) {
+				printf("Error: cannot open routes DB file in system_routing_configure().\n");
+				return 1;		
+			}
+			while (!feof($fd)) {
+				$oldrt = fgets($fd);
+				if ($oldrt)
+					mwexec("/sbin/route delete $inet " . escapeshellarg($oldrt));
+			}
+			fclose($fd);
+			unlink($routes_db);
 		}
-		while (!feof($fd)) {
-			$oldrt = fgets($fd);
-			if ($oldrt)
-				mwexec("/sbin/route delete " . escapeshellarg($oldrt));
-		}
-		fclose($fd);
-		unlink("{$g['vardb_path']}/routes.db");
-	}
 	
-	if (is_array($config['staticroutes']['route'])) {
+		if ((!$ipv6 && is_array($config['staticroutes']['route'])) || ($ipv6 && ipv6enabled())) {
 		
-		$fd = fopen("{$g['vardb_path']}/routes.db", "w");
-		if (!$fd) {
-			printf("Error: cannot open routes DB file in system_routing_configure().\n");
-			return 1;		
-		}
-		
-		foreach ($config['staticroutes']['route'] as $rtent) {
-			mwexec("/sbin/route add " . escapeshellarg($rtent['network']) . 
-				" " . escapeshellarg($rtent['gateway']));
+			$fd = fopen($routes_db, "w");
+			if (!$fd) {
+				printf("Error: cannot open routes DB file in system_routing_configure().\n");
+				return 1;		
+			}
 			
-			/* record route so it can be easily removed later (if necessary) */
-			fwrite($fd, $rtent['network'] . "\n");
-		}
+			$routes = $config['staticroutes'][$strtconf];
+			if (!is_array($routes))
+				$routes = array();
+			
+			if ($ipv6) {
+				/* disallow "internal" addresses to appear on the wire */
+				array_push($routes, array('network' => '::ffff:0.0.0.0/96',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+				array_push($routes, array('network' => '::0.0.0.0/96',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+
+				/* disallow packets to malicious 6to4 prefix */
+				array_push($routes, array('network' => '2002:e000::/20',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+				array_push($routes, array('network' => '2002:7f00::/24',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+				array_push($routes, array('network' => '2002:0000::/24',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+				array_push($routes, array('network' => '2002:ff00::/24',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+
+				/* Disallow unicast packets without outgoing scope identifiers,
+					or route such packets to a "default" interface, if it is
+					specified. */
+				array_push($routes, array('network' => 'fe80::/10',
+										  'gateway' => '::1',
+										  'opts'    => '-reject'));
+			}
 		
-		fclose($fd); 
+			foreach ($routes as $rtent) {
+				mwexec("/sbin/route add $inet " . escapeshellarg($rtent['network']) . 
+					' ' . escapeshellarg($rtent['gateway']) .
+					' ' . escapeshellarg($rtent['opts']));
+			
+				/* record route so it can be easily removed later (if necessary) */
+				fwrite($fd, $rtent['network'] . "\n");
+			}
+		
+			fclose($fd); 
+		}
 	}
 	
 	return 0;
 }
 
+function ipv6enabled() {
+	global $config;
+	return isset($config['system']['enableipv6']);
+}
+
 function system_routing_enable() {
 	global $config, $g;
 	
-	return mwexec("/sbin/sysctl net.inet.ip.forwarding=1");
+	$res = mwexec("/sbin/sysctl net.inet.ip.forwarding=1");
+	$res |= mwexec("/sbin/sysctl net.inet6.ip6.forwarding=1");
+	return $res;
 }
 
 function system_syslogd_start() {

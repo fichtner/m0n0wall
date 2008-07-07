@@ -43,6 +43,7 @@ sbin/mount_msdosfs
 sbin/newfs
 sbin/nologin
 sbin/ping
+sbin/ping6
 sbin/reboot
 sbin/route
 sbin/shutdown
@@ -70,7 +71,9 @@ usr/sbin/chown
 usr/sbin/chroot
 usr/sbin/hostapd
 usr/sbin/pwd_mkdb
+usr/sbin/rtadvd
 usr/sbin/traceroute
+usr/sbin/traceroute6
 
-# contents of /usr/libexec
-usr/libexec/ld-elf.so.1:libexec/ld-elf.so.1
+# contents of /libexec
+libexec/ld-elf.so.1

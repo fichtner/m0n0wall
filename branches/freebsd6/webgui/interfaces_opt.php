@@ -46,6 +46,19 @@ $pconfig['bridge'] = $optcfg['bridge'];
 $pconfig['ipaddr'] = $optcfg['ipaddr'];
 $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
+if (ipv6enabled()) {
+	$pconfig['ipv6ra'] = isset($optcfg['ipv6ra']);
+	
+	if ($optcfg['ipaddr6'] == "6to4") {
+		$pconfig['ipv6mode'] = "6to4";
+	} else if ($optcfg['ipaddr6']) {
+		$pconfig['ipaddr6'] = $optcfg['ipaddr6'];
+		$pconfig['subnet6'] = $optcfg['subnet6'];
+		$pconfig['ipv6mode'] = "static";
+	} else {
+		$pconfig['ipv6mode'] = "disabled";
+	}
+}
 
 /* Wireless interface? */
 if (isset($optcfg['wireless'])) {
@@ -105,6 +118,12 @@ if ($_POST) {
 			if (($_POST['subnet'] && !is_numeric($_POST['subnet']))) {
 				$input_errors[] = "A valid subnet bit count must be specified.";
 			}
+
+			if (ipv6enabled()) {
+				if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['ipaddr6'])) {
+					$input_errors[] = "A valid IPv6 address must be specified.";
+				}
+			}
 		}
 	}
 	
@@ -122,6 +141,22 @@ if ($_POST) {
 		$optcfg['subnet'] = $_POST['subnet'];
 		$optcfg['bridge'] = $_POST['bridge'];
 		$optcfg['enable'] = $_POST['enable'] ? true : false;
+		
+		if (ipv6enabled()) {
+			if ($_POST['ipv6mode'] == "6to4") {
+				$optcfg['ipaddr6'] = "6to4";
+				unset($optcfg['subnet6']);
+				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+			} else if ($_POST['ipv6mode'] == "static") {
+				$optcfg['ipaddr6'] = $_POST['ipaddr6'];
+				$optcfg['subnet6'] = $_POST['subnet6'];
+				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+			} else {
+				unset($optcfg['ipaddr6']);
+				unset($optcfg['subnet6']);
+				unset($optcfg['ipv6ra']);
+			}
+		}
 
 		write_config();
 		
@@ -148,28 +183,25 @@ $pgtitle = array("Interfaces", "Optional $index (" . htmlspecialchars($optcfg['d
 <script type="text/javascript">
 <!--
 function enable_change(enable_over) {
-	var endis;
-	endis = !(document.iform.enable.checked || enable_over);
-	document.iform.descr.disabled = endis;
-	document.iform.ipaddr.disabled = endis;
-	document.iform.subnet.disabled = endis;
-	document.iform.bridge.disabled = endis;
+	var all_enable = document.iform.enable.checked;
+	var bridge_enable = (document.iform.bridge.selectedIndex != 0);
+	
+	document.iform.descr.disabled = !(all_enable || enable_over);
+	document.iform.ipaddr.disabled = !((all_enable && !bridge_enable) || enable_over);
+	document.iform.subnet.disabled = !((all_enable && !bridge_enable) || enable_over);
+	document.iform.bridge.disabled = !(all_enable || enable_over);
+	
+<?php if (ipv6enabled()): ?>
+	var ipv6_enable = (document.iform.ipv6mode.selectedIndex == 1);
+	document.iform.ipv6mode.disabled = !((all_enable && !bridge_enable) || enable_over);
+	document.iform.ipaddr6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
+	document.iform.subnet6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
+	document.iform.ipv6ra.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+<?php endif; ?>
 
 	if (document.iform.mode) {
 		 wlan_enable_change(enable_over);
 	}
-}
-function bridge_change(enable_over) {
-	var endis;
-
-	if (document.iform.enable.checked || enable_over) {
-		endis = !((document.iform.bridge.selectedIndex == 0) || enable_over);
-	} else {
-		endis = true;
-	}
-
-	document.iform.ipaddr.disabled = endis;
-	document.iform.subnet.disabled = endis;
 }
 //-->
 </script>
@@ -184,7 +216,7 @@ function bridge_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
-<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false);bridge_change(false)">
+<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)">
                     <strong>Enable Optional <?=$index;?> interface</strong></td>
 				</tr>
                 <tr> 
@@ -203,7 +235,7 @@ function bridge_change(enable_over) {
 				<tr> 
                   <td width="22%" valign="top" class="vncellreq">Bridge with</td>
                   <td width="78%" class="vtable">
-					<select name="bridge" class="formfld" id="bridge" onChange="bridge_change(false)">
+					<select name="bridge" class="formfld" id="bridge" onChange="enable_change(false)">
 				  	<option <?php if (!$pconfig['bridge']) echo "selected";?> value="">none</option>
                       <?php $opts = array('lan' => "LAN", 'wan' => "WAN");
 					  	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
@@ -230,6 +262,47 @@ function bridge_change(enable_over) {
                     </select>
 				 </td>
 				</tr>
+				<?php if (ipv6enabled()): ?>
+                <tr> 
+                  <td valign="top" class="vncellreq">IPv6 mode</td>
+                  <td class="vtable"> 
+                    <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
+                      <?php $opts = array('disabled', 'static', '6to4');
+						foreach ($opts as $opt) {
+							echo "<option value=\"$opt\"";
+							if ($opt == $pconfig['ipv6mode']) echo "selected";
+							echo ">$opt</option>\n";
+						}
+						?>
+                    </select><br>
+					Choosing 6to4 on an optional interface will make it use the next available /64 prefix within
+					the WAN interface&apos;s 6to4 prefix (which is determined by its current IPv4 address).</td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">IPv6 address</td>
+                  <td class="vtable"> 
+                    <input name="ipaddr6" type="text" class="formfld" id="ipaddr6" size="30" value="<?=htmlspecialchars($pconfig['ipaddr6']);?>">
+                    / 
+                    <select name="subnet6" class="formfld" id="subnet6">
+                      <?php for ($i = 127; $i > 0; --$i): ?>
+                      <option value="<?=$i;?>" <?php
+                        if ($i == $pconfig['subnet6'] || (!isset($pconfig['subnet6']) && $i == 64)) echo "selected";
+                      ?>>
+                      <?=$i;?>
+                      </option>
+                      <?php endfor; ?>
+                    </select></td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">IPv6 RA</td>
+                  <td class="vtable"> 
+					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
+					If this option is checked, other hosts on this interface will be able to automatically configure
+					their IPv6 address based on prefix and gateway information that the firewall provides to them.
+					This option should normally be enabled.
+                  </td>
+                </tr>
+                <?php endif; ?>
 				<?php /* Wireless interface? */
 				if (isset($optcfg['wireless']))
 					wireless_config_print();
@@ -238,7 +311,7 @@ function bridge_change(enable_over) {
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
                     <input name="index" type="hidden" value="<?=$index;?>"> 
-				  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true);bridge_change(true)"> 
+				  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
                   </td>
                 </tr>
                 <tr> 
@@ -256,7 +329,6 @@ function bridge_change(enable_over) {
 <script type="text/javascript">
 <!--
 enable_change(false);
-bridge_change(false);
 <?php if (isset($optcfg['wireless'])): ?>         
 wlan_enable_change(false);
 <?php endif; ?>

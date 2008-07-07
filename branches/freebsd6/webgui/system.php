@@ -128,6 +128,25 @@ if ($_POST) {
 		
 		if ($_POST['password']) {
 			$config['system']['password'] = crypt($_POST['password']);
+		}	
+		
+		$savemsgadd = "";
+		/* when switching from HTTP to HTTPS, check if there's a user-specific certificate;
+		   if not, auto-generate one */
+		if ($config['system']['webgui']['protocol'] == "https" && $oldwebguiproto != $config['system']['webgui']['protocol']) {
+			if (!$config['system']['webgui']['certificate']) {
+				$ck = generate_self_signed_cert("m0n0wall", $config['system']['hostname'] . "." . $config['system']['domain']);
+				
+				if ($ck === false) {
+					$savemsgadd .= "<br><br>You don&apos;t appear to have a machine-specific HTTPS certificate, and one could not be automatically generated because your " .
+						"system&apos;s clock is not set. Please configure a custom certificate on the <a href=\"system_advanced.php\">System: Advanced</a> setup page " .
+						"for security; until then, the system will use an insecure default certificate (shared by all installations).";
+				} else {
+					$config['system']['webgui']['certificate'] = base64_encode($ck['cert']);
+					$config['system']['webgui']['private-key'] = base64_encode($ck['key']);
+					$savemsgadd .= "<br><br>A self-signed HTTPS certificate and private key have been automatically generated.";
+				}
+			}
 		}
 		
 		write_config();
@@ -153,7 +172,7 @@ if ($_POST) {
 			config_unlock();
 		}
 		
-		$savemsg = get_std_save_message($retval);
+		$savemsg = get_std_save_message($retval) . $savemsgadd;
 	}
 }
 ?>

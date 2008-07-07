@@ -35,6 +35,7 @@ function filter_resync() {
 	global $config, $g;
 	
 	mwexec("/sbin/ipf -y");
+	mwexec("/sbin/ipf -6 -y");
 }
 
 function filter_ipmon_start() {
@@ -80,8 +81,18 @@ function filter_configure() {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
 		return 1;
 	}
-		
+
 	fwrite($fd, $ipfrules);
+	pclose($fd);
+	
+	/* generate ipf rules for IPv6 */
+	$ipfrules_ipv6 = filter_rules_generate_ipv6();
+	$fd = popen("/sbin/ipf -6 -Fa -f - > /dev/null 2>&1", "w");
+	if (!$fd) {
+		printf("Cannot open /sbin/ipf in filter_configure()\n");
+		return 1;
+	}
+	fwrite($fd, $ipfrules_ipv6);
 	pclose($fd);
 	
 	if ($g['booting'])
@@ -100,6 +111,14 @@ function filter_flush_state_table() {
 	global $config, $g;
 	
 	return mwexec("/sbin/ipf -FS");
+}
+
+function filter_flush_state_table_ipv6() {
+	if (ipv6enabled()) {
+		return mwexec("/sbin/ipf -6 -FS");
+	} else {
+		return 0;
+	}
 }
 
 function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true) {
@@ -209,12 +228,6 @@ function filter_nat_rules_generate() {
 		}
 	}
 	
-	/* DIAG: add ipv6 NAT, if requested */
-	if (isset($config['diag']['ipv6nat']['enable'])) {
-		$natrules .= "rdr $wanif 0/0 port 0 -> " . 
-		"{$config['diag']['ipv6nat']['ipaddr']} port 0 ipv6\n";
-	}
-	
 	if (isset($config['nat']['rule'])) {
 		foreach ($config['nat']['rule'] as $rule) {
 		
@@ -277,7 +290,21 @@ EOD;
 	return $natrules;
 }
 
-function filter_rules_generate() {
+function filter_rules_generate_ipv6() {
+	global $config, $g;
+	
+	if (ipv6enabled() && $config['interfaces']['lan']['ipaddr6']) {
+		return filter_rules_generate(true);
+	} else {
+		return <<<EOD
+block in quick all
+block out quick all
+
+EOD;
+	}
+}
+
+function filter_rules_generate($ipv6 = false) {
 	global $config, $g;
 	
 	$wancfg = $config['interfaces']['wan'];
@@ -285,16 +312,30 @@ function filter_rules_generate() {
 	$pptpdcfg = $config['pptpd'];
 	
 	$lanif = $lancfg['if'];
-	$wanif = get_real_wan_interface();
+	$wanif = get_real_wan_interface($ipv6);
 	
-	$curwanip = get_current_wan_address();
+	$curwanip = get_current_wan_address($ipv6);
 	
 	/* rule groups (optional interfaces: see below) */
 	$ifgroups = array("lan" => 100, "wan" => 200);
 	
-	$lanip = $lancfg['ipaddr'];
-	$lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
-	$lansn = $lancfg['subnet'];
+	$lanip = $lancfg[$ipv6 ? 'ipaddr6' : 'ipaddr'];
+	$lansn = $lancfg[$ipv6 ? 'subnet6' : 'subnet'];
+	if ($ipv6) {
+		if ($lanip == "6to4") {
+			$lanip = calc_6to4_address("lan");
+			$lansn = 64;
+		}
+		
+		if (!$lanip) {
+			$lanip = "::1";	/* dummy until 6to4 address is known */
+			$lansa = "::";
+		} else {
+			$lansa = gen_subnet6($lanip, $lansn);
+		}
+	} else {
+		$lansa = gen_subnet($lanip, $lansn);
+	}
 	
 	/* optional interfaces */
 	$optcfg = array();
@@ -309,18 +350,41 @@ function filter_rules_generate() {
 			if ($oc['bridge']) {
 				if (!strstr($oc['bridge'], "opt") || 
 					 isset($config['interfaces'][$oc['bridge']]['enable'])) {
-					if (is_ipaddr($config['interfaces'][$oc['bridge']]['ipaddr'])) {
-						$oic['ip'] = $config['interfaces'][$oc['bridge']]['ipaddr'];
-						$oic['sn'] = $config['interfaces'][$oc['bridge']]['subnet'];
-						$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
+					if ($ipv6 ? is_ipaddr6($config['interfaces'][$oc['bridge']]['ipaddr6']) :
+								is_ipaddr($config['interfaces'][$oc['bridge']]['ipaddr'])) {
+						$oic['ip'] = $config['interfaces'][$oc['bridge']][$ipv6 ? 'ipaddr6' : 'ipaddr'];
+						$oic['sn'] = $config['interfaces'][$oc['bridge']][$ipv6 ? 'subnet6' : 'subnet'];
+						if ($ipv6)
+							$oic['sa'] = gen_subnet6($oic['ip'], $oic['sn']);
+						else
+							$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
 					}
 				}
 				$oic['bridge'] = 1;
 				$oic['bridge_if'] = $oc['bridge'];
 			} else {
-				$oic['ip'] = $oc['ipaddr'];
-				$oic['sn'] = $oc['subnet'];
-				$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
+				if ($ipv6) {
+					if ($oc['ipaddr6'] == "6to4") {
+						$oic['ip'] = calc_6to4_address('opt' . $i);
+						$oic['sn'] = 64;
+					} else {
+						$oic['ip'] = $oc['ipaddr6'];
+						$oic['sn'] = $oc['subnet6'];
+					}
+					
+					/* IPv6: ignore interface if no address is set or 6to4 address not yet known */
+					if (!$oic['ip'])
+						continue;
+				} else {
+					$oic['ip'] = $oc['ipaddr'];
+					$oic['sn'] = $oc['subnet'];
+				}
+				
+				if ($ipv6)
+					$oic['sa'] = gen_subnet6($oic['ip'], $oic['sn']);
+				else
+					$oic['sa'] = gen_subnet($oic['ip'], $oic['sn']);
+				$oic['ipv6ra'] = $oc['ipv6ra'];
 			}
 			
 			$optcfg['opt' . $i] = $oic;
@@ -328,10 +392,17 @@ function filter_rules_generate() {
 		}
 	}
 	
-	if ($pptpdcfg['mode'] == "server") {
+	if ($pptpdcfg['mode'] == "server" && !$ipv6) {
 		$pptpip = $pptpdcfg['localip'];
 		$pptpsa = $pptpdcfg['remoteip'];
 		$pptpsn = subnet_size_to_cidr($pptpdcfg['nunits'] ? $pptpdcfg['nunits'] : 16);
+	}
+	
+	if ($ipv6) {
+		/* Make sure that group numbers are unique */
+		foreach ($ifgroups as $key => $val) {
+			$ifgroups[$key] += 10000;
+		}
 	}
 	
 	/* default block logging? */
@@ -345,6 +416,10 @@ function filter_rules_generate() {
 pass in quick on lo0 all
 pass out quick on lo0 all
 
+EOD;
+
+	if (!$ipv6) {
+		$ipfrules .= <<<EOD
 # block short packets
 block in $log quick all with short
 
@@ -358,17 +433,54 @@ pass out quick on $lanif proto udp from $lanip port = 67 to any port = 68
 
 EOD;
 
-	/* allow access to DHCP server on optional interfaces */
-	foreach ($optcfg as $on => $oc) {
-		if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
-				($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
-					
-			$ipfrules .= <<<EOD
+		/* allow access to DHCP server on optional interfaces */
+		foreach ($optcfg as $on => $oc) {
+			if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
+					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
+
+				$ipfrules .= <<<EOD
 
 # allow access to DHCP server on {$on}
 pass in quick on {$oc['if']} proto udp from any port = 68 to 255.255.255.255 port = 67
 pass in quick on {$oc['if']} proto udp from any port = 68 to {$oc['ip']} port = 67
 pass out quick on {$oc['if']} proto udp from {$oc['ip']} port = 67 to any port = 68
+
+EOD;
+			}
+		}
+	}
+	
+	if ($ipv6) {
+		/* Allow ICMPv6 NS/NA/toobig */
+		$ipfrules .= <<<EOD
+
+# allow essential ICMPv6 messages: router and neighbor soliciation/advertisement
+pass in quick proto ipv6-icmp from any to any icmp-type 133
+pass in quick proto ipv6-icmp from any to any icmp-type 134
+pass in quick proto ipv6-icmp from any to any icmp-type 135
+pass in quick proto ipv6-icmp from any to any icmp-type 136
+pass out quick proto ipv6-icmp from any to any icmp-type 133
+pass out quick proto ipv6-icmp from any to any icmp-type 134
+pass out quick proto ipv6-icmp from any to any icmp-type 135
+pass out quick proto ipv6-icmp from any to any icmp-type 136
+
+# also allow ICMPv6 destination unreachable, packet too big (PMTUD) and time exceeded
+pass in quick proto ipv6-icmp from any to any icmp-type 1
+pass out quick proto ipv6-icmp from any to any icmp-type 1
+pass in quick proto ipv6-icmp from any to any icmp-type 2
+pass out quick proto ipv6-icmp from any to any icmp-type 2
+pass in quick proto ipv6-icmp from any to any icmp-type 3
+pass out quick proto ipv6-icmp from any to any icmp-type 3
+
+EOD;
+	} else {
+		/* Need to pass IP protocol 41 if using 6to4 */
+		if ($wancfg['ipaddr6'] == "6to4" && $curwanip) {
+			$ipfrules .= <<<EOD
+
+# allow 6to4 on WAN
+pass in quick on $wanif proto ipv6 from any to $curwanip
+pass out quick on $wanif proto ipv6 from $curwanip to any
 
 EOD;
 		}
@@ -377,8 +489,9 @@ EOD;
 	/* pass traffic between statically routed subnets and the subnet on the
 	   interface in question to avoid problems with complicated routing
 	   topologies */
-	if (isset($config['filter']['bypassstaticroutes']) && is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
-		foreach ($config['staticroutes']['route'] as $route) {
+	$strtconf = 'route' . ($ipv6 ? '6' : '');
+	if (isset($config['filter']['bypassstaticroutes']) && is_array($config['staticroutes'][$strtconf]) && count($config['staticroutes'][$strtconf])) {
+		foreach ($config['staticroutes'][$strtconf] as $route) {
 			unset($sa);
 			
 			if ($route['interface'] == "lan") {
@@ -422,7 +535,7 @@ EOD;
 	}
 	
 	/* allow PPTP traffic if PPTP client is enabled on WAN */
-	if ($wancfg['ipaddr'] == "pptp") {
+	if ($wancfg['ipaddr'] == "pptp" && !$ipv6) {
 		$ipfrules .= <<<EOD
 
 # allow PPTP client
@@ -435,7 +548,7 @@ EOD;
 	}
 
     /* allow SIP signaling and RTP traffic if enabled. Need assigned public IP address  */
-	if (isset($config['sip']['enable']) && $curwanip) {
+	if (isset($config['sip']['enable']) && $curwanip && !$ipv6) {
 	$ipfrules .= <<<EOD
 
 # allow SIP signaling and RTP traffic
@@ -445,7 +558,8 @@ pass in quick on {$wancfg['if']} proto udp from any to $curwanip port {$config['
 EOD;
     }
 
-	$ipfrules .= <<<EOD
+	if (!$ipv6) {
+		$ipfrules .= <<<EOD
 
 # allow our DHCP client out to the WAN
 # XXX - should be more restrictive
@@ -457,6 +571,7 @@ pass in quick on $wanif proto udp from any port = 67 to any port = 68
 # LAN/OPT spoof check (needs to be after DHCP because of broadcast addresses)
 
 EOD;
+	}
 
 	/* LAN spoof check */
 	/* omit if any interface is bridged to LAN and the filtering bridge is on */
@@ -468,7 +583,7 @@ EOD;
 		}
 	}
 	if (!$lanbridge || !isset($config['bridge']['filteringbridge']))
-		$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log);
+		$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log, $ipv6);
 
 	/* OPT spoof check */
 	foreach ($optcfg as $on => $oc) {
@@ -482,12 +597,13 @@ EOD;
 		}
 		
 		if ($oc['ip'] && !(($oc['bridge'] || $isbridged) && isset($config['bridge']['filteringbridge'])))
-			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log);
+			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log, $ipv6);
 	}
 	
 	/* block private networks on WAN? */
 	if (isset($config['interfaces']['wan']['blockpriv'])) {
-		$ipfrules .= <<<EOD
+		if (!$ipv6) {
+			$ipfrules .= <<<EOD
 
 # block anything from private networks on WAN interface
 block in $log quick on $wanif from 10.0.0.0/8 to any
@@ -496,10 +612,56 @@ block in $log quick on $wanif from 172.16.0.0/12 to any
 block in $log quick on $wanif from 192.168.0.0/16 to any
 
 EOD;
+		} else {
+			/* source: /etc/rc.firewall6 */
+			$ipfrules .= <<<EOD
+
+# Stop site-local on the outside interface
+block in $log quick on $wanif from fec0::/10 to any
+block in $log quick on $wanif from any to fec0::/10
+
+# Disallow "internal" addresses to appear on the wire.
+block in $log quick on $wanif from ::ffff:0.0.0.0/96 to any
+block in $log quick on $wanif from any to ::ffff:0.0.0.0/96
+
+# Disallow packets to malicious IPv4 compatible prefix.
+block in $log quick on $wanif from ::224.0.0.0/100 to any
+block in $log quick on $wanif from any to ::224.0.0.0/100
+block in $log quick on $wanif from ::127.0.0.0/104 to any
+block in $log quick on $wanif from any to ::127.0.0.0/104
+block in $log quick on $wanif from ::0.0.0.0/104 to any
+block in $log quick on $wanif from any to ::0.0.0.0/104
+block in $log quick on $wanif from ::255.0.0.0/104 to any
+block in $log quick on $wanif from any to ::255.0.0.0/104
+
+block in $log quick on $wanif from ::0.0.0.0/96 to any
+block in $log quick on $wanif from any to ::0.0.0.0/96
+
+# Disallow packets to malicious 6to4 prefix.
+block in $log quick on $wanif from 2002:e000::/20 to any
+block in $log quick on $wanif from any to 2002:e000::/20
+block in $log quick on $wanif from 2002:7f00::/24 to any
+block in $log quick on $wanif from any to 2002:7f00::/24
+block in $log quick on $wanif from 2002:0000::/24 to any
+block in $log quick on $wanif from any to 2002:0000::/24
+block in $log quick on $wanif from 2002:ff00::/24 to any
+block in $log quick on $wanif from any to 2002:ff00::/24
+block in $log quick on $wanif from 2002:0a00::/24 to any
+block in $log quick on $wanif from any to 2002:0a00::/24
+block in $log quick on $wanif from 2002:ac10::/28 to any
+block in $log quick on $wanif from any to 2002:ac10::/28
+block in $log quick on $wanif from 2002:c0a8::/32 to any
+block in $log quick on $wanif from any to 2002:c0a8::/32
+
+block in $log quick on $wanif from ff05::/16 to any
+block in $log quick on $wanif from any to ff05::/16
+
+EOD;
+		}
 	}
 	
 	/* IPsec enabled? */
-	if (isset($config['ipsec']['enable']) && 
+	if (!$ipv6 && isset($config['ipsec']['enable']) && 
 		((is_array($config['ipsec']['tunnel']) &&
 		count($config['ipsec']['tunnel'])) ||
 			isset($config['ipsec']['mobileclients']['enable']))) {
@@ -531,17 +693,17 @@ skip 1 in proto tcp all flags S/SAFR
 block in $log quick proto tcp all
 
 #---------------------------------------------------------------------------
-# group head 100 - LAN interface
+# group head {$ifgroups['lan']} - LAN interface
 #---------------------------------------------------------------------------
-block in $log quick on $lanif all head 100
+block in $log quick on $lanif all head {$ifgroups['lan']}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
 pass out quick on $lanif all keep state $out_kf
 
 #---------------------------------------------------------------------------
-# group head 200 - WAN interface
+# group head {$ifgroups['wan']} - WAN interface
 #---------------------------------------------------------------------------
-block in $log quick on $wanif all head 200
+block in $log quick on $wanif all head {$ifgroups['wan']}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
 pass out quick on $wanif all keep state $out_kf
@@ -567,7 +729,7 @@ EOD;
 	
 	}
 	
-	if (isset($config['ipsec']['enable'])) {
+	if (!$ipv6 && isset($config['ipsec']['enable'])) {
 		$ipfrules .= <<<EOD
 
 # always pass outgoing IPsec encapsulated packets
@@ -577,17 +739,16 @@ EOD;
 	}
 	
 	if (!isset($config['system']['webgui']['noantilockout'])) {
-	
-	$ipfrules .= <<<EOD
+		$ipfrules .= <<<EOD
 
 # make sure the user cannot lock himself out of the webGUI
-pass in quick from $lansa/$lansn to $lanip keep state group 100
+pass in quick from $lansa/$lansn to $lanip keep state group {$ifgroups['lan']}
 
 EOD;
 	}
 	
 	/* PPTPd enabled? */
-	if ($pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off") && !isset($pptpdcfg['nofwrulegen'])) {
+	if (!$ipv6 && $pptpdcfg['mode'] && ($pptpdcfg['mode'] != "off") && !isset($pptpdcfg['nofwrulegen'])) {
 	
 		if ($pptpdcfg['mode'] == "server")
 			$pptpdtarget = $curwanip;
@@ -605,23 +766,12 @@ EOD;
 		}
 	}
 	
-	/* BigPond client enabled? */
-	if ($wancfg['ipaddr'] == "bigpond") {
-		
-		$ipfrules .= <<<EOD
-
-# BigPond heartbeat rules
-pass in quick proto udp from any to any port = 5050 keep state group 200
-
-EOD;
-	}
-	
 	$ipfrules .= "\n# User-defined rules follow\n";
 	
 	$i = -1;
 	
-	if (isset($config['filter']['rule']))
-		foreach ($config['filter']['rule'] as $rule) {
+	if (isset($config['filter'][$ipv6 ? 'rule6' : 'rule']))
+		foreach ($config['filter'][$ipv6 ? 'rule6' : 'rule'] as $rule) {
 		
 		$i++;
 		
@@ -881,22 +1031,23 @@ EOD;
 	return $ipfrules;
 }
 
-function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log) {
+function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log, $ipv6 = false) {
 
 	global $g, $config;
 	
 	$ipfrules = "";
 
-	if (is_array($config['staticroutes']['route']) && count($config['staticroutes']['route'])) {
+	$strtconf = 'route' . ($ipv6 ? '6' : '');
+	if (is_array($config['staticroutes'][$strtconf]) && count($config['staticroutes'][$strtconf])) {
 		/* count rules */
 		$n = 1;
-		foreach ($config['staticroutes']['route'] as $route) {
+		foreach ($config['staticroutes'][$strtconf] as $route) {
 			if ($route['interface'] == $ifname)
 				$n++;
 		}
 		
 		/* output skip rules */
-		foreach ($config['staticroutes']['route'] as $route) {
+		foreach ($config['staticroutes'][$strtconf] as $route) {
 			if ($route['interface'] == $ifname) {
 				$ipfrules .= "skip $n in on $if from {$route['network']} to any\n";
 				$n--;

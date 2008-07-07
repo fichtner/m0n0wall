@@ -118,6 +118,9 @@
 	/* start DHCP service */
 	services_dhcpd_configure();
 	
+	/* start rtadvd */
+	interfaces_rtadvd_configure();
+	
 	/* start DHCP relay */
 	services_dhcrelay_configure();
 	

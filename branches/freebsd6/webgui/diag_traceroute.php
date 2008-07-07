@@ -54,6 +54,7 @@ if ($_POST) {
 		$host = $_POST['host'];
 		$ttl = $_POST['ttl'];
 		$resolve = $_POST['resolve'];
+		$ipv6 = $_POST['ipv6'];
 	}
 }
 if (!isset($do_traceroute)) {
@@ -61,6 +62,7 @@ if (!isset($do_traceroute)) {
 	$host = '';
 	$ttl = DEFAULT_TTL;
 	$resolve = false;
+	$ipv6 = false;
 }
 ?>
 <?php include("fbegin.inc"); ?>
@@ -82,7 +84,11 @@ if (!isset($do_traceroute)) {
                 <tr>
 				  <td width="22%" valign="top" class="vncellreq">Host</td>
 				  <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>"></td>
+                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>">
+
+					<?php if (ipv6enabled()): ?>
+					<input type="checkbox" name="ipv6" value="1" <?php if ($ipv6) echo "checked"; ?>> IPv6
+					<?php endif; ?></td>
 				</tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncellreq">Maximum number of hops</td>
@@ -112,7 +118,8 @@ if (!isset($do_traceroute)) {
 					echo("<br><strong>Traceroute output:</strong><br>");
 					echo('<pre>');
 					ob_end_flush();
-					system("/usr/sbin/traceroute " . ($resolve ? "" : "-n ") . "-w 2 -m " . escapeshellarg($ttl) . " " . escapeshellarg($host));
+					$traceprog = $ipv6 ? "traceroute6" : "traceroute";
+					system("/usr/sbin/$traceprog " . ($resolve ? "" : "-n ") . "-w 2 -m " . escapeshellarg($ttl) . " " . escapeshellarg($host));
 					echo('</pre>');
 				}
 				?>

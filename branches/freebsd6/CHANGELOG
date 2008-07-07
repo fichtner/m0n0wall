@@ -3,6 +3,32 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add initial IPv6 support (based on code contributed by Michael Hanselmann
+  in 2005)
+
+- removed IPv6 tunneling option
+
+- automatically generate self-signed SSL certificate when switching from
+  HTTP to HTTPS (CN = current hostname); also add a button to generate a
+  self-signed certificate on demand on the System: Advanced page
+
+- make captive portal "disable concurrent logins" function compare usernames
+  in a case-insensitive manner
+
+- fix polling setting on optional interfaces
+
+- add ipnat fix (from ipfilter mailing list) to prevent a (rare) case of
+  kernel panic when ipnat sees a fragment of a TCP packet, and that
+  fragment is not the first one
+
+- remove PPPoE/PPTP dial-on-demand feature. Still doesn't work properly,
+  nobody has enough interest in it to fix it, and most people probably
+  don't need it anyway
+
+- remove bpalogin - looks like it's dead
+
+- updated Dnsmasq to 2.42
+
 - don't run captive portal reauthentication (if enabled) for MAC
   pass-through clients (patch by Peter Allgeyer)
 

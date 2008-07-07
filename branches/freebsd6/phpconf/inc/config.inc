@@ -133,7 +133,6 @@ EOD;
 		$fd = fopen("{$g['etc_path']}/fstab", "w");
 		
 		$fstab = "/dev/{$cfgpartition} {$g['cf_path']} {$cfgfstype} ro 1 1\n";
-		$fstab .= "proc /proc procfs rw 0 0\n";
 		
 		fwrite($fd, $fstab);
 		fclose($fd);

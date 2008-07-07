@@ -344,3 +344,24 @@
  		if (!PCI_INTERRUPT_VALID(irq))
  			irq = pci_pir_choose_irq(pci_link, pir_bios_irqs);
  		if (!PCI_INTERRUPT_VALID(irq))
+--- sys/contrib/ipfilter/netinet/ip_nat.c.orig	2007-11-18 12:03:28.000000000 +0100
++++ sys/contrib/ipfilter/netinet/ip_nat.c	2008-07-05 10:48:33.000000000 +0200
+@@ -3843,7 +3843,7 @@
+ 					continue;
+ 			}
+ 
+-			if ((nat = nat_new(fin, np, NULL, nflags,
++			if ((fin->fin_off == 0) && (nat = nat_new(fin, np, NULL, nflags,
+ 					   NAT_OUTBOUND))) {
+ 				np->in_hits++;
+ 				break;
+@@ -4137,8 +4137,7 @@
+ 				}
+ 			}
+ 
+-			nat = nat_new(fin, np, NULL, nflags, NAT_INBOUND);
+-			if (nat != NULL) {
++			if ((fin->fin_off == 0) && (nat = nat_new(fin, np, NULL, nflags, NAT_INBOUND))) {
+ 				np->in_hits++;
+ 				break;
+ 			} else

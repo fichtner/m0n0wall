@@ -33,8 +33,6 @@ $pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
 
 $pconfig['filteringbridge_enable'] = isset($config['bridge']['filteringbridge']);
-$pconfig['ipv6nat_enable'] = isset($config['diag']['ipv6nat']['enable']);
-$pconfig['ipv6nat_ipaddr'] = $config['diag']['ipv6nat']['ipaddr'];
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
@@ -50,16 +48,29 @@ $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
 $pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
+$pconfig['enableipv6'] = isset($config['system']['enableipv6']);
 
 if ($_POST) {
 
 	unset($input_errors);
+	$savemsgadd = "";
+	
+	if ($_POST['gencert']) {
+		/* custom certificate generation requested */
+		$ck = generate_self_signed_cert("m0n0wall", $config['system']['hostname'] . "." . $config['system']['domain']);
+		
+		if ($ck === false) {
+			$input_errors[] = "A self-signed certificate could not be generated because the system's clock is not set.";
+		} else {
+			$_POST['cert'] = $ck['cert'];
+		 	$_POST['key'] = $ck['key'];
+			$savemsgadd = "<br><br>A self-signed certificate and private key have been automatically generated.";
+		}
+	}
+	
 	$pconfig = $_POST;
 
 	/* input validation */
-	if ($_POST['ipv6nat_enable'] && !is_ipaddr($_POST['ipv6nat_ipaddr'])) {
-		$input_errors[] = "You must specify an IP address to NAT IPv6 packets.";
-	}
 	if ($_POST['ipsecdnsinterval'] && !is_numericint($_POST['ipsecdnsinterval'])) {
 		$input_errors[] = "The IPsec DNS check interval must be an integer.";
 	}
@@ -80,8 +91,6 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$config['bridge']['filteringbridge'] = $_POST['filteringbridge_enable'] ? true : false;
-		$config['diag']['ipv6nat']['enable'] = $_POST['ipv6nat_enable'] ? true : false;
-		$config['diag']['ipv6nat']['ipaddr'] = $_POST['ipv6nat_ipaddr'];
 		$oldcert = $config['system']['webgui']['certificate'];
 		$oldkey = $config['system']['webgui']['private-key'];
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
@@ -108,6 +117,7 @@ if ($_POST) {
 			unset($config['diag']['ipfstatentries']);
 		else
 			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
+		$config['system']['enableipv6'] = $_POST['enableipv6'] ? true : false;
 		
 		write_config();
 		
@@ -138,22 +148,11 @@ if ($_POST) {
 			$retval |= system_set_termcap();
 			config_unlock();
 		}
-		$savemsg = get_std_save_message($retval);
+		$savemsg = get_std_save_message($retval) . $savemsgadd;
 	}
 }
 ?>
 <?php include("fbegin.inc"); ?>
-<script type="text/javascript">
-<!--
-function enable_change(enable_over) {
-	if (document.iform.ipv6nat_enable.checked || enable_over) {
-		document.iform.ipv6nat_ipaddr.disabled = 0;
-	} else {
-		document.iform.ipv6nat_ipaddr.disabled = 1;
-	}
-}
-// -->
-</script>
             <?php if ($input_errors) print_input_errors($input_errors); ?>
             <?php if ($savemsg) print_info_box($savemsg); ?>
             <p><span class="vexpl"><span class="red"><strong>Note: </strong></span>the 
@@ -162,21 +161,20 @@ function enable_change(enable_over) {
             <form action="system_advanced.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
-                  <td colspan="2" valign="top" class="listtopic">IPv6 tunneling</td>
+                  <td colspan="2" valign="top" class="listtopic">IPv6 support</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <input name="ipv6nat_enable" type="checkbox" id="ipv6nat_enable" value="yes" <?php if ($pconfig['ipv6nat_enable']) echo "checked"; ?> onclick="enable_change(false)"> 
-                    <strong>NAT encapsulated IPv6 packets (IP protocol 41/RFC2893) 
-                    to:</strong><br> <br> <input name="ipv6nat_ipaddr" type="text" class="formfld" id="ipv6nat_ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipv6nat_ipaddr']);?>"> 
-                    &nbsp;(IP address)<span class="vexpl"><br>
-                    Don't forget to add a firewall rule to permit IPv6 packets!</span></td>
+                    <input name="enableipv6" type="checkbox" id="enableipv6" value="yes" <?php if ($pconfig['enableipv6']) echo "checked"; ?>>
+                    <strong>Enable IPv6 support</strong><br>
+                    After enabling IPv6 support, configure IPv6 addresses on your LAN and WAN interfaces, then add 
+                    IPv6 firewall rules.
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
                   </td>
                 </tr>
                 <tr> 
@@ -199,7 +197,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
                   </td>
                 </tr>
                 <tr> 
@@ -225,7 +223,8 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
+					<input name="gencert" type="submit" class="formbtn" value="Generate self-signed certificate"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
                   </td>
                 </tr>
                 <tr> 
@@ -341,14 +340,9 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
                   </td>
                 </tr>
               </table>
 </form>
-<script type="text/javascript">
-<!--
-enable_change(false);
-//-->
-</script>
 <?php include("fend.inc"); ?>

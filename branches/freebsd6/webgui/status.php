@@ -133,9 +133,13 @@ defCmdT("ipfw show", "/sbin/ipfw show");
 defCmdT("ipnat -lv", "/sbin/ipnat -lv");
 defCmdT("ipfstat -v", "/sbin/ipfstat -v");
 defCmdT("ipfstat -nio", "/sbin/ipfstat -nio");
+if (ipv6enabled())
+	defCmdT("ipfstat -6 -nio", "/sbin/ipfstat -6 -nio");
 
 defStrT("unparsed ipnat rules", filter_nat_rules_generate());
 defStrT("unparsed ipfilter rules", filter_rules_generate());
+if (ipv6enabled())
+	defStrT("unparsed IPv6 ipfilter rules", filter_rules_generate_ipv6());
 defStrT("unparsed ipfw rules", shaper_rules_generate());
 
 defCmdT("resolv.conf","cat /etc/resolv.conf");
@@ -143,6 +147,8 @@ defCmdT("resolv.conf","cat /etc/resolv.conf");
 defCmdT("Processes","ps xauww");
 defCmdT("dhcpd.conf","cat /var/etc/dhcpd.conf");
 defCmdT("ez-ipupdate.cache","cat /conf/ez-ipupdate.cache");
+if (ipv6enabled())
+	defCmdT("rtadvd.conf","cat /var/etc/rtadvd.conf");
 
 defCmdT("df","/bin/df");
 

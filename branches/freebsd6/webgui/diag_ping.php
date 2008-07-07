@@ -53,15 +53,17 @@ if ($_POST) {
 		$host = $_POST['host'];
 		$interface = $_POST['interface'];
 		$count = $_POST['count'];
+		$ipv6 = $_POST['ipv6'];
 	}
 }
 if (!isset($do_ping)) {
 	$do_ping = false;
 	$host = '';
 	$count = DEFAULT_COUNT;
+	$ipv6 = false;
 }
 
-function get_interface_addr($ifdescr) {
+function get_interface_addr($ifdescr, $ipv6 = false) {
 	
 	global $config, $g;
 	
@@ -76,7 +78,10 @@ function get_interface_addr($ifdescr) {
 	exec("/sbin/ifconfig " . $if, $ifconfiginfo);
 	
 	foreach ($ifconfiginfo as $ici) {
-		if (preg_match("/inet (\S+)/", $ici, $matches)) {
+		if (!$ipv6 && preg_match("/inet (\S+)/", $ici, $matches)) {
+			return $matches[1];
+		}
+		if ($ipv6 && preg_match("/inet6 ([0-9a-f:]+) /", $ici, $matches)) {
 			return $matches[1];
 		}
 	}
@@ -103,7 +108,11 @@ function get_interface_addr($ifdescr) {
                 <tr>
 				  <td width="22%" valign="top" class="vncellreq">Host</td>
 				  <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>"></td>
+                    <?=$mandfldhtml;?><input name="host" type="text" class="formfld" id="host" size="20" value="<?=htmlspecialchars($host);?>">
+
+					<?php if (ipv6enabled()): ?>
+					<input type="checkbox" name="ipv6" value="1" <?php if ($ipv6) echo "checked"; ?>> IPv6
+					<?php endif; ?></td>
 				</tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncellreq">Interface</td>
@@ -144,11 +153,12 @@ function get_interface_addr($ifdescr) {
 					echo("<strong>Ping output:</strong><br>");
 					echo('<pre>');
 					ob_end_flush();
-					$ifaddr = get_interface_addr($interface);
+					$ifaddr = get_interface_addr($interface, $ipv6);
+					$pingprog = $ipv6 ? "ping6" : "ping";
 					if ($ifaddr)
-						system("/sbin/ping -S$ifaddr -c$count " . escapeshellarg($host));
+						system("/sbin/$pingprog -S$ifaddr -c$count " . escapeshellarg($host));
 					else
-						system("/sbin/ping -c$count " . escapeshellarg($host));
+						system("/sbin/$pingprog -c$count " . escapeshellarg($host));
 					echo('</pre>');
 				}
 				?>

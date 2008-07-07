@@ -60,21 +60,20 @@
 	/* flush NAT table */
 	filter_flush_nat_table();
 	
-	/* regenerate resolv.conf if DNS overrides are allowed or the BigPond
-	   client is enabled */
-	if (isset($config['system']['dnsallowoverride']) ||
-			($config['interfaces']['wan']['ipaddr'] == "bigpond"))
+	/* regenerate resolv.conf if DNS overrides are allowed */
+	if (isset($config['system']['dnsallowoverride']))
 		system_resolvconf_generate(true);
-	
-	/* fire up the BigPond client, if necessary */
-	if ($config['interfaces']['wan']['ipaddr'] == "bigpond")
-		interfaces_wan_bigpond_configure($curwanip);
 	
 	/* perform RFC 2136 DNS update */
 	services_dnsupdate_process();
 	
 	/* reconfigure IPsec tunnels */
 	vpn_ipsec_configure(true);
+	
+	if (ipv6enabled()) {
+		/* reconfigure v6 on WAN interface (may be 6to4) */
+		interfaces_wan_configure6();
+	}
 	
 	/* write current WAN IP to file */
 	$fd = @fopen("{$g['vardb_path']}/wanip", "w");

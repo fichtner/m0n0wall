@@ -28,6 +28,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("IPv6.php");
+
 /* kill a process by pid file */
 function killbypid($pidfile) {
 	sigkillbypid($pidfile, "TERM");
@@ -57,6 +59,14 @@ function gen_subnet($ipaddr, $bits) {
 		return "";
 	
 	return long2ip(ip2long($ipaddr) & gen_subnet_mask_long($bits));
+}
+
+/* return the subnet address given a host address and a subnet bit count, IPv6 variant */
+function gen_subnet6($ipaddr, $bits) {
+	if (!is_ipaddr6($ipaddr) || !is_numeric($bits))
+		return '';
+	
+	return Net_IPv6::getNetmask($ipaddr, $bits);
 }
 
 /* return the highest (broadcast) address in the subnet given a host address and a subnet bit count */
@@ -98,6 +108,11 @@ function is_ipaddr($ipaddr) {
 		return true;
 	else
 		return false;
+}
+
+/* returns true if $ipaddr is a valid IPv6 address */
+function is_ipaddr6($ipaddr) {
+	return Net_IPv6::checkIPv6($ipaddr);
 }
 
 /* returns true if $ipaddr is a valid dotted IPv4 address or an alias thereof */
@@ -328,7 +343,7 @@ function alias_expand($name) {
 	
 	if (isset($aliastable[$name]))
 		return $aliastable[$name];
-	else if (is_ipaddr($name) || is_subnet($name))
+	else if (is_ipaddr($name) || is_subnet($name) || is_ipaddr6($name))
 		return $name;
 	else
 		return null;
@@ -479,6 +494,49 @@ function subnet_size_to_cidr($size) {
 	}
 	
 	return $cidr;
+}
+
+/* converts the given IPv4 address to a string of v6 hex nibbles ("xxxx:xxxx"),
+   mostly for use in 6to4 calculations */
+function convert_to_6to4_nibbles($ipaddr) {
+	if (!is_ipaddr($ipaddr))
+		return false;
+	$octets = explode('.', $ipaddr);
+	return sprintf('%02x%02x:%02x%02x',	$octets[0], $octets[1], $octets[2], $octets[3]);
+}
+
+/* generate a self-signed SSL cert/key (1024-bit, valid for 2 years) and return it in PEM format */
+function generate_self_signed_cert($orgname, $cn) {
+	global $g;
+	
+	/* check local clock first - must be set to something after the release date
+	  (subtract a day to avoid TZ problems with early adopters) */
+	$buildtime = trim(file_get_contents("{$g['etc_path']}/version.buildtime.unix")) - 86400;
+	if (time() < $buildtime)
+		return false;
+	
+	$dn = array(
+	    "organizationName" => $orgname,
+	    "commonName" => $cn
+	);
+
+	$config = array(
+		"digest_alg" => "sha1",
+		"private_key_bits" => 1024
+	);
+
+	$privkey = openssl_pkey_new($config);
+	$csr = openssl_csr_new($dn, $privkey, $config);
+	$sscert = openssl_csr_sign($csr, null, $privkey, 730, $config);
+
+	openssl_x509_export($sscert, $certout);
+	openssl_pkey_export($privkey, $pkeyout);
+
+	/* sanity check */
+	if (strpos($certout, "BEGIN CERTIFICATE") !== false && strpos($pkeyout, "BEGIN RSA PRIVATE KEY") !== false)
+		return array('cert' => $certout, 'key' => $pkeyout);
+	else
+		return false;
 }
 
 ?>

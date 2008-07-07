@@ -250,11 +250,11 @@ function pprint_port($port) {
 /* sort by interface only, retain the original order of rules that apply to
    the same interface */
 function filter_rules_sort() {
-	global $g, $config;
+	global $g, $config, $configname;
 	
 	/* mark each rule with the sequence number (to retain the order while sorting) */
-	for ($i = 0; isset($config['filter']['rule'][$i]); $i++)
-		$config['filter']['rule'][$i]['seq'] = $i;
+	for ($i = 0; isset($config['filter'][$configname][$i]); $i++)
+		$config['filter'][$configname][$i]['seq'] = $i;
 	
 	function filtercmp($a, $b) {
 		if ($a['interface'] == $b['interface'])
@@ -263,11 +263,11 @@ function filter_rules_sort() {
 			return -strcmp($a['interface'], $b['interface']);
 	}
 	
-	usort($config['filter']['rule'], "filtercmp");
+	usort($config['filter'][$configname], "filtercmp");
 	
 	/* strip the sequence numbers again */
-	for ($i = 0; isset($config['filter']['rule'][$i]); $i++)
-		unset($config['filter']['rule'][$i]['seq']);
+	for ($i = 0; isset($config['filter'][$configname][$i]); $i++)
+		unset($config['filter'][$configname][$i]['seq']);
 }
 
 function nat_rules_sort() {
@@ -366,13 +366,13 @@ function admin_users_sort() {
 }
 
 function staticroutes_sort() {
-	global $g, $config;
+	global $g, $config, $configname;
 
 	function staticroutecmp($a, $b) {
 		return strcmp($a['network'], $b['network']);
 	}
 
-	usort($config['staticroutes']['route'], "staticroutecmp");
+	usort($config['staticroutes'][$configname], "staticroutecmp");
 }
 
 function hosts_sort() {

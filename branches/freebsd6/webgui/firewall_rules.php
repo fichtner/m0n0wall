@@ -29,14 +29,22 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Firewall", "Rules");
 require("guiconfig.inc");
 
-if (!is_array($config['filter']['rule'])) {
-	$config['filter']['rule'] = array();
+if ($ipv6rules = ($_GET['type'] == 'ipv6')) {
+	$configname = 'rule6';
+	$typelink = '&type=ipv6';
+} else {
+	$configname = 'rule';
+	$typelink = '';
+}
+$pgtitle = array("Firewall", ipv6enabled() ? ($ipv6rules ? 'IPv6 Rules' : 'IPv4 Rules') : 'Rules');
+
+if (!is_array($config['filter'][$configname])) {
+	$config['filter'][$configname] = array();
 }
 filter_rules_sort();
-$a_filter = &$config['filter']['rule'];
+$a_filter = &$config['filter'][$configname];
 
 $if = $_GET['if'];
 if ($_POST['if'])
@@ -44,10 +52,10 @@ if ($_POST['if'])
 	
 $iflist = array("lan" => "LAN", "wan" => "WAN");
 
-if ($config['pptpd']['mode'] == "server")
+if ($config['pptpd']['mode'] == "server" && !$ipv6rules)
 	$iflist['pptp'] = "PPTP VPN";
 
-if (isset($config['ipsec']['enable']))
+if (isset($config['ipsec']['enable']) && !$ipv6rules)
 	$iflist['ipsec'] = "IPsec VPN";
 
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
@@ -86,7 +94,7 @@ if (isset($_POST['del_x'])) {
 		}
 		write_config();
 		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php?if={$if}");
+		header("Location: firewall_rules.php?if={$if}{$typelink}");
 		exit;
 	}
 } else if ($_GET['act'] == "toggle") {
@@ -94,7 +102,7 @@ if (isset($_POST['del_x'])) {
 		$a_filter[$_GET['id']]['disabled'] = !isset($a_filter[$_GET['id']]['disabled']);
 		write_config();
 		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php?if={$if}");
+		header("Location: firewall_rules.php?if={$if}{$typelink}");
 		exit;
 	}
 } else {
@@ -138,7 +146,7 @@ if (isset($_POST['del_x'])) {
 		$a_filter = $a_filter_new;
 		write_config();
 		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php?if={$if}");
+		header("Location: firewall_rules.php?if={$if}{$typelink}");
 		exit;
 	}
 }
@@ -200,7 +208,7 @@ function fr_insline(id, on) {
 }
 // -->
 </script>
-<form action="firewall_rules.php" method="post">
+<form action="firewall_rules.php<?=($typelink ? '?' . $typelink : '')?>" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_filterconfdirty_path)): ?><p>
 <?php print_info_box_np("The firewall rule configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
@@ -213,7 +221,7 @@ function fr_insline(id, on) {
 	if ($ifent == $if): ?>
     <li class="tabact"><?=htmlspecialchars($ifname);?></li>
 <?php else: ?>
-    <li class="<?php if ($i == 0) echo "tabinact1"; else echo "tabinact";?>"><a href="firewall_rules.php?if=<?=$ifent;?>"><?=htmlspecialchars($ifname);?></a></li>
+    <li class="<?php if ($i == 0) echo "tabinact1"; else echo "tabinact";?>"><a href="firewall_rules.php?if=<?=$ifent;?><?=$typelink;?>"><?=htmlspecialchars($ifname);?></a></li>
 <?php endif; ?>
 <?php $i++; endforeach; ?>
   </ul>
@@ -237,11 +245,21 @@ function fr_insline(id, on) {
                   <td class="listt"></td>
                   <td class="listt" align="center"><img src="block.gif" width="11" height="11" border="0" alt=""></td>
                   <td class="listlr" style="background-color: #e0e0e0">*</td>
-                  <td class="listr" style="background-color: #e0e0e0">RFC 1918 networks</td>
+                  <td class="listr" style="background-color: #e0e0e0">
+						<?php if ($ipv6rules): ?>
+						Reserved IPv6 networks
+						<?php else: ?>
+						RFC 1918 networks
+						<?php endif; ?></td>
                   <td class="listr" style="background-color: #e0e0e0">*</td>
                   <td class="listr" style="background-color: #e0e0e0">*</td>
                   <td class="listr" style="background-color: #e0e0e0">*</td>
-                  <td class="listbg" style="background-color: #e0e0e0">Block private networks</td>
+                  <td class="listbg" style="background-color: #e0e0e0">
+						<?php if ($ipv6rules): ?>
+						Block reserved networks
+						<?php else: ?>
+						Block private networks
+						<?php endif; ?></td>
                   <td valign="middle" nowrap class="list">
 				    <table border="0" cellspacing="0" cellpadding="1" summary="rule table">
 					<tr>
@@ -281,7 +299,7 @@ function fr_insline(id, on) {
 							$textss = $textse = "";
 						}
 				  ?>
-				  <a href="?if=<?=$if;?>&act=toggle&id=<?=$i;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
+				  <a href="?if=<?=$if;?>&act=toggle&id=<?=$i;?><?=$typelink;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
 				  <?php if (isset($filterent['log'])):
 							$iconfn = "log_s";
 						if (isset($filterent['disabled']))
@@ -312,11 +330,11 @@ function fr_insline(id, on) {
 				    <table border="0" cellspacing="0" cellpadding="1" summary="button pane">
 					<tr>
 					  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule" onMouseOver="fr_insline(<?=$nrules;?>, true)" onMouseOut="fr_insline(<?=$nrules;?>, false)"></td>
-					  <td><a href="firewall_rules_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a></td>
+					  <td><a href="firewall_rules_edit.php?id=<?=$i;?><?=$typelink;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a></td>
 					</tr>
 					<tr>
 					  <td align="center" valign="middle"></td>
-					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a></td>
+					  <td><a href="firewall_rules_edit.php?dup=<?=$i;?><?=$typelink;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a></td>
 					</tr>
 					</table>
 				  </td>
@@ -329,7 +347,7 @@ function fr_insline(id, on) {
 			  <span class="gray">
 			  No rules are currently defined for this interface.<br>
 			  All incoming connections on this interface will be blocked until you add pass rules.<br><br>
-			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="middle" alt="add new rule"></a> button to add a new rule.</span>
+			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?><?=$typelink;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="middle" alt="add new rule"></a> button to add a new rule.</span>
 			  </td>
 			  <?php endif; ?>
                 <tr id="fr<?=$nrules;?>"> 
@@ -350,7 +368,7 @@ function fr_insline(id, on) {
 				    </tr>
 					<tr>
 					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0" alt="delete selected rules"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" alt="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
-					  <td><a href="firewall_rules_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0" alt="add new rule"></a></td>
+					  <td><a href="firewall_rules_edit.php?if=<?=$if;?><?=$typelink;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0" alt="add new rule"></a></td>
 					</tr>
 				    </table>
 				  </td>

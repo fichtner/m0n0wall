@@ -12,6 +12,7 @@ hints		"M0N0WALL_GENERIC.hints"
 
 options 	SCHED_4BSD		# 4BSD scheduler
 options 	INET			# InterNETworking
+options 	INET6			# IPv6 communications protocols
 options 	FFS			# Berkeley Fast Filesystem
 options 	SOFTUPDATES		# Enable FFS soft updates support
 options 	MD_ROOT			# MD is a potential root device
@@ -185,6 +186,7 @@ device		tun		# Packet tunnel.
 device		pty		# Pseudo-ttys (telnet etc)
 device		md		# Memory "disks"
 device		gif		# IPv6 and IPv4 tunneling
+device		stf		# 6to4 IPv6 over IPv4 encapsulation
 
 device		if_bridge	#Bridge interface
 device          vlan

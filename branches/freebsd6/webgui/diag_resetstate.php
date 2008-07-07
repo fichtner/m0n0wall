@@ -41,6 +41,8 @@ if ($_POST) {
 	}
 	if ($_POST['statetable']) {
 		filter_flush_state_table();
+		if (ipv6enabled())
+    		filter_flush_state_table_ipv6();
 		if ($savemsg)
 			$savemsg .= " ";
 		$savemsg .= "The state table has been flushed successfully.";

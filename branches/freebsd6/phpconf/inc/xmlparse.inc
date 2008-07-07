@@ -30,9 +30,9 @@
 */
 
 /* tags that are always to be handled as lists */
-$listtags = explode(" ", "rule user group key dnsserver winsserver pages " .
+$listtags = explode(" ", "rule rule6 user group key dnsserver winsserver pages " .
 	"encryption-algorithm-option hash-algorithm-option hosts tunnel onetoone " .
-	"staticmap route alias pipe queue shellcmd cacert earlyshellcmd mobilekey " .
+	"staticmap route route6 alias pipe queue shellcmd cacert earlyshellcmd mobilekey " .
 	"servernat proxyarpnet passthrumac allowedip wolentry vlan domainoverrides element " .
 	"roll active");
 
