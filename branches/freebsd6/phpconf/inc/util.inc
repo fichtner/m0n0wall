@@ -527,7 +527,7 @@ function generate_self_signed_cert($orgname, $cn) {
 
 	$privkey = openssl_pkey_new($config);
 	$csr = openssl_csr_new($dn, $privkey, $config);
-	$sscert = openssl_csr_sign($csr, null, $privkey, 730, $config);
+	$sscert = openssl_csr_sign($csr, null, $privkey, 730, $config, time());
 
 	openssl_x509_export($sscert, $certout);
 	openssl_pkey_export($privkey, $pkeyout);
