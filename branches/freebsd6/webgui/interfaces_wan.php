@@ -65,8 +65,8 @@ $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
 $pconfig['spoofmac'] = $wancfg['spoofmac'];
 
 if (ipv6enabled()) {	
-	if ($wancfg['ipaddr6'] == "6to4") {
-		$pconfig['ipv6mode'] = "6to4";
+	if ($wancfg['ipaddr6'] == "6to4" || $wancfg['ipaddr6'] == "ppp") {
+		$pconfig['ipv6mode'] = $wancfg['ipaddr6'];
 	} else if ($wancfg['ipaddr6']) {
 		$pconfig['ipaddr6'] = $wancfg['ipaddr6'];
 		$pconfig['subnet6'] = $wancfg['subnet6'];
@@ -140,6 +140,9 @@ if ($_POST) {
 		if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['gateway6'])) {
 			$input_errors[] = 'A valid IPv6 gateway must be specified.';
 		}
+		if ($_POST['ipv6mode'] == "ppp" && $_POST['type'] != "PPPoE" && $_POST['type'] != "PPTP") {
+			$input_errors[] = 'IPv6 PPP mode can only be used in conjunction with PPPoE or PPTP.';
+		}
 	}
 	
 	/* Wireless interface? */
@@ -196,8 +199,8 @@ if ($_POST) {
 		$wancfg['spoofmac'] = $_POST['spoofmac'];
 		
 		if (ipv6enabled()) {
-			if ($_POST['ipv6mode'] == "6to4") {
-				$wancfg['ipaddr6'] = "6to4";
+			if ($_POST['ipv6mode'] == "6to4" || $_POST['ipv6mode'] == "ppp") {
+				$wancfg['ipaddr6'] = $_POST['ipv6mode'];
 				unset($wancfg['subnet6']);
 				unset($wancfg['gateway6']);
 			} else if ($_POST['ipv6mode'] == "static") {
@@ -408,17 +411,18 @@ function type_change() {
                   <td valign="top" class="vncellreq">IPv6 mode</td>
                   <td class="vtable"> 
                     <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
-                      <?php $opts = array('disabled', 'static', '6to4');
-						foreach ($opts as $opt) {
-							echo "<option value=\"$opt\"";
-							if ($opt == $pconfig['ipv6mode']) echo "selected";
-							echo ">$opt</option>\n";
+                      <?php $opts = array('disabled' => 'disabled', 'static' => 'static', '6to4' => '6to4', 'ppp' => 'PPP');
+						foreach ($opts as $optn => $optd) {
+							echo "<option value=\"$optn\"";
+							if ($optn == $pconfig['ipv6mode']) echo "selected";
+							echo ">$optd</option>\n";
 						}
 						?>
                     </select><br>
 					6to4 mode will automatically try to establish an IPv6-over-IPv4 tunnel via the
 					nearest gateway. You also need to set your LAN interface (and optional interfaces, if present)
-					to 6to4 mode for it to work properly.</td>
+					to 6to4 mode for it to work properly.<br>
+					PPP mode can be used if your ISP provides native IPv6 connectivity over PPPoE or PPTP.</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">IPv6 address</td>

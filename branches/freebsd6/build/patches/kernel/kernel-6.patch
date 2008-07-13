@@ -97,11 +97,11 @@
  	return 0;
  }
 --- sys/netinet/ip_input.c.orig	2007-04-03 10:16:05.000000000 +0200
-+++ sys/netinet/ip_input.c	2008-02-23 19:42:23.000000000 +0100
++++ sys/netinet/ip_input.c	2008-07-09 21:47:45.000000000 +0200
 @@ -389,18 +389,22 @@
  		}
  	}
- 
+
 -	if (m->m_pkthdr.csum_flags & CSUM_IP_CHECKED) {
 -		sum = !(m->m_pkthdr.csum_flags & CSUM_IP_VALID);
 -	} else {
@@ -129,9 +129,9 @@
 -		ipstat.ips_badsum++;
 -		goto bad;
  	}
- 
+
  #ifdef ALTQ
-@@ -463,6 +467,20 @@
+@@ -463,6 +467,21 @@
  	/* Jump over all PFIL processing if hooks are not active. */
  	if (inet_pfil_hook.ph_busy_count == -1)
  		goto passin;
@@ -147,9 +147,10 @@
 +		if (dn_tag != NULL)
 +			m_tag_delete(m, dn_tag);
 +		
++		m->m_flags &= ~M_IPIN_SKIPPFIL;
 +		goto passin;
 +	}
- 
+
  	odst = ip->ip_dst;
  	if (pfil_run_hooks(&inet_pfil_hook, &m, m->m_pkthdr.rcvif,
 --- sys/netinet/ip_dummynet.c.orig	2006-07-29 10:24:12.000000000 +0200

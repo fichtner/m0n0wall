@@ -550,7 +550,7 @@ function interfaces_wan_configure() {
 	return 0;
 }
 
-function interfaces_wan_configure6() {
+function interfaces_wan_configure6($newwanip = false) {
 	global $config, $g;
 	
 	$wancfg = $config['interfaces']['wan'];
@@ -577,6 +577,12 @@ function interfaces_wan_configure6() {
 					interfaces_lan_configure6();
 					interfaces_optional_configure6();
 				}
+			}
+		} else if ($wancfg['ipaddr6'] == "ppp") {
+			if ($newwanip) {
+				/* called from up-script -> add IPv6 default route */
+				mwexec('/sbin/route delete -inet6 default');
+				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
 			}
 		} else {
 			if ($wancfg['ipaddr6'] && $wancfg['subnet6'] && $wancfg['gateway6']) {
@@ -664,6 +670,11 @@ pppoe:
 	set iface enable tcpmssfix
 
 EOD;
+
+	/* IPv6 enabled on WAN interface? */
+	if ($wancfg['ipaddr6'] == "ppp") {
+		$mpdconf .= "	set bundle enable ipv6cp\n";
+	}
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
@@ -763,6 +774,11 @@ pptp:
 	set iface up-script /usr/local/sbin/ppp-linkup
 
 EOD;
+
+	/* IPv6 enabled on WAN interface? */
+	if ($wancfg['ipaddr6'] == "ppp") {
+		$mpdconf .= "	set bundle enable ipv6cp\n";
+	}
 	
 	$mpdconf .= <<<EOD
 	set bundle disable multilink
@@ -915,9 +931,12 @@ function get_real_wan_interface($ipv6 = false) {
 	$wancfg = $config['interfaces']['wan'];
 	
 	$wanif = $wancfg['if'];
+	
 	if ($ipv6) {
 		if ($wancfg['ipaddr6'] == "6to4")
 			$wanif = "stf0";
+		else if ($wancfg['ipaddr6'] == "ppp")
+			$wanif = $g['pppoe_interface'];
 	} else {
 		if (($wancfg['ipaddr'] == "pppoe") || ($wancfg['ipaddr'] == "pptp")) {
 			$wanif = $g['pppoe_interface'];

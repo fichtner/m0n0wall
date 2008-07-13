@@ -71,8 +71,8 @@
 	vpn_ipsec_configure(true);
 	
 	if (ipv6enabled()) {
-		/* reconfigure v6 on WAN interface (may be 6to4) */
-		interfaces_wan_configure6();
+		/* reconfigure v6 on WAN interface (may be 6to4 or PPP) */
+		interfaces_wan_configure6(true);
 	}
 	
 	/* write current WAN IP to file */

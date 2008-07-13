@@ -3,6 +3,18 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix issue where firewall rules on PPTP VPN (and access to m0n0wall's own
+  services, like ping or DNS, from a PPTP VPN client) wouldn't work if incoming
+  GRE packets were matched by a traffic shaper rule on WAN
+
+- add support for IPv6 over PPPoE/PPTP (WAN)
+
+- fix "Register DHCP leases in DNS forwarder" option
+
+
+1.3b12
+------
+
 - add initial IPv6 support (based on code contributed by Michael Hanselmann
   in 2005)
 
