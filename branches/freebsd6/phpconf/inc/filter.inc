@@ -474,13 +474,17 @@ pass out quick proto ipv6-icmp from any to any icmp-type 3
 
 EOD;
 	} else {
-		/* Need to pass IP protocol 41 if using 6to4 */
-		if ($wancfg['ipaddr6'] == "6to4" && $curwanip) {
+		/* Need to pass IP protocol 41 if using 6to4 or GIF tunnel */
+		if (($wancfg['ipaddr6'] == "6to4" || $wancfg['tunnel6']) && $curwanip) {
+			$tunep = "any";
+			if ($wancfg['tunnel6'])
+				$tunep = $wancfg['tunnel6'];
+			
 			$ipfrules .= <<<EOD
 
 # allow 6to4 on WAN
-pass in quick on $wanif proto ipv6 from any to $curwanip
-pass out quick on $wanif proto ipv6 from $curwanip to any
+pass in quick on $wanif proto ipv6 from $tunep to $curwanip
+pass out quick on $wanif proto ipv6 from $curwanip to $tunep
 
 EOD;
 		}

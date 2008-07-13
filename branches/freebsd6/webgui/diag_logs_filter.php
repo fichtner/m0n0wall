@@ -145,6 +145,10 @@ function conv_clog($logfile, $tail) {
 			$flent['interface'] = "PPTP";
 		else if ($ipfa[$i] == "enc0")
 			$flent['interface'] = "IPsec";
+		else if ($ipfa[$i] == "gif0")
+			$flent['interface'] = "WAN";
+		else if ($ipfa[$i] == "stf0")
+			$flent['interface'] = "WAN";
 		else
 			$flent['interface'] = $ipfa[$i];
 		

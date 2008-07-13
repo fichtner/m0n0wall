@@ -108,10 +108,10 @@ if ($_POST) {
 			}
 		}
 		
-		$dhcpd_was_enabled = 0;
-		if (isset($config['dhcpd']['enable'])) {
-			unset($config['dhcpd']['enable']);
-			$dhcpd_was_enabled = 1;
+		$dhcpd_was_enabled = false;
+		if (isset($config['dhcpd']['lan']['enable'])) {
+			unset($config['dhcpd']['lan']['enable']);
+			$dhcpd_was_enabled = true;
 		}
 			
 		write_config();

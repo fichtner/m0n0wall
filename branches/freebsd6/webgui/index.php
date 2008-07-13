@@ -47,6 +47,20 @@ if ($fd) {
 	fclose($fd);
 }
 
+if ($g['platform'] == "wrap") {
+	/* figure out whether we're on a WRAP or an ALIX */
+	$pce_platform = "ALIX board";
+	$fd = @popen("/sbin/dmesg", "r");
+	while (!feof($fd)) {
+		$line = fgets($fd);
+		if (strpos($line, "PC Engines WRAP") !== false) {
+			$pce_platform = "WRAP board";
+			break;
+		}
+	}
+	pclose($fd);
+}
+
 if ($_POST) {
 	$config['system']['notes'] = base64_encode($_POST['notes']);
 	write_config();
@@ -86,6 +100,9 @@ if ($_POST) {
                 <td width="25%" class="vncellt">Platform</td>
                 <td width="75%" class="listr"> 
                   <?=htmlspecialchars($g['fullplatform']);?>
+				  <?php if ($pce_platform)
+							echo "($pce_platform)";
+				  ?>
                 </td>
               </tr><?php if ($hwcrypto): ?>
               <tr> 

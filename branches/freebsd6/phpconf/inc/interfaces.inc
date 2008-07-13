@@ -557,6 +557,7 @@ function interfaces_wan_configure6($newwanip = false) {
 	
 	remove_all_ipv6_addresses($wancfg['if']);
 	remove_all_ipv6_addresses("stf0");
+	remove_all_ipv6_addresses("gif0");
 	
 	if (ipv6enabled()) {
 		if ($wancfg['ipaddr6'] == "6to4") {
@@ -585,15 +586,35 @@ function interfaces_wan_configure6($newwanip = false) {
 				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
 			}
 		} else {
-			if ($wancfg['ipaddr6'] && $wancfg['subnet6'] && $wancfg['gateway6']) {
-				mwexec('/sbin/ifconfig ' . escapeshellarg($wancfg['if']) .
-					' inet6 ' . escapeshellarg($wancfg['ipaddr6']) .
-					' prefixlen ' . escapeshellarg($wancfg['subnet6'] . ' alias')
-				);
-				/* default route */
-				mwexec('/sbin/route delete -inet6 default');
-				mwexec('/sbin/route add -inet6 default ' .
-					escapeshellarg($wancfg['gateway6']));
+			if ($wancfg['ipaddr6'] && $wancfg['subnet6'] && ($wancfg['tunnel6'] || $wancfg['gateway6'])) {
+				$wanif6 = $wancfg['if'];
+				$gw6 = escapeshellarg($wancfg['gateway6']);
+				
+				/* use GIF tunnel? */
+				if ($wancfg['tunnel6']) {
+					$curwanip6 = get_current_wan_address(false);
+					
+					if ($curwanip6) {
+						$wanif6 = "gif0";
+						$gw6 = "-iface gif0";
+						
+						mwexec('/sbin/ifconfig gif0 create');
+						mwexec('/sbin/ifconfig gif0 tunnel ' . escapeshellarg($curwanip6) . ' ' . escapeshellarg($wancfg['tunnel6']));
+						mwexec('/sbin/ifconfig gif0 up');
+					} else {
+						$wanif6 = false;
+					}
+				}
+				
+				if ($wanif6) {
+					mwexec('/sbin/ifconfig ' . escapeshellarg($wanif6) .
+						' inet6 ' . escapeshellarg($wancfg['ipaddr6']) .
+						' prefixlen ' . escapeshellarg($wancfg['subnet6'] . ' alias')
+					);
+					/* default route */
+					mwexec('/sbin/route delete -inet6 default');
+					mwexec('/sbin/route add -inet6 default ' . $gw6);
+				}
 			}
 		}
 	}
@@ -935,6 +956,8 @@ function get_real_wan_interface($ipv6 = false) {
 	if ($ipv6) {
 		if ($wancfg['ipaddr6'] == "6to4")
 			$wanif = "stf0";
+		else if ($wancfg['tunnel6'])
+			$wanif = "gif0";
 		else if ($wancfg['ipaddr6'] == "ppp")
 			$wanif = $g['pppoe_interface'];
 	} else {

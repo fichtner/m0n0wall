@@ -70,8 +70,14 @@ if (ipv6enabled()) {
 	} else if ($wancfg['ipaddr6']) {
 		$pconfig['ipaddr6'] = $wancfg['ipaddr6'];
 		$pconfig['subnet6'] = $wancfg['subnet6'];
-		$pconfig['gateway6'] = $wancfg['gateway6'];
-		$pconfig['ipv6mode'] = "static";
+		
+		if ($wancfg['tunnel6']) {
+			$pconfig['ipv6mode'] = "tunnel";
+			$pconfig['tunnel6'] = $wancfg['tunnel6'];
+		} else {
+			$pconfig['ipv6mode'] = "static";
+			$pconfig['gateway6'] = $wancfg['gateway6'];
+		}
 	} else {
 		$pconfig['ipv6mode'] = "disabled";
 	}
@@ -134,7 +140,7 @@ if ($_POST) {
 	}
 
 	if (ipv6enabled()) {
-		if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['ipaddr6'])) {
+		if (($_POST['ipv6mode'] == "static" || $_POST['ipv6mode'] == "tunnel") && !is_ipaddr6($_POST['ipaddr6'])) {
 			$input_errors[] = "A valid IPv6 address must be specified.";
 		}
 		if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['gateway6'])) {
@@ -142,6 +148,9 @@ if ($_POST) {
 		}
 		if ($_POST['ipv6mode'] == "ppp" && $_POST['type'] != "PPPoE" && $_POST['type'] != "PPTP") {
 			$input_errors[] = 'IPv6 PPP mode can only be used in conjunction with PPPoE or PPTP.';
+		}
+		if ($_POST['ipv6mode'] == "tunnel" && !is_ipaddr($_POST['tunnel6'])) {
+			$input_errors[] = 'An IPv6 tunnel endpoint address must be specified.';
 		}
 	}
 	
@@ -163,6 +172,7 @@ if ($_POST) {
 		unset($wancfg['ipaddr6']);
 		unset($wancfg['subnet6']);
 		unset($wancfg['gateway6']);
+		unset($wancfg['tunnel6']);
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
 		unset($config['pppoe']['provider']);
@@ -201,16 +211,14 @@ if ($_POST) {
 		if (ipv6enabled()) {
 			if ($_POST['ipv6mode'] == "6to4" || $_POST['ipv6mode'] == "ppp") {
 				$wancfg['ipaddr6'] = $_POST['ipv6mode'];
-				unset($wancfg['subnet6']);
-				unset($wancfg['gateway6']);
 			} else if ($_POST['ipv6mode'] == "static") {
 				$wancfg['ipaddr6'] = $_POST['ipaddr6'];
 				$wancfg['subnet6'] = $_POST['subnet6'];
 				$wancfg['gateway6'] = $_POST['gateway6'];
-			} else {
-				unset($wancfg['ipaddr6']);
-				unset($wancfg['subnet6']);
-				unset($wancfg['gateway6']);
+			} else if ($_POST['ipv6mode'] == "tunnel") {
+				$wancfg['ipaddr6'] = $_POST['ipaddr6'];
+				$wancfg['subnet6'] = $_POST['subnet6'];
+				$wancfg['tunnel6'] = $_POST['tunnel6'];
 			}
 		}
 			
@@ -231,10 +239,11 @@ if ($_POST) {
 <!--
 function enable_change(enable_over) {
 <?php if (ipv6enabled()): ?>
-	var en = (document.iform.ipv6mode.selectedIndex == 1 || enable_over);
+	var en = (document.iform.ipv6mode.selectedIndex == 1 || document.iform.ipv6mode.selectedIndex == 3 || enable_over);
 	document.iform.ipaddr6.disabled = !en;
 	document.iform.subnet6.disabled = !en;
 	document.iform.gateway6.disabled = !(document.iform.ipv6mode.selectedIndex == 1 || enable_over);
+	document.iform.tunnel6.disabled = !(document.iform.ipv6mode.selectedIndex == 3 || enable_over);
 <?php endif; ?>
 	
 	if (document.iform.mode) {
@@ -411,7 +420,7 @@ function type_change() {
                   <td valign="top" class="vncellreq">IPv6 mode</td>
                   <td class="vtable"> 
                     <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
-                      <?php $opts = array('disabled' => 'disabled', 'static' => 'static', '6to4' => '6to4', 'ppp' => 'PPP');
+                      <?php $opts = array('disabled' => 'disabled', 'static' => 'static', '6to4' => '6to4', 'tunnel' => 'Tunnel', 'ppp' => 'PPP');
 						foreach ($opts as $optn => $optd) {
 							echo "<option value=\"$optn\"";
 							if ($optn == $pconfig['ipv6mode']) echo "selected";
@@ -422,6 +431,7 @@ function type_change() {
 					6to4 mode will automatically try to establish an IPv6-over-IPv4 tunnel via the
 					nearest gateway. You also need to set your LAN interface (and optional interfaces, if present)
 					to 6to4 mode for it to work properly.<br>
+					To use tunnel mode (IPv6-in-IPv4 tunnel), you need a configured remote endpoint (e.g. tunnel broker).
 					PPP mode can be used if your ISP provides native IPv6 connectivity over PPPoE or PPTP.</td>
                 </tr>
                 <tr> 
@@ -443,6 +453,13 @@ function type_change() {
                   <td valign="top" class="vncellreq">IPv6 gateway</td>
                   <td class="vtable"> 
                     <input name="gateway6" type="text" class="formfld" id="gateway6" size="30" value="<?=htmlspecialchars($pconfig['gateway6']);?>">
+                   </td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">IPv6 tunnel endpoint</td>
+                  <td class="vtable"> 
+                    <input name="tunnel6" type="text" class="formfld" id="tunnel6" size="30" value="<?=htmlspecialchars($pconfig['tunnel6']);?>"><br>
+					The IPv4 address of the remote tunnel endpoint (only when using tunnel mode).
                    </td>
                 </tr>
 				<?php endif; ?>

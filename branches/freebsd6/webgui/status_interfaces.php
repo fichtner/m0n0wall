@@ -227,6 +227,19 @@ function get_interface_info($ifdescr) {
 							}
 						}
 					}
+
+					/* GRE tunnel on WAN? need to run ifconfig on gif0 then */
+					if ($config['interfaces']['wan']['tunnel6']) {
+						unset($ifconfiginfo);
+						exec("/sbin/ifconfig gif0", $ifconfiginfo);
+
+						foreach ($ifconfiginfo as $ici) {
+							if (preg_match("/inet6 ([0-9a-f:]+) prefixlen (\d+)/", $ici, $matches)) {
+								$ifinfo['ipaddr6'] = $matches[1];
+								$ifinfo['subnet6'] = $matches[2];
+							}
+						}
+					}
 				}
 			}
 		}
