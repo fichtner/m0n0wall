@@ -249,7 +249,7 @@ function enable_change(enable_change) {
 	
 	document.iform.radiusacctport.disabled = (radius_endis || !document.iform.radacct_enable.checked) && !enable_change;
 	
-	document.iform.radmac_secret.disabled = (radius_endis || !document.iform.radmac_enable.checked) && !enable_change;
+	document.iform.radmac_secret.disabled = (radius_endis || !document.iform.radmac_enable.checked) && !enable_change;
 	
 	var reauthenticate_dis = (radius_endis || !document.iform.reauthenticate.checked) && !enable_change;
 	document.iform.reauthenticateacct[0].disabled = reauthenticate_dis;
