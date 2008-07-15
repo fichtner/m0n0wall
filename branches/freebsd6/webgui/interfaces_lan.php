@@ -89,10 +89,15 @@ if ($_POST) {
 	}
 
 	if (!$input_errors) {
+		$v4changed = ($_POST['ipaddr'] != $config['interfaces']['lan']['ipaddr'] || $_POST['subnet'] != $config['interfaces']['lan']['subnet']);
 		$config['interfaces']['lan']['ipaddr'] = $_POST['ipaddr'];
 		$config['interfaces']['lan']['subnet'] = $_POST['subnet'];
 		
 		if (ipv6enabled()) {
+			$oldipaddr6 = $config['interfaces']['lan']['ipaddr6'];
+			$oldsubnet6 = $config['interfaces']['lan']['subnet6'];
+			$oldipv6ra = $config['interfaces']['lan']['ipv6ra'];
+			
 			if ($_POST['ipv6mode'] == "6to4") {
 				$config['interfaces']['lan']['ipaddr6'] = "6to4";
 				unset($config['interfaces']['lan']['subnet6']);
@@ -106,22 +111,30 @@ if ($_POST) {
 				unset($config['interfaces']['lan']['subnet6']);
 				unset($config['interfaces']['lan']['ipv6ra']);
 			}
+			
+			$v6changed = ($oldipaddr6 != $config['interfaces']['lan']['ipaddr6'] ||
+						  $oldsubnet6 != $config['interfaces']['lan']['subnet6'] ||
+						  $oldipv6ra != $config['interfaces']['lan']['ipv6ra']);
 		}
 		
-		$dhcpd_was_enabled = false;
-		if (isset($config['dhcpd']['lan']['enable'])) {
+		$dhcpd_disabled = false;
+		if ($v4changed && isset($config['dhcpd']['lan']['enable'])) {
 			unset($config['dhcpd']['lan']['enable']);
-			$dhcpd_was_enabled = true;
+			$dhcpd_disabled = true;
 		}
-			
+		
 		write_config();
-		touch($d_sysrebootreqd_path);
+		
+		if ($v4changed)
+			touch($d_sysrebootreqd_path);
+		else if ($v6changed)
+			interfaces_lan_configure6();
 		
 		$savemsg = get_std_save_message(0);
 		
-		if ($dhcpd_was_enabled)
-			$savemsg .= "<br>Note that the DHCP server has been disabled.<br>Please review its configuration " .
-				"and enable it again prior to rebooting.";
+		if ($dhcpd_disabled)
+			$savemsg .= "<br><strong>Note that the DHCP server has been disabled.<br>Please review its configuration " .
+				"and enable it again prior to rebooting.</strong>";
 	}
 }
 ?>
