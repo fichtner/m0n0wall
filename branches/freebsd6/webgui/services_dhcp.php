@@ -222,9 +222,9 @@ function enable_change(enable_over) {
                         <td width="22%" valign="top" class="vncellreq">Available 
                           range</td>
                         <td width="78%" class="vtable"> 
-                          <?=long2ip(ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet']));?>
+                          <?=long2ip((ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet'])) + 1);?>
                           - 
-                          <?=long2ip(ip2long($ifcfg['ipaddr']) | (~gen_subnet_mask_long($ifcfg['subnet']))); ?>
+                          <?=long2ip((ip2long($ifcfg['ipaddr']) | (~gen_subnet_mask_long($ifcfg['subnet']))) - 1); ?>
                         </td>
                       </tr>
                       <tr> 
