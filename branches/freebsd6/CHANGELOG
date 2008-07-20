@@ -3,6 +3,20 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- don't allow the interface's network or broadcast address to be used in
+  the DHCP client range, and also make sure that the interface's own
+  address does not fall within the range
+
+- make behavior of Interfaces: LAN page more intelligent (only disable
+  DHCP server if the IPv4 address has actually changed; do not require
+  reboot if only IPv6 address changed)
+
+- fix broken time zones (hard links in zoneinfo.tgz)
+
+
+1.3b13
+------
+
 - add support for IPv6-in-IPv4 tunnels on WAN (for use with tunnel brokers)
 
 - for wrap image, show whether we're running on a WRAP or ALIX board on

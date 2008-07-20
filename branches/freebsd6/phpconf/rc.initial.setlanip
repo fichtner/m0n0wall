@@ -62,25 +62,38 @@
 	echo "\nDo you want to enable the DHCP server on LAN? (y/n) ";
 	
 	if (strcasecmp(chop(fgets($fp)), "y") == 0) {
-		do {
-			echo "Enter the start address of the client address range: ";
-			$dhcpstartip = chop(fgets($fp));
-			if ($dhcpstartip === "") {
-				exit(0);
+		$dhcpok = false;
+		while (!$dhcpok) {
+			do {
+				echo "Enter the start address of the client address range: ";
+				$dhcpstartip = chop(fgets($fp));
+				if ($dhcpstartip === "") {
+					exit(0);
+				}
+			} while (!is_ipaddr($dhcpstartip));
+	
+			do {
+				echo "Enter the end address of the client address range: ";
+				$dhcpendip = chop(fgets($fp));
+				if ($dhcpendip === "") {
+					exit(0);
+				}
+			} while (!is_ipaddr($dhcpendip));
+	
+			/* sanity checks on DHCP client range */
+			$rangeerrs = check_dhcp_range($lanip, $lanbits, $dhcpstartip, $dhcpendip);
+			
+			if (count($rangeerrs) > 0) {
+				foreach ($rangeerrs as $err)
+					echo "\nError: $err";
+				echo "\n\n";
+			} else {
+				$config['dhcpd']['lan']['enable'] = true;
+				$config['dhcpd']['lan']['range']['from'] = $dhcpstartip;
+				$config['dhcpd']['lan']['range']['to'] = $dhcpendip;
+				$dhcpok = true;
 			}
-		} while (!is_ipaddr($dhcpstartip));
-		
-		do {
-			echo "Enter the end address of the client address range: ";
-			$dhcpendip = chop(fgets($fp));
-			if ($dhcpendip === "") {
-				exit(0);
-			}
-		} while (!is_ipaddr($dhcpendip));
-		
-		$config['dhcpd']['lan']['enable'] = true;
-		$config['dhcpd']['lan']['range']['from'] = $dhcpstartip;
-		$config['dhcpd']['lan']['range']['to'] = $dhcpendip;
+		}
 	} else {
 		unset($config['dhcpd']['lan']['enable']);
 	}

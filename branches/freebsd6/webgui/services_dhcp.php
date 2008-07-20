@@ -98,18 +98,8 @@ if ($_POST) {
 			$input_errors[] = "A valid next server IP address must be specified.";
 		}
 		
-		if (!$input_errors) {
-			/* make sure the range lies within the current subnet */
-			$subnet_start = (ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet']));
-			$subnet_end = (ip2long($ifcfg['ipaddr']) | (~gen_subnet_mask_long($ifcfg['subnet'])));
-			
-			if ((ip2long($_POST['range_from']) < $subnet_start) || (ip2long($_POST['range_from']) > $subnet_end) ||
-			    (ip2long($_POST['range_to']) < $subnet_start) || (ip2long($_POST['range_to']) > $subnet_end)) {
-				$input_errors[] = "The specified range lies outside of the current subnet.";	
-			}
-			
-			if (ip2long($_POST['range_from']) > ip2long($_POST['range_to']))
-				$input_errors[] = "The range is invalid (first element higher than second element).";
+		if (!$input_errors) {				
+			$input_errors = array_merge($input_errors, check_dhcp_range($ifcfg['ipaddr'], $ifcfg['subnet'], $_POST['range_from'], $_POST['range_to']));
 			
 			/* make sure that the DHCP Relay isn't enabled on this interface */
 			if (isset($config['dhcrelay'][$if]['enable']))

@@ -539,4 +539,31 @@ function generate_self_signed_cert($orgname, $cn) {
 		return false;
 }
 
+/* check whether a DHCP client range is valid on an interface with a given IP address and subnet mask;
+   return an array of error strings (or an empty array on success) */
+function check_dhcp_range($if_ipaddr, $if_subnet, $range_from, $range_to) {
+	$input_errors = array();
+	$subnet_start = (ip2long($if_ipaddr) & gen_subnet_mask_long($if_subnet));
+	$subnet_end = (ip2long($if_ipaddr) | (~gen_subnet_mask_long($if_subnet)));
+	
+	$rangefrom = ip2long($range_from);
+	$rangeto = ip2long($range_to);
+	$ifip = ip2long($if_ipaddr);
+	
+	if (($rangefrom < $subnet_start) || ($rangefrom > $subnet_end) ||
+	    ($rangeto < $subnet_start) || ($rangeto > $subnet_end))
+		$input_errors[] = "The specified range lies outside of the current subnet.";
+	
+	if ($rangefrom > $rangeto)
+		$input_errors[] = "The range is invalid (start address higher than end address).";
+	
+	if (($rangefrom == $subnet_start) || ($rangeto == $subnet_end))
+		$input_errors[] = "The network address (" . long2ip($subnet_start) . ") or the broadcast address (" . long2ip($subnet_end) . ") cannot be used in the range.";
+	
+	if ($ifip >= $rangefrom && $ifip <= $rangeto)
+		$input_errors[] = "The interface's IP address cannot be included in the range.";
+	
+	return $input_errors;
+}
+
 ?>
