@@ -180,8 +180,9 @@
               <entry>webGUI Protocol</entry>
 
               <entry>The protocol for the m0n0wall webGUI to use. If you
-              select HTTPS, you will need to access your webGUI using a URL
-              that starts with "https:".</entry>
+              select HTTPS, you will need to securely access your webGUI using
+              a URL that starts with "https:" and to enter a signed
+              certificate and key in the Advanced System page.</entry>
 
               <entry></entry>
 
@@ -347,8 +348,9 @@
             <row>
               <entry>webGUI SSL certificate/key</entry>
 
-              <entry>Paste a signed certificate in X.509 and a RSA private key
-              in PEM format here.</entry>
+              <entry>Paste a signed (firmware 1.2) or create a self signed
+              (firmware 1.3b12+) certificate in X.509 and a RSA private key in
+              PEM format here.</entry>
             </row>
 
             <row>
@@ -459,6 +461,118 @@
           </tbody>
         </tgroup>
       </table>
+
+      <sect3>
+        <title>IPv6</title>
+
+        <para>IPv6 support is included in the latest 1.3beta release (v12 or
+        later). The base for this was actually contributed by Michael
+        Hanselmann way back in 2005, and with some modifications to reflect
+        the changes in m0n0wall since then, as well as a few fixes/
+        improvements (most notably easy to configure 6to4 support), it is now
+        finally in an official release. (Belated) Thanks, Michael!</para>
+
+        <para>IPv6 support must be explicitly enabled on the System: Advanced
+        setup page before any of the new options will become available. Also,
+        by default there are no firewall rules for IPv6, so everything is
+        blocked. Make sure to add at least a rule on your LAN interface for
+        outbound connections if you want to use IPv6.</para>
+
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/system/advanced.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+
+        <para>After IPv6 is activated, additional options will become
+        available in the main menu for routing and firewall management.
+        Interface pages will also offer additional IPv6 configuration
+        options..</para>
+
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/system/ip6_sys_fw.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+
+        <caution>
+          <para>Since 1.3b12 is the first release with IPv6 support, bugs in
+          the implementation are likely. As always, please post on the mailing
+          list or in the forum if you've found something odd (with a detailled
+          description of what you did, please). Also let us know if everything
+          worked "out of the box". :)</para>
+        </caution>
+
+        <para>If you don't have native IPv6 connectivity yet, don't worry:
+        6to4 tunneling is supported, which should work anywhere you've got a
+        (non- firewalled) public IPv4 address. Simply choose "6to4" for the
+        IPv6 mode on both the WAN and LAN interfaces - no need to manually
+        configure any IPv6 addresses (check the IPv6 RA option on the LAN
+        interface and your LAN hosts will be able to automatically obtain an
+        IPv6 address). It can also work with dynamic WAN IPv4 addresses (LAN/
+        OPT IPv6 subnets are adjusted automatically). Note that some operating
+        systems do not use IPv6 when connecting to a host that supports both
+        IPv4 and IPv6 if they are configured with a 6to4 IPv6 address (-&gt;
+        <ulink url="http://tools.ietf.org/html/rfc3484">RFC 3484</ulink>), so
+        use an IPv6-only host (try <ulink
+        url="http://ipv6.m0n0.ch">http://ipv6.m0n0.ch</ulink>) for browser
+        testing, or simply do a "ping6".</para>
+
+        <para>If you've got native IPv6 connectivity (over PPPoE/PPTP with
+        1.3b13 or later), remember that you'll have to statically route your
+        m0n0wall's LAN subnet from your upstream router - there's no NAT for
+        IPv6 in m0n0wall (and it would be pretty pointless in most cases
+        anyway :).</para>
+
+        <para>Also, if you've gotten it to work and need some IPv6 capable web
+        sites to try it out, have a look at <ulink
+        url="http://sixy.ch">http://sixy.ch</ulink> (or <ulink
+        url="http://ipv6.sixy.ch">http://ipv6.sixy.ch</ulink>), a directory of
+        IPv6 enabled web sites.</para>
+
+        <para>For more information on IPv6 check out some of the following
+        websites.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><ulink url="http://www.ch.ipv6tf.org/?cid=104">IPv6 Swiss
+            Task Force</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para><ulink url="http://en.wikipedia.org/wiki/Ipv6">Wikipedia
+            IPv6</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para><ulink
+            url="http://technet.microsoft.com/en-us/network/bb530961.aspx">Microsoft
+            Technet IPv6</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para><ulink
+            url="http://arstechnica.com/articles/paedia/IPv6.ars">ars techna:
+            Everything you need to know about IPv6</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>IPv6 Tunnel Brokers <ulink
+            url="http://en.wikipedia.org/wiki/List_of_IPv6_tunnel_brokers">Wikipedia</ulink>
+            or <ulink
+            url="http://en.linuxreviews.org/Free_IPv4_to_IPv6_Tunnel_Brokers">LinuxReviews.org</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para><ulink url="http://www.sixxs.net/misc/coolstuff/">Cool IPv6
+            Stuff from sixxs.net</ulink></para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
     </sect2>
 
     <sect2>
@@ -503,6 +617,22 @@
       the netmask (in CIDR notation) of the firewall internal interface. The
       system must be rebooted in order to apply the changes as suggested after
       pressing the "Save" button.</para>
+
+      <sect3>
+        <title>LAN IPv6</title>
+
+        <para>When IPv6 is activated in firmware 1.3 beta 13 or higher,
+        additional IPv6 options will become available on the WAN
+        interface.</para>
+
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/interfaces/lan_1.3_ip6.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+      </sect3>
     </sect2>
 
     <sect2>
@@ -654,6 +784,22 @@
         the remote VPN device, not from the private IP subnet on the remote
         side.</para>
       </note>
+
+      <sect3>
+        <title>WAN IPv6</title>
+
+        <para>When IPv6 is activated in firmware 1.3 beta 13 or higher,
+        additional IPv6 options will become available on the WAN
+        interface.</para>
+
+        <screenshot>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="screens/interfaces/wan_1.3_ip6.png" />
+            </imageobject>
+          </mediaobject>
+        </screenshot>
+      </sect3>
     </sect2>
 
     <sect2>
