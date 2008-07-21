@@ -452,7 +452,7 @@
             <row>
               <entry>Firewall states displayed</entry>
 
-              <entry>Maxmimum number of firewall state entries to be displayed
+              <entry>Maximum number of firewall state entries to be displayed
               on the Diagnostics: Firewall state page. Default is 300. Setting
               this to a very high value will cause a slowdown when viewing the
               firewall states page, depending on your system's processing
@@ -502,7 +502,7 @@
         <caution>
           <para>Since 1.3b12 is the first release with IPv6 support, bugs in
           the implementation are likely. As always, please post on the mailing
-          list or in the forum if you've found something odd (with a detailled
+          list or in the forum if you've found something odd (with a detailed
           description of what you did, please). Also let us know if everything
           worked "out of the box". :)</para>
         </caution>
@@ -816,7 +816,7 @@
       <para>The wireless interface configuration screen is only presented if a
       compatible wireless card is found at system startup. Options will be
       presented depending on the features supported for the wireless card. See
-      the Wireles chapter for more information on wireless configuration
+      the Wireless chapter for more information on wireless configuration
       options.</para>
     </sect2>
   </sect1>
@@ -834,7 +834,7 @@
       <para>This service allows you to use the fixed IP address of your
       m0n0wall's LAN ethernet interface to resolve/proxy all DNS queries on
       your LAN network. When the m0n0wall DHCP server assigns IP addresses, it
-      also assigns the LAN IP address as the DNS server to use. Otherwie, to
+      also assigns the LAN IP address as the DNS server to use. Otherwise, to
       benefit from this service you must manually configure the DNS IP address
       on your computers to be the LAN IP of your m0n0wall.</para>
 
@@ -900,7 +900,7 @@
       <para>If there are certain DNS host names you want to override for your
       internal DNS clients, add them under DNS overrides on this page. For
       example, if you want www.yourcompany.com to point to a different site
-      internally than it does from the internet, enter an override for
+      internally than it does from the Internet, enter an override for
       www.yourcompany.com with the appropriate IP address. This can also be
       used as a rudimentary (and easy to bypass) filter on web sites LAN
       clients can visit, by assigning the undesired host name to an invalid IP
@@ -1003,7 +1003,7 @@
       Many will find the increased security worth the increase in maintenance.
       Note that this is only sufficient to stop the typical user that expects
       to be able to plug into your network and obtain a DHCP lease to get on
-      the internet. Anyone with network and/or security expertise can easily
+      the Internet. Anyone with network and/or security expertise can easily
       bypass this.</para>
 
       <para>Subnet, Subnet Mask, and Available range are filled in from the IP
@@ -1208,7 +1208,7 @@
           cannot exclude a specific site, as this popup appears to come from
           whatever server the user tried to go to prior to authentication. If
           you have a popup blocker, you'll need to disable it prior to logging
-          in, and then re-enable it after the logoff popup appears.</para>
+          in, and then re-enable it after the log off popup appears.</para>
         </note></para>
 
       <para><emphasis role="bold">RADIUS server</emphasis> - Enter the IP
@@ -1448,7 +1448,7 @@
       <caution>
         <para>The logs are limited to available RAM and are erased after a
         reboot. To store logs permanently you should enable the use of a
-        remote syslog server on the Diagnostic Log Setings page.</para>
+        remote syslog server on the Diagnostic Log Settings page.</para>
       </caution>
 
       <screenshot>
@@ -1490,7 +1490,7 @@
             <row>
               <entry>Number of log entries</entry>
 
-              <entry>how many log ntries to keep</entry>
+              <entry>how many log entries to keep</entry>
             </row>
 
             <row>
