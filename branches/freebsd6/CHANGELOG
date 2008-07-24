@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add kernel patch to fix ATA on some Cyrix/Geode based boards
+  (see http://www.freebsd.org/cgi/cvsweb.cgi/src/sys/dev/pci/pci.c#rev1.343)
+  (suggested by Konrad Jopek)
+
 - fix "RSA Cert Subject" choice for My Identifier on IPsec VPN Mobile Client
   setup page (reported by rdnzl)
 
