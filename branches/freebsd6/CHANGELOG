@@ -3,6 +3,16 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- import ipnat source port randomization patch from FreeBSD CVS
+  (see http://docs.freebsd.org/cgi/getmsg.cgi?fetch=427148+0+current/cvs-src)
+  (important when running DNS servers behind m0n0wall with NAT turned on);
+  add new option to System: Advanced page to control the port range used
+  for random source port allocation during outbound NAT (default is
+  1024 - 64535; portrange sysctls have been adjusted accordingly);
+  reorganize System: Advanced page slightly at the same time
+
+- update Dnsmasq to 2.45
+
 - add kernel patch to fix ATA on some Cyrix/Geode based boards
   (see http://www.freebsd.org/cgi/cvsweb.cgi/src/sys/dev/pci/pci.c#rev1.343)
   (suggested by Konrad Jopek)

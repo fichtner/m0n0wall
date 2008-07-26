@@ -60,6 +60,11 @@ function filter_configure() {
 		mwexec("/sbin/ipf -E");
 	}
 	
+	/* set portrange sysctls - m0n0wall doesn't need many ports for itself, and we'd rather
+	   let ipnat have the rest for better source port randomization */
+	mwexec("/sbin/sysctl net.inet.ip.portrange.first=64536");
+	mwexec("/sbin/sysctl net.inet.ip.portrange.hifirst=64536");
+	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
 	
@@ -122,6 +127,7 @@ function filter_flush_state_table_ipv6() {
 }
 
 function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true) {
+	global $config;
 
 	if ($target)
 		$tgt = $target . "/32";
@@ -130,8 +136,17 @@ function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true)
 	
 	$natrule = "map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp\n";
 	
-	if ($portmap)
-		$natrule .= "map $if $src $dst -> {$tgt} portmap tcp/udp auto\n";
+	if ($portmap) {
+		$rangelow = 1024;
+		$rangehigh = 64535;
+		
+		if ($config['nat']['portrange-low'] && $config['nat']['portrange-high']) {
+			$rangelow = $config['nat']['portrange-low'];
+			$rangehigh = $config['nat']['portrange-high'];
+		}
+		
+		$natrule .= "map $if $src $dst -> {$tgt} portmap tcp/udp $rangelow:$rangehigh\n";
+	}
 	
 	$natrule .= "map $if $src $dst -> {$tgt}\n";
 	

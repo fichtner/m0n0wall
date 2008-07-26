@@ -49,6 +49,8 @@ $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
 $pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
 $pconfig['enableipv6'] = isset($config['system']['enableipv6']);
+$pconfig['portrangelow'] = $config['nat']['portrange-low'];
+$pconfig['portrangehigh'] = $config['nat']['portrange-high'];
 
 if ($_POST) {
 
@@ -88,6 +90,9 @@ if ($_POST) {
 		if (!strstr($_POST['key'], "BEGIN RSA PRIVATE KEY") || !strstr($_POST['key'], "END RSA PRIVATE KEY"))
 			$input_errors[] = "This key does not appear to be valid.";
 	}
+	if (($_POST['portrangelow'] || $_POST['portrangehigh']) &&
+		(!is_port($_POST['portrangelow']) || !is_port($_POST['portrangehigh'])))
+		$input_errors[] = "The outbound NAT port range start and end must be integers between 1 and 65535.";
 
 	if (!$input_errors) {
 		$config['bridge']['filteringbridge'] = $_POST['filteringbridge_enable'] ? true : false;
@@ -118,6 +123,8 @@ if ($_POST) {
 		else
 			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
 		$config['system']['enableipv6'] = $_POST['enableipv6'] ? true : false;
+		$config['nat']['portrange-low'] = $_POST['portrangelow'];
+		$config['nat']['portrange-high'] = $_POST['portrangehigh'];
 		
 		write_config();
 		
@@ -231,6 +238,41 @@ if ($_POST) {
                   <td colspan="2" class="list" height="12"></td>
                 </tr>
                 <tr> 
+                  <td colspan="2" valign="top" class="listtopic">Firewall</td>
+                </tr>
+				<tr>
+                  <td valign="top" class="vncell">TCP idle timeout </td>
+                  <td class="vtable">                    <span class="vexpl">
+                    <input name="tcpidletimeout" type="text" class="formfld" id="tcpidletimeout" size="8" value="<?=htmlspecialchars($pconfig['tcpidletimeout']);?>">
+                    seconds<br>
+    Idle TCP connections will be removed from the state table after no packets have been received for the specified number of seconds. Don't set this too high or your state table could become full of connections that have been improperly shut down. The default is 2.5 hours.</span></td>
+			    </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">Static route filtering</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="bypassstaticroutes" type="checkbox" id="bypassstaticroutes" value="yes" <?php if ($pconfig['bypassstaticroutes']) echo "checked"; ?>>
+                    <strong>Bypass firewall rules for traffic on the same interface</strong><br>
+					This option only applies if you have defined one or more static routes. If it is enabled, traffic that enters and leaves through the same interface will not be checked by the firewall. This may be desirable in some situations where multiple subnets are connected to the same interface. </td>
+                </tr>
+				<tr>
+                  <td valign="top" class="vncell">IPsec fragmented packets</td>
+                  <td class="vtable">
+                    <input name="allowipsecfrags" type="checkbox" id="allowipsecfrags" value="yes" <?php if ($pconfig['allowipsecfrags']) echo "checked"; ?>>
+                    <strong>Allow fragmented IPsec packets</strong><span class="vexpl"><br>
+    This will cause m0n0wall to allow fragmented IP packets that are encapsulated in IPsec ESP packets.</span></td>
+			    </tr>
+				<tr>
+                  <td valign="top" class="vncell">Outbound NAT port range</td>
+                  <td class="vtable"><span class="vexpl">
+                    <input name="portrangelow" type="text" class="formfld" id="portrangelow" size="5" value="<?=htmlspecialchars($pconfig['portrangelow']);?>"> - 
+					<input name="portrangehigh" type="text" class="formfld" id="portrangehigh" size="5" value="<?=htmlspecialchars($pconfig['portrangehigh']);?>">
+                    <br>
+    This setting controls the range from which ports are randomly picked for outbound NAT. Do not change this unless you know exactly what you're doing.</span></td>
+			    </tr>
+                <tr> 
+                  <td colspan="2" class="list" height="12"></td>
+                </tr>
+                <tr> 
                   <td colspan="2" valign="top" class="listtopic">Miscellaneous</td>
                 </tr>
 				<tr> 
@@ -248,13 +290,6 @@ if ($_POST) {
     This will cause m0n0wall not to check for newer firmware versions when the <a href="system_firmware.php">System: Firmware</a> page is viewed.</span></td>
 			    </tr>
 				<tr>
-                  <td valign="top" class="vncell">IPsec fragmented packets</td>
-                  <td class="vtable">
-                    <input name="allowipsecfrags" type="checkbox" id="allowipsecfrags" value="yes" <?php if ($pconfig['allowipsecfrags']) echo "checked"; ?>>
-                    <strong>Allow fragmented IPsec packets</strong><span class="vexpl"><br>
-    This will cause m0n0wall to allow fragmented IP packets that are encapsulated in IPsec ESP packets.</span></td>
-			    </tr>
-				<tr>
                   <td valign="top" class="vncell">IPsec DNS check interval</td>
                   <td class="vtable">                    <span class="vexpl">
                     <input name="ipsecdnsinterval" type="text" class="formfld" id="ipsecdnsinterval" size="8" value="<?=htmlspecialchars($pconfig['ipsecdnsinterval']);?>">
@@ -262,13 +297,6 @@ if ($_POST) {
     If at least one IPsec tunnel has a host name (instead of an IP address) as the remote gateway, a DNS lookup
     is performed at the interval specified here, and if the IP address that the host name resolved to has changed,
     the IPsec tunnel is reconfigured. The default is 60 seconds.</span></td>
-			    </tr>
-				<tr>
-                  <td valign="top" class="vncell">TCP idle timeout </td>
-                  <td class="vtable">                    <span class="vexpl">
-                    <input name="tcpidletimeout" type="text" class="formfld" id="tcpidletimeout" size="8" value="<?=htmlspecialchars($pconfig['tcpidletimeout']);?>">
-                    seconds<br>
-    Idle TCP connections will be removed from the state table after no packets have been received for the specified number of seconds. Don't set this too high or your state table could become full of connections that have been improperly shut down. The default is 2.5 hours.</span></td>
 			    </tr>
 <?php if ($g['platform'] == "generic-pc"): ?>
 				<tr> 
@@ -291,13 +319,6 @@ if ($_POST) {
                   <td width="78%" class="vtable"> 
                     <input name="expanddiags" type="checkbox" id="expanddiags" value="yes" <?php if ($pconfig['expanddiags']) echo "checked"; ?>>
                     <strong>Keep diagnostics in navigation expanded </strong></td>
-                </tr>
-				<tr> 
-                  <td width="22%" valign="top" class="vncell">Static route filtering</td>
-                  <td width="78%" class="vtable"> 
-                    <input name="bypassstaticroutes" type="checkbox" id="bypassstaticroutes" value="yes" <?php if ($pconfig['bypassstaticroutes']) echo "checked"; ?>>
-                    <strong>Bypass firewall rules for traffic on the same interface</strong><br>
-					This option only applies if you have defined one or more static routes. If it is enabled, traffic that enters and leaves through the same interface will not be checked by the firewall. This may be desirable in some situations where multiple subnets are connected to the same interface. </td>
                 </tr>
 				<tr> 
                   <td width="22%" valign="top" class="vncell">webGUI anti-lockout</td>

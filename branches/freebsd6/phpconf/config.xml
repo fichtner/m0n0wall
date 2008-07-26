@@ -380,6 +380,10 @@
 			<descr></descr>
 		</servernat>
 		-->
+		<!--
+		<portrange-low></portrange-low>
+		<portrange-high></portrange-high>
+		-->
 	</nat>
 	<filter>
 		<!-- <tcpidletimeout></tcpidletimeout> -->
