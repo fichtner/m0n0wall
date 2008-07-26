@@ -552,8 +552,6 @@ pass out quick on {$wancfg['if']} proto tcp from any to any port = 1723
 EOD;
 	}
 
-    }
-
 	if (!$ipv6) {
 		$ipfrules .= <<<EOD
 
