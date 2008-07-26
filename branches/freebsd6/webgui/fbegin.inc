@@ -142,7 +142,6 @@ $menu['Services']['Captive portal'] = array('services_captiveportal.php',
 			                  				'services_captiveportal_users.php',
 							  				'services_captiveportal_elementmanager.php');
 $menu['Services']['Wake on LAN']  	= array('services_wol.php');
-$menu['Services']['SIP Proxy']      = array('services_sip.php');
 
 $menu['VPN']['IPsec']  				= array('vpn_ipsec.php',
 											'vpn_ipsec_mobile.php',
@@ -183,7 +182,6 @@ $menu['Diagnostics']['Logs']			= array('diag_logs.php',
 $menu['Diagnostics']['DHCP Leases'] 	= array('diag_dhcp_leases.php');
 $menu['Diagnostics']['IPsec'] 			= array('diag_ipsec_sad.php',
 												'diag_ipsec_spd.php');
-$menu['Diagnostics']['SIP Proxy'] 	= array('diag_sip_proxy.php');
 $menu['Diagnostics']['Ping/Traceroute'] = array('diag_ping.php',
 												'diag_traceroute.php');
 $menu['Diagnostics']['ARP Table'] 		= array('diag_arp.php');

@@ -287,20 +287,6 @@ rdr $wanif 0/0 port 1723 -> {$pptpdcfg['redir']} port 1723 tcp
 
 EOD;
 	}
-	if (isset($config['sip']['enable']) && (5060 == $config['sip']['port'])) {
-	
-	    $lancfg = $config['interfaces'][$config['sip']['ifin']];
-        $lanif = $lancfg['if'];
-	    $lanip = $lancfg['ipaddr'];
-	    $curwanip = get_current_wan_address();
-		$natrules .= <<<EOD
-
-# SIP transparent proxy
-rdr $lanif 0/0 port 5060 -> $lanip port 5060 udp
-rdr $wanif 0/0 port 5060 -> $curwanip port 5060 udp
-
-EOD;
-	}
 	
 	return $natrules;
 }
@@ -566,15 +552,6 @@ pass out quick on {$wancfg['if']} proto tcp from any to any port = 1723
 EOD;
 	}
 
-    /* allow SIP signaling and RTP traffic if enabled. Need assigned public IP address  */
-	if (isset($config['sip']['enable']) && $curwanip && !$ipv6) {
-	$ipfrules .= <<<EOD
-
-# allow SIP signaling and RTP traffic
-pass in quick on {$wancfg['if']} proto udp from any to $curwanip port = {$config['sip']['port']}
-pass in quick on {$wancfg['if']} proto udp from any to $curwanip port {$config['sip']['rtplow']} >< {$config['sip']['rtphigh']}
-
-EOD;
     }
 
 	if (!$ipv6) {

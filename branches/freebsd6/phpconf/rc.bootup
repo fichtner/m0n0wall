@@ -148,9 +148,6 @@
 	/* start Voucher support */
 	voucher_configure();
 	
-	/* start SIP proxy/masquerading service */
-	services_sip_configure();
-
 	/* set up termcap (for the firewall states page) */
 	system_set_termcap();
 	

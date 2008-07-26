@@ -70,7 +70,6 @@ function dump_clog($logfile, $tail) {
            		  'DHCP' => 'diag_logs_dhcp.php',
            		  'Captive portal' => 'diag_logs_portal.php',
            		  'PPTP VPN' => 'diag_logs_vpn.php',
-           		  'SIP' => 'diag_logs_sip.php',
            		  'Settings' => 'diag_logs_settings.php');
 	dynamic_tab_menu($tabs);
 ?> 

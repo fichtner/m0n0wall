@@ -245,7 +245,6 @@ function system_syslogd_start() {
 local0.*					%/var/log/filter.log
 local3.*					%/var/log/vpn.log
 local4.*					%/var/log/portalauth.log
-local6.*					%/var/log/siproxd.log
 local7.*					%/var/log/dhcpd.log
 *.notice;kern.debug;lpr.info;mail.crit;news.err;daemon.none;local0.none;local3.none;local4.none;local6.none;local7.none %/var/log/system.log
 security.*					%/var/log/system.log
@@ -271,13 +270,6 @@ EOD;
 		if (isset($syslogcfg['portalauth'])) {
 			$syslogconf .= <<<EOD
 local4.*					@{$syslogcfg['remoteserver']}
-
-EOD;
-		}
-
-		if (isset($syslogcfg['sip'])) {
-			$syslogconf .= <<<EOD
-local6.*					@{$syslogcfg['remoteserver']}
 
 EOD;
 		}
