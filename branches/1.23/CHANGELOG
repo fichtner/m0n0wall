@@ -3,6 +3,19 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added source port randomization for ipnat
+
+- bumped MFS size for firmware upgrades to 10 MB
+
+- updated Dnsmasq to 2.45 (source port randomization)
+
+- updated PHP to 4.4.9
+
+- change ZoneEdit update server name to dynamic.zoneedit.com
+
+1.233
+-----
+
 - fix MPD IPCP options reject processing (BellSouth/AT&T SECONDARYDNS
   reject problem)
 

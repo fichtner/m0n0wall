@@ -14,7 +14,7 @@ fi
 
 case $1 in
 enable)
-	/sbin/mount_mfs -s 16384 -T qp120at -b 8192 -f 1024 dummy /ftmp \
+	/sbin/mount_mfs -s 20480 -T qp120at -b 8192 -f 1024 dummy /ftmp \
 		> /dev/null 2>&1
 	;;
 upgrade)

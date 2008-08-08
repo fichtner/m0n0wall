@@ -78,8 +78,8 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_fil.h sys/contrib/ipfilter/netin
  #else
  	u_int	fl_unit;
 diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet/ip_nat.c
---- sys.orig/contrib/ipfilter/netinet/ip_nat.c	Fri Dec 17 03:24:30 2004
-+++ sys/contrib/ipfilter/netinet/ip_nat.c	Mon May  9 01:38:17 2005
+--- sys/contrib/ipfilter/netinet/ip_nat.c.orig	Fri Dec 17 03:24:30 2004
++++ sys/contrib/ipfilter/netinet/ip_nat.c	Fri Aug  8 20:38:08 2008
 @@ -127,6 +127,11 @@
  ipnat_t	**rdr_rules = NULL;
  hostmap_t	**maptable  = NULL;
@@ -157,7 +157,19 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  	*(sp) = htons(sumshort);
  }
  
-@@ -1757,7 +1765,8 @@
+@@ -1317,7 +1325,10 @@
+ 			} else if (((np->in_redir & NAT_MAPBLK) == 0) &&
+ 				   (nflags & IPN_TCPUDP) &&
+ 				   (np->in_pnext != 0)) {
+-				port = htons(np->in_pnext++);
++				port = htons((arc4random() %
++					(ntohs(np->in_pmax) - ntohs(np->in_pmin) + 1))
++					+ ntohs(np->in_pmin));
++				np->in_pnext++;
+ 				if (np->in_pnext > ntohs(np->in_pmax)) {
+ 					np->in_pnext = ntohs(np->in_pmin);
+ 					if (np->in_outmsk != 0xffffffff)
+@@ -1757,7 +1768,8 @@
  
  	sum2 = LONG_SUM(ntohl(in.s_addr));
  
@@ -167,7 +179,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  
  	/*
  	 * Fix IP checksum of the offending IP packet to adjust for
-@@ -1788,17 +1797,14 @@
+@@ -1788,17 +1800,14 @@
  		 * The UDP checksum is optional, only adjust it 
  		 * if it has been set.
  		 */
@@ -187,7 +199,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  	}
  
  	/*
-@@ -1808,23 +1814,14 @@
+@@ -1808,23 +1817,14 @@
  	 * the TCP checksum (normally it does not!).
  	 */
  	else if ((oip->ip_p == IPPROTO_TCP) && (dlen >= 18)) {
@@ -213,7 +225,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  	}
  
  	if (((flags & IPN_TCPUDP) != 0) && (dlen >= 4)) {
-@@ -1847,103 +1844,46 @@
+@@ -1847,103 +1847,46 @@
  		 * include the TCP checksum. So we have to check if the
  		 * ip->ip_len actually holds the TCP checksum of the oip!
  		 */
@@ -337,7 +349,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  			}
  
  			/*
-@@ -1952,27 +1892,15 @@
+@@ -1952,27 +1895,15 @@
  			 * packet flows the other direction compared to
  			 * the ICMP message.
  			 */
@@ -373,7 +385,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  		}
  		if (sumd2) {
  			sumd2 = (sumd2 & 0xffff) + (sumd2 >> 16);
-@@ -2319,8 +2247,15 @@
+@@ -2319,8 +2250,15 @@
  	void *sifp;
  	u_32_t iph;
  	nat_t *nat;
@@ -389,7 +401,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  		return 0;
  
  	if ((fr = fin->fin_fr) && !(fr->fr_flags & FR_DUP) &&
-@@ -2344,6 +2279,11 @@
+@@ -2344,6 +2282,11 @@
  	}
  
  	ipa = fin->fin_saddr;
@@ -401,7 +413,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  
  	READ_ENTER(&ipf_nat);
  
-@@ -2495,9 +2435,13 @@
+@@ -2495,9 +2438,13 @@
                                   * only deal IPv4 for now.
                                   */
                                  if (nat->nat_mssclamp &&
@@ -416,7 +428,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  
  				MUTEX_EXIT(&nat->nat_lock);
  			} else if (fin->fin_p == IPPROTO_UDP) {
-@@ -2527,6 +2471,7 @@
+@@ -2527,6 +2474,7 @@
  		} else
  			i = 1;
  		ATOMIC_INCL(nat_stats.ns_mapped[1]);
@@ -424,7 +436,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  		RWLOCK_EXIT(&ipf_nat);	/* READ */
  		fin->fin_ifp = sifp;
  		return i;
-@@ -2534,6 +2479,28 @@
+@@ -2534,6 +2482,28 @@
  	RWLOCK_EXIT(&ipf_nat);			/* READ/WRITE */
  	fin->fin_ifp = sifp;
  	return 0;
@@ -453,7 +465,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  }
  
  
-@@ -2555,8 +2522,14 @@
+@@ -2555,8 +2525,14 @@
  	int i, icmpset = 0;
  	nat_t *nat;
  	u_32_t iph;
@@ -468,7 +480,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  		return 0;
  
  	if ((fin->fin_off == 0) && !(fin->fin_fl & FI_SHORT)) {
-@@ -2574,6 +2547,11 @@
+@@ -2574,6 +2550,11 @@
  	in = fin->fin_dst;
  	/* make sure the source address is to be redirected */
  	src = fin->fin_src;
@@ -480,7 +492,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  
  	READ_ENTER(&ipf_nat);
  
-@@ -2718,9 +2696,13 @@
+@@ -2718,9 +2699,13 @@
                                   * only deal IPv4 for now.
                                   */
                                  if (nat->nat_mssclamp &&
@@ -495,7 +507,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  
  				MUTEX_EXIT(&nat->nat_lock);
  			} else if (fin->fin_p == IPPROTO_UDP) {
-@@ -2740,11 +2722,33 @@
+@@ -2740,11 +2725,33 @@
  			}
  		}
  		ATOMIC_INCL(nat_stats.ns_mapped[0]);
@@ -529,7 +541,7 @@ diff -u -r sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netin
  }
  
  
-@@ -2966,6 +2970,7 @@
+@@ -2966,6 +2973,7 @@
  					v = htons(maxmss);
  					bcopy(&v, &cp[2], sizeof(v));
  					CALC_SUMD(mss, maxmss, sumd);
