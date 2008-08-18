@@ -488,8 +488,11 @@
 
         <para>After IPv6 is activated, additional options will become
         available in the main menu for routing and firewall management.
-        Interface pages will also offer additional IPv6 configuration
-        options..</para>
+        Interface pages will also offer additional IPv6 configuration options.
+        A useful option under the LAN interface will appear to send IPv6
+        Router Advertisements. This allows other hosts on the LAN to
+        automatically configure their IPv6 address based on the prefix and
+        gateway information that the Firewall provides them.</para>
 
         <screenshot>
           <mediaobject>
@@ -533,6 +536,15 @@
         url="http://sixy.ch">http://sixy.ch</ulink> (or <ulink
         url="http://ipv6.sixy.ch">http://ipv6.sixy.ch</ulink>), a directory of
         IPv6 enabled web sites.</para>
+
+        <note>
+          <para>Although many operating systems support IPv6 by default such
+          as MacOSX 10.4+, Windows Vista and many Linux packages, some systems
+          need it to be activated (such as Windows XP) and some systems may
+          not support it at all (such as the Apple iPhone 2.0 and older
+          versions of Windows). Check your operating system documentation to
+          see if IPv6 is available.</para>
+        </note>
 
         <para>For more information on IPv6 check out some of the following
         websites.</para>
@@ -622,8 +634,8 @@
         <title>LAN IPv6</title>
 
         <para>When IPv6 is activated in firmware 1.3 beta 13 or higher,
-        additional IPv6 options will become available on the WAN
-        interface.</para>
+        additional IPv6 options will become available on the WAN interface.
+        </para>
 
         <screenshot>
           <mediaobject>
@@ -1092,9 +1104,18 @@
     <sect2>
       <title>SNMP</title>
 
-      <para>You can enable SNMP on your LAN interface on this screen. This is
-      useful if you have a network management or monitoring system that takes
-      advantage of it.</para>
+      <para>SNMP is a Network Management Protocol that allows a central
+      management software to consult information on devices running an SNMP
+      agent. You can enable a SNMP agent on your LAN interface on this screen.
+      This is useful if you have a network management or monitoring system
+      that takes advantage of it. This service uses UDP port 161.</para>
+
+      <caution>
+        <para>Retrieving information from a m0n0wall SNMP agent is only
+        secured by the community name. If you want additional security you
+        will need to either use filters to limit who has access to this port
+        or access it over an encrypted channel such as PPTP or IPSec.</para>
+      </caution>
 
       <screenshot>
         <mediaobject>
@@ -1405,6 +1426,145 @@
       <para>More information on wireless features can be found in the Wireless
       chapter.</para>
     </sect2>
+
+    <sect2 id="status.php.page">
+      <title>The status.php page</title>
+
+      <para>The ultimate page showing the status of your m0n0wall device is
+      actually not shown on the menu. You simply add "/status.php" after the
+      ip address of your m0n0wall device, for example
+      http://10.0.0.1/status.php. This page will show statistics of the
+      following information.</para>
+
+      <warning>
+        <para>Make sure to remove any sensitive information (passwords, maybe
+        also IP addresses) before posting information from this page in public
+        places (like mailing lists)! Passwords in config.xml have been
+        automatically removed.</para>
+      </warning>
+
+      <itemizedlist>
+        <listitem>
+          <para>System uptime</para>
+        </listitem>
+
+        <listitem>
+          <para>Interfaces</para>
+        </listitem>
+
+        <listitem>
+          <para>Routing tables</para>
+        </listitem>
+
+        <listitem>
+          <para>Network buffers</para>
+        </listitem>
+
+        <listitem>
+          <para>Network protocol statistics</para>
+        </listitem>
+
+        <listitem>
+          <para>Kernel parameters</para>
+        </listitem>
+
+        <listitem>
+          <para>Kernel modules loaded</para>
+        </listitem>
+
+        <listitem>
+          <para>ipfw show</para>
+        </listitem>
+
+        <listitem>
+          <para>ipnat -lv</para>
+        </listitem>
+
+        <listitem>
+          <para>ipfstat -v</para>
+        </listitem>
+
+        <listitem>
+          <para>ipfstat -nio</para>
+        </listitem>
+
+        <listitem>
+          <para>ipfstat -6 -nio</para>
+        </listitem>
+
+        <listitem>
+          <para>unparsed ipnat rules</para>
+        </listitem>
+
+        <listitem>
+          <para>unparsed ipfilter rules</para>
+        </listitem>
+
+        <listitem>
+          <para>unparsed IPv6 ipfilter rules</para>
+        </listitem>
+
+        <listitem>
+          <para>unparsed ipfw rules</para>
+        </listitem>
+
+        <listitem>
+          <para>resolv.conf</para>
+        </listitem>
+
+        <listitem>
+          <para>Processes</para>
+        </listitem>
+
+        <listitem>
+          <para>dhcpd.conf</para>
+        </listitem>
+
+        <listitem>
+          <para>ez-ipupdate.cache</para>
+        </listitem>
+
+        <listitem>
+          <para>rtadvd.conf</para>
+        </listitem>
+
+        <listitem>
+          <para>df</para>
+        </listitem>
+
+        <listitem>
+          <para>racoon.conf</para>
+        </listitem>
+
+        <listitem>
+          <para>SPD</para>
+        </listitem>
+
+        <listitem>
+          <para>SAD</para>
+        </listitem>
+
+        <listitem>
+          <para>last 200 system log entries</para>
+        </listitem>
+
+        <listitem>
+          <para>last 50 filter log entries</para>
+        </listitem>
+
+        <listitem>
+          <para>ls /conf</para>
+        </listitem>
+
+        <listitem>
+          <para>ls /var/run</para>
+        </listitem>
+
+        <listitem>
+          <para>config.xml</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
   </sect1>
 
   <sect1>
@@ -1459,10 +1619,19 @@
         </mediaobject>
       </screenshot>
 
-      <para>System log settings can also be configured on this page by
-      clicking on the Settings tab. Syslog sends UDP datagrams to port 514 on
-      the specified remote syslog server. Be sure to set syslogd on the remote
-      server to accept syslog messages from m0n0wall.</para>
+      <para>System log (often called syslog) settings can also be configured
+      on this page by clicking on the Settings tab. When sending Syslog to a
+      remote server m0n0wall sends UDP datagrams to port 514 on the specified
+      remote syslog server. Be sure to set syslogd on the remote server to
+      accept syslog messages from m0n0wall and to not block the traffic in any
+      intervening firewalls.</para>
+
+      <caution>
+        <para>Because of the detailed information that these messages can
+        contain about your network it is highly recommended to not send syslog
+        messages over the Internet unless they are inside an encrypted tunnel
+        like PPTP or IPSec.</para>
+      </caution>
 
       <table>
         <title>Log Settings Parameters</title>
@@ -1534,6 +1703,21 @@
           </tbody>
         </tgroup>
       </table>
+
+      <para>It is recommended that you log your m0n0wall to a remote syslog
+      server for diagnostics and forensic purposes. There are a number of free
+      tools receive and store syslog messages for you on Windows, Mac, and
+      Unix based systems. These software packages also offer additional
+      features such as automatically sending pages, emails or SMS messages as
+      well as running software or commands based on the messages that are
+      received. Some software packages are listed <link
+      linkend="Ref.Logging">here</link>.</para>
+
+      <para>Some operating systems that are by default using syslog messages,
+      such as MacOSX, may have default configurations that limit reception of
+      syslog messages from external sources. If you hav problems receiving
+      messages verify that your syslog server software can receive external
+      messages.</para>
     </sect2>
 
     <sect2>
@@ -1679,8 +1863,6 @@
             </imageobject>
           </mediaobject>
         </screenshot></para>
-
-      <para></para>
     </sect2>
 
     <sect2>

@@ -8,6 +8,14 @@
   experience when using m0n0wall, and how to troubleshoot and resolve
   them.</para>
 
+  <tip>
+    <para>To allow yourself access to log messages even if the m0n0wall device
+    is unreachable, you can send syslog messages to a remote syslog server.
+    This way you can see many logs that might help identify the problem. See
+    the section on <link linkend="Ref.Logging">Logging</link> for more
+    information.</para>
+  </tip>
+
   <sect1>
     <title>Interfaces are not detected</title>
 
@@ -381,9 +389,9 @@ Ping statistics for 192.168.1.1:
     other is 192.168.1.0/24, or similar, the latter lies in the subnet of the
     former.</para>
 
-    <para>If they do lie within the same address space, you'll need to change
-    one side or the other. There is no way to set up a site to site IPsec VPN
-    with any product when this is the case.</para>
+    <para>If they are within the same address space, you'll need to change one
+    side or the other. There is no way to set up a site to site IPsec VPN with
+    any product when this is the case.</para>
   </sect1>
 
   <sect1>

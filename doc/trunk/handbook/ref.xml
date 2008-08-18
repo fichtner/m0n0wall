@@ -65,15 +65,22 @@
 
     <title>Logging (syslog)</title>
 
-    <para>Log messages include a timestamp of when the event ocurred. The
-    system time on the firewall is synchronized to an NTP (Network Time
-    Protocol) server. You can change the NTP server and related parameters in
-    the <link linkend="Config.System.General">General Setup</link>
-    screen.</para>
+    <para></para>
 
     <para>It is recommended that you log your m0n0wall to a remote syslog
     server for diagnostics and forensic purposes. There are a number of free
-    tools that do this for you on Windows, Mac, and Unix based systems.</para>
+    tools receive and store syslog messages for you on Windows, Mac, and Unix
+    based systems. These software packages also offer additional features such
+    as automatically sending pages, emails or SMS messages as well as running
+    software or commands based on the messages that are received.</para>
+
+    <tip>
+      <para>Log messages include a timestamp of when the event ocurred. The
+      system time on the firewall is synchronized to an NTP (Network Time
+      Protocol) server. You can change the NTP server and related parameters
+      in the <link linkend="Config.System.General">General Setup</link>
+      screen.</para>
+    </tip>
 
     <para><emphasis role="bold">Unix-based tools</emphasis></para>
 
