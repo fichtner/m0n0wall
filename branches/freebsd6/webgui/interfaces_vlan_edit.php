@@ -103,7 +103,11 @@ if ($_POST) {
                       <?php
 					  foreach ($portlist as $ifn => $ifinfo): ?>
                       <option value="<?=$ifn;?>" <?php if ($ifn == $pconfig['if']) echo "selected"; ?>> 
-                      <?=htmlspecialchars($ifn . " (" . $ifinfo['mac'] . ")");?>
+					  <?php if ($ifinfo['drvname'])
+							echo htmlspecialchars($ifn . " (" . $ifinfo['drvname'] . ", " .  $ifinfo['mac'] . ")");
+						else
+							echo htmlspecialchars($ifn . " (" . $ifinfo['mac'] . ")");
+					  ?>
                       </option>
                       <?php endforeach; ?>
                     </select></td>

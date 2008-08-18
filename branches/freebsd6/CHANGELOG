@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- show driver names for network interfaces (obtained from dmesg) when
+  assigning interfaces to make it a bit easier for the user to choose
+
 - import ipnat source port randomization patch from FreeBSD CVS
   (see http://docs.freebsd.org/cgi/getmsg.cgi?fetch=427148+0+current/cvs-src)
   (important when running DNS servers behind m0n0wall with NAT turned on);

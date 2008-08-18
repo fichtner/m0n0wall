@@ -245,6 +245,9 @@ function get_interface_list() {
 	exec("/usr/bin/netstat -inW -f link", $linkinfo);
 	array_shift($linkinfo);
 	
+	/* get dmesg output in order to parse interface driver names from it */
+	$dmesg = file_get_contents("{$g['varlog_path']}/dmesg.boot");
+	
 	$iflist = array();
 	
 	foreach ($linkinfo as $link) {
@@ -270,6 +273,16 @@ function get_interface_list() {
 						$iflist[$ifname]['up'] = true;
 					break;
 				}
+			}
+			
+			/* try to figure out driver name */
+			if (preg_match("/$ifname:\s+<(.+?)>/", $dmesg, $matches)) {
+				/* truncate at 40 characters; some of these get really long
+				   and mess up the CLI and webGUI display */
+				$drvname = $matches[1];
+				if (strlen($drvname) > 40)
+					$drvname = substr($drvname, 0, 40) . "...";
+				$iflist[$ifname]['drvname'] = $drvname;
 			}
 		}
 	}

@@ -213,8 +213,12 @@ if ($_GET['act'] == "add") {
 					if ($portinfo['descr'])
 						$descr .= " (" . $portinfo['descr'] . ")";
 					echo htmlspecialchars($descr);
-				  } else
-					echo htmlspecialchars($portname . " (" . $portinfo['mac'] . ")");
+				  } else {
+					if ($portinfo['drvname'])
+						echo htmlspecialchars($portname . " (" . $portinfo['drvname'] . ", " . $portinfo['mac'] . ")");
+					else
+						echo htmlspecialchars($portname . " (" . $portinfo['mac'] . ")");
+				  }
 		  ?>
 		  </option>
 		  <?php endforeach; ?>
