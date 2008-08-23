@@ -88,7 +88,7 @@ $medias = array("auto" => "autoselect", "100full" => "100BASE-TX full-duplex",
 	"10half" => "10BASE-T half-duplex", "1000full" => "1000BASE-TX full-duplex");
 	
 /* platforms that support firmware updating */
-$fwupplatforms = array('net45xx', 'net48xx', 'generic-pc', 'wrap');
+$fwupplatforms = array('generic-pc', 'embedded');
 
 /* IPsec defines */
 $my_identifier_list = array('myaddress' => 'My IP address',

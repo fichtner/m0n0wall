@@ -246,7 +246,7 @@ function get_interface_list() {
 	array_shift($linkinfo);
 	
 	/* get dmesg output in order to parse interface driver names from it */
-	$dmesg = file_get_contents("{$g['varlog_path']}/dmesg.boot");
+	$dmesg = system_get_dmesg_boot();
 	
 	$iflist = array();
 	
@@ -577,6 +577,18 @@ function check_dhcp_range($if_ipaddr, $if_subnet, $range_from, $range_to) {
 		$input_errors[] = "The interface's IP address cannot be included in the range.";
 	
 	return $input_errors;
+}
+
+function format_bytes($bytes) {
+	if ($bytes >= 1073741824) {
+		return sprintf("%.2f GB", $bytes/1073741824);
+	} else if ($bytes >= 1048576) {
+		return sprintf("%.2f MB", $bytes/1048576);
+	} else if ($bytes >= 1024) {
+		return sprintf("%.0f KB", $bytes/1024);
+	} else {
+		return sprintf("%d bytes", $bytes);
+	}
 }
 
 ?>

@@ -35,31 +35,11 @@ require("guiconfig.inc");
 
 /* find out whether there's hardware encryption (hifn) */
 unset($hwcrypto);
-$fd = @fopen("{$g['varlog_path']}/dmesg.boot", "r");
-if ($fd) {
-	while (!feof($fd)) {
-		$dmesgl = fgets($fd);
-		if (preg_match("/^hifn.: (.*?),/", $dmesgl, $matches)) {
-			$hwcrypto = $matches[1];
-			break;
-		}
-	}
-	fclose($fd);
-}
+$dmesg = system_get_dmesg_boot();
+if (preg_match("/^hifn.: (.*?),/m", $dmesg, $matches))
+	$hwcrypto = $matches[1];
 
-if ($g['platform'] == "wrap") {
-	/* figure out whether we're on a WRAP or an ALIX */
-	$pce_platform = "ALIX board";
-	$fd = @popen("/sbin/dmesg", "r");
-	while (!feof($fd)) {
-		$line = fgets($fd);
-		if (strpos($line, "PC Engines WRAP") !== false) {
-			$pce_platform = "WRAP board";
-			break;
-		}
-	}
-	pclose($fd);
-}
+$specplatform = system_identify_specific_platform();
 
 if ($_POST) {
 	$config['system']['notes'] = base64_encode($_POST['notes']);
@@ -99,10 +79,7 @@ if ($_POST) {
               <tr> 
                 <td width="25%" class="vncellt">Platform</td>
                 <td width="75%" class="listr"> 
-                  <?=htmlspecialchars($g['fullplatform']);?>
-				  <?php if ($pce_platform)
-							echo "($pce_platform)";
-				  ?>
+                  <?=htmlspecialchars($specplatform['descr']); ?>
                 </td>
               </tr><?php if ($hwcrypto): ?>
               <tr> 

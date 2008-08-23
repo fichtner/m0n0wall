@@ -54,8 +54,8 @@
 			return 0;	/* nothing to do */
 	}
 	
-	/* reload firewall rules */
-	filter_rules_generate();
+	/* reload firewall/NAT rules */
+	filter_configure();
 	
 	/* flush NAT table */
 	filter_flush_nat_table();

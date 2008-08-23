@@ -6,6 +6,9 @@
 	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
+	Portions Copyright (C) 2007-2008 IKT <http://itison-ikt.de>.
+	All rights reserved.
+	
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	
@@ -569,6 +572,9 @@ function system_console_configure() {
 function system_dmesg_save() {
 	global $g;
 	
+	if (file_exists("{$g['varlog_path']}/dmesg.boot"))
+		return 0;	/* nothing to do */
+	
 	exec("/sbin/dmesg", $dmesg);
 	
 	/* find last copyright line (output from previous boots may be present) */
@@ -691,27 +697,12 @@ EOD;
 }
 
 function system_check_reset_button() {
-	global $config, $g;
+	$specplatform = system_identify_specific_platform();
 
-	if ($g['platform'] != "wrap")
+	if ($specplatform['name'] != "wrap" && $specplatform['name'] != "alix")
 		return 0;
 
-	/* WRAP images can also be used on ALIX, but the reset procedure is
-	   different, so we need to figure out whether it's a WRAP or an ALIX */
-	$pce_platform = "alix";
-	$fd = @popen("/sbin/dmesg", "r");
-	if (!$fd)
-		return 0;
-	while (!feof($fd)) {
-		$line = fgets($fd);
-		if (strpos($line, "PC Engines WRAP") !== false) {
-			$pce_platform = "wrap";
-			break;
-		}
-	}
-	pclose($fd);
-
-	$retval = mwexec("/usr/local/sbin/" . $pce_platform . "resetbtn");
+	$retval = mwexec("/usr/local/sbin/" . $specplatform['name'] . "resetbtn");
 
 	if ($retval == 99) {
 		/* user has pressed reset button for 2 seconds - 
@@ -732,6 +723,82 @@ EOD;
 	}
 
 	return 0;
+}
+
+/* attempt to identify the specific platform (for embedded systems)
+   Returns an array with two elements:
+	name => platform string (e.g. 'wrap', 'alix' etc.)
+	descr => human-readable description (e.g. "PC Engines WRAP")
+*/
+function system_identify_specific_platform() {
+	global $g;
+	
+	if ($g['platform'] == 'generic-pc')
+		return array('name' => 'generic-pc', 'descr' => "Generic PC");
+	
+	if ($g['platform'] == 'generic-pc-cdrom')
+		return array('name' => 'generic-pc-cdrom', 'descr' => "Generic PC (CD-ROM)");
+	
+	/* the rest of the code only deals with 'embedded' platforms */
+	if ($g['platform'] != 'embedded')
+		return array('name' => $g['platform'], 'descr' => $g['platform']);
+	
+	$dmesg = system_get_dmesg_boot();
+	
+	if (strpos($dmesg, "PC Engines WRAP") !== false)
+		return array('name' => 'wrap', 'descr' => 'PC Engines WRAP');
+	
+	if (strpos($dmesg, "PC Engines ALIX") !== false)
+		return array('name' => 'alix', 'descr' => 'PC Engines ALIX');
+
+	if (preg_match("/Soekris net45../", $dmesg, $matches))
+		return array('name' => 'net45xx', 'descr' => $matches[0]);
+	
+	if (preg_match("/Soekris net48../", $dmesg, $matches))
+		return array('name' => 'net48xx', 'descr' => $matches[0]);
+		
+	if (preg_match("/Soekris net55../", $dmesg, $matches))
+		return array('name' => 'net55xx', 'descr' => $matches[0]);
+	
+	/* unknown embedded platform */
+	return array('name' => 'embedded', 'descr' => 'embedded (unknown)');
+}
+
+function system_get_dmesg_boot() {
+	global $g;
+	
+	if (!file_exists("{$g['varlog_path']}/dmesg.boot"))
+		system_dmesg_save();
+	
+	return file_get_contents("{$g['varlog_path']}/dmesg.boot");
+}
+
+function storage_disk_get_devices() {
+	return explode(" ", trim(exec("/sbin/sysctl -n kern.disks")));
+}
+
+function storage_read_diskinfo($device) {
+	$output = preg_split("/\s+/", exec("/usr/sbin/diskinfo $device"));
+
+	$info['sectorsize'] = $output[1];
+	$info['sizeinbytes'] = $output[2];
+	$info['sizeinsectors'] = $output[3];
+
+	return $info;
+}
+
+function storage_disk_get_name($device) {
+	
+	$dmesg = system_get_dmesg_boot();
+	$matches = array();
+	if (preg_match("/^$device:.+<.+>/m", $dmesg, &$matches)) {
+		$start = strpos($matches[0], "<") + 1;
+		$name = substr($matches[0], $start, strpos($matches[0], ">") - $start);
+	} else {
+		$name = "unavailable";
+	}
+	
+	return $name;
 }
 
 ?>

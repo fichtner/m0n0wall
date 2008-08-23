@@ -387,6 +387,7 @@ function services_dnsmasq_configure() {
 	
 	if (!$g['booting']) {
 		services_dhcpd_configure();
+		filter_configure();
 	}
 
 	return 0;
@@ -411,8 +412,9 @@ function services_snmpd_configure() {
 		}
 		
 		$version = chop(file_get_contents("{$g['etc_path']}/version"));
+		$specplatform = system_identify_specific_platform();
 		$sysDescr = "m0n0wall " . php_uname("n") . " " . $version . " " .
-			$g['platform'] . " " . php_uname("s") . " " . php_uname("r") .
+			$specplatform['name'] . " " . php_uname("s") . " " . php_uname("r") .
 			" " . php_uname("m");
 		
 		$snmpdconf = <<<EOD

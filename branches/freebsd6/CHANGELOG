@@ -3,6 +3,25 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add VMware .vmx config file (for "official" VM release)
+
+- import "install on Hard Drive" feature (console menu) from AskoziaPBX; this
+  allows one to install an image on HD/CF by first booting with the cdrom
+  version of m0n0wall
+
+- *** consolidate net45xx, net48xx and wrap images into a single "embedded"
+  image. Users should download the "embedded" image and rename it to reflect
+  their current platform so that it can be used to upgrade previous versions
+
+- fix a long standing bug with regenerating firewall rules (including
+  automatically generated ones) that reference the WAN interface when the
+  WAN IP address changes
+
+- change ZoneEdit update server name to dynamic.zoneedit.com
+
+- remove SIP proxy (not much feedback from users; used a considerable amount of
+  space)
+
 - show driver names for network interfaces (obtained from dmesg) when
   assigning interfaces to make it a bit easier for the user to choose
 

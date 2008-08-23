@@ -1,15 +1,17 @@
 machine		i386
+cpu		I486_CPU
 cpu		I586_CPU
-ident		M0N0WALL_WRAPALIX
+ident		M0N0WALL_EMBEDDED
 
 makeoptions	MODULES_OVERRIDE="dummynet ipfw"
 
 options		HZ=1000
-options		CONSPEED=38400
 
+options		CPU_ELAN
 options		CPU_GEODE
+options		CPU_SOEKRIS
 
-hints		"M0N0WALL_WRAPALIX.hints"
+hints		"M0N0WALL_EMBEDDED.hints"
 
 options 	SCHED_4BSD		# 4BSD scheduler
 options 	INET			# InterNETworking
@@ -57,6 +59,12 @@ device          da              # Direct Access (disks)
 
 # Add suspend/resume support for the i8254.
 device		pmtimer
+
+# PCCARD (PCMCIA) support
+# PCMCIA and cardbus bridge support
+device		cbb		# cardbus (yenta) bridge
+device		pccard		# PC Card (16-bit) bus
+device		cardbus		# CardBus (32-bit) bus
 
 # Serial (COM) ports
 device		sio		# 8250, 16[45]50 based serial ports

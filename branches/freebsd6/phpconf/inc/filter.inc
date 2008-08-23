@@ -243,6 +243,19 @@ function filter_nat_rules_generate() {
 		}
 	}
 	
+	/* if the DNS forwarder is enabled, we need to add a map rule for outgoing
+	   DNS queries (source IP = WAN, destination port = 53). Otherwise, since 
+	   Dnsmasq now picks port at random, they could clash with inbound mappings,
+	   leading to sporadic query timeouts. The map rule (without portmap) ensures
+	   that an entry in the NAT table is generated and prevents rdr rules from
+	   taking effect. */
+	if (isset($config['dnsmasq']['enable'])) {
+		$curwanip = get_current_wan_address(false);
+		if ($curwanip)
+			$natrules .= "map $wanif from $curwanip/32 to any port = 53 -> 0.0.0.0/32 tcp/udp\n";
+	}
+	
+	/* inbound rules */
 	if (isset($config['nat']['rule'])) {
 		foreach ($config['nat']['rule'] as $rule) {
 		

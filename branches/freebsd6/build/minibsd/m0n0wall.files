@@ -39,6 +39,7 @@ sbin/ldconfig
 sbin/mdconfig
 sbin/mdmfs
 sbin/mount
+sbin/mount_cd9660
 sbin/mount_msdosfs
 sbin/newfs
 sbin/nologin
@@ -69,6 +70,7 @@ usr/sbin/ancontrol
 usr/sbin/arp
 usr/sbin/chown
 usr/sbin/chroot
+usr/sbin/diskinfo
 usr/sbin/hostapd
 usr/sbin/pwd_mkdb
 usr/sbin/rtadvd

@@ -230,9 +230,10 @@ function conf_mount_ro() {
 function convert_config() {
 	global $config, $g;
 
-	/* Special solution for WRAP/ALIX: if interfaces in config use sisX, but
-	   we only have vrX, then change all */
-	if ($g['booting'] && strpos($g['platform'], "wrap") === 0 &&
+	/* Special solution for embedded: if interfaces in config use sisX, but
+	   we only have vrX, then change all (for migrating from WRAP to ALIX
+	   or Soekris 4xxx to 5xxx) */
+	if ($g['booting'] && ($g['platform'] == "embedded") &&
 		strpos($config['interfaces']['lan']['if'], "sis") === 0) {
 	
 		$iflist = get_interface_list();

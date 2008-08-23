@@ -37,7 +37,10 @@ require("guiconfig.inc");
    returns any HTML message it gets from the server */
 function check_firmware_version() {
 	global $g;
+	
+	$specplatform = system_identify_specific_platform();
 	$post = "platform=" . rawurlencode($g['fullplatform']) . 
+		"&specplatform=" . rawurlencode($specplatform['name']) . 
 		"&version=" . rawurlencode(trim(file_get_contents("/etc/version")));
 		
 	$rfd = @fsockopen("m0n0.ch", 80, $errno, $errstr, 3);

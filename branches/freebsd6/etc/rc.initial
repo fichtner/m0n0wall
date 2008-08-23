@@ -44,6 +44,11 @@ echo "3) Reset webGUI password"
 echo "4) Reset to factory defaults"
 echo "5) Reboot system"
 echo "6) Ping host"
+# need an install option?
+PLATFORM=`cat /etc/platform`
+if [ "$PLATFORM" = "generic-pc-cdrom" ]; then
+echo "7) Install on Hard Drive";
+fi
 echo
 
 read -p "Enter a number: " opmode
@@ -67,6 +72,11 @@ case ${opmode} in
 	;;
 6)
 	/etc/rc.initial.ping
+	;;
+7)
+	if [ "$PLATFORM" = "generic-pc-cdrom" ]; then
+		/etc/rc.initial.install
+	fi
 	;;
 esac
 

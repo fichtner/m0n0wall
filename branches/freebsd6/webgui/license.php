@@ -170,6 +170,9 @@ require("guiconfig.inc");
 			  <br>
               Marcel Wiget (<a href="mailto:mwiget@mac.com">mwiget@mac.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">captive portal: Voucher authentication</font></em><br>
+			  <br>
+              Michael Iedema (<a href="mailto:michael@askozia.com">michael@askozia.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CD-ROM to HD installation feature</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
