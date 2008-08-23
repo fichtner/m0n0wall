@@ -1,5 +1,5 @@
 /*
-	$Id: wrapresetbtn.c 196 2007-03-03 21:39:49Z mkasper $
+	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2007 Manuel Kasper <mk@neon1.net>.

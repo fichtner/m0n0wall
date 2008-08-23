@@ -18,7 +18,7 @@
  * @author Alexander Merz <alexander.merz@web.de>
  * @copyright 2003-2005 The PHP Group
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @version CVS: $Id: IPv6.php,v 1.15 2007/11/16 00:22:28 alexmerz Exp $
+ * @version CVS: $Id$
  * @link http://pear.php.net/package/Net_IPv6
  */
 
@@ -107,7 +107,7 @@ define("NET_IPV6_UNKNOWN_TYPE", 1001);
  * @author Alexander Merz <alexander.merz@web.de>
  * @copyright 2003-2005 The PHP Group
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @version CVS: $Id: IPv6.php,v 1.15 2007/11/16 00:22:28 alexmerz Exp $
+ * @version CVS: $Id$
  * @link http://pear.php.net/package/Net_IPv6
  * @author elfrink at introweb dot nl
  * @author Josh Peck <jmp at joshpeck dot org>
