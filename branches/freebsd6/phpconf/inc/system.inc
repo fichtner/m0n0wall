@@ -791,9 +791,8 @@ function storage_disk_get_name($device) {
 	
 	$dmesg = system_get_dmesg_boot();
 	$matches = array();
-	if (preg_match("/^$device:.+<.+>/m", $dmesg, &$matches)) {
-		$start = strpos($matches[0], "<") + 1;
-		$name = substr($matches[0], $start, strpos($matches[0], ">") - $start);
+	if (preg_match("/^$device:.*<(.+)>/m", $dmesg, $matches)) {
+		$name = $matches[1];
 	} else {
 		$name = "unavailable";
 	}
