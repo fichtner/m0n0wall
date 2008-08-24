@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- updated PHP to 4.4.9
+
 - modify boot loader for embedded images to use the serial speed set by
   the BIOS (and no longer a fixed speed as soon as the kernel boots),
   as in 1.2x releases
