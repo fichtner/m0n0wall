@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix problem with DNS forwarder domain overrides
+
+1.234
+-----
+
 - added source port randomization for ipnat
 
 - bumped MFS size for firmware upgrades to 10 MB
