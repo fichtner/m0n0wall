@@ -248,7 +248,7 @@ function filter_nat_rules_generate() {
 	if (isset($config['dnsmasq']['enable'])) {
 		$curwanip = get_current_wan_address();
 		if ($curwanip)
-			$natrules .= "map $wanif from $curwanip/32 to any port = 53 -> 0.0.0.0/32 tcp/udp\n";
+			$natrules .= "map $wanif from $curwanip/32 to any port = 53 -> 0.0.0.0/32\n";
 	}
 	
 	if (isset($config['nat']['rule'])) {
