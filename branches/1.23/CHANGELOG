@@ -3,6 +3,13 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add map rule for port 53 to avoid problems with clashes between inbound
+  NAT rules and Dnsmasq random port selection.
+
+- fix a long standing bug with regenerating firewall rules (including
+  automatically generated ones) that reference the WAN interface when the
+  WAN IP address changes
+
 - fix problem with DNS forwarder domain overrides
 
 1.234

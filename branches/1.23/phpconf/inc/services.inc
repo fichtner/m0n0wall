@@ -388,6 +388,7 @@ function services_dnsmasq_configure() {
 	
 	if (!$g['booting']) {
 		services_dhcpd_configure();
+		filter_configure();
 	}
 
 	return 0;
