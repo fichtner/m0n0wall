@@ -236,5 +236,8 @@ All rights reserved.<br>
               Copyright (c) 2003, Michael Bretterklieber &lt;michael@bretterklieber.com&gt;. All rights reserved.<br>
               <br>
               ATAidle (<a href="http://www.cran.org.uk/bruce/software/ataidle/" target="_blank">http://www.cran.org.uk/bruce/software/ataidle</a>)<br>
-              Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.
+              Copyright 2004-2007 Bruce Cran &lt;bruce@cran.org.uk&gt;. All rights reserved.<br>
+              <br>
+              AICCU (<a href="http://www.sixxs.net/tools/aiccu/" target="_blank">http://www.sixxs.net/tools/aiccu/</a>)<br>
+              Copyright (C) SixXS Staff &lt;info@sixxs.net&gt;. All rights reserved.
 <?php include("fend.inc"); ?>

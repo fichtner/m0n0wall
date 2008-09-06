@@ -3,6 +3,17 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fixed IPv6-ICMP firewall rule type matching
+
+- added support for AICCU (a tool for dynamically configuring IPv6 tunnels
+  from SixXS, allowing users with dynamic WAN IP addresses to use tunnels)
+  Note that only heartbeat tunnels are supported at this time (no AYIYA).
+
+- updated kernel to 6.3-RELEASE-p4 (ICMPv6 denial of service fix)
+
+1.3b14
+------
+
 - updated PHP to 4.4.9
 
 - modify boot loader for embedded images to use the serial speed set by

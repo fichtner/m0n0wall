@@ -139,7 +139,7 @@ if (isset($id) && $a_filter[$id]) {
 	else
 		$pconfig['proto'] = "any";
 	
-	if ($a_filter[$id]['protocol'] == "icmp")
+	if ($a_filter[$id]['protocol'] == "icmp" || $a_filter[$id]['protocol'] == "ipv6-icmp")
 		$pconfig['icmptype'] = $a_filter[$id]['icmptype'];
 	
 	address_to_pconfig($a_filter[$id]['source'], $pconfig['src'],
@@ -304,7 +304,7 @@ if ($_POST) {
 		else
 			unset($filterent['protocol']);
 	
-		if ($_POST['proto'] == "icmp" && $_POST['icmptype'])
+		if (($_POST['proto'] == "icmp" || $_POST['proto'] == "ipv6-icmp") && $_POST['icmptype'])
 			$filterent['icmptype'] = $_POST['icmptype'];
 		else
 			unset($filterent['icmptype']);

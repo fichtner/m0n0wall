@@ -487,9 +487,22 @@ pass in quick proto ipv6-icmp from any to any icmp-type 3
 pass out quick proto ipv6-icmp from any to any icmp-type 3
 
 EOD;
+		
+		/* when using IPv6 tunnels, allow ping to our WAN IPv6 address,
+		   as most tunnel brokers insist on getting replies or else will
+		   delete the tunnel after a while */
+		if ($curwanip && ($wancfg['tunnel6'] || $wancfg['ipaddr6'] == "aiccu")) {
+			$ipfrules .= <<<EOD
+
+# allow ping to make tunnel broker happy
+pass in quick proto ipv6-icmp from any to $curwanip icmp-type 128
+pass out quick proto ipv6-icmp from $curwanip to any icmp-type 129
+
+EOD;
+		}
 	} else {
 		/* Need to pass IP protocol 41 if using 6to4 or GIF tunnel */
-		if (($wancfg['ipaddr6'] == "6to4" || $wancfg['tunnel6']) && $curwanip) {
+		if (($wancfg['ipaddr6'] == "6to4" || $wancfg['tunnel6'] || $wancfg['ipaddr6'] == "aiccu") && $curwanip) {
 			$tunep = "any";
 			if ($wancfg['tunnel6'])
 				$tunep = $wancfg['tunnel6'];
@@ -999,7 +1012,7 @@ EOD;
 				}
 			}
 			
-			if (($rule['protocol'] == "icmp") && $rule['icmptype']) {
+			if (($rule['protocol'] == "icmp" || $rule['protocol'] == "ipv6-icmp") && $rule['icmptype']) {
 				$line .= "icmp-type {$rule['icmptype']} ";
 			}
 			

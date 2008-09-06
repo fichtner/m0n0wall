@@ -559,6 +559,9 @@ function interfaces_wan_configure6($newwanip = false) {
 	remove_all_ipv6_addresses("stf0");
 	remove_all_ipv6_addresses("gif0");
 	
+	/* kill any running aiccu */
+	killbypid("{$g['varrun_path']}/aiccu.pid");
+	
 	if (ipv6enabled()) {
 		if ($wancfg['ipaddr6'] == "6to4") {
 			/* obtain current IPv4 address and make a 6to4 address out of it */
@@ -584,6 +587,58 @@ function interfaces_wan_configure6($newwanip = false) {
 				/* called from up-script -> add IPv6 default route */
 				mwexec('/sbin/route delete -inet6 default');
 				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
+			}
+		} else if ($wancfg['ipaddr6'] == "aiccu") {
+			/* fire up AICCU, which will take care of setting the IP address
+			   on gif0 and adding the default route */
+			
+			/* can only start AICCU once the IPv4 connectivity is
+			   ready; otherwise it will exit immediately... */
+			if ($newwanip || is_ipaddr($wancfg['ipaddr'])) {
+				$aiccuconf = <<<EOD
+username {$wancfg['aiccu']['username']}
+password {$wancfg['aiccu']['password']}
+tunnel_id {$wancfg['aiccu']['tunnelid']}
+ipv6_interface gif0
+daemonize true
+automatic true
+requiretls false
+pidfile {$g['varrun_path']}/aiccu.pid
+defaultroute true
+
+EOD;
+
+				$fd = fopen("{$g['varetc_path']}/aiccu.conf", "w");
+				fwrite($fd, $aiccuconf);
+				fclose($fd);
+			
+				mwexec("/usr/local/sbin/sixxs-aiccu start {$g['varetc_path']}/aiccu.conf");
+			
+				/* at this point, it can take anywhere from a millisecond to forever
+				   until gif0 has been configured by AICCU. Unfortunately, the
+				   "setupscript" option in aiccu.conf isn't actually implemented
+				   under Unix, so to figure out when gif0 comes up, we need to
+				   watch it with a little shell script... */
+				$watchsh = <<<EOD
+#!/bin/sh
+
+while true; do
+	/sbin/ifconfig gif0 > /dev/null 2>&1
+	if [ $? = 0 ]; then
+		sleep 1
+		/etc/rc.newwanip6
+		exit
+	fi
+	sleep 1
+done
+
+EOD;
+				$fd = fopen("{$g['tmp_path']}/gifwatch.sh", "w");
+				fwrite($fd, $watchsh);
+				fclose($fd);
+				chmod("{$g['tmp_path']}/gifwatch.sh", 0755);
+			
+				mwexec_bg("{$g['tmp_path']}/gifwatch.sh");
 			}
 		} else {
 			if ($wancfg['ipaddr6'] && $wancfg['subnet6'] && ($wancfg['tunnel6'] || $wancfg['gateway6'])) {
@@ -956,6 +1011,8 @@ function get_real_wan_interface($ipv6 = false) {
 	if ($ipv6) {
 		if ($wancfg['ipaddr6'] == "6to4")
 			$wanif = "stf0";
+		else if ($wancfg['ipaddr6'] == "aiccu")
+			$wanif = "gif0";
 		else if ($wancfg['tunnel6'])
 			$wanif = "gif0";
 		else if ($wancfg['ipaddr6'] == "ppp")
@@ -974,7 +1031,7 @@ function get_current_wan_address($ipv6 = false) {
 	
 	$wancfg = $config['interfaces']['wan'];
 	
-	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp'))) {
+	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp')) || ($ipv6 && $wancfg['ipaddr6'] == "aiccu")) {
 		/* dynamic WAN IP address, find out which one */
 		$wanif = get_real_wan_interface($ipv6);
 		

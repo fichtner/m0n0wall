@@ -752,38 +752,16 @@ function config_validate($conffile) {
 	return true;
 }
 
-/* lock configuration file, decide that the lock file is stale after
-   10 seconds */
+/* lock configuration file */
 function config_lock() {
-	
 	global $g;
-	
-	$lockfile = "{$g['varrun_path']}/config.lock";
-	
-	$n = 0;
-	while ($n < 10) {
-		/* open the lock file in append mode to avoid race condition */
-		if ($fd = @fopen($lockfile, "x")) {
-			/* succeeded */
-			fclose($fd);
-			return;
-		} else {
-			/* file locked, wait and try again */
-			sleep(1);
-			$n++;
-		}
-	}
+	lock_file("{$g['varrun_path']}/config.lock");
 }
 
 /* unlock configuration file */
 function config_unlock() {
-	
 	global $g;
-	
-	$lockfile = "{$g['varrun_path']}/config.lock";
-	
-	if (file_exists($lockfile))
-		unlink($lockfile);
+	unlock_file("{$g['varrun_path']}/config.lock");
 }
 
 ?>

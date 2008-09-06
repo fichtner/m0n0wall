@@ -591,4 +591,27 @@ function format_bytes($bytes) {
 	}
 }
 
+/* lock a file; decide that the lock is stale after $maxwait seconds */
+function lock_file($lockfile, $maxwait = 20) {
+	$n = 0;
+	
+	while ($n < $maxwait) {
+		/* open the lock file in append mode to avoid race condition */
+		if ($fd = @fopen($lockfile, "x")) {
+			/* succeeded */
+			fclose($fd);
+			return;
+		} else {
+			/* file locked, wait and try again */
+			usleep(rand(200000,500000));
+			$n++;
+		}
+	}
+}
+
+function unlock_file($lockfile) {
+	if (file_exists($lockfile))
+		unlink($lockfile);
+}
+
 ?>

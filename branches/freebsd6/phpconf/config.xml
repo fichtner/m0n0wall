@@ -77,10 +77,15 @@
 			<media></media>
 			<mediaopt></mediaopt>
 			<!--
-			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4|ppp</ipaddr6>
+			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4|ppp|aiccu</ipaddr6>
 			<subnet6></subnet6>
 			<gateway6></gateway6>
 			<tunnel6>xxx.xxx.xxx.xxx</tunnel6>
+			<aiccu>
+				<username></username>
+				<password></password>
+				<tunnelid></tunnelid>
+			</aiccu>
 			<ispointtopoint/>
 			<wireless>
 				*see below (opt[n])*

@@ -229,7 +229,7 @@ function get_interface_info($ifdescr) {
 					}
 
 					/* GRE tunnel on WAN? need to run ifconfig on gif0 then */
-					if ($config['interfaces']['wan']['tunnel6']) {
+					if ($config['interfaces']['wan']['tunnel6'] || $config['interfaces']['wan']['ipaddr6'] == "aiccu") {
 						unset($ifconfiginfo);
 						exec("/sbin/ifconfig gif0", $ifconfiginfo);
 

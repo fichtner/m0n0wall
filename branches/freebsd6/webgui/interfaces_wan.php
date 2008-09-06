@@ -65,8 +65,14 @@ $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
 $pconfig['spoofmac'] = $wancfg['spoofmac'];
 
 if (ipv6enabled()) {	
-	if ($wancfg['ipaddr6'] == "6to4" || $wancfg['ipaddr6'] == "ppp") {
+	if ($wancfg['ipaddr6'] == "6to4" || $wancfg['ipaddr6'] == "ppp" || $wancfg['ipaddr6'] == "aiccu") {
 		$pconfig['ipv6mode'] = $wancfg['ipaddr6'];
+		
+		if ($wancfg['ipaddr6'] == "aiccu") {
+			$pconfig['aiccu_username'] = $wancfg['aiccu']['username'];
+			$pconfig['aiccu_password'] = $wancfg['aiccu']['password'];
+			$pconfig['aiccu_tunnelid'] = $wancfg['aiccu']['tunnelid'];
+		}
 	} else if ($wancfg['ipaddr6']) {
 		$pconfig['ipaddr6'] = $wancfg['ipaddr6'];
 		$pconfig['subnet6'] = $wancfg['subnet6'];
@@ -152,6 +158,9 @@ if ($_POST) {
 		if ($_POST['ipv6mode'] == "tunnel" && !is_ipaddr($_POST['tunnel6'])) {
 			$input_errors[] = 'An IPv6 tunnel endpoint address must be specified.';
 		}
+		if ($_POST['ipv6mode'] == "aiccu" && (!$_POST['aiccu_username'] || !$_POST['aiccu_password'] || !$_POST['aiccu_tunnelid'])) {
+			$input_errors[] = 'Username, password and tunnel ID must be specified for AICCU.';
+		}
 	}
 	
 	/* Wireless interface? */
@@ -181,6 +190,9 @@ if ($_POST) {
 		unset($config['pptp']['local']);
 		unset($config['pptp']['subnet']);
 		unset($config['pptp']['remote']);
+		unset($config['aiccu']['username']);
+		unset($config['aiccu']['password']);
+		unset($config['aiccu']['tunnelid']);
 	
 		if ($_POST['type'] == "Static") {
 			$wancfg['ipaddr'] = $_POST['ipaddr'];
@@ -219,6 +231,11 @@ if ($_POST) {
 				$wancfg['ipaddr6'] = $_POST['ipaddr6'];
 				$wancfg['subnet6'] = $_POST['subnet6'];
 				$wancfg['tunnel6'] = $_POST['tunnel6'];
+			} else if ($_POST['ipv6mode'] == "aiccu") {
+				$wancfg['ipaddr6'] = "aiccu";
+				$wancfg['aiccu']['username'] = $_POST['aiccu_username'];
+				$wancfg['aiccu']['password'] = $_POST['aiccu_password'];
+				$wancfg['aiccu']['tunnelid'] = $_POST['aiccu_tunnelid'];
 			}
 		}
 			
@@ -240,10 +257,14 @@ if ($_POST) {
 function enable_change(enable_over) {
 <?php if (ipv6enabled()): ?>
 	var en = (document.iform.ipv6mode.selectedIndex == 1 || document.iform.ipv6mode.selectedIndex == 3 || enable_over);
+	var aiccu_en = (document.iform.ipv6mode.selectedIndex == 5 || enable_over);
 	document.iform.ipaddr6.disabled = !en;
 	document.iform.subnet6.disabled = !en;
 	document.iform.gateway6.disabled = !(document.iform.ipv6mode.selectedIndex == 1 || enable_over);
 	document.iform.tunnel6.disabled = !(document.iform.ipv6mode.selectedIndex == 3 || enable_over);
+	document.iform.aiccu_username.disabled = !aiccu_en;
+	document.iform.aiccu_password.disabled = !aiccu_en;
+	document.iform.aiccu_tunnelid.disabled = !aiccu_en;
 <?php endif; ?>
 	
 	if (document.iform.mode) {
@@ -420,7 +441,7 @@ function type_change() {
                   <td valign="top" class="vncellreq">IPv6 mode</td>
                   <td class="vtable"> 
                     <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
-                      <?php $opts = array('disabled' => 'disabled', 'static' => 'static', '6to4' => '6to4', 'tunnel' => 'Tunnel', 'ppp' => 'PPP');
+                      <?php $opts = array('disabled' => 'disabled', 'static' => 'static', '6to4' => '6to4', 'tunnel' => 'Tunnel', 'ppp' => 'PPP', 'aiccu' => 'AICCU');
 						foreach ($opts as $optn => $optd) {
 							echo "<option value=\"$optn\"";
 							if ($optn == $pconfig['ipv6mode']) echo "selected";
@@ -432,7 +453,8 @@ function type_change() {
 					nearest gateway. You also need to set your LAN interface (and optional interfaces, if present)
 					to 6to4 mode for it to work properly.<br>
 					To use tunnel mode (IPv6-in-IPv4 tunnel), you need a configured remote endpoint (e.g. tunnel broker).
-					PPP mode can be used if your ISP provides native IPv6 connectivity over PPPoE or PPTP.</td>
+					PPP mode can be used if your ISP provides native IPv6 connectivity over PPPoE or PPTP.
+					AICCU is used with dynamic tunnels from SixXS (only heartbeat tunnels are supported).</td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">IPv6 address</td>
@@ -460,6 +482,26 @@ function type_change() {
                   <td class="vtable"> 
                     <input name="tunnel6" type="text" class="formfld" id="tunnel6" size="30" value="<?=htmlspecialchars($pconfig['tunnel6']);?>"><br>
 					The IPv4 address of the remote tunnel endpoint (only when using tunnel mode).
+                   </td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">AICCU</td>
+                  <td class="vtable"> 
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr> 
+                        <td>Username:&nbsp;&nbsp;</td>
+                        <td><input name="aiccu_username" type="text" class="formfld" id="aiccu_username" size="20" value="<?=htmlspecialchars($pconfig['aiccu_username']);?>"></td>
+                      </tr>
+                      <tr> 
+                        <td>Password:&nbsp;&nbsp;</td>
+                        <td><input name="aiccu_password" type="text" class="formfld" id="aiccu_password" size="20" value="<?=htmlspecialchars($pconfig['aiccu_password']);?>"></td>
+					  </tr>
+                      <tr> 
+                        <td>Tunnel ID:&nbsp;&nbsp;</td>
+                        <td><input name="aiccu_tunnelid" type="text" class="formfld" id="aiccu_tunnelid" size="10" value="<?=htmlspecialchars($pconfig['aiccu_tunnelid']);?>"></td>
+					  </tr>
+                    </table><br>
+					Enter your SixXS account information here (only when using AICCU).
                    </td>
                 </tr>
 				<?php endif; ?>
