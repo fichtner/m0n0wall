@@ -153,7 +153,7 @@ class Auth_RADIUS extends PEAR {
      * @param  integer $maxtries     Max. retries for each request
      * @return void
      */
-    function addServer($servername = 'localhost', $port = 0, $sharedSecret = 'testing123', $timeout = 5, $maxtries = 3) 
+    function addServer($servername = 'localhost', $port = 0, $sharedSecret = 'testing123', $timeout = 3, $maxtries = 2) 
     {
         $this->_servers[] = array($servername, $port, $sharedSecret, $timeout, $maxtries);
     }

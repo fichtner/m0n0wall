@@ -198,27 +198,6 @@ function portal_reply_page($redirurl, $type = null, $message = null) {
     echo $htmltext;
 }
 
-function portal_mac_fixed($clientmac) {
-    global $g ;
-
-    /* open captive portal mac db */
-    if (file_exists("{$g['vardb_path']}/captiveportal_mac.db")) {
-        $fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db","r") ;
-        if (!$fd) {
-            return FALSE;
-        }
-        while (!feof($fd)) {
-            $mac = trim(fgets($fd)) ;
-            if(strcasecmp($clientmac, $mac) == 0) {
-                fclose($fd) ;
-                return TRUE ;
-            }
-        }
-        fclose($fd) ;
-    }
-    return FALSE ;
-}
-
 function portal_mac_radius($clientmac,$clientip) {
     global $config ;
 
@@ -269,7 +248,7 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
         }
         elseif ((isset($config['captiveportal']['noconcurrentlogins'])) && ($username != 'unauthenticated')) {
             /* on the same username */
-            if ($cpdb[$i][4] == $username) {
+            if (strcasecmp($cpdb[$i][4], $username) == 0) {
                 /* This user was already logged in so we disconnect the old one */
                 captiveportal_disconnect($cpdb[$i],$radiusservers,13);
                 captiveportal_logportalauth($cpdb[$i][4],$cpdb[$i][3],$cpdb[$i][2],"CONCURRENT LOGIN - TERMINATING OLD SESSION");

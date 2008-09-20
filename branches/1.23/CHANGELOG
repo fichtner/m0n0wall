@@ -3,6 +3,18 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Change radius timeout/maxtries from 5/3 to 3/2 reducing failover time from 30 to 15 seconds
+
+- imported fixes from freebsd6 branch (jdegraeve)
+  - fix concurrent login detection, now case-insensitive
+  - Pass-Through mac-addresses in combination with radius mac authentication
+  submitted by Peter Allgeyer
+  - SVG fixes for IE7 submitted by Daniel S. Haischt
+  - Properly escape DHCP client hostnames in webgui
+
+1.235
+-----
+
 - add map rule for port 53 to avoid problems with clashes between inbound
   NAT rules and Dnsmasq random port selection.
 
