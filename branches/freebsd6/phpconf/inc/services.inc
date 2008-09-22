@@ -152,6 +152,11 @@ host s_{$dhcpif}_{$i} {
 EOD;
 				if ($sm['ipaddr'])
 					$dhcpdconf .= "	fixed-address {$sm['ipaddr']};\n";
+
+				if ($sm['next-server'])
+					$dhcpdconf .= "	next-server {$sm['next-server']};\n";
+				if ($sm['filename'])
+					$dhcpdconf .= "	filename \"{$sm['filename']}\";\n";
 				
 				$dhcpdconf .= "}\n";
 				$i++;

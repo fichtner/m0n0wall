@@ -218,6 +218,8 @@
 			<staticmap>
 				<mac>xx:xx:xx:xx:xx:xx</mac>
 				<ipaddr>xxx.xxx.xxx.xxx</ipaddr>
+				<next-server></next-server>
+				<filename></filename>
 				<descr></descr>
 			</staticmap>
 			-->
