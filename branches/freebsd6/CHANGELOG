@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- make PPPoE MTU on WAN configurable
+
 - add patch to enable custom next-server and filename options for
   static mappings in DHCP server (by Stephen Erisman)
 
@@ -12,7 +14,8 @@ $Id$
   from SixXS, allowing users with dynamic WAN IP addresses to use tunnels)
   Note that only heartbeat tunnels are supported at this time (no AYIYA).
 
-- updated kernel to 6.3-RELEASE-p4 (ICMPv6 denial of service fix)
+- updated kernel to 6.3-RELEASE-p5 (ICMPv6 denial of service fix; IPv6
+  NDP routing vulnerability fix)
 
 1.3b14
 ------

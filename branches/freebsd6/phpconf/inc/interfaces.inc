@@ -734,6 +734,10 @@ function interfaces_wan_pppoe_configure() {
 		return 1;
 	}
 	
+	$mtu = 1492;
+	if ($pppoecfg['mtu'])
+		$mtu = $pppoecfg['mtu'];
+	
 	$mpdconf = <<<EOD
 startup:
 
@@ -762,7 +766,7 @@ EOD;
 	set link no acfcomp protocomp
 	set link disable pap chap
 	set link accept chap
-	set link mtu 1492
+	set link mtu $mtu
 	set ipcp yes vjcomp
 	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
 

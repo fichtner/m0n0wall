@@ -38,6 +38,7 @@ $optcfg = &$config['interfaces']['wan'];
 $pconfig['username'] = $config['pppoe']['username'];
 $pconfig['password'] = $config['pppoe']['password'];
 $pconfig['provider'] = $config['pppoe']['provider'];
+$pconfig['pppoemtu'] = $config['pppoe']['mtu'];
 
 $pconfig['pptp_username'] = $config['pptp']['username'];
 $pconfig['pptp_password'] = $config['pptp']['password'];
@@ -144,6 +145,9 @@ if ($_POST) {
 	if (($_POST['spoofmac'] && !is_macaddr($_POST['spoofmac']))) {
 		$input_errors[] = "A valid MAC address must be specified.";
 	}
+	if (($_POST['pppoemtu'] && !(is_numeric($_POST['pppoemtu']) && $_POST['pppoemtu'] >= 512 && $_POST['pppoemtu'] <= 1492))) {
+		$input_errors[] = "The PPPoE MTU must be between 512 and 1492 bytes.";
+	}
 
 	if (ipv6enabled()) {
 		if (($_POST['ipv6mode'] == "static" || $_POST['ipv6mode'] == "tunnel") && !is_ipaddr6($_POST['ipaddr6'])) {
@@ -185,6 +189,7 @@ if ($_POST) {
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
 		unset($config['pppoe']['provider']);
+		unset($config['pppoe']['mtu']);
 		unset($config['pptp']['username']);
 		unset($config['pptp']['password']);
 		unset($config['pptp']['local']);
@@ -208,6 +213,7 @@ if ($_POST) {
 			$config['pppoe']['username'] = $_POST['username'];
 			$config['pppoe']['password'] = $_POST['password'];
 			$config['pppoe']['provider'] = $_POST['provider'];
+			$config['pppoe']['mtu'] = $_POST['pppoemtu'];
 		} else if ($_POST['type'] == "PPTP") {
 			$wancfg['ipaddr'] = "pptp";
 			$config['pptp']['username'] = $_POST['pptp_username'];
@@ -278,6 +284,7 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoemtu.disabled = 1;
 			document.iform.ipaddr.disabled = 0;
 			document.iform.subnet.disabled = 0;
 			document.iform.gateway.disabled = 0;
@@ -292,6 +299,7 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoemtu.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -306,6 +314,7 @@ function type_change() {
 			document.iform.username.disabled = 0;
 			document.iform.password.disabled = 0;
 			document.iform.provider.disabled = 0;
+			document.iform.pppoemtu.disabled = 0;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -320,6 +329,7 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoemtu.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -334,6 +344,7 @@ function type_change() {
 			document.iform.username.disabled = 1;
 			document.iform.password.disabled = 1;
 			document.iform.provider.disabled = 1;
+			document.iform.pppoemtu.disabled = 1;
 			document.iform.ipaddr.disabled = 1;
 			document.iform.subnet.disabled = 1;
 			document.iform.gateway.disabled = 1;
@@ -526,6 +537,12 @@ function type_change() {
                   <td class="vtable"><input name="provider" type="text" class="formfld" id="provider" size="20" value="<?=htmlspecialchars($pconfig['provider']);?>"> 
                     <br> <span class="vexpl">Hint: this field can usually be left 
                     empty</span></td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncell">MTU</td>
+                  <td class="vtable"><input name="pppoemtu" type="text" class="formfld" id="pppoemtu" size="6" value="<?=htmlspecialchars($pconfig['pppoemtu']);?>"> bytes 
+                    <br><span class="vexpl">Usually, the maximum MTU value of 1492 bytes (which is used by default) works fine, but if you
+						have problems with some sites not loading properly, you can try a smaller value (e.g. 1400) here.</span></td>
                 </tr>
                 <tr> 
                   <td colspan="2" valign="top" height="16"></td>
