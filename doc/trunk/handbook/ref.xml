@@ -57,15 +57,27 @@
 
     <title>Encryption (PPTP/IPsec)</title>
 
-    <para></para>
+    <para>Many operating systems now include free VPN clients for PPTP and
+    IPSec. Although the PPTP VPN of MacOSX and Windows work well with
+    m0n0wall, the IPSec that is included often requires L2TP which m0n0wall
+    does not support. </para>
+  </sect1>
+
+  <sect1>
+    <?dbhtml filename="ref-polling.html"?>
+
+    <title>Polling SNMP</title>
+
+    <para>Because m0n0wall offers an SNMP agent, management and statistics
+    software for network devices can query this agent for information on the
+    status of the firewall itself. This is useful for managing numerous
+    </para>
   </sect1>
 
   <sect1 id="Ref.Logging">
     <?dbhtml filename="ref-logging.html"?>
 
     <title>Logging (syslog)</title>
-
-    <para></para>
 
     <para>It is recommended that you log your m0n0wall to a remote syslog
     server for diagnostics and forensic purposes. There are a number of free
