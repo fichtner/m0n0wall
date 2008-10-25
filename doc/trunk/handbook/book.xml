@@ -58,11 +58,11 @@
       <para>A freely-redistributable complete embedded firewall software
       package.</para>
 
-      <para><mediaobject id="m0n0wall.logo">
+      <mediaobject id="m0n0wall.logo">
           <imageobject>
             <imagedata fileref="m0n0icon.png" />
           </imageobject>
-        </mediaobject></para>
+        </mediaobject>
     </abstract>
 
     <releaseinfo>m0n0wall Version 1.2 and 1.3b</releaseinfo>
@@ -101,49 +101,27 @@
       POSSIBILITY OF SUCH DAMAGE.</para>
     </legalnotice>
   </bookinfo>
-
   &__intro__dqw7kgl9;
-  
   &__hardware__dqw7kgm0;
-
   &__setup__dqw7kofo;
-
   &__config__dqw7kw2s;
-  
   &__firewall__dqw73d2s;
-
   &__nat__dqw7sd23;
-  
   &__trafficshaping__dqw7ew91;
-
   &__ipsec__du4ydlzq;
-
   &__pptp__du4zlre9;
-  
   &__openvpn__du4zdae9;
-
   &__wireless__du4zda29;
-
   &__captiveportal__du4zda39;
-
-  &__ref__dqw7lc8p;
-
   &__examples__dqw7lip4;
-  
   &__examplevpn__dqw7lip8;
-
   &__faq__dqw7lq5t;
-
   &__otherdoc__dugbfzsq;
-
-  &__thirdparty__dugb32sd;
-
   &__troubleshooting__dul42vek;
-
   &__bibliography__dul42vek;
-
   &__glossary__du5ss10h;
-
+  &__ref__dqw7lc8p;
+  &__thirdparty__dugb32sd;
   &__license__dul42vek;
   <index></index>
 </book>
