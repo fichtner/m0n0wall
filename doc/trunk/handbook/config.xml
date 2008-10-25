@@ -1112,9 +1112,10 @@
 
       <caution>
         <para>Retrieving information from a m0n0wall SNMP agent is only
-        secured by the community name. If you want additional security you
-        will need to either use filters to limit who has access to this port
-        or access it over an encrypted channel such as PPTP or IPSec.</para>
+        secured by the community name. All information is transmitted in clear
+        text. If you want additional security you will need to either use
+        filters to limit who has access to this port or access it over an
+        encrypted channel such as PPTP or IPSec.</para>
       </caution>
 
       <screenshot>
