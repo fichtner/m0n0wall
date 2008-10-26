@@ -5,28 +5,409 @@
 
   <title>IPsec</title>
 
-  <para>This chapter will go over configuring a site to site VPN link between
-  two m0n0walls, and will discuss how to configure site to site links with
-  third party IPsec-compliant devices. The <link linkend="Example.VPN">Example
-  VPN Configurations</link> chapter goes over, in detail, how to configure
-  site to site IPsec links with some third party IPsec devices. If you have
-  gotten m0n0wall working in a site to site IPsec configuration with some
-  third party IPsec device, we would appreciate if you could put together a
-  short write up of how you got it configured, preferably with screenshots
-  where applicable.</para>
+  <para>This chapter will go over configuring a site to site Virtual Private
+  Network (VPN) links between two m0n0walls, discuss how to configure site to
+  site links with third party IPsec-compliant devices and discuss VPN to
+  remote IPSec client software. Once you have IPSec properly configured you
+  will be able to take advantage of the following capabilities:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Support incoming mobile connections (for instance from a
+      laptop)</para>
+    </listitem>
+
+    <listitem>
+      <para>Connect and encrypt two or more Monowall devices over the Internet
+      (and their local networks)</para>
+    </listitem>
+
+    <listitem>
+      <para>Communicate with 3rd party IPSec capable devices (Cisco,
+      Checkpoint and others)</para>
+    </listitem>
+  </itemizedlist>
+
+  <para>The <link linkend="Example.VPN">Example VPN Configurations</link>
+  chapter goes over, in detail, how to configure site to site IPsec links with
+  some third party IPsec devices. Although it might seem confusing, in most
+  cases you just need to assure that all of the parameters match on both sides
+  (except of course the definition of who is the remote network). Some routing
+  issues might come up depending on your situation but reading the rest of
+  this chapter should be enough to successfully use IPsec encryption.</para>
+
+  <para>If you have gotten m0n0wall working in a site to site IPsec
+  configuration with some third party IPsec device that is not already listed,
+  we would appreciate if you could put together a short write up of how you
+  got it configured, preferably with screenshots where applicable.</para>
 
   <sect1>
     <?dbhtml filename="ipsec-preface.html"?>
 
     <title>Preface</title>
 
-    <para>IPsec (IP security) is a standard for providing security to IP
-    protocols via encryption and/or authentication, typically employing both.
-    Its use in m0n0wall is for <glossterm linkend="gloss.VPN"> Virtual Private
-    Networks (VPN's)</glossterm>.</para>
+    <para>IPsec (IP security) is an international standard for providing
+    security to IP protocols via encryption and/or authentication, typically
+    employing both. Its use in m0n0wall is for<glossterm linkend="gloss.VPN">
+    Virtual Private Networks (VPN's)</glossterm>. After two or more points
+    securely authenticate each other's identification, access rights, and how
+    to encrypt data (phase 1), they will be able to communicate using
+    encrypted data packets (phase 2). The two points can be on a local
+    network, a wireless network or even on the Internet.</para>
 
-    <para>There are two types of IPsec VPN capabilities in m0n0wall, site to
-    site and remote access.</para>
+    <para>There are two general types of IPsec VPN capabilities in m0n0wall,
+    site to site and remote access. Site to site will connect entire networks
+    while remote access allows mobile users access to secured networks.</para>
+
+    <sect2>
+      <title>Features</title>
+
+      <para>The IPsec specification includes many features and services. Below
+      is a list of IPsec features, including features not currently supported
+      by selected m0n0wall versions.</para>
+
+      <table>
+        <title>IPSec Feature List</title>
+
+        <tgroup cols="4">
+          <colspec align="left" colname="col1" colnum="1" colwidth="6*" />
+
+          <colspec colname="col4" colnum="2" colwidth="1*" />
+
+          <colspec align="center" colname="col2" colnum="3" colwidth="1*" />
+
+          <colspec align="center" colname="col3" colnum="4" colwidth="1*" />
+
+          <thead>
+            <row>
+              <entry align="center">Feature</entry>
+
+              <entry align="center"></entry>
+
+              <entry align="center">1.2</entry>
+
+              <entry align="center">1.3</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>Site to site</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Mobile user to site</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Tunnel mode</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Transport mode</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Perfect Forward Security (PFS)</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Main Mode</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Aggressive Mode</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Remote gateway hostname/domain support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>IKEv2 support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 local IP, Domain, FQDN Identifier</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 local RSA Cert Subject Identifier</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 Authentication Hashes md5, sha1 support</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 Authentication Hashes tiger192, ripemd160
+              support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 Authentication Preshared Key support</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 Authentication RSA / PKI X.509 Certificate
+              support</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 1 Authentication DSA Certificate support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>XAUTH Authentication</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Phase 2 Diffie-Hellman Key support 768, 1024, 1536 bit
+              (also Modp)</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Phase 2 Diffie-Hellman Key support 2048, 3072, 4096 bit
+              (also Modp)</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Encryption Ciphers DES,3DES, Blowfish, CAST128</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Encryption Cipher AES (Rijndael)</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Encryption Ciphers Twofish, Serpent, IDEA</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>NAT-T Traversal</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Dead Peer Detection</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>IPSec diagnostic logs</entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>Dynamic DNS remote site support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry>x</entry>
+            </row>
+
+            <row>
+              <entry>IPSec Traffic filtering</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>DHCP over IPSec</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>L2TP Authentication</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Manual Key support</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+
+            <row>
+              <entry>Certificate Revocation List</entry>
+
+              <entry></entry>
+
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </sect2>
 
     <sect2>
       <title>Site to Site VPN Explained</title>
@@ -54,14 +435,17 @@
       connection will be 30-80+ ms depending on the number of hops on the
       Internet between the two VPN endpoints.</para>
 
-      <para>When deploying VPN's, you should stay with the same ISP for all
-      sites if possible, or at a minimum, stay with ISP's that use the same
-      backbone provider. Geographic proximity usually has no relation to
-      Internet proximity. A server in the same city as you but on a different
-      Internet-backbone provider could be as far away from you in Internet
-      distance (hops) as a server on the other side of the continent. This
-      difference in Internet proximity can make the difference between a VPN
-      with 30 ms latency and one with 80+ ms latency.</para>
+      <tip>
+        <para>When deploying VPN's, you should stay with the same ISP for all
+        sites if possible, or at a minimum, stay with ISP's that use the same
+        backbone provider. Geographic proximity usually has no relation to
+        Internet proximity. A server in the same city as you but on a
+        different Internet-backbone provider could be as far away from you in
+        Internet distance (hops) as a server on the other side of the
+        continent. This difference in Internet proximity can make the
+        difference between a VPN with 30 ms latency and one with 80+ ms
+        latency.</para>
+      </tip>
     </sect2>
 
     <sect2>
@@ -70,13 +454,17 @@
       <para>m0n0wall provides two means of remote access VPN, PPTP and IPsec
       (with OpenVPN available in beta versions only for now). m0n0wall's
       mobile IPsec functionality has some serious limitations that hinder its
-      practicality for many deployments. m0n0wall does
+      practicality for many deployments. m0n0wall version 1.2 does
       <emphasis>not</emphasis> support NAT-Traversal (NAT-T) for IPsec, which
       means if any of your client machines are behind NAT, IPsec VPN will not
       work. This alone eliminates it as a possibility for most environments,
       since remote users will almost always need access from behind NAT. Many
       home networks use a NAT router of some sort, as do most hot spot
       locations, hotel networks, etc.</para>
+
+      <note>
+        <para>NAT-T is supported in m0n0wall version 1.3 beta.</para>
+      </note>
 
       <para>One good use of the m0n0wall IPsec client VPN capabilities is to
       secure all traffic sent by hosts on a wireless network or other
@@ -89,6 +477,185 @@
       <para>For most situations, PPTP is probably the best remote access VPN
       option in m0n0wall right now. See the PPTP chapter for more
       information.</para>
+    </sect2>
+
+    <sect2>
+      <title>Tunnel Mode</title>
+
+      <para>IPsec's Tunnel mode is supported on m0n0wall devices. This mode
+      allows secured communication between entire subnets. When the packet
+      leavs the subnet it will be encrypted, when it gets to the remote IPSec
+      device the packets are decrypted and routed/ sent into the remote
+      network.</para>
+
+      <para>The IPsec Specification supports a 2nd mode of operation called
+      Transport mode. Transport mode limits encrypted communication to the 2
+      devices that are encrypting the information. If this was supported it
+      would only allow secured communication to the m0n0wall device itself and
+      not to its connected networks. Transport mode is not supported.</para>
+    </sect2>
+
+    <sect2>
+      <title>Perfect Forward Secrecy</title>
+
+      <para>This option increases security during authentication by assuring
+      that new keys (which are generated on a regular basis to ensure
+      security) are not based on previous keys. When activated, this means
+      that if someone obtains or discovers 1 encryption key that they cannot
+      use it to discover previous or future keys. This can be disabled to
+      allow faster key negotiation.</para>
+    </sect2>
+
+    <sect2>
+      <title>IPsec Software Clients</title>
+
+      <para>Most operating systems include IPsec clients. Windows 2000 and
+      above includes a free IPsec client but it is also difficult to
+      configure. MacOSX 10.3 and later also includes a free IPsec client but
+      the free configuration tool is for a special version of IPsec called
+      L2TP/IPsec. Free configuration tools exist for both operating systems
+      but commercial solutions, at least for Windows, are more evolved and
+      easier to use than the built-in free version.</para>
+
+      <note>
+        <para>m0n0wall does not support L2TP so if your IPsec client software
+        only supports L2TP it will not work with m0n0wall. However, for
+        adventure seekers, there is a how to for using IPsec on a device and
+        L2TP on an internal Windows 200x server to offset the encryption
+        workload: <ulink
+        url="http://koeppe-net.de/l2tp-howto.txt ">http://koeppe-net.de/l2tp-howto.txt</ulink>.
+        This has not been tested yet with m0n0wall devices.</para>
+      </note>
+
+      <para>Below is a list of IPsec software clients.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>shrew - win32 - <ulink
+          url="http://www.shrew.net">http://www.shrew.net</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>the green bow - win32 - <ulink
+          url="http://www.thegreenbow.com">http://www.thegreenbow.com</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>IPsecuritas - MacOSX - <ulink
+          url="http://www.lobotomo.com">http://www.lobotomo.com</ulink> -
+          <ulink
+          url="http://www.lobotomo.com/products/IPSecuritas/howto/m0n0wall%20HOWTO.pdf">howto</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>Freeswan/ Openswan/ Strongswan - Linux - <ulink
+          url="http://www.strongswan.org/">http://www.strongswan.org</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>Racoon - Freebsd</para>
+        </listitem>
+      </itemizedlist>
+
+      <caution>
+        <para>In some versions of Microsoft Windows, you must deactivate the
+        built-in IPsec client before installing a commercial 3rd party IPsec
+        client. Be sure to read the installation instructions.</para>
+      </caution>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Special Features</title>
+
+    <para>Most special IPsec features have been added to beta versions of
+    m0n0wall and may be changed or withdrawn before a final stable version
+    release.</para>
+
+    <sect2>
+      <title>Dead Peer Detection</title>
+
+      <para>Starting in firmware 1.3b11 it is possible to configure a Dead
+      Peer Detection (DPD) interval in seconds with a default of seconds. This
+      allows the m0n0wall device to detect if a tunnel is still being used. If
+      the DPD interval has passed and the m0n0wall devices finds an IPsec
+      tunnel is not exchanging phase 1 IKE messages (which should be happening
+      even if the tunnel is not being used to transmit data) the tunnel will
+      be closed.</para>
+
+      <para>Without this option activated, an IPsec tunnel may be left open
+      and active when an actual problem has appeared such as bad routing,
+      reboot of the remote client, change of IP addresses.</para>
+
+      <para>Both sides of the IPsec connection must support and activate Dead
+      Peer Detection.</para>
+
+      <note>
+        <para>Firmware 1.3b11 also includes a fix for m0n0wall preferring new
+        SAs over old SAs by default (should solve problems with tunnels not
+        working after an interruption or peer IP address change). In previous
+        versions old SAs where preferred.</para>
+      </note>
+    </sect2>
+
+    <sect2>
+      <title>Dynamic DNS Support</title>
+
+      <para>Starting in firmware 1.3b6 it is possible to configure domain
+      names to be IPsec connection endpoints. Although fixed IP addresses are
+      recommended for building IPsec connections, using domain names allows
+      IPsec usage with clients whose IP address may change frequently (a home
+      Internet connection or a laptop user at a wireless hotspot for
+      example.)</para>
+
+      <para>The IPsec DNS Check Interval option is under the System &gt;
+      Advanced menu. An interval time in seconds can be set here. If at least
+      one IPsec tunnel has a host name (instead of an IP address) as the
+      remote gateway, a DNS lookup is performed at the interval specified
+      here, and if the IP address that the host name resolved to has changed,
+      the IPsec tunnel is reconfigured. The default is 60 seconds.</para>
+
+      <para>The remote connection point must use a Dynamic DNS client software
+      that registers any IP address changes with the domain server.</para>
+    </sect2>
+
+    <sect2>
+      <title>NAT Traversal</title>
+
+      <para>Starting in firmware 1.3b2 it is possible to use NAT Traversal
+      (NAT-T) with IPsec connections. This feature allows IPsec clients to be
+      behind a NAT device (common in a home or office firewall). Using ESP
+      packets to transmit encrypted data does not allow it to pass through a
+      NAT transformation but encapsulating the encrypted data in UDP packets
+      allows the data to pass through NAT transformations.</para>
+
+      <para>Using NAT-T creates two types of traffic: IKE authentication
+      (phase 1) on UDP 500 and encrypted data (phase 2) on UDP 4500. These two
+      ports must be allowing data on the m0n0wall device and not be blocked by
+      any intervening firewalls. This feature can be turned on or off for each
+      IPsec connection.</para>
+    </sect2>
+
+    <sect2>
+      <title>IPsec Traffic Filtering</title>
+
+      <para>Starting in firmware 1.3b6 there is firewall support for
+      decapsulated IPsec packets (new pseudo-interface "IPsec" in firewall
+      rule editor); this is on by default, but the default configuration
+      contains a "pass all" rule on the new IPsec pseudo- interface (and this
+      is also added automatically for existing configurations), which can then
+      be deleted to actually filter IPsec VPN traffic.</para>
+
+      <para>To configure filtering on IPsec traffic, select the IPsec
+      interface from the list of interfaces that packets must come in to match
+      the selected rule.</para>
+
+      <note>
+        <para>These rules are applied to all IPsec connection traffic. The
+        only way to apply rules to specific connections is to additionally use
+        a source IP address or subnet that is used on a selected remote IPsec
+        connection.</para>
+      </note>
     </sect2>
   </sect1>
 
@@ -142,6 +709,9 @@
       </listitem>
 
       <listitem>
+        <para>Decide how much you trust connected users and/ or
+        networks.</para>
+
         <para>Host and application level security become more important when
         connecting multiple networks, how much depending on how much you trust
         the other network. The VPN tunnel <emphasis>will not respond to
@@ -149,25 +719,26 @@
         be able to limit which hosts can be accessed by users across the VPN
         connection. If a worm would get into the network you are connected to
         via VPN, it could easily spread to your network. If a system on the
-        remote network is compromized by an attacker, he could easily hop over
+        remote network is compromised by an attacker, he could easily hop over
         the VPN to attack your systems without any firewall protection.</para>
       </listitem>
 
       <listitem>
-        <para>Pay attention to what you are doing! If you have a VPN to your
-        office, and a VPN to your friend's home network, your friend can now
-        hop over to your company's network from your network. Or, if your
-        friend gets infected with a worm, it could then infect your machines
-        and continue to propagate over the VPN connection to your office. Most
-        companies would probably fire you if your friend was caught on their
-        network. Best bet here is if you have a site to site VPN into your
-        network at work, do not connect with friends, or use one network and
-        firewall for accessing work and one for accessing your friend's
-        network.</para>
+        <para>Pay attention to what you are doing!</para>
+
+        <para>If you have a VPN to your office, and a VPN to your friend's
+        home network, your friend can now hop over to your company's network
+        from your network. Or, if your friend gets infected with a worm, it
+        could then infect your machines and continue to propagate over the VPN
+        connection to your office. Most companies would probably fire you if
+        your friend was caught on their network. Best bet here is if you have
+        a site to site VPN into your network at work, do not connect with
+        friends, or use one network and firewall for accessing work and one
+        for accessing your friend's network.</para>
       </listitem>
     </orderedlist>
 
-    <para>Ok now that we have the basics let's get started on the firewall
+    <para>Ok now that we have the basics let's get started on the m0n0wall
     settings.</para>
   </sect1>
 
@@ -199,7 +770,7 @@
     shots of each section as we discuss it.</para>
 
     <para>The first area is the one you use to establish what network ranges
-    will use this IPSEC tunnel.</para>
+    will use this IPsec tunnel.</para>
 
     <para><screenshot>
         <mediaobject>
@@ -302,7 +873,7 @@
         <para>My identifier: This is the key to probably 90% of the email on
         the list where people seem to not get the VPN tunnel up, or want to
         know how to do this with dynamic IP addresses, etc. Very simple, set
-        your identifier to something that isn’t going to change. So if you
+        your identifier to something that is not going to change. So if you
         leave it as My IP address (* This will be the IP address of the
         “interface” you listed in the first section. *) then make sure that IP
         is static and persistent. If you use a DHCP assigned address then I
@@ -343,7 +914,7 @@
       </listitem>
 
       <listitem>
-        <para>Pre-Shared Key: Contrary to some suggestions this key must be
+        <para>Preshared Key: Contrary to some suggestions this key must be
         exactly the same on both VPN routers. It is case sensitive, and it
         does support special characters. I suggest using both. E.x.
         f00m0nk3y@BubbaLand</para>
@@ -419,24 +990,200 @@
   </sect1>
 
   <sect1>
-    <?dbhtml filename="ipsec-behindfirewall.html"?>
+    <title>Possible Issues</title>
 
-    <title>What if your m0n0wall isn’t the main Internet Firewall?</title>
+    <para>Below are some possible issues that you may face when building IPSec
+    connections.</para>
 
-    <para>FIXME - In some cases you have a firewall or router with layer 2
-    routing (protocol ACLs) sitting in front of your m0n0wall. If this is the
-    case you will need to port forward ESP or AH (depending on which one you
-    chose) to the m0n0wall. (NOTE: if you are running NAT on that firewall AH
-    will not be an option.)</para>
+    <sect2>
+      <?dbhtml filename="ipsec-behindfirewall1.html"?>
 
-    <figure>
-      <title>Example: m0n0wall behind a router</title>
+      <title>What if your m0n0wall is not the main Internet Firewall?</title>
 
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="screens/ipsec/routing.png" />
-        </imageobject>
-      </mediaobject>
-    </figure>
+      <para>FIXME - In some cases you have a firewall or router with layer 2
+      routing (protocol ACLs) sitting in front of your m0n0wall. If this is
+      the case you will need to port forward ESP or AH (depending on which one
+      you chose) to the m0n0wall. (NOTE: if you are running NAT on that
+      firewall AH will not be an option.)</para>
+
+      <para>Starting in m0n0wall firmware 1.3 NAT-T traversal is supported.
+      This allows all ESP packets to be encapsulated in UDP packets using port
+      4500. Allowing and redirecting UDP 500 traffic (used for IKE
+      authentication in phase 1) and UDP 4500 (NAT-T encapsulated data packets
+      in phase 2) allows the m0n0wall to be placed behind another
+      firewall.</para>
+
+      <figure>
+        <title>Example: m0n0wall behind a router</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="screens/ipsec/routing.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+    </sect2>
+
+    <sect2>
+      <title>Additional Questions</title>
+
+      <para>Below are some more issues that you may face when building IPSec
+      connections.</para>
+
+      <qandaset>
+        <qandaentry>
+          <question>
+            <para>What if I have a Dynamic DNS name?</para>
+          </question>
+
+          <answer>
+            <para>Some users have an IP address that changes regularly, The
+            changing IP address can be on either the m0n0wall device or the
+            remote IPSec VPN client. For example a dialup account, DSL
+            Internet modem or simply moving a laptop computer from one
+            wireless hotspot to another all can cause IP addresses that
+            change. While the changing IP address does not affect normal
+            Internet usage, it will break IPSec tunnels that are configured to
+            use a specific DNS name or IP address.</para>
+
+            <para>A dynamic DNS name will allow you to keep the same name and
+            can be used with m0n0wall. M0n0wall version 1.2 supports dynamic
+            DNS for its own interface but does not support a domain name for
+            the remote user of the VPN connection. M0n0wall 1.3b supports
+            domain names on both sides.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>What happens when I change my IPSec configuration?</para>
+          </question>
+
+          <answer>
+            <para>Any changes to your IPSec configuration will cause all IPSec
+            tunnels to be closed when the changes are applied.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can a single IPsec tunnel support non-contiguous
+            subnets?</para>
+          </question>
+
+          <answer>
+            <para>Not at this time. The only way to achieve this would be to
+            have multiple IPsec connections for each subnet.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can I use NAT on a subnet that is on the other side of an
+            IPsec connection?</para>
+          </question>
+
+          <answer>
+            <para>Not at this time. This would be useful if 2 or more networks
+            use the same subnet and are trying to communicate with each other
+            over an IPsec connection.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can fragmented packets pass through an IPsec
+            connection?</para>
+          </question>
+
+          <answer>
+            <para>By default, fragmented packets are not allowed to be
+            encrypted. This default can be changed in the System &gt; Advanced
+            &gt; Miscellaneous menu by checking the "Allow fragmented IPsec
+            packets" box. When activated, this will cause m0n0wall to allow
+            fragmented IP packets that are encapsulated in IPsec ESP
+            packets.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>What happens when an IPsec connection is restarted with a
+            new IP address?</para>
+          </question>
+
+          <answer>
+            <para>By default, if several Security Associations (SAs) match,
+            the newest one is preferred if it's at least 30 seconds old. This
+            default can be changed in the System &gt; Advanced &gt;
+            Miscellaneous menu by checking the "Prefer old IPsec SAs" When
+            activated, this option always prefers old SAs over new
+            ones.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>When are IPsec connections opened?</para>
+          </question>
+
+          <answer>
+            <para>When traffic is attempting to reach a network or IP address
+            that is configured to be on a remote IPsec connection, m0n0wall
+            will attempt to build the connection.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can I use the Cisco IPsec client to connect to
+            m0n0wall?</para>
+          </question>
+
+          <answer>
+            <para>It won't work. It's not the same kind of IPsec client
+            required by m0n0wall. However some users have reported success
+            when using the NAT-T feature (i.. encapsulating encrypted traffic
+            in UDP packets.) FIXME - verify this.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can I route any traffic over my IPsec connection?</para>
+          </question>
+
+          <answer>
+            <para>Part of the IPsec configuration identifies local and remote
+            networks. IP addresses that are outside of those networks are not
+            authorized to travel through an IPsec connection. This means that
+            if you have additional routed networks connected to your LAN, they
+            may not be able to travrse the IPsec connection because they do
+            not originate from the LAN itself.</para>
+
+            <para>If you have an additional network or subnet that you want to
+            travel through IPsec you can make additional tunnels or optionally
+            put a NAT device between the LAN network and the other subnets so
+            that traffic from the additional network will appear to be coming
+            from the authorized network.</para>
+          </answer>
+        </qandaentry>
+
+        <qandaentry>
+          <question>
+            <para>Can I forward IP broadcasts over an IPsec VPN?</para>
+          </question>
+
+          <answer>
+            <para>Not yet. OpenVPN will make this possible in the future.
+            Broadcasts don't cross broadcast domains. In the case of a VPN
+            link, each network is its own broadcast domain. Normally you don't
+            want to connect broadcast domains because most networks have way
+            more broadcast traffic than you want to push over a VPN
+            connection. </para>
+          </answer>
+        </qandaentry>
+      </qandaset>
+    </sect2>
   </sect1>
 </chapter>
