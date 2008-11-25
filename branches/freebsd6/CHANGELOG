@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix display of firewall rules and static routes pages in group manager
+  (reported by Peter Allgeyer)
+
+1.3b15
+------
+
 - make PPPoE MTU on WAN configurable
 
 - add patch to enable custom next-server and filename options for

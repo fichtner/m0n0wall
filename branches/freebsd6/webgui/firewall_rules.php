@@ -38,6 +38,7 @@ if ($ipv6rules = ($_GET['type'] == 'ipv6')) {
 	$configname = 'rule';
 	$typelink = '';
 }
+$pgtitle = array("Firewall", "Rules");	/* make group manager happy */
 $pgtitle = array("Firewall", ipv6enabled() ? ($ipv6rules ? 'IPv6 Rules' : 'IPv4 Rules') : 'Rules');
 
 if (!is_array($config['filter'][$configname])) {

@@ -294,7 +294,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
 		</tr>
 		<tr>
 			<td colspan="3">
-		      Additional webGui admin groups can be added here.  Each group can be restricted to specific portions of the webGUI.  Individually select the desired web pages each group may access.  For example, a troubleshooting group could be created which has access only to selected Status and Diagnostics pages.
+		      Additional webGUI admin groups can be added here.  Each group can be restricted to specific portions of the webGUI.  Individually select the desired web pages each group may access.  For example, a troubleshooting group could be created which has access only to selected Status and Diagnostics pages.
 			</td>
 		</tr>
  </table>

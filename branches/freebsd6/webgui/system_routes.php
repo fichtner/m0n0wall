@@ -38,6 +38,7 @@ if ($ipv6routes = ($_GET['type'] == 'ipv6')) {
 	$configname = 'route';
 	$typelink = '';
 }
+$pgtitle = array("System", "Static routes");	/* make group manager happy */
 $pgtitle = array("System", ipv6enabled() ? ($ipv6routes ? 'IPv6 Static routes' : 'IPv4 Static routes') : 'Static routes');
 
 if (!is_array($config['staticroutes'][$configname]))

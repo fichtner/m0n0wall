@@ -40,6 +40,7 @@ if ($ipv6rules = ($_GET['type'] == 'ipv6')) {
 	$typelink = '';
 	$maxnetmask = 32;
 }
+$pgtitle = array("Firewall", "Rules", "Edit");	/* make group manager happy */
 $pgtitle = array("Firewall", ipv6enabled() ? ($ipv6rules ? 'IPv6 Rules' : 'IPv4 Rules') : 'Rules', "Edit");
 
 $specialsrcdst = explode(" ", "any wanip lan pptp");

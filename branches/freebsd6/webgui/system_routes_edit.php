@@ -40,6 +40,7 @@ if ($ipv6routes = ($_GET['type'] == 'ipv6')) {
 	$typelink = '';
 	$maxnetmask = 32;
 }
+$pgtitle = array("System", "Static routes", "Edit");	/* make group manager happy */
 $pgtitle = array("System", ipv6enabled() ? ($ipv6routes ? 'IPv6 Static routes' : 'IPv4 Static routes') : 'Static routes', "Edit");
 
 if (!is_array($config['staticroutes'][$configname]))
