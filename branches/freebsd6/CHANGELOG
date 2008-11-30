@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add support for Broadcom BCM5722 NIC
+  (suggested by Sebastian Lemke)
+
 - fix display of firewall rules and static routes pages in group manager
   (reported by Peter Allgeyer)
 
