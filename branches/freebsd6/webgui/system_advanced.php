@@ -176,7 +176,8 @@ if ($_POST) {
                     <input name="enableipv6" type="checkbox" id="enableipv6" value="yes" <?php if ($pconfig['enableipv6']) echo "checked"; ?>>
                     <strong>Enable IPv6 support</strong><br>
                     After enabling IPv6 support, configure IPv6 addresses on your LAN and WAN interfaces, then add 
-                    IPv6 firewall rules.
+                    IPv6 firewall rules.<br>
+                    Note: you <strong>must set an IPv6 address on the LAN interface</strong> for the IPv6 support to work.
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

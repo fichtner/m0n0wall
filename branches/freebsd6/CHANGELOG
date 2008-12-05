@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added kernel security patch FreeBSD-SA-08:11.arc4random
+
 - add support for Broadcom BCM5722 NIC
   (suggested by Sebastian Lemke)
 
