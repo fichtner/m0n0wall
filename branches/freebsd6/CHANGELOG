@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- allow the remote syslog port to be changed (requested by Martin Desormeaux
+  for m0n0log project)
+
 - added kernel security patch FreeBSD-SA-08:11.arc4random
 
 - add support for Broadcom BCM5722 NIC

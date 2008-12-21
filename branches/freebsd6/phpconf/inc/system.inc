@@ -244,6 +244,10 @@ function system_syslogd_start() {
 			return 1;
 		}
 		
+		$syslogserver = $syslogcfg['remoteserver'];
+		if ($syslogcfg['remoteport'])
+			$syslogserver .= ":" . $syslogcfg['remoteport'];
+		
 		$syslogconf = <<<EOD
 local0.*					%/var/log/filter.log
 local3.*					%/var/log/vpn.log
@@ -258,38 +262,38 @@ EOD;
 
 		if (isset($syslogcfg['filter'])) {
 			$syslogconf .= <<<EOD
-local0.*					@{$syslogcfg['remoteserver']}
+local0.*					@{$syslogserver}
 
 EOD;
 		}
 		
 		if (isset($syslogcfg['vpn'])) {
 			$syslogconf .= <<<EOD
-local3.*					@{$syslogcfg['remoteserver']}
+local3.*					@{$syslogserver}
 
 EOD;
 		}
 		
 		if (isset($syslogcfg['portalauth'])) {
 			$syslogconf .= <<<EOD
-local4.*					@{$syslogcfg['remoteserver']}
+local4.*					@{$syslogserver}
 
 EOD;
 		}
 
 		if (isset($syslogcfg['dhcp'])) {
 			$syslogconf .= <<<EOD
-local7.*					@{$syslogcfg['remoteserver']}
+local7.*					@{$syslogserver}
 
 EOD;
 		}
 
 		if (isset($syslogcfg['system'])) {
 			$syslogconf .= <<<EOD
-*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local6.none;local7.none @{$syslogcfg['remoteserver']}
-security.*					@{$syslogcfg['remoteserver']}
-auth.info;authpriv.info;daemon.info		@{$syslogcfg['remoteserver']}
-*.emerg						@{$syslogcfg['remoteserver']}
+*.notice;kern.debug;lpr.info;mail.crit;news.err;local0.none;local3.none;local4.none;local6.none;local7.none @{$syslogserver}
+security.*					@{$syslogserver}
+auth.info;authpriv.info;daemon.info		@{$syslogserver}
+*.emerg						@{$syslogserver}
 
 EOD;
 		}

@@ -286,6 +286,7 @@
 		<reverse/>
 		<enable/>
 		<remoteserver>xxx.xxx.xxx.xxx</remoteserver>
+		<remoteport>514</remoteport>
 		<filter/>
 		<dhcp/>
 		<system/>
