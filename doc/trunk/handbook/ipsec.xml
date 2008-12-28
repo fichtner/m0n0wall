@@ -923,7 +923,7 @@
             <para>Not with IPsec. Broadcasts don't cross broadcast domains. In
               the case of a VPN link, each network is its own broadcast
               domain. Normally you don't want to connect broadcast domains
-              because most networks have way more broadcast traffic than you
+              because most networks have more broadcast traffic than you
               want to push over a VPN connection. </para>
           </answer>
         </qandaentry>
@@ -931,6 +931,7 @@
     </sect2>
   </sect1>
   <sect1>
+    <?dbhtml filename="ipsec-rsa-auth.html"?>
     <title>Quick Start for RSA Signature Authentication</title>
     <para>From Lynn Grant, <ulink
         url="http://m0n0.ch/wall/list/showmsg.php?id=353/09">as contributed to
