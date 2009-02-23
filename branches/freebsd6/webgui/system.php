@@ -80,7 +80,13 @@ if ($_POST) {
 		$input_errors[] = "The domain may only contain the characters a-z, 0-9, '-' and '.'.";
 	}
 	if (($_POST['dns1'] && !is_ipaddr($_POST['dns1'])) || ($_POST['dns2'] && !is_ipaddr($_POST['dns2'])) || ($_POST['dns3'] && !is_ipaddr($_POST['dns3']))) {
-		$input_errors[] = "A valid IP address must be specified for the primary/secondary/tertiary DNS server.";
+		if (ipv6enabled()) {
+			if (($_POST['dns1'] && !is_ipaddr6($_POST['dns1']) && !is_ipaddr($_POST['dns1'])) || ($_POST['dns2'] && !is_ipaddr6($_POST['dns2']) && !is_ipaddr($_POST['dns2'])) || ($_POST['dns3'] && !is_ipaddr6($_POST['dns3']) && !is_ipaddr($_POST['dns3']))) {
+				$input_errors[] = "A valid IPv4 or IPv6 address must be specified for the primary/secondary/tertiary DNS server.";
+			}
+		} else {
+			$input_errors[] = "A valid IPv4 address must be specified for the primary/secondary/tertiary DNS server.";
+		}
 	}
 	if ($_POST['username'] && !preg_match("/^[a-zA-Z0-9]*$/", $_POST['username'])) {
 		$input_errors[] = "The username may only contain the characters a-z, A-Z and 0-9.";

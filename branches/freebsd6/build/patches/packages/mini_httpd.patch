@@ -1,6 +1,6 @@
---- Makefile.orig	Sat Nov  2 00:02:57 2002
-+++ Makefile	Tue May 10 13:58:23 2005
-@@ -14,10 +14,10 @@
+--- Makefile.orig	2002-11-02 00:02:57.000000000 +0100
++++ Makefile	2009-02-23 20:31:37.000000000 +0100
+@@ -14,16 +14,17 @@
  # http://www.openssl.org/  Make sure the SSL_TREE definition points to the
  # tree with your OpenSSL installation - depending on how you installed it,
  # it may be in /usr/local instead of /usr/local/ssl.
@@ -13,8 +13,16 @@
 +SSL_INC =	-I${SSL_TREE}/include
 +SSL_LIBS =	-L${SSL_TREE}/lib -lssl -lcrypto
  
++IPV6_DEFS =    -DUSE_IPV6
  
  BINDIR =	/usr/local/sbin
+ MANDIR =	/usr/local/man
+ CC =		gcc
+-CDEFS =		${SSL_DEFS} ${SSL_INC}
++CDEFS =		${IPV6_DEFS} ${SSL_DEFS} ${SSL_INC}
+ CFLAGS =	-O ${CDEFS}
+ #CFLAGS =	-g ${CDEFS}
+ LDFLAGS =	-s
 --- mini_httpd.c.orig	2005-06-29 19:31:17.000000000 +0200
 +++ mini_httpd.c	2008-02-28 20:47:54.000000000 +0100
 @@ -74,7 +74,7 @@

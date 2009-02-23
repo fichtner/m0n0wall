@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added IPv6 support to mini_httpd (for the webGUI)
+
+- allow IPv6 addresses for DNS servers on System: General setup page
+  (contributed by Andrew White)
+
 - allow the remote syslog port to be changed (requested by Martin Desormeaux
   for m0n0log project)
 
