@@ -66,8 +66,12 @@ if ($_POST) {
 	if (($_POST['domain'] && !is_domain($_POST['domain']))) {
 		$input_errors[] = "A valid domain must be specified.";
 	}
-	if (($_POST['ip'] && !is_ipaddr($_POST['ip']))) {
-		$input_errors[] = "A valid IP address must be specified.";
+	if (ipv6enabled()) {
+		if (($_POST['ip'] && !is_ipaddr($_POST['ip']) && !is_ipaddr6($_POST['ip'])))
+			$input_errors[] = "A valid IPv4 or IPv6 address must be specified.";
+	} else {
+		if (($_POST['ip'] && !is_ipaddr($_POST['ip'])))
+			$input_errors[] = "A valid IP address must be specified.";
 	}
 
 	/* check for overlaps */

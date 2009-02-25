@@ -5,7 +5,8 @@ $Id$
 
 - added IPv6 support to mini_httpd (for the webGUI)
 
-- allow IPv6 addresses for DNS servers on System: General setup page
+- allow IPv6 addresses for DNS servers on System: General setup page, and
+  for hosts on the DNS forwarder setup page
   (contributed by Andrew White)
 
 - allow the remote syslog port to be changed (requested by Martin Desormeaux
