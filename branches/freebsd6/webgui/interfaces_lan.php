@@ -32,6 +32,7 @@
 $pgtitle = array("Interfaces", "LAN");
 require("guiconfig.inc");
 
+$wancfg = &$config['interfaces']['wan'];
 $lancfg = &$config['interfaces']['lan'];
 $optcfg = &$config['interfaces']['lan'];
 $pconfig['ipaddr'] = $config['interfaces']['lan']['ipaddr'];
@@ -114,7 +115,7 @@ if ($_POST) {
 			
 			$v6changed = ($oldipaddr6 != $config['interfaces']['lan']['ipaddr6'] ||
 						  $oldsubnet6 != $config['interfaces']['lan']['subnet6'] ||
-						  $oldipv6ra != $config['interfaces']['lan']['ipv6ra']);
+						  isset($oldipv6ra) != isset($_POST['ipv6ra']));
 		}
 		
 		$dhcpd_disabled = false;
@@ -206,6 +207,17 @@ function enable_change(enable_over) {
                       <?php endfor; ?>
                     </select></td>
                 </tr>
+				<tr> 
+	                <td valign="top" class="vncellreq">Suggested IPv6 address</td>
+	                <td class="vtable"> 
+	                <?php if (!isset($wancfg['ipv6ra'])): ?>
+					Router advertisements are not enabled on WAN interface!
+	 				<?php else: ?>
+					<strong><?php echo suggest_ipv6_lan_addr() ?></strong><br>
+					This IPv6 address is suggested from listening to prefix advertisements recieved on the WAN interface, and using the first address available in that prefix.
+					<?php endif; ?>
+					</td>
+	            </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">IPv6 RA</td>
                   <td class="vtable"> 

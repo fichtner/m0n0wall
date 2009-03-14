@@ -65,7 +65,9 @@ if ($wancfg['ipaddr'] == "dhcp") {
 $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
 $pconfig['spoofmac'] = $wancfg['spoofmac'];
 
-if (ipv6enabled()) {	
+if (ipv6enabled()) {
+		$pconfig['ipv6ra'] = isset($wancfg['ipv6ra']);
+		
 	if ($wancfg['ipaddr6'] == "6to4" || $wancfg['ipaddr6'] == "ppp" || $wancfg['ipaddr6'] == "aiccu") {
 		$pconfig['ipv6mode'] = $wancfg['ipaddr6'];
 		
@@ -186,6 +188,7 @@ if ($_POST) {
 		unset($wancfg['subnet6']);
 		unset($wancfg['gateway6']);
 		unset($wancfg['tunnel6']);
+		unset($wancfg['ipv6ra']);
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
 		unset($config['pppoe']['provider']);
@@ -227,6 +230,7 @@ if ($_POST) {
 		$wancfg['spoofmac'] = $_POST['spoofmac'];
 		
 		if (ipv6enabled()) {
+		$wancfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
 			if ($_POST['ipv6mode'] == "6to4" || $_POST['ipv6mode'] == "ppp") {
 				$wancfg['ipaddr6'] = $_POST['ipv6mode'];
 			} else if ($_POST['ipv6mode'] == "static") {
@@ -271,6 +275,7 @@ function enable_change(enable_over) {
 	document.iform.aiccu_username.disabled = !aiccu_en;
 	document.iform.aiccu_password.disabled = !aiccu_en;
 	document.iform.aiccu_tunnelid.disabled = !aiccu_en;
+	document.iform.ipv6ra.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
 <?php endif; ?>
 	
 	if (document.iform.mode) {
@@ -481,6 +486,15 @@ function type_change() {
                       </option>
                       <?php endfor; ?>
                     </select></td>
+                </tr>
+				<tr> 
+                  <td valign="top" class="vncellreq">IPv6 RA</td>
+                  <td class="vtable"> 
+					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
+					If this option is checked, other hosts on this interface will be able to automatically configure
+					their IPv6 address based on prefix and gateway information that the firewall provides to them.
+					This option should normally be enabled.
+                  </td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">IPv6 gateway</td>

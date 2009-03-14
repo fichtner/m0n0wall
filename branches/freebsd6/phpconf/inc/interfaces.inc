@@ -673,6 +673,10 @@ EOD;
 			}
 		}
 	}
+	if (!$g['booting']) {
+		/* reload rtadvd */
+		interfaces_rtadvd_configure();
+	}
 }
 
 function interfaces_wan_dhcp_configure() {
@@ -954,6 +958,12 @@ function interfaces_rtadvd_configure() {
 		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":maxinterval#10:mininterval#4\n";
 	}
 	
+	if (isset($config['interfaces']['wan']['ipv6ra'])) {
+		$wanif = get_real_wan_interface(true);
+		$rtadvdifs .= ' ' . $wanif;
+		$rtadvdconf .= $wanif . ":maxinterval#10:mininterval#4\n";
+	}
+	
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 		$optcfg = $config['interfaces']['opt' . $i];
 		if (isset($optcfg['ipv6ra']) && isset($optcfg['enable']) &&
@@ -1174,4 +1184,24 @@ function calc_6to4_address($if) {
 	return false;
 }
 
+function suggest_ipv6_lan_addr(){
+	$sugipv6lan = "No RA found! Maybe try again in a few minutes.";
+	 /* get the prefix */
+	exec("/usr/sbin/clog /var/log/system.log", $logarr);
+	
+	foreach ($logarr as $logent) {
+		$logent = preg_split("/\s+/", $logent, 6);
+		$lograsrch = strstr($logent[5] , "<prefix_check> prefix ");
+		if ($lograsrch) {
+			$prefixpos = strpos($lograsrch, "/",0);
+			$sugipv6lan = substr($lograsrch,21,$prefixpos -21);	
+			$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
+		} 
+	}
+	if (!is_ipaddr6 ($sugipv6lan)) {
+		return "Error calculating IPv6 address!";
+	} else {
+		return $sugipv6lan;
+	}
+}
 ?>

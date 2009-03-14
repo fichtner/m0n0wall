@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- allow RA support on WAN interface, and add feature to automatically
+  suggest an IPv6 address for the LAN interface, based on an RA received
+  from WAN/ISP
+  (contributed by Andrew White)
+
 - added IPv6 support to mini_httpd (for the webGUI)
 
 - allow IPv6 addresses for DNS servers on System: General setup page, and
