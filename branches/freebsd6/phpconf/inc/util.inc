@@ -97,6 +97,14 @@ function is_numericint($arg) {
 }
 
 /* returns true if $ipaddr is a valid dotted IPv4 address */
+function is_ipaddr4or6($ipaddr) {
+	if (is_ipaddr($ipaddr)) 
+		return true;
+	else if (ipv6enabled()) 
+		return is_ipaddr6($ipaddr);
+	else 
+		return false;	
+}
 function is_ipaddr($ipaddr) {
 	if (!is_string($ipaddr))
 		return false;

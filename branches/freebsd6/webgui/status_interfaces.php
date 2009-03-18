@@ -31,8 +31,8 @@
 
 $pgtitle = array("Status", "Interfaces");
 require("guiconfig.inc");
-
 $wancfg = &$config['interfaces']['wan'];
+
 
 if ($_POST) {
 	if ($_POST['submit'] == "Disconnect" || $_POST['submit'] == "Release") {
@@ -54,11 +54,23 @@ if ($_POST) {
 		exit;
 	}
 }
-
+function get_resolvers() {
+	global $g;
+	$resolvers = array();
+	if (file_exists("{$g['etc_path']}/resolv.conf")) {
+		$resolvconf = file_get_contents("{$g['etc_path']}/resolv.conf");
+		preg_match_all("/nameserver (\S+)/",$resolvconf,$matches);
+		$resolvers = $matches[1];
+	} else {
+		$resolvers[] = "Error reading {$g['etc_path']}/resolv.conf";
+	}
+	return $resolvers;
+}
 function get_interface_info($ifdescr) {
 	
 	global $config, $g;
-	
+	$ifaddr6s = array();
+	$ifaddr4s = array();
 	$ifinfo = array();
 	
 	/* find out interface name */
@@ -186,11 +198,10 @@ function get_interface_info($ifdescr) {
 				}
 				if (preg_match("/netmask (\S+)/", $ici, $matches)) {
 					if (preg_match("/^0x/", $matches[1]))
-						$ifinfo['subnet'] = long2ip(hexdec($matches[1]));
+						$ifaddr4s[] = $ifinfo['ipaddr'] . "/" . long2ip(hexdec($matches[1]));
 				}
-				if (preg_match("/inet6 ([0-9a-f:]+) prefixlen (\d+)/", $ici, $matches)) {
-					$ifinfo['ipaddr6'] = $matches[1];
-					$ifinfo['subnet6'] = $matches[2];
+				if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+					$ifaddr6s[] = $matches[1] . "/" . $matches[2];
 				}
 			}
 			
@@ -221,9 +232,8 @@ function get_interface_info($ifdescr) {
 						exec("/sbin/ifconfig stf0", $ifconfiginfo);
 
 						foreach ($ifconfiginfo as $ici) {
-							if (preg_match("/inet6 ([0-9a-f:]+) prefixlen (\d+)/", $ici, $matches)) {
-								$ifinfo['ipaddr6'] = $matches[1];
-								$ifinfo['subnet6'] = $matches[2];
+							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
 							}
 						}
 					}
@@ -234,9 +244,8 @@ function get_interface_info($ifdescr) {
 						exec("/sbin/ifconfig gif0", $ifconfiginfo);
 
 						foreach ($ifconfiginfo as $ici) {
-							if (preg_match("/inet6 ([0-9a-f:]+) prefixlen (\d+)/", $ici, $matches)) {
-								$ifinfo['ipaddr6'] = $matches[1];
-								$ifinfo['subnet6'] = $matches[2];
+							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
 							}
 						}
 					}
@@ -245,21 +254,22 @@ function get_interface_info($ifdescr) {
 		}
 	}
 	
-	return $ifinfo;
+	return array ($ifinfo, $ifaddr6s,$ifaddr4s);
 }
 
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="" method="post">
             <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="content pane">
-              <?php $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
+              <?php $resolvers = get_resolvers();
+					$i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
 						
 					for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
 						$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 					}
 					
 			      foreach ($ifdescrs as $ifdescr => $ifname): 
-				  $ifinfo = get_interface_info($ifdescr);
+				 list( $ifinfo, $ifaddr6s, $ifaddr4s) = get_interface_info($ifdescr);
 				  ?>
               <?php if ($i): ?>
               <tr>
@@ -317,32 +327,25 @@ function get_interface_info($ifdescr) {
                 </td>
               </tr><?php endif; if ($ifinfo['status'] != "down"): ?>
 			  <?php if ($ifinfo['dhcplink'] != "down" && $ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down"): ?>
-			  <?php if ($ifinfo['ipaddr']): ?>
-              <tr> 
-                <td width="22%" class="vncellt">IP address</td>
-                <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['ipaddr']);?>
-                  &nbsp; </td>
-              </tr><?php endif; ?><?php if ($ifinfo['subnet']): ?>
-              <tr> 
-                <td width="22%" class="vncellt">Subnet mask</td>
-                <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['subnet']);?>
-                </td>
-              </tr><?php endif; ?><?php if ($ifinfo['gateway']): ?>
-              <tr> 
-                <td width="22%" class="vncellt">Gateway</td>
-                <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['gateway']);?>
-                </td>
-              </tr><?php endif; ?>
-			  <?php if ($ifinfo['ipaddr6']): ?>
-              <tr> 
-                <td width="22%" class="vncellt">IPv6 address</td>
-                <td width="78%" class="listr"> 
-                  <?=htmlspecialchars($ifinfo['ipaddr6'] . "/" . $ifinfo['subnet6']);?>
-                  &nbsp; </td>
-              </tr><?php endif; ?>
+			
+			  <?php if (!empty($ifaddr4s)): ?>
+              	<tr> 
+                	<td width="22%" class="vncellt">IPv4 address</td>
+                	<td width="78%" class="listr"> 
+			 		<?php foreach ($ifaddr4s as $if4info):
+		 			echo "$if4info<br>";
+		    		endforeach; ?></td>
+              </tr>
+              <?php endif; ?>
+			  <?php if (!empty($ifaddr6s)): ?>
+					 <tr> 
+		                <td width="22%" class="vncellt">IPv6 address</td>
+		                <td width="78%" class="listr">
+					 	<?php foreach ($ifaddr6s as $if6info):
+				 		echo "$if6info<br>";
+				    	endforeach; ?></td>
+		              </tr>
+                <?php endif; ?>
 			  <?php if ($ifinfo['gateway6']): ?>
               <tr> 
                 <td width="22%" class="vncellt">IPv6 gateway</td>
@@ -350,10 +353,14 @@ function get_interface_info($ifdescr) {
                   <?=htmlspecialchars($ifinfo['gateway6']);?>
                   &nbsp; </td>
               </tr><?php endif; ?>
-			  <?php if ($ifdescr == "wan" && file_exists("{$g['varetc_path']}/nameservers.conf")): ?>
+
+			  <?php if ($ifdescr == "wan" && !empty($resolvers)): ?>
               <tr>
                 <td width="22%" class="vncellt">ISP DNS servers</td>
-                <td width="78%" class="listr"><?php echo nl2br(file_get_contents("{$g['varetc_path']}/nameservers.conf")); ?></td>
+                <td width="78%" class="listr">
+				<?php foreach ($resolvers as $resolver):
+				 		echo "$resolver<br>";
+				    	endforeach; ?></td>
               </tr>
 			  <?php endif; endif; if ($ifinfo['media']): ?>
               <tr> 

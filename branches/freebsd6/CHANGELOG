@@ -1,7 +1,11 @@
-$Id$
+$Id:
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- added function is_ipaddr4or6
+  updated dnsmasq_edit and System setup page to use this function
+  change to status_interfaces to list all ips on an interface 
+  fix to status_interfaces to display nameservers from resolv.conf not nameservers.conf
 
 - allow RA support on WAN interface, and add feature to automatically
   suggest an IPv6 address for the LAN interface, based on an RA received
