@@ -976,10 +976,10 @@ function interfaces_rtadvd_configure() {
 		if (isset($optcfg['ipv6ra']) && isset($optcfg['enable']) &&
 			$optcfg['if'] && !$optcfg['bridge']) {
 			$raflags = "";
-			if (isset($config['interfaces']['lan']['ipv6ram'])) {
+			if (isset($config['interfaces']['opt' . $i]['ipv6ram'])) {
 				$raflags .= "m";
 			}
-			if (isset($config['interfaces']['lan']['ipv6rao'])) {
+			if (isset($config['interfaces']['opt' . $i]['ipv6rao'])) {
 				$raflags .= "o";
 			}
 			$rtadvdifs .= ' ' . $optcfg['if'];
