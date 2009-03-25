@@ -954,8 +954,15 @@ function interfaces_rtadvd_configure() {
 	$rtadvdconf = '';
 	
 	if (isset($config['interfaces']['lan']['ipv6ra'])) {
+		$raflags = "";
+		if (isset($config['interfaces']['lan']['ipv6ram'])) {
+			$raflags .= "m";
+		}
+		if (isset($config['interfaces']['lan']['ipv6rao'])) {
+			$raflags .= "o";
+		}
 		$rtadvdifs .= ' ' . $config['interfaces']['lan']['if'];
-		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":maxinterval#10:mininterval#4\n";
+		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4\n";
 	}
 	
 	if (isset($config['interfaces']['wan']['ipv6ra'])) {
@@ -968,10 +975,16 @@ function interfaces_rtadvd_configure() {
 		$optcfg = $config['interfaces']['opt' . $i];
 		if (isset($optcfg['ipv6ra']) && isset($optcfg['enable']) &&
 			$optcfg['if'] && !$optcfg['bridge']) {
-			
+			$raflags = "";
+			if (isset($config['interfaces']['lan']['ipv6ram'])) {
+				$raflags .= "m";
+			}
+			if (isset($config['interfaces']['lan']['ipv6rao'])) {
+				$raflags .= "o";
+			}
 			$rtadvdifs .= ' ' . $optcfg['if'];
 			/* maybe this can be configurable in the future */
-			$rtadvdconf .= $optcfg['if'] . ":maxinterval#10:mininterval#4\n";
+			$rtadvdconf .= $optcfg['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4\n";
 		}
 	}
 

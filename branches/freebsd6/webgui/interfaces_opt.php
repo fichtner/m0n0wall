@@ -48,6 +48,8 @@ $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
 if (ipv6enabled()) {
 	$pconfig['ipv6ra'] = isset($optcfg['ipv6ra']);
+	$pconfig['ipv6ram'] = isset($optcfg['ipv6ram']);
+	$pconfig['ipv6rao'] = isset($optcfg['ipv6rao']);
 	
 	if ($optcfg['ipaddr6'] == "6to4") {
 		$pconfig['ipv6mode'] = "6to4";
@@ -147,14 +149,20 @@ if ($_POST) {
 				$optcfg['ipaddr6'] = "6to4";
 				unset($optcfg['subnet6']);
 				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$optcfg['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
+				$optcfg['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else if ($_POST['ipv6mode'] == "static") {
 				$optcfg['ipaddr6'] = $_POST['ipaddr6'];
 				$optcfg['subnet6'] = $_POST['subnet6'];
 				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$optcfg['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
+				$optcfg['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else {
 				unset($optcfg['ipaddr6']);
 				unset($optcfg['subnet6']);
 				unset($optcfg['ipv6ra']);
+				unset($optcfg['ipv6ram']);
+				unset($optcfg['ipv6rao']);
 			}
 		}
 
@@ -197,6 +205,8 @@ function enable_change(enable_over) {
 	document.iform.ipaddr6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.subnet6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.ipv6ra.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+	document.iform.ipv6ram.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+	document.iform.ipv6rao.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
 <?php endif; ?>
 
 	if (document.iform.mode) {
@@ -299,7 +309,11 @@ function enable_change(enable_over) {
 					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
 					If this option is checked, other hosts on this interface will be able to automatically configure
 					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option should normally be enabled.
+					This option should normally be enabled.<br>
+					<input type="checkbox" name="ipv6ram" id="ipv6ram" value="1" <?php if ($pconfig['ipv6ram']) echo "checked";?>> <strong>Managed address configuration</strong><br>
+					If this option is checked, other hosts on this interface will use DHCPv6 for address allocation and non address allocation configuration.<br>
+					<input type="checkbox" name="ipv6rao" id="ipv6rao" value="1" <?php if ($pconfig['ipv6rao']) echo "checked";?>> <strong>Other stateful configuration</strong><br>
+					If this option is checked, other hosts on this interface will use DHCPv6 for non address allocation configuration, such as DNS.
                   </td>
                 </tr>
                 <?php endif; ?>

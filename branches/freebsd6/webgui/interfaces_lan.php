@@ -39,6 +39,8 @@ $pconfig['ipaddr'] = $config['interfaces']['lan']['ipaddr'];
 $pconfig['subnet'] = $config['interfaces']['lan']['subnet'];
 if (ipv6enabled()) {
 	$pconfig['ipv6ra'] = isset($config['interfaces']['lan']['ipv6ra']);
+	$pconfig['ipv6ram'] = isset($config['interfaces']['lan']['ipv6ram']);
+	$pconfig['ipv6rao'] = isset($config['interfaces']['lan']['ipv6rao']);
 	
 	if ($config['interfaces']['lan']['ipaddr6'] == "6to4") {
 		$pconfig['ipv6mode'] = "6to4";
@@ -98,24 +100,34 @@ if ($_POST) {
 			$oldipaddr6 = $config['interfaces']['lan']['ipaddr6'];
 			$oldsubnet6 = $config['interfaces']['lan']['subnet6'];
 			$oldipv6ra = $config['interfaces']['lan']['ipv6ra'];
+			$oldipv6ram = $config['interfaces']['lan']['ipv6ram'];
+			$oldipv6rao = $config['interfaces']['lan']['ipv6rao'];
 			
 			if ($_POST['ipv6mode'] == "6to4") {
 				$config['interfaces']['lan']['ipaddr6'] = "6to4";
 				unset($config['interfaces']['lan']['subnet6']);
 				$config['interfaces']['lan']['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$config['interfaces']['lan']['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
+				$config['interfaces']['lan']['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else if ($_POST['ipv6mode'] == "static") {
 				$config['interfaces']['lan']['ipaddr6'] = $_POST['ipaddr6'];
 				$config['interfaces']['lan']['subnet6'] = $_POST['subnet6'];
 				$config['interfaces']['lan']['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$config['interfaces']['lan']['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
+				$config['interfaces']['lan']['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else {
 				unset($config['interfaces']['lan']['ipaddr6']);
 				unset($config['interfaces']['lan']['subnet6']);
 				unset($config['interfaces']['lan']['ipv6ra']);
+				unset($config['interfaces']['lan']['ipv6ram']);
+				unset($config['interfaces']['lan']['ipv6rao']);
 			}
 			
 			$v6changed = ($oldipaddr6 != $config['interfaces']['lan']['ipaddr6'] ||
 						  $oldsubnet6 != $config['interfaces']['lan']['subnet6'] ||
-						  isset($oldipv6ra) != isset($_POST['ipv6ra']));
+						  isset($oldipv6ra) != isset($_POST['ipv6ra'])  ||
+						  isset($oldipv6ram) != isset($_POST['ipv6ram'])  ||
+						  isset($oldipv6rao) != isset($_POST['ipv6rao']));
 		}
 		
 		$dhcpd_disabled = false;
@@ -148,6 +160,8 @@ function enable_change(enable_over) {
 	document.iform.ipaddr6.disabled = !en;
 	document.iform.subnet6.disabled = !en;
 	document.iform.ipv6ra.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
+	document.iform.ipv6ram.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
+	document.iform.ipv6rao.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
 <?php endif; ?>
 	
 	if (document.iform.mode) {
@@ -224,7 +238,11 @@ function enable_change(enable_over) {
 					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
 					If this option is checked, other hosts on this interface will be able to automatically configure
 					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option should normally be enabled.
+					This option should normally be enabled.<br>
+					<input type="checkbox" name="ipv6ram" id="ipv6ram" value="1" <?php if ($pconfig['ipv6ram']) echo "checked";?>> <strong>Managed address configuration</strong><br>
+					If this option is checked, other hosts on this interface will use DHCPv6 for address allocation and non address allocation configuration.<br>
+					<input type="checkbox" name="ipv6rao" id="ipv6rao" value="1" <?php if ($pconfig['ipv6rao']) echo "checked";?>> <strong>Other stateful configuration</strong><br>
+					If this option is checked, other hosts on this interface will use DHCPv6 for non address allocaiton configuration, such as DNS.
                   </td>
                 </tr>
                 <?php endif; ?>
