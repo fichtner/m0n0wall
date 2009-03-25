@@ -34,6 +34,7 @@ require("guiconfig.inc");
 
 $pconfig['enable'] = isset($config['dnsmasq']['enable']);
 $pconfig['regdhcp'] = isset($config['dnsmasq']['regdhcp']);
+$pconfig['allservers'] = isset($config['dnsmasq']['allservers']);
 
 if (!is_array($config['dnsmasq']['hosts'])) {
 	$config['dnsmasq']['hosts'] = array();
@@ -52,6 +53,7 @@ if ($_POST) {
 
 	$config['dnsmasq']['enable'] = ($_POST['enable']) ? true : false;
 	$config['dnsmasq']['regdhcp'] = ($_POST['regdhcp']) ? true : false;
+	$config['dnsmasq']['allservers'] = ($_POST['allservers']) ? true : false;
 
 	write_config();
 	
@@ -102,6 +104,14 @@ if ($_GET['act'] == "del") {
                   <td class="vtable">
                       <input name="enable" type="checkbox" id="enable" value="yes" <?php if ($pconfig['enable']) echo "checked";?>>
                       <strong>Enable DNS forwarder</strong></td>
+                </tr>
+				  <td class="vtable">
+                      <input name="allservers" type="checkbox" id="allservers" value="yes" <?php if ($pconfig['allservers']) echo "checked";?>>
+                      <strong>Enable All Servers</strong><br>
+					  By default, when more than one upstream server is available, 
+					  it will send queries to just one server. Setting this flag forces all
+					  queries to all available servers. The reply from the server
+					  which answers first will be returned to the original requestor. </td>
                 </tr>
                 <tr> 
                   <td class="vtable">
