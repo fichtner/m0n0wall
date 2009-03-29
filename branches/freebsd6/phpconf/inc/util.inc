@@ -68,7 +68,15 @@ function gen_subnet6($ipaddr, $bits) {
 	
 	return Net_IPv6::getNetmask($ipaddr, $bits);
 }
-
+/* return the broadcast address given a host address and a subnet bit count, IPv6 variant */
+function gen_subnet_max6($ipaddr, $bits) {
+	if (!is_ipaddr6($ipaddr) || !is_numeric($bits))
+		return '';
+	$ipasbin = Net_IPv6::_ip2Bin(Net_IPv6::removeNetmaskSpec($ipaddr));
+	$binBcast = substr($ipasbin,0,$bits) . str_repeat('1',128 - $bits);
+	
+	return  Net_IPv6::_Bin2ip($binBcast);
+}
 /* return the highest (broadcast) address in the subnet given a host address and a subnet bit count */
 function gen_subnet_max($ipaddr, $bits) {
 	if (!is_ipaddr($ipaddr) || !is_numeric($bits))
@@ -118,9 +126,21 @@ function is_ipaddr($ipaddr) {
 		return false;
 }
 
-/* returns true if $ipaddr is a valid IPv6 address */
+/* returns true if $ipaddr is a valid IPv6 address with not prefix */
 function is_ipaddr6($ipaddr) {
-	return Net_IPv6::checkIPv6($ipaddr);
+	if (!Net_IPv6::getNetmaskSpec($ipaddr)) {
+		return Net_IPv6::checkIPv6($ipaddr);
+	} else {
+	return false;
+	}
+}
+
+function isInNetmask6($ip, $netmask, $bits=null) {
+	return Net_IPv6::isInNetmask($ip, $netmask, $bits);
+}
+
+function ipv6Uncompress($ip) {
+	return Net_IPv6::Uncompress($ip);
 }
 
 /* returns true if $ipaddr is a valid dotted IPv4 address or an alias thereof */
@@ -587,6 +607,25 @@ function check_dhcp_range($if_ipaddr, $if_subnet, $range_from, $range_to) {
 	return $input_errors;
 }
 
+function check_v6dhcp_range($if_ipaddr6, $if_subnet6, $v6range_from, $v6range_to) {
+	$input_errors = array();
+	$if_v6subnet = gen_subnet6($if_ipaddr6, $if_subnet6);
+	if (!isInNetmask6($v6range_from, $if_v6subnet, $if_subnet6) || !isInNetmask6($v6range_to, $if_v6subnet, $if_subnet6)) {
+		$input_errors[] = "The specified IPv6 range lies outside of the current subnet.";
+	} else {
+		$v6range_from_array = explode(":",ipv6Uncompress($v6range_from));
+		$v6range_to_array = explode(":",ipv6Uncompress($v6range_to));
+		for ($i=0; $i<=7; $i++)		{
+		  if ($v6range_from_array[$i] > $v6range_to_array[$i]) {
+				$input_errors[] = "The IPv6 range is invalid (start address higher than end address).";
+			  break;
+			} elseif ($v6range_from_array[$i] < $v6range_to_array[$i]) {
+			break;
+		  }
+		}
+	}
+	return $input_errors;
+}
 function format_bytes($bytes) {
 	if ($bytes >= 1073741824) {
 		return sprintf("%.2f GB", $bytes/1073741824);

@@ -75,7 +75,7 @@ if ($_POST) {
 	
 	$_POST['mac'] = str_replace("-", ":", $_POST['mac']);
 	
-	if (($_POST['ipaddr'] && !is_ipaddr($_POST['ipaddr']))) {
+	if (($_POST['ipaddr'] && !is_ipaddr4or6($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";
 	}
 	if (($_POST['mac'] && !is_macaddr($_POST['mac']))) {
@@ -90,14 +90,18 @@ if ($_POST) {
 		if (isset($id) && ($a_maps[$id]) && ($a_maps[$id] === $mapent))
 			continue;
 
-		if (($mapent['mac'] == $_POST['mac']) || ($_POST['ipaddr'] && (ip2long($mapent['ipaddr']) == ip2long($_POST['ipaddr'])))) {
-			$input_errors[] = "This IP or MAC address already exists.";
+		if ( $_POST['ipaddr'] && is_ipaddr($_POST['ipaddr']) && (ip2long($mapent['ipaddr']) == ip2long($_POST['ipaddr']))) {
+			$input_errors[] = "This IPv4 address already exists.";
+			break;
+		}
+		if ( $_POST['ipaddr'] && is_ipaddr6($_POST['ipaddr']) && (ipv6Uncompress($mapent['ipaddr']) == ipv6Uncompress($_POST['ipaddr']))) {
+			$input_errors[] = "This IPv6 address already exists.";
 			break;
 		}
 	}
 		
 	/* make sure it's not within the dynamic subnet */
-	if ($_POST['ipaddr']) {
+	if ($_POST['ipaddr'] && is_ipaddr($_POST['ipaddr'])) {
 		$dynsubnet_start = ip2long($config['dhcpd'][$if]['range']['from']);
 		$dynsubnet_end = ip2long($config['dhcpd'][$if]['range']['to']);
 		$lansubnet_start = (ip2long($ifcfg['ipaddr']) & gen_subnet_mask_long($ifcfg['subnet']));
@@ -112,15 +116,21 @@ if ($_POST) {
 			$input_errors[] = "The IP address must lie in the {$ifcfg['descr']} subnet.";
 		}
 	}
+	if ($_POST['ipaddr'] && is_ipaddr6($_POST['ipaddr'])) {
+		if (!isInNetmask6($_POST['ipaddr'], $ifcfg['ipaddr6'], $ifcfg['subnet6']) ) {
+			$input_errors[] = "The IPv6 address must lie in the {$ifcfg['descr']} subnet.";		
+		}
 
+	}
 	if (!$input_errors) {
 		$mapent = array();
 		$mapent['mac'] = $_POST['mac'];
 		$mapent['ipaddr'] = $_POST['ipaddr'];
 		$mapent['descr'] = $_POST['descr'];
-		$mapent['next-server'] = $_POST['nextserver'];
-		$mapent['filename'] = $_POST['filename'];
-
+		if (!is_ipaddr6($_POST['ipaddr'])){
+			$mapent['next-server'] = $_POST['nextserver'];
+			$mapent['filename'] = $_POST['filename'];
+		}
 		if (isset($id) && $a_maps[$id])
 			$a_maps[$id] = $mapent;
 		else
@@ -168,13 +178,14 @@ if ($_POST) {
                   <td colspan="2" valign="top" height="16"></td>
                 </tr>
                 <tr> 
-                  <td colspan="2" valign="top" class="listtopic">PXE configuration</td>
+                  <td colspan="2" valign="top" class="listtopic">IPv4 PXE configuration</td>
                 </tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncell">&nbsp;</td>
   				  <td width="78%" class="vtable"> 
-				    These settings are usually only needed with PXE booting and for some VoIP phones.  They can usually
-				    be left empty.  These settings (if provided) will override any values specified for the whole pool.</td>
+				    These IPv4 settings are usually only needed with PXE booting and for some VoIP phones.  They can usually
+				    be left empty.  These settings (if provided) will override any values specified for the whole pool.
+					These settings are ignored for IPv6 addresses.</td>
 				</tr>
 				<tr>
 				  <td width="22%" valign="top" class="vncell">Next server</td>
