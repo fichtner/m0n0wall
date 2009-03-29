@@ -2,6 +2,11 @@ $Id:
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Include changelog update for previous commit
+
+- Add DHCPv6 support. requires dhcp6sd in /usr/local/sbin. Also modified is_ipaddr6 to return false if
+  there is a prefix in the address
+  
 - fix RA flags on opt interfaces
 
 - added additional RA options for lan and opt interfaces , required for DHCPv6
