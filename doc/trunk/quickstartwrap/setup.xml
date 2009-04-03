@@ -85,7 +85,7 @@
         <listitem>
           <para>Mac OS X:</para>
 
-          <para><programlisting>sudo gunzip wrap-1.xxx.img | dd of=/dev/diskX bs=16k</programlisting>where
+          <para><programlisting>sudo gzcat wrap-1.xxx.img | dd of=/dev/diskX bs=16k</programlisting>where
           X = the IDE device name of your HD/CF card (check with <emphasis
           role="bold">diskutil list</emphasis> or Disk Utility) - (ignore the
           warning about trailing garbage - it's because of the digital
