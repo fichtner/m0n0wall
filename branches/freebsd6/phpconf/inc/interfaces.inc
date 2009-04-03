@@ -33,7 +33,6 @@ require_once("functions.inc");
 
 function interfaces_secondaries_configure($if) {
 	global $config, $g;
-	$ifconfig = "blah";
 	$ifcfg = $config['interfaces'][$if];
 	if (is_array($config['secondaries']['secondary'])) {
 		$a_secondaries = &$config['secondaries']['secondary'];
@@ -43,13 +42,13 @@ function interfaces_secondaries_configure($if) {
 					continue;
 				}
 				if (ipv6enabled() && is_ipaddr6($secondary['ipaddr'])){
-					$ifconfig = " inet6 ";
+					$ifconfig = $config['interfaces'][$if]['if'] . " inet6 ";
 				}
 				if (is_ipaddr($secondary['ipaddr'])){
-					$ifconfig = " inet ";
+					$ifconfig = $config['interfaces'][$if]['if'] . " inet ";
 				}
-				mwexec("/sbin/ifconfig "  escapeshellarg($ifconfig . $config['interfaces'][$if]['if'] . $secondary['ipaddr'] . "/" . $secondary['prefix']  . " alias") );
-				mwexec("echo \"blurb\" > /tmp/ttaa" . escapeshellarg( $ifconfig .  $config['interfaces'][$if]['if']   . $secondary['ipaddr'] . "" . $secondary['prefix']  . "txt"));
+				$ifconfig .=  $secondary['ipaddr'] . "/" . $secondary['prefix']  . " alias";
+				mwexec("/sbin/ifconfig " . $ifconfig);
 			}
 		}
 	}
@@ -1240,12 +1239,12 @@ function suggest_ipv6_lan_addr(){
 		if ($lograsrch) {
 			$prefixpos = strpos($lograsrch, "/",0);
 			$sugipv6lan = substr($lograsrch,21,$prefixpos -21);	
+			$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
 		} 
 	}
 	if (!is_ipaddr6 ($sugipv6lan)) {
 		return "Error calculating IPv6 address!";
 	} else {
-		$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
 		return $sugipv6lan;
 	}
 }
