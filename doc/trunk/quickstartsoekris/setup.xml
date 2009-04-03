@@ -229,7 +229,7 @@ su-2.05b# camcontrol devlist
       </sect3>
 
       <sect3>
-        <title>MacOSX</title>
+        <title>Mac OS X</title>
 
         <para>It is important to identify the Disk number that is assigned to
         your connected compact flash drive and to unmount and opn partitions
@@ -298,7 +298,7 @@ su-2.05b# camcontrol devlist
         <para>You will find your CF card somewhere in the above output. Make
         note of its device name (diskX).</para>
 
-        <programlisting>sudo dd if=net45xx-xxx.img of=/dev/diskX bs=16k</programlisting>
+        <programlisting>sudo gunzip net45xx-xxx.img | dd of=/dev/diskX bs=16k</programlisting>
 
         <para>where X = the IDE device name of your HD/CF card (check with
         <emphasis role="bold">diskutil list</emphasis> or Disk Utility) -
