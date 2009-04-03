@@ -31,6 +31,30 @@
 /* include all configuration functions */
 require_once("functions.inc");
 
+function interfaces_secondaries_configure($if) {
+	global $config, $g;
+	$ifconfig = "blah";
+	$ifcfg = $config['interfaces'][$if];
+	if (is_array($config['secondaries']['secondary'])) {
+		$a_secondaries = &$config['secondaries']['secondary'];
+		foreach ($a_secondaries as $secondary) {
+			if ($if == $secondary['if']) {
+				if (!ipv6enabled() && is_ipaddr6($secondary['ipaddr'])){
+					continue;
+				}
+				if (ipv6enabled() && is_ipaddr6($secondary['ipaddr'])){
+					$ifconfig = " inet6 ";
+				}
+				if (is_ipaddr($secondary['ipaddr'])){
+					$ifconfig = " inet ";
+				}
+				mwexec("/sbin/ifconfig "  escapeshellarg($ifconfig . $config['interfaces'][$if]['if'] . $secondary['ipaddr'] . "/" . $secondary['prefix']  . " alias") );
+				mwexec("echo \"blurb\" > /tmp/ttaa" . escapeshellarg( $ifconfig .  $config['interfaces'][$if]['if']   . $secondary['ipaddr'] . "" . $secondary['prefix']  . "txt"));
+			}
+		}
+	}
+}
+
 function interfaces_loopback_configure() {
 	global $config, $g;
 
@@ -122,6 +146,9 @@ function interfaces_lan_configure() {
 		/* reload dhcpd (gateway may have changed) */
 		services_dhcpd_configure();
 		
+		/* reload dhcp6s (gateway may have changed) */
+		services_dhcp6s_configure();
+		
 		/* reload dnsmasq */
 		services_dnsmasq_configure();
 		
@@ -157,6 +184,7 @@ function interfaces_lan_configure6() {
 			);
 		}
 	}
+	interfaces_secondaries_configure('lan');
 	
 	if (!$g['booting']) {
 		/* reload rtadvd */
@@ -207,6 +235,9 @@ function interfaces_optional_configure() {
 		
 		/* reload dhcpd (interface enabled/disabled/bridged status may have changed) */
 		services_dhcpd_configure();
+		
+		/* reload dhcp6s (gateway may have changed) */
+		services_dhcp6s_configure();
 		
 		/* restart dnsmasq */
 		services_dnsmasq_configure();
@@ -289,6 +320,7 @@ function interfaces_optional_configure_if($opti) {
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " " . 
 				escapeshellarg($optcfg['ipaddr'] . "/" . $optcfg['subnet']) . $addflags);
 		}
+		interfaces_secondaries_configure('opt' . $opti);
 	} else {
 		mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
 			" delete down");
@@ -319,9 +351,9 @@ function interfaces_optional_configure_if6($opti) {
 					' prefixlen ' . escapeshellarg($optcfg['subnet6'] . ' alias')
 				);
 			}
+		interfaces_secondaries_configure( 'opt' . $opti );
 		}
 	}
-	
 	return 0;
 }
 
@@ -1208,12 +1240,12 @@ function suggest_ipv6_lan_addr(){
 		if ($lograsrch) {
 			$prefixpos = strpos($lograsrch, "/",0);
 			$sugipv6lan = substr($lograsrch,21,$prefixpos -21);	
-			$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
 		} 
 	}
 	if (!is_ipaddr6 ($sugipv6lan)) {
 		return "Error calculating IPv6 address!";
 	} else {
+		$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
 		return $sugipv6lan;
 	}
 }

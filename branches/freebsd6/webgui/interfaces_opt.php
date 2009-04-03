@@ -221,6 +221,16 @@ function enable_change(enable_over) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
+		  <tr><td class="tabnavtbl">
+		  <ul id="tabnav">
+			<li class="tabact">Primary configuration</li>
+			<li class="tabinact1"><a href="interfaces_secondaries.php?if=opt<?=$index?>">Secondary IP's</a></li>
+		  </ul>
+		  </td></tr>
+		  <tr> 
+		<td class="tabcont">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
             <form action="interfaces_opt.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
@@ -351,4 +361,5 @@ wlan_enable_change(false);
 <?php else: ?>
 <strong>Optional <?=$index;?> has been disabled because there is no OPT<?=$index;?> interface.</strong>
 <?php endif; ?>
+</table>
 <?php include("fend.inc"); ?>

@@ -549,10 +549,43 @@ pass out quick on {$if} from {$sa}/{$sn} to {$route['network']}
 pass out quick on {$if} from {$route['network']} to {$sa}/{$sn}
 
 EOD;
+			/* this would be a good place to insert code here to pass traffic from subnets to secondaries etc.*/
+	
 			}
 		}
 	}
 
+
+	/* pass traffic from/to secondary ip subnets and the firewall ip in that subnet only*/
+	if (is_array($config['secondaries']['secondary'])) {
+		$a_secondaries = &$config['secondaries']['secondary'];
+		foreach ($a_secondaries as $secondary) {
+			if (!ipv6enabled() && is_ipaddr6($secondary['ipaddr'])){
+				continue;
+			}
+			/*  this would be a good place to insert a nested foreach loop to pass traffic from secondary subnets to other secondary subnets etc.*/
+			$sif = $secondary['if'];
+			$if = $config['interfaces'][$sif]['if'];
+			$ip = $secondary['ipaddr'];
+			$sn = $secondary['prefix'];
+			if (is_ipaddr6($secondary['ipaddr'])) {
+				$sa = gen_subnet6($ip,$sn);
+			} else {
+				$sa = gen_subnet($ip,$sn);
+			}
+
+				$ipfrules .= <<<EOD
+
+pass in quick on {$if} from {$sa}/{$sn} to {$ip}/{$sn}
+pass in quick on {$if} from {$ip}/{$sn} to {$sa}/{$sn}
+pass out quick on {$if} from {$sa}/{$sn} to {$ip}/{$sn}
+pass out quick on {$if} from {$ip}/{$sn} to {$sa}/{$sn}
+
+EOD;
+		}
+	}
+	
+	
 	$ipfrules .= <<<EOD
 
 # WAN spoof check
@@ -634,8 +667,20 @@ block in $log quick on $wanif from 192.168.0.0/16 to any
 EOD;
 		} else {
 			/* source: /etc/rc.firewall6 */
+			
 			$ipfrules .= <<<EOD
+# Allow link-local on lan and opt interfaces
+pass in quick on $lanif from fe80::/10 to fe80::/10
+pass out quick on $lanif from fe80::/10 to fe80::/10
 
+EOD;
+			foreach ($optcfg as $on => $oc) {
+				$ipfrules .= "pass in quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
+				$ipfrules .= "pass out quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
+			}
+			
+			$ipfrules .= <<<EOD
+			
 # Stop site-local on the outside interface
 block in $log quick on $wanif from fec0::/10 to any
 block in $log quick on $wanif from any to fec0::/10
@@ -1073,10 +1118,11 @@ function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log, $ipv6 = 
 				$n--;
 			}
 		}
+
 		$ipfrules .= "skip 1 in on $if from $sa/$sn to any\n";
 		$ipfrules .= "block in $log quick on $if all\n";
 	} else {
-		$ipfrules .= "block in $log quick on $if from ! $sa/$sn to any\n";
+		$ipfrules .= "block in quick on $if from ! $sa/$sn to any\n";
 	}
 	
 	return $ipfrules;

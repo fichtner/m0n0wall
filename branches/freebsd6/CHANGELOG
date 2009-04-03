@@ -2,6 +2,11 @@ $Id:
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Open firewall rules for link-local ipv6 addresses on opt and lan interfaces
+  Initial basic support for secondary ip addresses
+  Suggested ipv6 addr fix and dhcpv6 fix
+  
+  
 - Include changelog update for previous commit
 
 - Add DHCPv6 support. requires dhcp6sd in /usr/local/sbin. Also modified is_ipaddr6 to return false if

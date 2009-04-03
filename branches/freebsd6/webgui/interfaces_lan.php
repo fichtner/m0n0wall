@@ -143,6 +143,8 @@ if ($_POST) {
 		else if ($v6changed)
 			interfaces_lan_configure6();
 		
+		interfaces_secondaries_configure('lan');
+		
 		$savemsg = get_std_save_message(0);
 		
 		if ($dhcpd_disabled)
@@ -175,6 +177,17 @@ function enable_change(enable_over) {
 <?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
+  <tr><td class="tabnavtbl">
+  <ul id="tabnav">
+    <li class="tabact">Primary configuration</li>
+	<li class="tabinact1"><a href="interfaces_secondaries.php?if=lan">Secondary IP's</a></li>
+  </ul>
+  </td></tr>
+  <tr> 
+    <td class="tabcont">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
             <form action="interfaces_lan.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
@@ -228,7 +241,7 @@ function enable_change(enable_over) {
 					Router advertisements are not enabled on WAN interface!
 	 				<?php else: ?>
 					<strong><?php echo suggest_ipv6_lan_addr() ?></strong><br>
-					This IPv6 address is suggested from listening to prefix advertisements recieved on the WAN interface, and using the first address available in that prefix.
+					This IPv6 Address is suggested from listening to prefix advertisements recieved on the WAN interface, and using the first address available in that prefix.
 					<?php endif; ?>
 					</td>
 	            </tr>
@@ -281,4 +294,5 @@ function enable_change(enable_over) {
 enable_change(false);
 //-->
 </script>
+</table>
 <?php include("fend.inc"); ?>
