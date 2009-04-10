@@ -173,6 +173,9 @@ require("guiconfig.inc");
 			  <br>
               Michael Iedema (<a href="mailto:michael@askozia.com">michael@askozia.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">CD-ROM to HD installation feature</font></em><br>
+			  <br>
+              Andrew White (<a href="mailto:andywhite@gmail.com">andywhite@gmail.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPv6 improvements</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
@@ -210,10 +213,6 @@ All rights reserved.<br>
               <br>
               Racoon (<a href="http://www.kame.net/racoon" target="_blank">http://www.kame.net/racoon</a>)<br>
               Copyright &copy; 1995-2002 WIDE Project. All rights reserved.<br>
-              <br>
-              msntp (<a href="http://www.hpcf.cam.ac.uk/export" target="_blank">http://www.hpcf.cam.ac.uk/export</a>)<br>
-              Copyright &copy; 1996, 1997, 2000 N.M. Maclaren, University of Cambridge. 
-              All rights reserved.<br>
               <br>
               UCD-SNMP (<a href="http://www.ece.ucdavis.edu/ucd-snmp" target="_blank">http://www.ece.ucdavis.edu/ucd-snmp</a>)<br>
               Copyright &copy; 1989, 1991, 1992 by Carnegie Mellon University.<br>

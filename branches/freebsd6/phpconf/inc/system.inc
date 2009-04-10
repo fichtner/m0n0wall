@@ -461,8 +461,8 @@ function system_ntp_configure() {
 	if ($g['booting'])
 		echo "Starting NTP client... ";
 	else {
-		killbypid("{$g['varrun_path']}/runmsntp.pid");
-		killbypid("{$g['varrun_path']}/msntp.pid");
+		killbypid("{$g['varrun_path']}/runsntp.pid");
+		killbypid("{$g['varrun_path']}/sntp.pid");
 	}
 
 	/* start ntp client if needed - needs to be forced into background */
@@ -476,9 +476,9 @@ function system_ntp_configure() {
 		foreach (explode(' ', $syscfg['timeservers']) as $ts)
 			$timeservers .= " " . $ts;
 		
-		mwexec_bg("/usr/local/bin/runmsntp.sh " .
-			escapeshellarg("{$g['varrun_path']}/runmsntp.pid") . " " .
-			escapeshellarg("{$g['varrun_path']}/msntp.pid") . " " .
+		mwexec_bg("/usr/local/bin/runsntp.sh " .
+			escapeshellarg("{$g['varrun_path']}/runsntp.pid") . " " .
+			escapeshellarg("{$g['varrun_path']}/sntp.pid") . " " .
 			escapeshellarg($updateinterval) . " " .
 			escapeshellarg($timeservers));
 	}

@@ -74,6 +74,7 @@ usr/sbin/diskinfo
 usr/sbin/hostapd
 usr/sbin/pwd_mkdb
 usr/sbin/rtadvd
+usr/sbin/sntp
 usr/sbin/traceroute
 usr/sbin/traceroute6
 
