@@ -182,7 +182,7 @@ function enable_change(enable_over) {
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabact">Primary configuration</li>
-	<li class="tabinact1"><a href="interfaces_secondaries.php?if=lan">Secondary IP's</a></li>
+	<li class="tabinact1"><a href="interfaces_secondaries.php?if=lan&amp;ifname=LAN">Secondary IPs</a></li>
   </ul>
   </td></tr>
   <tr> 
@@ -255,7 +255,7 @@ function enable_change(enable_over) {
 					<input type="checkbox" name="ipv6ram" id="ipv6ram" value="1" <?php if ($pconfig['ipv6ram']) echo "checked";?>> <strong>Managed address configuration</strong><br>
 					If this option is checked, other hosts on this interface will use DHCPv6 for address allocation and non address allocation configuration.<br>
 					<input type="checkbox" name="ipv6rao" id="ipv6rao" value="1" <?php if ($pconfig['ipv6rao']) echo "checked";?>> <strong>Other stateful configuration</strong><br>
-					If this option is checked, other hosts on this interface will use DHCPv6 for non address allocaiton configuration, such as DNS.
+					If this option is checked, other hosts on this interface will use DHCPv6 for non address allocation configuration, such as DNS.
                   </td>
                 </tr>
                 <?php endif; ?>

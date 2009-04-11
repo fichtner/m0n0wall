@@ -96,7 +96,7 @@ if ($_POST) {
 		
 		write_config();		
 		touch($d_sysrebootreqd_path);
-		header("Location: interfaces_secondaries.php?if=$if&ifname=$ifname");
+		header("Location: interfaces_secondaries.php?if=$if&ifname=" . urlencode($ifname));
 		exit;
 	}
 }
@@ -106,18 +106,19 @@ if ($_POST) {
             <form action="interfaces_secondaries_edit.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
 				<tr>
-                  <td width="22%" valign="top" class="vncellreq">IP Address</td>
+                  <td width="22%" valign="top" class="vncellreq">IP address</td>
                   <td width="78%" class="vtable">     
-				<?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>"
+				<?=$mandfldhtml;?><input name="ipaddr" type="text" class="formfld" id="ipaddr" size="20" value="<?=htmlspecialchars($pconfig['ipaddr']);?>">
+				/ 
+                <select name="prefix" class="formfld" id="prefix">
+                  <?php for ($i = (ipv6enabled() ? 128 : 32); $i > 0; $i--): ?>
+                  <option value="<?=$i;?>" <?php if ($i == $pconfig['prefix']) echo "selected"; ?>>
+                  <?=$i;?>
+                  </option>
+                  <?php endfor; ?>
+                </select>
     			</td>
                 </tr>
-				<tr>
-                  <td valign="top" class="vncellreq">Subnet/Prefix</td>
-                  <td class="vtable">
-                    <?=$mandfldhtml;?>/<input name="prefix" type="text" class="formfld" id="prefix" size="2" value="<?=htmlspecialchars($pconfig['prefix']);?>">
-                    <br>
-                    <span class="vexpl">IPv4 Subnet mask or IPv6 Prefix</span></td>
-			    </tr>
 				<tr>
                   <td width="22%" valign="top" class="vncell">Description</td>
                   <td width="78%" class="vtable"> 
@@ -136,7 +137,7 @@ if ($_POST) {
                     <input name="if" type="hidden" value="<?=$if;?>">
                     <?php endif; ?>
 					<?php if (isset($ifname)): ?>
-                    <input name="ifname" type="hidden" value="<?=$ifname;?>">
+                    <input name="ifname" type="hidden" value="<?=htmlspecialchars($ifname);?>">
                     <?php endif; ?>
                   </td>
                 </tr>

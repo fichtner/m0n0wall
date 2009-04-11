@@ -225,7 +225,7 @@ function enable_change(enable_over) {
 		  <tr><td class="tabnavtbl">
 		  <ul id="tabnav">
 			<li class="tabact">Primary configuration</li>
-			<li class="tabinact1"><a href="interfaces_secondaries.php?if=opt<?=$index?>">Secondary IP's</a></li>
+			<li class="tabinact1"><a href="interfaces_secondaries.php?if=opt<?=$index?>&amp;ifname=<?=urlencode("Optional $index (" . htmlspecialchars($optcfg['descr']) . ")"); ?>">Secondary IPs</a></li>
 		  </ul>
 		  </td></tr>
 		  <tr> 

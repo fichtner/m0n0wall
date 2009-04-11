@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Interfaces " . $_GET['ifname'], "Add Secondary IP addresses");
+$pgtitle = array("Interfaces", $_GET['ifname'], "Add secondary IP address");
 require("guiconfig.inc");
 
 if (!is_array($config['secondaries']['secondary']))
@@ -37,33 +37,12 @@ if (!is_array($config['secondaries']['secondary']))
 
 $a_secondaries = &$config['secondaries']['secondary'] ;
 
-function vlan_inuse($num) {
-	global $config, $g;
-
-	if ($config['interfaces']['lan']['if'] == "vlan{$num}")
-		return true;
-	if ($config['interfaces']['wan']['if'] == "vlan{$num}")
-		return true;
-	
-	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-		if ($config['interfaces']['opt' . $i]['if'] == "vlan{$num}")
-			return true;
-	}
-	
-	return false;
-}
-
-function renumber_vlan($if, $delvlan) {
-
-}
-
 if ($_GET['act'] == "del") {
-		unset($a_secondaries[$_GET['id']]);
-			write_config();
-			touch($d_sysrebootreqd_path);
-			header("Location: interfaces_secondaries.php?if=" . $_GET['if'] ."&ifname=" . $_GET['ifname']);
-			exit;
-
+	unset($a_secondaries[$_GET['id']]);
+	write_config();
+	touch($d_sysrebootreqd_path);
+	header("Location: interfaces_secondaries.php?if=" . $_GET['if'] ."&ifname=" . urlencode($_GET['ifname']));
+	exit;
 }
 
 ?>
@@ -73,16 +52,20 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
-    <li class="tabinact1"><a href="interfaces_<?=$_GET['ifname']; ?>.php">Primary configuration</a></li>
-    <li class="tabact">Secondary IP's</li>
+    <li class="tabinact1"><a href="<?php
+		if ($_GET['if'] == "lan")
+			echo "interfaces_lan.php";
+		else if (preg_match("/^opt(\d)$/", $_GET['if'], $matches))
+			echo "interfaces_opt.php?index=" . $matches[1];
+	?>">Primary configuration</a></li>
+    <li class="tabact">Secondary IPs</li>
   </ul>
   </td></tr>
   <tr> 
     <td class="tabcont">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
-                  <td width="20%" class="listhdrr">IP Address</td>
-                  <td width="20%" class="listhdrr">Mask/Prefix</td>
+                  <td width="20%" class="listhdrr">IP address</td>
                   <td width="50%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
@@ -90,28 +73,25 @@ if ($_GET['act'] == "del") {
 			 	if ($_GET['if'] == $secondary['if']) {?>
                 <tr>
                   <td class="listlr">
-					<?=htmlspecialchars($secondary['ipaddr']);?>
-                  </td>
-                  <td class="listr">
-					<?=htmlspecialchars($secondary['prefix']);?>
+					<?=htmlspecialchars($secondary['ipaddr']);?>/<?=htmlspecialchars($secondary['prefix']);?>
                   </td>
                   <td class="listbg">
                     <?=htmlspecialchars($secondary['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="interfaces_secondaries_edit.php?id=<?=$i;?>&ampif=<?=$_GET['if']?>&ampifname=<?$_GET['ifname']?>"><img src="e.gif" title="edit IP Address" width="17" height="17" border="0" alt="edit IP Address"></a>
-                     &nbsp;<a href="interfaces_secondaries.php?act=del&amp;id=<?=$i;?>&ampif=<?=$_GET['if']?>&ampifname=<?$_GET['ifname']?>" onclick="return confirm('Do you really want to delete this IP Address?')"><img src="x.gif" title="delete IP Address" width="17" height="17" border="0" alt="delete IP Address"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="interfaces_secondaries_edit.php?id=<?=$i;?>&amp;if=<?=$_GET['if']?>&amp;ifname=<?=urlencode($_GET['ifname'])?>"><img src="e.gif" title="edit IP Address" width="17" height="17" border="0" alt="edit IP Address"></a>
+                     &nbsp;<a href="interfaces_secondaries.php?act=del&amp;id=<?=$i;?>&amp;if=<?=$_GET['if']?>&amp;ifname=<?=urlencode($_GET['ifname'])?>" onclick="return confirm('Do you really want to delete this IP Address?')"><img src="x.gif" title="delete IP Address" width="17" height="17" border="0" alt="delete IP Address"></a></td>
 				</tr>
 				
 			  <?php } ; $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="3">&nbsp;</td>
-                  <td class="list"> <a href="interfaces_secondaries_edit.php?if=<?=$_GET['if']?>&ifname=<?=$_GET['ifname']?>"><img src="plus.gif" title="add IP Address" width="17" height="17" border="0" alt="add IP Address"></a></td>
+                  <td class="list" colspan="2">&nbsp;</td>
+                  <td class="list"> <a href="interfaces_secondaries_edit.php?if=<?=$_GET['if']?>&amp;ifname=<?=urlencode($_GET['ifname'])?>"><img src="plus.gif" title="add IP Address" width="17" height="17" border="0" alt="add IP Address"></a></td>
 				</tr>
 				<tr>
-				<td colspan="3" class="list"><span class="vexpl"><span class="red"><strong>
+				<td colspan="2" class="list"><span class="vexpl"><span class="red"><strong>
 				  Note:<br>
 				  </strong></span>
-				  Applying changes will reset the Firewall and may cause disconnection</span>
+				  Applying changes will reset the Firewall and may cause disconnection.</span>
 				  </td>
 				<td class="list">&nbsp;</td>
 				</tr>
