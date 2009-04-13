@@ -3,6 +3,15 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- avoid PEAR dependency and fix DHCPv6 range check when interface is not
+  configured with a v6 address
+
+- put logging back in for anti-spoof block rule
+
+
+1.3b16
+------
+
 - Open firewall rules for link-local ipv6 addresses on opt and lan interfaces
   Initial basic support for secondary ip addresses
   Suggested ipv6 addr fix and dhcpv6 fix

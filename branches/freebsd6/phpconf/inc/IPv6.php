@@ -177,8 +177,7 @@ class Net_IPv6 {
                 $addr = $elements[0];
                 $bits = $elements[1];
             } else {
-                require_once 'PEAR.php';
-                return PEAR::raiseError(NET_IPV6_NO_NETMASK_MSG, NET_IPV6_NO_NETMASK);
+                return null;
             }
         } else {
             $addr = $ip;
@@ -219,8 +218,7 @@ class Net_IPv6 {
                      $bits = $elements[1];
                 }
                 if(null == $bits) {
-                    require_once 'PEAR.php';
-                    return PEAR::raiseError(NET_IPV6_NO_NETMASK_MSG, NET_IPV6_NO_NETMASK);
+                    return false;
                 }
             }
         }

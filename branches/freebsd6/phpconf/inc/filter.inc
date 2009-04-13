@@ -1122,7 +1122,7 @@ function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log, $ipv6 = 
 		$ipfrules .= "skip 1 in on $if from $sa/$sn to any\n";
 		$ipfrules .= "block in $log quick on $if all\n";
 	} else {
-		$ipfrules .= "block in quick on $if from ! $sa/$sn to any\n";
+		$ipfrules .= "block in $log quick on $if from ! $sa/$sn to any\n";
 	}
 	
 	return $ipfrules;

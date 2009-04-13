@@ -611,7 +611,7 @@ function check_v6dhcp_range($if_ipaddr6, $if_subnet6, $v6range_from, $v6range_to
 	$input_errors = array();
 	$if_v6subnet = gen_subnet6($if_ipaddr6, $if_subnet6);
 	if (!isInNetmask6($v6range_from, $if_v6subnet, $if_subnet6) || !isInNetmask6($v6range_to, $if_v6subnet, $if_subnet6)) {
-		$input_errors[] = "The specified IPv6 range lies outside of the current subnet.";
+		$input_errors[] = "The specified IPv6 range lies outside of the current subnet (make sure the interface is configured with an IPv6 address before you enable the DHCP server).";
 	} else {
 		$v6range_from_array = explode(":",ipv6Uncompress($v6range_from));
 		$v6range_to_array = explode(":",ipv6Uncompress($v6range_to));
