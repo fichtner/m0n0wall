@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- updated base system to FreeBSD 6.4
+
 - avoid PEAR dependency and fix DHCPv6 range check when interface is not
   configured with a v6 address
 
