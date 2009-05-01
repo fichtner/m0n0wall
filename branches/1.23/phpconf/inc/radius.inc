@@ -255,7 +255,7 @@ class Auth_RADIUS extends PEAR {
     }
 
     /**
-     * Return our know attributes array received from the server.
+     * Return our known attributes array received from the server.
      *
      * @access public
      */
@@ -616,6 +616,18 @@ class Auth_RADIUS extends PEAR {
             $this->attributes['billing_class_of_service'] = radius_cvt_string($datav);
             break;
            }
+        }
+
+        if ($vendor == 14559) { /* RADIUS_VENDOR_ChilliSpot */
+
+            switch ($attrv) {
+            case 4: /* ChilliSpot-Bandwidth-Max-Up */
+            $this->attributes['bw_up'] = radius_cvt_int($datav);
+            break;
+            case 5: /* ChilliSpot-Bandwidth-Max-Down */
+            $this->attributes['bw_down'] = radius_cvt_int($datav);
+            break;
+            }
         }
 
                 break;
