@@ -532,7 +532,7 @@ class Net_IPv6 {
     function _bin2Ip($bin) {
         $ip = "";
         if(strlen($bin)<128) {
-            $bin = str_pad($str, 128, '0', STR_PAD_LEFT);
+            $bin = str_pad($bin, 128, '0', STR_PAD_LEFT);
         }
         $parts = Net_IPv6::pstr_split($bin, 16);
         foreach($parts as $v) {
