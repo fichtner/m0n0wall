@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- added device msk to kernel configuration
+
 - updated base system to FreeBSD 6.4
 
 - avoid PEAR dependency and fix DHCPv6 range check when interface is not
