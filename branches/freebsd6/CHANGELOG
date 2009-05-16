@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fixed bug with IPv6 subnets in firewall rules
+
 - added device msk to kernel configuration
 
 - updated base system to FreeBSD 6.4

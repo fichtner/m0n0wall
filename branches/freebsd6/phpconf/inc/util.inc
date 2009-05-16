@@ -181,6 +181,22 @@ function is_subnet($subnet) {
 	return true;
 }
 
+/* returns true if $subnet is a valid IPv6 subnet in CIDR format */
+function is_subnet6($subnet) {
+	if (!is_string($subnet))
+		return false;
+		
+	list($hp,$np) = explode('/', $subnet);
+	
+	if (!is_ipaddr6($hp))
+		return false;
+	
+	if (!is_numeric($np) || ($np < 1) || ($np > 128))
+		return false;
+		
+	return true;
+}
+
 /* returns true if $subnet is a valid subnet in CIDR format or an alias thereof */
 function is_subnetoralias($subnet) {
 	
@@ -384,7 +400,7 @@ function alias_expand($name) {
 	
 	if (isset($aliastable[$name]))
 		return $aliastable[$name];
-	else if (is_ipaddr($name) || is_subnet($name) || is_ipaddr6($name))
+	else if (is_ipaddr($name) || is_subnet($name) || is_ipaddr6($name) || is_subnet6($name))
 		return $name;
 	else
 		return null;
