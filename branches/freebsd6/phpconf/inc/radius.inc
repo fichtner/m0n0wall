@@ -33,7 +33,7 @@
     any other GPL-like (LGPL, GPL2) License.
 
         This version of RADIUS.php has been modified by
-        Jonathan De Graeve <jonathan@esstec.be> to integrate with M0n0wall <http://www.m0n0.ch/wall>
+        Jonathan De Graeve <m0n0wall@esstec.be> to integrate with M0n0wall <http://www.m0n0.ch/wall>
 
         Changes made include:
         * StandardAttributes for M0n0wall use
@@ -43,6 +43,7 @@
         * Adding of VENDOR Bay Networks (Nortel)
         * Adding of VENDOR Nomadix
         * Adding of VENDOR WISPr (Wi-Fi Alliance)
+        * Adding of VENDOR ChilliSpot (bandwidth-attributes only)
 
 */
 
@@ -153,7 +154,7 @@ class Auth_RADIUS extends PEAR {
      * @param  integer $maxtries     Max. retries for each request
      * @return void
      */
-    function addServer($servername = 'localhost', $port = 0, $sharedSecret = 'testing123', $timeout = 5, $maxtries = 3) 
+    function addServer($servername = 'localhost', $port = 0, $sharedSecret = 'testing123', $timeout = 3, $maxtries = 2) 
     {
         $this->_servers[] = array($servername, $port, $sharedSecret, $timeout, $maxtries);
     }
@@ -255,7 +256,7 @@ class Auth_RADIUS extends PEAR {
     }
 
     /**
-     * Return our know attributes array received from the server.
+     * Return our known attributes array received from the server.
      *
      * @access public
      */
@@ -616,6 +617,18 @@ class Auth_RADIUS extends PEAR {
             $this->attributes['billing_class_of_service'] = radius_cvt_string($datav);
             break;
            }
+        }
+
+        if ($vendor == 14559) { /* RADIUS_VENDOR_ChilliSpot */
+
+            switch ($attrv) {
+            case 4: /* ChilliSpot-Bandwidth-Max-Up */
+            $this->attributes['bw_up'] = radius_cvt_int($datav);
+            break;
+            case 5: /* ChilliSpot-Bandwidth-Max-Down */
+            $this->attributes['bw_down'] = radius_cvt_int($datav);
+            break;
+            }
         }
 
                 break;

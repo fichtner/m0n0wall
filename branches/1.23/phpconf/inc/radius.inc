@@ -43,7 +43,7 @@
         * Adding of VENDOR Bay Networks (Nortel)
         * Adding of VENDOR Nomadix
         * Adding of VENDOR WISPr (Wi-Fi Alliance)
-        * Adding of VENDOR ChilliSpot
+        * Adding of VENDOR ChilliSpot (bandwidth-attributes only)
 
 */
 
