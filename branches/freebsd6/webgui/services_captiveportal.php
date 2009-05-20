@@ -123,6 +123,9 @@ if ($_POST) {
 	if ($_POST['idletimeout'] && (!is_numeric($_POST['idletimeout']) || ($_POST['idletimeout'] < 1))) {
 		$input_errors[] = "The idle timeout must be at least 1 minute.";
 	}
+	if ($_POST['peruserbw'] && (!isset($config['shaper']['enable']))) {
+		$input_errors[] = "The Traffic shaper has to be enabled first.";
+	}
 	if ($_POST['bwdefaultdn'] && (!is_numeric($_POST['bwdefaultdn']) || ($_POST['bwdefaultdn'] < 16))) {
 		$input_errors[] = "The per-user bandwidth download speed must be at least 16.";
 	}
