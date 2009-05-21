@@ -337,6 +337,13 @@ function get_interface_info($ifdescr) {
 		    		endforeach; ?></td>
               </tr>
               <?php endif; ?>
+			  <?php if ($ifinfo['gateway']): ?>
+              <tr> 
+                <td width="22%" class="vncellt">IPv4 gateway</td>
+                <td width="78%" class="listr"> 
+                  <?=htmlspecialchars($ifinfo['gateway']);?>
+                  &nbsp; </td>
+              </tr><?php endif; ?>
 			  <?php if (!empty($ifaddr6s)): ?>
 					 <tr> 
 		                <td width="22%" class="vncellt">IPv6 address</td>
