@@ -52,6 +52,12 @@ function dynamic_menu(&$menu, $menu_title) {
         			$allowed[] = $item[0];
 		}
 	}
+
+	// Workaround for IPv6 pages
+	if (ipv6enabled() && in_array('firewall_rules.php', $allowed))
+		$allowed[] = 'firewall_rules.php?type=ipv6';
+	if (ipv6enabled() && in_array('system_routes.php', $allowed))
+		$allowed[] = 'system_routes.php?type=ipv6';
 	
 	foreach ($menu as $desc => $links) {
 		if ($intersect = array_intersect($menu[$desc],$allowed)) {
