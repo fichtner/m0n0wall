@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix DHCP lease page to only show the last lease for a given IP address
+  (see dhcpd.leases(5))
+
 - fix for IPv6 pages in user/group manager
 
 - show IPv4 gateway on Status: Interfaces page (was removed inadvertently)

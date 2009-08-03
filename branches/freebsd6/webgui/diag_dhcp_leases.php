@@ -93,47 +93,47 @@ while ($line = fgets($fp)) {
 fclose($fp);
 
 $leases = array();
-$i = 0;
 
 // Put everything together again
 while ($data = array_shift($return)) {
+	if ($data[0] == "lease") {
+		$d = array_shift($return);
+		$curlease = $d[0];
+		$leases[$curlease] = array();	/* newer lease for same IP overwrites older lease */
+		$leases[$curlease]['ip'] = $curlease;
+	}
 	if ($data[0] == "next") {
 		$d = array_shift($return);
 	}
-	if ($data[0] == "lease") {
-		$d = array_shift($return);
-		$leases[$i]['ip'] = $d[0];
-	}
 	if ($data[0] == "client-hostname") {
 		$d = array_shift($return);
-		$leases[$i]['hostname'] = $d[0];
+		$leases[$curlease]['hostname'] = $d[0];
 	}
 	if ($data[0] == "hardware") {
 		$d = array_shift($return);
 		if ($d[0] == "ethernet") {
 			$d = array_shift($return);
-			$leases[$i]['mac'] = $d[0];
+			$leases[$curlease]['mac'] = $d[0];
 		}
 	} else if ($data[0] == "starts") {
 		$d = array_shift($return);
 		$d = array_shift($return);
-		$leases[$i]['start'] = $d[0];
+		$leases[$curlease]['start'] = $d[0];
 		$d = array_shift($return);
-		$leases[$i]['start'] .= " " . $d[0];
+		$leases[$curlease]['start'] .= " " . $d[0];
 	} else if ($data[0] == "ends") {
 		$d = array_shift($return);
 		$d = array_shift($return);
-		$leases[$i]['end'] = $d[0];
+		$leases[$curlease]['end'] = $d[0];
 		$d = array_shift($return);
-		$leases[$i]['end'] .= " " . $d[0];
+		$leases[$curlease]['end'] .= " " . $d[0];
 	} else if ($data[0] == "binding") {
 		$d = array_shift($return);
 		if ($d[0] == "state") {
 			$d = array_shift($return);
-			$leases[$i]['act'] = $d[0];
+			$leases[$curlease]['act'] = $d[0];
 		}
-	} else if (($data[0] == "}") && ($data[1] == 1))		// End of group
-		$i++;
+	}
 }
 
 if ($_GET['order'])
