@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fixed problems when using advanced outbound NAT rules with destination
+  matching (non-FTP connections were processed by the ipnat FTP proxy,
+  leading to slowness, lost connections, rogue ICMP host unreachable
+  messages etc. because ipfilter requires an additional match statement
+  on the destination port when using proxies)
+
 - fix DHCP lease page to only show the last lease for a given IP address
   (see dhcpd.leases(5))
 

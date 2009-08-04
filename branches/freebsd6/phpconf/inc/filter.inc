@@ -134,7 +134,11 @@ function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true)
 	else
 		$tgt = "0/32";
 	
-	$natrule = "map $if $src $dst -> {$tgt} proxy port ftp ftp/tcp\n";
+	if (strpos($src, "from") !== false)
+		/* must explicitly match destination port when using from/to matching with proxy rules */
+		$natrule = "map $if $src $dst port = 21 -> {$tgt} proxy port 21 ftp/tcp\n";
+	else
+		$natrule = "map $if $src $dst -> {$tgt} proxy port 21 ftp/tcp\n";
 	
 	if ($portmap) {
 		$rangelow = 1024;
