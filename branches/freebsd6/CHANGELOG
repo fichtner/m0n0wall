@@ -3,6 +3,13 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix a problem with ipnat refusing to create new RDR translation entries
+  in the NAT table if a MAP entry exists for the same port, even though that
+  check is probably only meant to check for existing RDR entries. This
+  fixes issues with SIP communication when there is an inbound NAT
+  mapping for port 5060.
+  (see also http://marc.info/?l=ipfilter&m=121749272404107&w=2)
+
 - fixed problems when using advanced outbound NAT rules with destination
   matching (non-FTP connections were processed by the ipnat FTP proxy,
   leading to slowness, lost connections, rogue ICMP host unreachable

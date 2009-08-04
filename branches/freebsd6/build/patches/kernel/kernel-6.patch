@@ -308,8 +308,8 @@
  			} else {
  				if (ippr_ftp_debug > 1) {
  					printf("FIN: thseq %x seqoff %d ftps_seq %x %x\n",
---- sys/contrib/ipfilter/netinet/ip_nat.c.orig	2007-11-18 12:03:28.000000000 +0100
-+++ sys/contrib/ipfilter/netinet/ip_nat.c	2008-07-26 18:40:03.000000000 +0200
+--- sys/contrib/ipfilter/netinet/ip_nat.c.orig	2008-10-02 04:57:24.000000000 +0200
++++ sys/contrib/ipfilter/netinet/ip_nat.c	2009-08-04 23:00:53.000000000 +0200
 @@ -1678,6 +1678,9 @@
  
  	if (logtype != 0 && nat_logging != 0)
@@ -336,6 +336,15 @@
  
  			if (np->in_pnext > ntohs(np->in_pmax)) {
  				np->in_pnext = ntohs(np->in_pmin);
+@@ -2279,7 +2289,7 @@
+ 			     (u_int)fin->fin_p, inb, fin->fin_src);
+ 	fin->fin_data[0] = sp;
+ 	fin->fin_data[1] = dp;
+-	if (natl != NULL)
++	if (natl != NULL && natl->nat_redir == NAT_REDIRECT)
+ 		return -1;
+ 
+ 	nat->nat_inip.s_addr = htonl(in.s_addr);
 @@ -3793,7 +3803,7 @@
  
  	READ_ENTER(&ipf_nat);
