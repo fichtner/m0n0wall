@@ -32,7 +32,6 @@
 $pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
 
-$pconfig['filteringbridge_enable'] = isset($config['bridge']['filteringbridge']);
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
@@ -95,7 +94,6 @@ if ($_POST) {
 		$input_errors[] = "The outbound NAT port range start and end must be integers between 1 and 65535.";
 
 	if (!$input_errors) {
-		$config['bridge']['filteringbridge'] = $_POST['filteringbridge_enable'] ? true : false;
 		$oldcert = $config['system']['webgui']['certificate'];
 		$oldkey = $config['system']['webgui']['private-key'];
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
@@ -194,13 +192,12 @@ if ($_POST) {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
-                    <input name="filteringbridge_enable" type="checkbox" id="filteringbridge_enable" value="yes" <?php if ($pconfig['filteringbridge_enable']) echo "checked"; ?>>
                     <strong>Enable filtering bridge</strong><span class="vexpl"><br>
-                    This will cause bridged packets to pass through the packet 
-                    filter in the same way as routed packets do (by default bridged 
-                    packets are always passed). If you enable this option, you'll 
-                    have to add filter rules to selectively permit traffic from 
-                    bridged interfaces.</span></td>
+                    This is no longer available because it is not applicable with
+                    if_bridge, the new way of bridging in FreeBSD. Filtering always
+                    occurs on the member interfaces of the bridge. It is retained
+                    here as a notice for those accustomed to using this option.
+                    </span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>

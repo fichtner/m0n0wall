@@ -104,7 +104,7 @@ function is_numericint($arg) {
 	return (preg_match("/[^0-9]/", $arg) ? false : true);
 }
 
-/* returns true if $ipaddr is a valid dotted IPv4 address */
+/* returns true if $ipaddr is a valid IPv4 or IPv6 address */
 function is_ipaddr4or6($ipaddr) {
 	if (is_ipaddr($ipaddr)) 
 		return true;
@@ -113,6 +113,8 @@ function is_ipaddr4or6($ipaddr) {
 	else 
 		return false;	
 }
+
+/* returns true if $ipaddr is a valid dotted IPv4 address */
 function is_ipaddr($ipaddr) {
 	if (!is_string($ipaddr))
 		return false;
@@ -133,6 +135,24 @@ function is_ipaddr6($ipaddr) {
 	} else {
 	return false;
 	}
+}
+
+/* returns MTU of the interface */
+function get_interface_mtu($interface) {
+       $mtu = null;
+       $p = @popen("/sbin/ifconfig " . escapeshellarg($interface), "r");
+       if ($p === false)
+               return null;
+       while (!feof($p)) {
+               $line = fgets($p);
+               if (preg_match("/mtu (\d+)/", $line, $matches)) {
+                       $mtu = $matches[1];
+                       break;
+               }
+       }
+       pclose($p);
+       
+       return $mtu;
 }
 
 function isInNetmask6($ip, $netmask, $bits=null) {
@@ -332,6 +352,26 @@ function get_interface_list() {
 	}
 	
 	return $iflist;
+}
+
+/* convert friendly interface name (WAN, OPTx, etc.) to real interface (fxp0, ng0, etc.) */
+function convert_friendly_interface_to_real_interface_name($interface) {
+	global $config;
+	if($config['interfaces'][$interface]['ipaddr'] == "pppoe" or $config['interfaces'][$interface]['ipaddr'] == "pptp")
+		return "ng0";
+	$lc_interface = strtolower($interface);
+	if($lc_interface == "lan") return $config['interfaces']['lan']['if'];
+	if($lc_interface == "wan") return $config['interfaces']['wan']['if'];
+	$ifdescrs = array();
+	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++)
+		$ifdescrs['opt' . $j] = "opt" . $j;
+	foreach ($ifdescrs as $ifdescr => $ifname) {
+		if(strtolower($ifname) == $lc_interface)
+	    return $config['interfaces'][$ifname]['if'];
+		if(strtolower($config['interfaces'][$ifname]['descr']) == $lc_interface)
+			return $config['interfaces'][$ifname]['if'];
+   }
+   return $interface;
 }
 
 /* wrapper for exec() */

@@ -193,31 +193,12 @@ function interfaces_lan_configure6() {
 
 function interfaces_optional_configure() {
 	global $config, $g;
-	global $bridgeconfig;
-	
-	/* Reset bridge configuration.	Interfaces will add to it. */
-	$bridgeconfig = "";
 	
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 		interfaces_optional_configure_if($i);
 	}
 	
 	interfaces_optional_configure6();
-	
-	if ($bridgeconfig) {
-		/* Set the system bridge configuration and enable bridging. */
-		mwexec("/sbin/sysctl net.link.ether.bridge.config=" . $bridgeconfig);
-		
-		if (isset($config['bridge']['filteringbridge']))
-			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=1");
-		else
-			mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
-		
-		mwexec("/sbin/sysctl net.link.ether.bridge.enable=1");
-	} else {
-		mwexec("/sbin/sysctl net.link.ether.bridge.ipf=0");
-		mwexec("/sbin/sysctl net.link.ether.bridge.enable=0");
-	}
 	
 	if (!$g['booting']) {
 		/* reconfigure static routes (kernel may have deleted them) */
@@ -243,6 +224,116 @@ function interfaces_optional_configure() {
 	}
 	
 	return 0;
+}
+
+function interfaces_bridge_configure() {
+	global $config, $g;
+	// Setup the bridge sysctls to filter on member interfaces and not bridge itself
+	mwexec("/sbin/sysctl net.link.bridge.pfil_member=1");
+	mwexec("/sbin/sysctl net.link.bridge.pfil_bridge=0");
+	$bridge_if_num = -1;
+	$bridgearray = array();
+	$iflist = array("lan", "wan");
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+		if(isset($config['interfaces']['opt' . $i]['enable']))
+			$iflist['opt' . $i] = 'opt' . $i;
+	foreach($iflist as $if) {
+		// go through all interfaces and check for bridged interfaces
+		if ($config['interfaces'][$if]['bridge']) {
+			// this interface is bridged
+			$bridgefound = false;
+			if ($bridge_if_num == -1) {
+				// this is the first bridge, create the bridge0 interface
+				$bridge_if_num++;
+				$bridgearray[$bridge_if_num][] = convert_friendly_interface_to_real_interface_name($if);
+				$bridgearray[$bridge_if_num][] = convert_friendly_interface_to_real_interface_name($config['interfaces'][$if]['bridge']);
+			} else {
+				// additional bridge
+				// check if interface exists in another bridge
+				// since the same int can't be added to two bridges
+				$realif = convert_friendly_interface_to_real_interface_name($if);
+				$realifbridge = convert_friendly_interface_to_real_interface_name($config['interfaces'][$if]['bridge']);
+				for($x=0; $x <= $bridge_if_num; $x++) {
+					if (in_array($realif, $bridgearray[$x])) {
+						// the interface is already in this bridge
+						$bridgefound = true;
+						if (!in_array($realifbridge, $bridgearray[$x])) {
+							// bridged interface isn't already in this
+							// bridge, add it.
+							$bridgearray[$bridge_if_num][] = $realifbridge;
+						}
+					} else {
+						// see if the other member interface of the bridge is in existing bridge
+						if (in_array($realifbridge, $bridgearray[$x])) {
+							$bridgefound = true;
+							if (!in_array($realif, $bridgearray[$x])) {
+								// if real interface isn't already in
+								// this bridge, add it.
+								$bridgearray[$bridge_if_num][] = $realif;
+							}
+						}
+					}
+				}
+				if (!$bridgefound) {
+					// the interfaces of this bridge are not contained
+					// in any existing bridge. Add new bridge interface.
+					$bridge_if_num++;
+					$bridgearray[$bridge_if_num][] = convert_friendly_interface_to_real_interface_name($if);
+					$bridgearray[$bridge_if_num][] = convert_friendly_interface_to_real_interface_name($config['interfaces'][$if]['bridge']);
+				}
+			}
+		}
+	}
+	// at this point, $bridgearray is fully populated for the number of bridges the system requires.
+	// time to set them up.
+	for($x=0; $x <= $bridge_if_num; $x++) {
+		// destroy and create ifbridge interface
+		mwexec("/sbin/ifconfig bridge{$x} destroy");
+		mwexec("/sbin/ifconfig bridge{$x} create");
+		// log commands run for debugging in /tmp
+		$fd = fopen("{$g['tmp_path']}/bridge{$x}_config", "w");
+		fwrite($fd, "/sbin/ifconfig bridge{$x} destroy \n");
+		fwrite($fd, "/sbin/ifconfig bridge{$x} create \n");
+		$bridgecmd = "/sbin/ifconfig bridge{$x} ";
+		$lowestmtu = "1500";
+		
+		foreach ($bridgearray[$x] as $bridgeif) {
+			// iterate through all the interfaces in this bridge
+			// append to the bridgecmd for this interface
+			$bridgecmd .= " addm $bridgeif ";
+			// get MTU for this interface
+			$mtu = get_interface_mtu($bridgeif);
+			if (intval($mtu) == 0) {
+				syslog(LOG_ERR, "An error occurred while trying to obtain the MTU setting for $bridgeif.  Using 1500.");
+				$mtu = "1500";
+			} else {
+				if (intval($mtu) < intval($lowestmtu))
+					$lowestmtu = $mtu;
+			}
+		}
+		
+		// force all bridged interfaces to same MTU, the lowest common denominator
+		foreach ($bridgearray[$x] as $bridgeif) {
+			mwexec("/sbin/ifconfig {$bridgeif} mtu {$lowestmtu}");
+			fwrite($fd, "/sbin/ifconfig {$bridgeif} mtu {$lowestmtu} \n");
+		}
+		
+		// bring up each interface
+		foreach ($bridgearray[$x] as $bridgeif) {
+			mwexec("/sbin/ifconfig {$bridgeif} up");
+			fwrite($fd, "/sbin/ifconfig {$bridgeif} up \n");
+		}
+		
+		// setup the bridge
+		mwexec("{$bridgecmd}");
+		fwrite($fd, "{$bridgecmd} \n");
+		
+		// in FreeBSD 6.x, without a final separate "up", it won't work
+		mwexec("/sbin/ifconfig bridge{$x} up");
+		fwrite($fd, "/sbin/ifconfig bridge{$x} up");
+		
+		fclose($fd);
+	}
 }
 
 function interfaces_optional_configure6() {
@@ -302,19 +393,7 @@ function interfaces_optional_configure_if($opti) {
 	
 		/* bridged? */
 		if ($optcfg['bridge']) {
-			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
-				" delete up");
-
-			/* ensure that hardware TX/RX checksumming is off for bridged interfaces */
-			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " -rxcsum -txcsum");
-			mwexec("/sbin/ifconfig " . escapeshellarg($config['interfaces'][$optcfg['bridge']]['if']) . " -rxcsum -txcsum");
-			
-			if ($bridgeconfig != "")
-				$bridgeconfig .= ",";
-			
-			$bridgeconfig .= $optcfg['if'] . ":" . $opti . "," .
-				$config['interfaces'][$optcfg['bridge']]['if'] .
-				":" . $opti;
+			interfaces_bridge_configure();
 		} else {
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " " . 
 				escapeshellarg($optcfg['ipaddr'] . "/" . $optcfg['subnet']) . $addflags);

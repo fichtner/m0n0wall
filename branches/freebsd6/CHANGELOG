@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Convert from BRIDGE to if_bridge. Remove multi-interface bridge check, 
+  and checkbox under System > Advanced for filtering bridge since member 
+  interfaces will always be filtered. 
+
 - fix a problem with ipnat refusing to create new RDR translation entries
   in the NAT table if a MAP entry exists for the same port, even though that
   check is probably only meant to check for existing RDR entries. This

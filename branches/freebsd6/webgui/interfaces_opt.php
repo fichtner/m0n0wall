@@ -86,24 +86,6 @@ if ($_POST) {
 		}
 		
 		if ($_POST['bridge']) {
-			/* double bridging? */
-			for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-				if ($i != $index) {
-					if ($config['interfaces']['opt' . $i]['bridge'] == $_POST['bridge']) {
-						$input_errors[] = "Optional interface {$i} " . 
-							"({$config['interfaces']['opt' . $i]['descr']}) is already bridged to " .
-							"the specified interface.";
-					} else if ($config['interfaces']['opt' . $i]['bridge'] == "opt{$index}") {
-						$input_errors[] = "Optional interface {$i} " . 
-							"({$config['interfaces']['opt' . $i]['descr']}) is already bridged to " .
-							"this interface.";
-					}
-				}
-			}
-			if ($config['interfaces'][$_POST['bridge']]['bridge']) {
-				$input_errors[] = "The specified interface is already bridged to " .
-					"another interface.";
-			}
 			/* captive portal on? */
 			if (isset($config['captiveportal']['enable'])) {
 				$input_errors[] = "Interfaces cannot be bridged while the captive portal is enabled.";
