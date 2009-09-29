@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix security issue in ISC DHCP client
+
 - Change radius timeout/maxtries from 5/3 to 3/2 reducing failover time from 30 to 15 seconds
 
 - Added radius attribute support for: ChilliSpot-Bandwidth-Max-Up/ChilliSpot-Bandwidth-Max-Down

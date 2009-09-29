@@ -1,0 +1,11 @@
+--- contrib/isc-dhcp/client/dhclient.c.orig	Mon Mar 24 00:33:05 2003
++++ contrib/isc-dhcp/client/dhclient.c	Tue Sep 29 23:00:09 2009
+@@ -2467,6 +2467,8 @@
+ 		if (data.len > 3) {
+ 			struct iaddr netmask, subnet, broadcast;
+ 
++			if (data.len > sizeof netmask.iabuf)
++			    data.len = sizeof netmask.iabuf;
+ 			memcpy (netmask.iabuf, data.data, data.len);
+ 			netmask.len = data.len;
+ 			data_string_forget (&data, MDL);
