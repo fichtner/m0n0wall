@@ -3,6 +3,24 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+1.3
+---
+
+- fixed DHCP server "deny unknown clients" option with known clients
+  without a statically assigned IP address
+
+- fixed a security issue in the DHCP client (CVE-2009-0692)
+
+
+1.3b18
+------
+
+- fix broken IPsec support (missing library)
+
+
+1.3b17
+------
+
 - Convert from BRIDGE to if_bridge. Remove multi-interface bridge check, 
   and checkbox under System > Advanced for filtering bridge since member 
   interfaces will always be filtered. 
