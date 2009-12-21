@@ -35,6 +35,7 @@ require("guiconfig.inc");
 $pconfig['enable'] = isset($config['dnsmasq']['enable']);
 $pconfig['regdhcp'] = isset($config['dnsmasq']['regdhcp']);
 $pconfig['allservers'] = isset($config['dnsmasq']['allservers']);
+$pconfig['strictorder'] = isset($config['dnsmasq']['strictorder']);
 
 if (!is_array($config['dnsmasq']['hosts'])) {
 	$config['dnsmasq']['hosts'] = array();
@@ -54,6 +55,7 @@ if ($_POST) {
 	$config['dnsmasq']['enable'] = ($_POST['enable']) ? true : false;
 	$config['dnsmasq']['regdhcp'] = ($_POST['regdhcp']) ? true : false;
 	$config['dnsmasq']['allservers'] = ($_POST['allservers']) ? true : false;
+	$config['dnsmasq']['strictorder'] = ($_POST['strictorder']) ? true : false;
 
 	write_config();
 	
@@ -112,6 +114,13 @@ if ($_GET['act'] == "del") {
 					  it will send queries to just one server. Setting this flag forces all
 					  queries to all available servers. The reply from the server
 					  which answers first will be returned to the original requestor. </td>
+                </tr>
+				<td class="vtable">
+                      <input name="strictorder" type="checkbox" id="strictorder" value="yes" <?php if ($pconfig['strictorder']) echo "checked";?>>
+                      <strong>Strict Order</strong><br>
+					  By default, dnsmasq will send queries to any of the upstream servers it
+					  knows about and tries to favour servers that are known to be up. Setting
+					  this flag forces dnsmasq to try each query with each server strictly in order.</td>
                 </tr>
                 <tr> 
                   <td class="vtable">

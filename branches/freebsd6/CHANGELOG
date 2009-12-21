@@ -2,6 +2,12 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add 'strict order' to DNS forwarder.  Useful when using Sixxs DNS.  Use Sixxs as
+  primary and isp as secondary, Then when tunnel is up, you get google via ipv6.
+  see http://www.sixxs.net/tools/dnscache/ , you must have isp or similar dns as
+  tunnel won't come up without working dns.
+- Allow ipv6 addresses for domain overrides in Dns Forwarder options.
+- Add note about using /48's for LAN ip's, typical when using Sixxs.
 
 1.3
 ---

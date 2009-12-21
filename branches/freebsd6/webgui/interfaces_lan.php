@@ -232,7 +232,8 @@ function enable_change(enable_over) {
                       <?=$i;?>
                       </option>
                       <?php endfor; ?>
-                    </select></td>
+                    </select><br>
+					   Using a number less than /64 will cause RA's not to be announced as there aren't enough subnet bits. i.e. /48</td>
                 </tr>
 				<tr> 
 	                <td valign="top" class="vncellreq">Suggested IPv6 address</td>

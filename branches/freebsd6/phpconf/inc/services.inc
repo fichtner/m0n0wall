@@ -507,6 +507,10 @@ function services_dnsmasq_configure() {
 			$args .= " --all-servers";
 		}
 		
+		if (isset($config['dnsmasq']['strictorder'])) {
+			$args .= " --strict-order";
+		}
+		
 		if (isset($config['dnsmasq']['domainoverrides']) && is_array($config['dnsmasq']['domainoverrides'])) {
 			foreach($config['dnsmasq']['domainoverrides'] as $override) {
 				$args .= " " . escapeshellarg('--server=/' . $override['domain'] . '/' . $override['ip']);
