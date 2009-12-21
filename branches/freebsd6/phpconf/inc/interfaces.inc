@@ -1148,8 +1148,10 @@ function get_real_wan_interface($ipv6 = false) {
 	if ($ipv6) {
 		if ($wancfg['ipaddr6'] == "6to4")
 			$wanif = "stf0";
-		else if ($wancfg['ipaddr6'] == "aiccu")
+		else if ($wancfg['ipaddr6'] == "aiccu" && !isset($config['interfaces']['wan']['aiccu']['ayiya']))
 			$wanif = "gif0";
+		else if ($wancfg['ipaddr6'] == "aiccu" && isset($config['interfaces']['wan']['aiccu']['ayiya']))
+			$wanif = "tun0";
 		else if ($wancfg['tunnel6'])
 			$wanif = "gif0";
 		else if ($wancfg['ipaddr6'] == "ppp")

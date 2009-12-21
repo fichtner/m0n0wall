@@ -75,6 +75,7 @@ if (ipv6enabled()) {
 			$pconfig['aiccu_username'] = $wancfg['aiccu']['username'];
 			$pconfig['aiccu_password'] = $wancfg['aiccu']['password'];
 			$pconfig['aiccu_tunnelid'] = $wancfg['aiccu']['tunnelid'];
+			$pconfig['aiccu_ayiya'] = isset($wancfg['aiccu']['ayiya']);
 		}
 	} else if ($wancfg['ipaddr6']) {
 		$pconfig['ipaddr6'] = $wancfg['ipaddr6'];
@@ -201,7 +202,8 @@ if ($_POST) {
 		unset($config['aiccu']['username']);
 		unset($config['aiccu']['password']);
 		unset($config['aiccu']['tunnelid']);
-	
+		unset($config['aiccu']['aiccu_ayiya']);
+		
 		if ($_POST['type'] == "Static") {
 			$wancfg['ipaddr'] = $_POST['ipaddr'];
 			$wancfg['subnet'] = $_POST['subnet'];
@@ -246,6 +248,7 @@ if ($_POST) {
 				$wancfg['aiccu']['username'] = $_POST['aiccu_username'];
 				$wancfg['aiccu']['password'] = $_POST['aiccu_password'];
 				$wancfg['aiccu']['tunnelid'] = $_POST['aiccu_tunnelid'];
+				$wancfg['aiccu']['ayiya']  = $_POST['aiccu_ayiya'] ? true : false;
 			}
 		}
 			
@@ -275,6 +278,7 @@ function enable_change(enable_over) {
 	document.iform.aiccu_username.disabled = !aiccu_en;
 	document.iform.aiccu_password.disabled = !aiccu_en;
 	document.iform.aiccu_tunnelid.disabled = !aiccu_en;
+	document.iform.aiccu_ayiya.disabled = !aiccu_en;
 	document.iform.ipv6ra.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
 <?php endif; ?>
 	
@@ -521,9 +525,13 @@ function type_change() {
                         <td>Password:&nbsp;&nbsp;</td>
                         <td><input name="aiccu_password" type="text" class="formfld" id="aiccu_password" size="20" value="<?=htmlspecialchars($pconfig['aiccu_password']);?>"></td>
 					  </tr>
-                      <tr> 
+					  <tr> 
                         <td>Tunnel ID:&nbsp;&nbsp;</td>
                         <td><input name="aiccu_tunnelid" type="text" class="formfld" id="aiccu_tunnelid" size="10" value="<?=htmlspecialchars($pconfig['aiccu_tunnelid']);?>"></td>
+					  </tr>
+                      <tr> 
+	                    <td>AYIYA:&nbsp;&nbsp;</td>
+	                    <td><input type="checkbox" name="aiccu_ayiya" id="aiccu_ayiya" value="1" <?php if ($pconfig['aiccu_ayiya']) echo "checked";?>></td>
 					  </tr>
                     </table><br>
 					Enter your SixXS account information here (only when using AICCU).

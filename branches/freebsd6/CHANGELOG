@@ -2,6 +2,11 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+---
+- add initial support for AYIYA in aiccu for Sixxs tunnels
+
+---
 - add 'strict order' to DNS forwarder.  Useful when using Sixxs DNS.  Use Sixxs as
   primary and isp as secondary, Then when tunnel is up, you get google via ipv6.
   see http://www.sixxs.net/tools/dnscache/ , you must have isp or similar dns as

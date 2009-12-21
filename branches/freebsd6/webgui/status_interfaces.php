@@ -239,9 +239,19 @@ function get_interface_info($ifdescr) {
 					}
 
 					/* GRE tunnel on WAN? need to run ifconfig on gif0 then */
-					if ($config['interfaces']['wan']['tunnel6'] || $config['interfaces']['wan']['ipaddr6'] == "aiccu") {
+					if ($config['interfaces']['wan']['tunnel6'] || ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && !isset($config['interfaces']['wan']['aiccu']['ayiya']) ) ) {
 						unset($ifconfiginfo);
 						exec("/sbin/ifconfig gif0", $ifconfiginfo);
+
+						foreach ($ifconfiginfo as $ici) {
+							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
+							}
+						}
+					}
+					if ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && isset($config['interfaces']['wan']['aiccu']['ayiya']) ) {
+						unset($ifconfiginfo);
+						exec("/sbin/ifconfig tun0", $ifconfiginfo);
 
 						foreach ($ifconfiginfo as $ici) {
 							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
