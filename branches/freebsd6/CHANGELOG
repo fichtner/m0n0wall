@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 ---
+- fix for dhcpdv6 firewall rule
+
+---
 - added log :-)
 
 ---

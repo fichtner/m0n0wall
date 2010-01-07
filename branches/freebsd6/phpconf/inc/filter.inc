@@ -466,6 +466,26 @@ pass out quick on {$oc['if']} proto udp from {$oc['ip']} port = 67 to any port =
 EOD;
 			}
 		}
+	} else {
+		$ipfrules .= <<<EOD
+		
+# allow access to DHCPv6 server on LAN
+pass in quick on $lanif proto udp from any port = 546 to ff02::1:2 port = 547
+
+EOD;
+		/* allow access to DHCP server on optional interfaces */
+		foreach ($optcfg as $on => $oc) {
+			if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
+					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
+
+				$ipfrules .= <<<EOD
+
+# allow access to DHCP server on {$on}
+pass in quick on {$oc['if']} proto udp from any port = 546 to ff02::1:2 port = 547
+
+EOD;
+			}
+		}
 	}
 	
 	if ($ipv6) {
