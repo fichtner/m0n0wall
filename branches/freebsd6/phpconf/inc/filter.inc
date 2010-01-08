@@ -469,12 +469,19 @@ EOD;
 	} else {
 		$ipfrules .= <<<EOD
 		
+# allow link-local traffic on LAN
+pass in quick on $lanif from fe80::/10 to fe80::/10
+pass out quick on $lanif from fe80::/10 to fe80::/10
+		
 # allow access to DHCPv6 server on LAN
 pass in quick on $lanif proto udp from any port = 546 to ff02::1:2 port = 547
 
 EOD;
 		/* allow access to DHCP server on optional interfaces */
 		foreach ($optcfg as $on => $oc) {
+			$ipfrules .= "# allow link-local traffic on {$on}";
+			$ipfrules .= "pass in quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
+			$ipfrules .= "pass out quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
 			if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
 					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
 
@@ -692,16 +699,6 @@ EOD;
 		} else {
 			/* source: /etc/rc.firewall6 */
 			
-			$ipfrules .= <<<EOD
-# Allow link-local on lan and opt interfaces
-pass in quick on $lanif from fe80::/10 to fe80::/10
-pass out quick on $lanif from fe80::/10 to fe80::/10
-
-EOD;
-			foreach ($optcfg as $on => $oc) {
-				$ipfrules .= "pass in quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
-				$ipfrules .= "pass out quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
-			}
 			
 			$ipfrules .= <<<EOD
 			

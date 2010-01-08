@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 ---
+- fix to allow linklocal addresses to communicate
+---
 - fix for dhcpdv6 firewall rule
 
 ---
