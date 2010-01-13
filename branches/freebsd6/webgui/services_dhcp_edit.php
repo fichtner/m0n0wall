@@ -78,8 +78,11 @@ if ($_POST) {
 	if (($_POST['ipaddr'] && !is_ipaddr4or6($_POST['ipaddr']))) {
 		$input_errors[] = "A valid IP address must be specified.";
 	}
-	if (($_POST['mac'] && !is_macaddr($_POST['mac']))) {
+	if (($_POST['mac'] && is_ipaddr($_POST['ipaddr']) && !is_macaddr($_POST['mac']))) {
 		$input_errors[] = "A valid MAC address must be specified.";
+	}
+	if (($_POST['mac'] && is_ipaddr6($_POST['ipaddr']) && (!is_macaddr($_POST['mac']) && !is_duid($_POST['mac'])))) {
+		$input_errors[] = "A valid MAC address or DUID must be specified.";
 	}
 	if ($_POST['nextserver'] && !is_ipaddr($_POST['nextserver'])) {
 		$input_errors[] = "A valid next server IP address must be specified.";

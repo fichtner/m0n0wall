@@ -280,6 +280,26 @@ function is_macaddr($macaddr) {
 	return true;
 }
 
+/* returns true if $duid is a valid DUID address */
+/* RFC3315 says that a 'servers MUST NOT restrict DUIDs to the types in this Document' which means the length could be anything, though a mac length is a good min*/
+function is_duid($duid) {
+	if (!is_string($duid))
+		return false;
+		
+	$duida = explode(":", $duid);
+	if (count($duida) < 7)
+		return false;
+	
+	foreach ($duida as $duidl) {
+		if (($duidl === "") || (strlen($duidl) > 2))
+			return false;
+		if (preg_match("/[^0-9a-f]/i", $duidl))
+			return false;
+	}
+	
+	return true;
+}
+
 /* returns true if $name is a valid name for an alias */
 function is_validaliasname($name) {
 	if (!preg_match("/[^a-zA-Z0-9-]/", $name))

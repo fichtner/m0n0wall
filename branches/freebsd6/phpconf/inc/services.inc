@@ -92,16 +92,16 @@ EOD;
 			
 		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
 			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $dhcpifconf['dnsserver'];
-			if (isipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . " ;\n";
-			if (isipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
-			if (isipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . " ;\n";
+			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3'] . ";\n";
 		} else if (isset($config['dnsmasq']['enable'])) {
 			$dnscfg .= "option domain-name-servers " . $ifcfg['ipaddr6'] . ";\n";
 		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
 			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $syscfg['dnsserver'];
-			if (isipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . ";\n";
-			if (isipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
-			if (isipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3']  . ";\n";
+			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3']  . ";\n";
 		}
 		$dhcp6sconf .= <<<EOD
 $dnscfg
@@ -271,21 +271,23 @@ EOD;
 		
 			$i = 0;
 			foreach ($dhcpifconf['staticmap'] as $sm) {
-				$dhcpdconf .= <<<EOD
+				if (!is_ipaddr6($sm['ipaddr'])) {
+					$dhcpdconf .= <<<EOD
 host s_{$dhcpif}_{$i} {
 	hardware ethernet {$sm['mac']};
 
 EOD;
-				if ($sm['ipaddr'])
-					$dhcpdconf .= "	fixed-address {$sm['ipaddr']};\n";
+					if ($sm['ipaddr'])
+						$dhcpdconf .= "	fixed-address {$sm['ipaddr']};\n";
 
-				if ($sm['next-server'])
-					$dhcpdconf .= "	next-server {$sm['next-server']};\n";
-				if ($sm['filename'])
-					$dhcpdconf .= "	filename \"{$sm['filename']}\";\n";
+					if ($sm['next-server'])
+						$dhcpdconf .= "	next-server {$sm['next-server']};\n";
+					if ($sm['filename'])
+						$dhcpdconf .= "	filename \"{$sm['filename']}\";\n";
 				
-				$dhcpdconf .= "}\n";
-				$i++;
+					$dhcpdconf .= "}\n";
+					$i++;
+				}
 			}
 		}
 		

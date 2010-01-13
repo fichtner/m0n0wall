@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 ---
+- fix to adding dhcpv6 reservation is also added to dhcpv4
+- allow input of duid in mac address field to a dhcpv6 reservation
+---
 - fix to allow linklocal addresses to communicate
 ---
 - fix for dhcpdv6 firewall rule
