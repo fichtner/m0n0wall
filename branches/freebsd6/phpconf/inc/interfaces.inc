@@ -824,15 +824,18 @@ EOD;
 }
 
 function interfaces_wan_dhcp_down() {
-	mwexec("/sbin/dhclient -r");
-
+	global $g;
+	mwexec("/sbin/dhclient -r -nw -cf {$g['varetc_path']}/dhclient.conf -sf /sbin/dhclient-script ");
 	sleep(3);
+	/*make sure dhclient is killed and remove pid*/
+	mwexec("/usr/bin/killall dhclient");
+	unlink_if_exists("{$g['varrun_path']}/dhclient.pid");
 }
 
 function interfaces_wan_dhcp_up() {
 	interfaces_wan_dhcp_configure();
 
-	sleep(3);
+	sleep(10);
 }
 
 function interfaces_wan_pppoe_configure() {
