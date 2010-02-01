@@ -659,6 +659,7 @@ EOD;
 
 	/* LAN spoof check */
 	/* omit if any interface is bridged to LAN and the filtering bridge is on */
+	/* skip imposing spoof check if 'Disable Spoof Check On Bridge' is enabled */
 	$lanbridge = false;
 	foreach ($optcfg as $on => $oc) {
 		if ($oc['bridge'] && $oc['bridge_if'] == "lan") {
@@ -666,7 +667,7 @@ EOD;
 			break;
 		}
 	}
-	if (!$lanbridge || !isset($config['bridge']['filteringbridge']))
+	if (!$lanbridge || (!isset($config['bridge']['filteringbridge']) && !isset($config['bridge']['nospoofcheck'])))
 		$ipfrules .= filter_rules_spoofcheck_generate('lan', $lanif, $lansa, $lansn, $log, $ipv6);
 
 	/* OPT spoof check */
@@ -680,7 +681,7 @@ EOD;
 			}
 		}
 		
-		if ($oc['ip'] && !(($oc['bridge'] || $isbridged) && isset($config['bridge']['filteringbridge'])))
+		if ($oc['ip'] && !(($oc['bridge'] || $isbridged) && (isset($config['bridge']['filteringbridge']) || isset($config['bridge']['nospoofcheck'])) ))
 			$ipfrules .= filter_rules_spoofcheck_generate($on, $oc['if'], $oc['sa'], $oc['sn'], $log, $ipv6);
 	}
 	

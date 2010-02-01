@@ -31,7 +31,7 @@
 
 $pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
-
+$pconfig['nospoofcheck'] = isset($config['bridge']['nospoofcheck']);
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
@@ -94,6 +94,7 @@ if ($_POST) {
 		$input_errors[] = "The outbound NAT port range start and end must be integers between 1 and 65535.";
 
 	if (!$input_errors) {
+		$config['bridge']['nospoofcheck'] = $_POST['nospoofcheck'] ? true : false;
 		$oldcert = $config['system']['webgui']['certificate'];
 		$oldkey = $config['system']['webgui']['private-key'];
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
@@ -197,6 +198,23 @@ if ($_POST) {
                     if_bridge, the new way of bridging in FreeBSD. Filtering always
                     occurs on the member interfaces of the bridge. It is retained
                     here as a notice for those accustomed to using this option.
+                    </span></td>
+                </tr>
+                
+				<tr> 
+                  <td colspan="2" class="list" height="12"></td>
+                </tr>
+				<tr> 
+                  <td colspan="2" valign="top" class="listtopic">Spoof Checking</td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">&nbsp;</td>
+                  <td width="78%" class="vtable"> 
+				    <input name="nospoofcheck" type="checkbox" id="nospoofcheck" value="yes" <?php if ($pconfig['nospoofcheck']) echo "checked"; ?>>
+                    <strong>Disable Spoof Checking On Bridge</strong><span class="vexpl"><br>
+                    Spoof Checking blocks packets not sourced from the subnet of the
+					interface the packet was recieved on.<br>
+					Disabling this will only effect bridged interfaces.
                     </span></td>
                 </tr>
                 <tr> 

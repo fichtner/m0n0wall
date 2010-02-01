@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 ---
+- add option to disable spoof check on Bridge, removal of filtered bridge
+  causes non-m0n0wall dhcp servers to break, and some multicast traffic.
+---
 - fix to WAN dhcp, cleanup dhclient pid and specify dhclient-script location.
 ---
 - fix to adding dhcpv6 reservation is also added to dhcpv4
