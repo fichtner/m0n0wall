@@ -360,3 +360,19 @@ ul#tabnav li.tabact {
 	padding-top: 12px;
 	padding-bottom: 12px;
 }
+.listsensorval {
+	margin: 0px;
+	font-size: 11px;
+	white-space: nowrap;
+	color: #3366FF;
+	padding-left: 4px;
+}
+.listsensor {
+	margin: 0px;
+	border: 1px solid #C0C0C0;
+	font-size: 11px;
+	padding-top: 0px;
+	white-space: nowrap;
+	color: #808080;
+	padding-right: 4px;
+}
