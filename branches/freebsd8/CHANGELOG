@@ -1,4 +1,5 @@
 $Id$
+small change to howto
 
 add first draft of (incomplete) instructions to build generic-pc cdrom image
 add some files required to build under nanobsd and fbsd 8.0
