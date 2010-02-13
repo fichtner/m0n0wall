@@ -1,0 +1,194 @@
+Install i386 Freebsd 8.0 with plenty of space
+Choose Developer
+login. as root do all the below;
+
+-------
+
+cd /usr/src/tools/tools/nanobsd/
+mkdir m0n0cd
+cd m0n0cd
+pkg_add -r subversion
+pkg_add -r cdrtools
+pkg_add -r curl
+
+rehash
+svn export http://svn.m0n0.ch/wall/branches/freebsd8/
+cp  freebsd8/build .
+cp -r freebsd8/build/Files .
+
+mkdir build/Files/etc
+cp -r freebsd8/phpconf/* build/Files/etc
+mkdir Files/etc/rc.d/
+mv Files/etc/rc.bootup Files/etc/rc.d/
+
+mkdir -p  build/Files/usr/local/www/
+cp -r freebsd8/webgui/ build/Files/usr/local/www/
+chmod -R 0755 build/Files/*
+cp -r freebsd8/captiveportal/ build/Files/usr/local/captiveportal
+chmod -R 0755 build/Files/usr/local/captiveportal
+
+cd build/Files
+mkdir bin cf conf conf.default dev etc ftmp mnt modules proc root sbin tmp usr var
+mkdir etc/inc
+ln -s /cf/conf conf
+cd usr
+mkdir bin lib libexec local sbin share
+cd local
+mkdir bin captiveportal lib sbin www
+ln -s /var/run/htpasswd www/.htpasswd
+cd ../../../..
+echo "generic-pc-cdrom" > Files/etc/platform
+date > Files/etc/version.buildtime
+echo "2.0rc1" > Files/etc/version
+curl http://m0n0.ch/wall/downloads/config.xml > Files/conf.default/config.xml
+cp Files/conf.default/config.xml Files/conf/config.xml
+mkdir Files/usr/share/misc
+cp /usr/share/misc/termcap Files/usr/share/misc
+cp zoneinfo.tgz Files/usr/share/
+
+
+cd Pkg
+wget ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.0-release/Latest/mbmon.tbz
+
+cd ..
+mkdir tmp
+cd tmp
+
+pkg_add -r autoconf213
+rm /usr/local/bin/autoconf
+rm /usr/local/bin/autoheader
+ln -s /usr/local/bin/autoconf-2.13 /usr/local/bin/autoconf
+ln -s /usr/local/bin/autoheader-2.13 /usr/local/bin/autoheader
+wget http://dk.php.net/distributions/php-4.4.9.tar.bz2
+tar -zxf php-4.4.9.tar.bz2
+cd php-4.4.9/ext/
+wget http://pecl.php.net/get/radius-1.2.5.tgz
+tar -zxf radius-1.2.5.tgz
+mv radius-1.2.5 radius
+cd ..
+./buildconf --force
+./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
+make
+install -s sapi/cgi/php /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin/
+
+
+cd ..
+wget http://acme.com/software/mini_httpd/mini_httpd-1.19.tar.gz
+tar -zxf mini_httpd-1.19.tar.gz
+rm mini_httpd-1.19.tar.gz
+cd mini_httpd-1.19/
+patch < /usr/src/tools/tools/nanobsd/m0n0cd/freebsd8/build/patches/packages/mini_httpd.patch
+make
+install -s mini_httpd ../../../Files/usr/local/sbin
+
+cd /usr/ports/net/isc-dhcp30-server
+make
+#Don't choose any options in the dialog box (i.e. deselect them all). When it's compiled, install as follows:
+install -s work/dhcp-*/work.freebsd/server/dhcpd /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+
+cd /usr/ports/net/isc-dhcp30-relay
+make
+install -s work/dhcp-*/work.freebsd/relay/dhcrelay /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+
+cd /usr/ports/dns/dnsmasq
+#Just select IPV6
+make
+install -s work/dnsmasq-*/src/dnsmasq /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+
+cd /usr/ports/net/msntp
+make
+install -s work/msntp-*/msntp /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+
+cd /usr/src/tools/tools/nanobsd/m0n0cd/build/tmp
+
+wget "http://downloads.sourceforge.net/project/wake-on-lan/wol/0.7.1/wol-0.7.1.tar.gz?use_mirror=mesh"
+tar -zxf wol-0.7.1.tar.gz
+cd wol-0.7.1
+./configure --disable-nls
+make
+install -s src/wol /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+
+wget http://dyn.pl/client/UNIX/ez-ipupdate/ez-ipupdate-3.0.11b8.tar.gz
+tar -zxf ez-ipupdate-3.0.11b8.tar.gz
+cd ez-ipupdate-3.0.11b8
+patch < ../../../freebsd8/build/patches/packages/ez-ipupdate.c.patch
+./configure
+make
+install -s ez-ipupdate /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+
+cd ..
+wget "http://downloads.sourceforge.net/project/bpalogin/bpalogin/2.0.1/bpalogin-2.0.1-src.tar.gz
+tar -zxf bpalogin-2.0.1-src.tar.gz
+cd bpalogin-2.0.1
+make
+install -s bpalogin /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+
+Install MPD 3.x using the ports system:
+
+CD /USR/PORTS/NET/MPD
+MAKE
+INSTALL -S WORK/MPD-*/SRC/MPD /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/USR/LOCAL/SBIN
+
+cd /usr/ports/security/ipsec-tools
+enable ipv6 dpd and frag
+edit makefile add --without-readline  to  CONFIGURE_ARGS
+make
+install -s work/ipsec-tools-*/src/racoon/.libs/racoon /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/lib
+
+cd /usr/src/tools/tools/nanobsd/m0n0cd/build/tmp
+
+rm /usr/local/bin/autoconf
+rm /usr/local/bin/autoheader
+ln -s /usr/local/bin/autoconf-2.62 /usr/local/bin/autoconf
+ln -s /usr/local/bin/autoheader-2.62 /usr/local/bin/autoheader
+
+wget "http://downloads.sourceforge.net/project/net-snmp/ucd-snmp/4.2.7.1/ucd-snmp-4.2.7.1.tar.gz?use_mirror=ovh"
+tar -zxf ucd-snmp-4.2.7.1.tar.gz
+cd ucd-snmp-4.2.7.1
+./configure  --without-openssl --disable-debugging --enable-static \
+--enable-mini-agent --disable-privacy --disable-testing-code \
+--disable-shared-version --disable-shared --enable-ipv6 \
+'--with-out-transports=TCP Unix' \
+'--with-mib-modules=mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2'
+edit config.h
+tidy up 
+#define SNMP_NO_DEBUGGING
+#define SNMP_ALWAYS_DEBUG 0
+make
+install -s agent/snmpd /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+
+cd ../freebsd8/build/tools/
+gcc -o stats.cgi stats.c
+gcc -o minicron minicron.c
+gcc -o atareinit atareinit.c
+gcc -o choparp choparp.c
+gcc -o verifysig -lcrypto verifysig.c
+install -s choparp /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+install -s stats.cgi /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/www
+install -s minicron /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+install -s verifysig /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+install runmsntp.sh /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/bin
+install ppp-linkup vpn-linkdown vpn-linkup /usr/src/tools/tools/nanobsd/m0n0cd/build/Files/usr/local/sbin
+
+
+cd /usr/src/tools/tools/nanobsd/m0n0cd/build/
+sh  m0n0i386.sh  
+-------
+
+iso is  /usr/obj/nanobsd.M0n0walli386_CD//_.disk.iso
+tar cvzf monowall2.tgz /usr/obj/nanobsd.M0n0walli386_CD//_.disk.iso
+scp monowall2.tgz awhite@awhiteimac:
+scp /usr/obj/nanobsd.M0n0walli386_CD//_.disk.iso awhite@awhiteimac:
+
+
+boots to login as root with no password as rc.bootup doesn't find php
+manually run /etc/rc.d/rc.bootup
+
+obvious broken things are, some pages missing css like /status.php with php5
+timezone seems broken under php5
+can't find config.xml on usb stick 
+ipfstat runs 99% cpu
+all patches still to be applied other than mini_httpd (probably causes above)
+
+termcap written to RO place
