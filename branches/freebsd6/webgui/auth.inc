@@ -79,7 +79,7 @@ if (!($_SERVER['REMOTE_USER'] === $config['system']['username'])) {
 		// they are attempting to go to.  Redirect them to an allowed page.
 
 		if (in_array("index.php",$allowed)) {
-			header("Location: /index.php"); 
+			echo "<html><head><title>401 Unauthorized</title><meta HTTP-EQUIV='REFRESH' content='2; url=/index.php'></head><body><h3>401 Unauthorized</h3>Authorization required.</body></html>";
 			exit;
 		}
 		else {

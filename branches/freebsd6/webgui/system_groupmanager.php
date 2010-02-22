@@ -87,6 +87,7 @@ function getAdminPageList() {
         $tmp['diag_logs_portal.php'] = "Diagnostics: Logs: Captive Portal";
         $tmp['diag_logs_dhcp.php'] = "Diagnostics: Logs: DHCP";
         $tmp['diag_logs.php'] = "Diagnostics: Logs: System";
+		$tmp['interfaces_secondaries.php'] = "Interfaces: Add Secondary IP addresses";
         
         // Add appropriate descriptions for extensions, if they exist
         if(file_exists("extensions.inc")){
