@@ -211,10 +211,10 @@ if ($_POST) {
                   <td width="22%" valign="top" class="vncell">&nbsp;</td>
                   <td width="78%" class="vtable"> 
 				    <input name="nospoofcheck" type="checkbox" id="nospoofcheck" value="yes" <?php if ($pconfig['nospoofcheck']) echo "checked"; ?>>
-                    <strong>Disable Spoof Checking On Bridge</strong><span class="vexpl"><br>
+                    <strong>Disable Spoof Checking on bridge</strong><span class="vexpl"><br>
                     Spoof Checking blocks packets not sourced from the subnet of the
 					interface the packet was recieved on.<br>
-					Disabling this will only effect bridged interfaces.
+					This option only affects bridged interfaces.
                     </span></td>
                 </tr>
                 <tr> 

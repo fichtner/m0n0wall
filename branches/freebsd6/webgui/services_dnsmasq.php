@@ -118,9 +118,9 @@ if ($_GET['act'] == "del") {
 				<td class="vtable">
                       <input name="strictorder" type="checkbox" id="strictorder" value="yes" <?php if ($pconfig['strictorder']) echo "checked";?>>
                       <strong>Strict Order</strong><br>
-					  By default, dnsmasq will send queries to any of the upstream servers it
+					  By default, the DNS forwarder will send queries to any of the upstream servers it
 					  knows about and tries to favour servers that are known to be up. Setting
-					  this flag forces dnsmasq to try each query with each server strictly in order.</td>
+					  this flag forces it to try each query with each server strictly in order.</td>
                 </tr>
                 <tr> 
                   <td class="vtable">
