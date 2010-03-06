@@ -2,6 +2,14 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+1.31
+----
+- added patch to ISC-DHCPD to rewrite lease file every 5 minutes instead of
+  every hour
+
+- added fix for OpenSSL session renegotiation vulnerability
+
 ---
 - tidy page description in group manager for interfaces_secondaries.php
 - change auth.inc so when reaching an authorized page you get a message before redirect to /index.php 
