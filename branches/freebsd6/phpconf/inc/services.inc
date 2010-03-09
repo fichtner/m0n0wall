@@ -92,16 +92,16 @@ EOD;
 			
 		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
 			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $dhcpifconf['dnsserver'];
-			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . " ;\n";
-			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
-			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns1'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns2'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns3'] . ";\n";
 		} else if (isset($config['dnsmasq']['enable'])) {
 			$dnscfg .= "option domain-name-servers " . $ifcfg['ipaddr6'] . ";\n";
 		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
 			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $syscfg['dnsserver'];
-			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns1'] . ";\n";
-			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns2'] . ";\n";
-			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers" . $dnsconfig['dns3']  . ";\n";
+			if (is_ipaddr6($dnsconfig['dns1']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns1'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns2']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns2'] . ";\n";
+			if (is_ipaddr6($dnsconfig['dns3']))	$dnscfg .= "option domain-name-servers " . $dnsconfig['dns3'] . ";\n";
 		}
 		$dhcp6sconf .= <<<EOD
 $dnscfg
@@ -220,13 +220,28 @@ EOD;
 			$dnscfg .= "	option domain-name \"{$dhcpifconf['domain']}\";\n";
 		}
 		
-		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
-			$dnscfg .= "	option domain-name-servers " . join(",", $dhcpifconf['dnsserver']) . ";";
-		} else if (isset($config['dnsmasq']['enable'])) {
-			$dnscfg .= "	option domain-name-servers " . $ifcfg['ipaddr'] . ";";
-		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-			$dnscfg .= "	option domain-name-servers " . join(",", $syscfg['dnsserver']) . ";";
+		
+		$dnscfg = "";
+		
+		if ($dhcpifconf['domain']) {
+			$dnscfg .= "	option domain-name \"{$dhcpifconf['domain']}\";\n";
 		}
+		
+		$dnscfg .= "	option domain-name-servers ";
+		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
+			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $dhcpifconf['dnsserver'];
+			if (is_ipaddr($dnsconfig['dns1'])) $dnscfg .=  $dnsconfig['dns1'] . ",";
+			if (is_ipaddr($dnsconfig['dns2'])) $dnscfg .=  $dnsconfig['dns2'] . ",";
+			if (is_ipaddr($dnsconfig['dns3'])) $dnscfg .=  $dnsconfig['dns3'] ;
+		} else if (isset($config['dnsmasq']['enable'])) {
+			$dnscfg .=  $ifcfg['ipaddr'] ;
+		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
+			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $syscfg['dnsserver'];
+			if (is_ipaddr($dnsconfig['dns1'])) $dnscfg .=  $dnsconfig['dns1'] . ",";
+			if (is_ipaddr($dnsconfig['dns2'])) $dnscfg .=  $dnsconfig['dns2'] . ",";
+			if (is_ipaddr($dnsconfig['dns3'])) $dnscfg .=  $dnsconfig['dns3'] ;
+		}
+		$dnscfg = rtrim($dnscfg,",") . ";\n" ;
 
 		$dhcpdconf .= "subnet $subnet netmask $subnetmask {\n";
 		$dhcpdconf .= "	pool {\n";

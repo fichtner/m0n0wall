@@ -32,6 +32,7 @@
 $pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
 $pconfig['nospoofcheck'] = isset($config['bridge']['nospoofcheck']);
+$pconfig['mbmon'] = isset($config['system']['webgui']['mbmon']);
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
@@ -95,6 +96,7 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$config['bridge']['nospoofcheck'] = $_POST['nospoofcheck'] ? true : false;
+		$config['system']['webgui']['mbmon'] = $_POST['mbmon'] ? true : false;
 		$oldcert = $config['system']['webgui']['certificate'];
 		$oldkey = $config['system']['webgui']['private-key'];
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
@@ -290,6 +292,13 @@ if ($_POST) {
                 </tr>
                 <tr> 
                   <td colspan="2" valign="top" class="listtopic">Miscellaneous</td>
+                </tr>
+				<tr> 
+                  <td width="22%" valign="top" class="vncell">Motherboard Monitor</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="mbmon" type="checkbox" id="mbmon" value="yes" <?php if ($pconfig['mbmon']) echo "checked"; ?>>
+                    <strong>Enable Motherboard Monitoring</strong><span class="vexpl"><br>
+                    This will display Motherboard information on the system status page for supported chipsets.  On some systems this may cause a delay in loading the system status page.</span></td>
                 </tr>
 				<tr> 
                   <td width="22%" valign="top" class="vncell">Console menu </td>

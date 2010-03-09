@@ -497,7 +497,7 @@ function type_change() {
 					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
 					If this option is checked, other hosts on this interface will be able to automatically configure
 					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option should normally be enabled.
+					This option is NOT normally enabled on the WAN interface when connected to an ISP.
                   </td>
                 </tr>
                 <tr> 

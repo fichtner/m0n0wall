@@ -3,6 +3,11 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Update text for WAN RA, to suggest this is normally off
+- Fix ipv6 link local filter rule, missing newline
+- Fix dhcpv4 having ipv6 address inserted in dhcpd.conf
+- Make motherboard monitor off by default, and switchable in advanced/misc.
+
 1.31
 ----
 - added patch to ISC-DHCPD to rewrite lease file every 5 minutes instead of

@@ -148,6 +148,7 @@ echo $memUsage . "%";
                 </td>
               </tr>
 			  <?php
+					if ( isset($config['system']['webgui']['mbmon']) ) {
                                 exec("/usr/local/bin/mbmon -c1 -r 2>/dev/null ", $mbmonop, $error);
                                 if (!$error){
                         ?>
@@ -250,7 +251,8 @@ echo $memUsage . "%";
                                                 }
 										echo '</table></td></tr>';
                                 }
-                        ?>
+                        }
+						?>
               <tr> 
                 <td width="25%" class="vncellt" valign="top">Notes</td>
                 <td width="75%" class="listr">
