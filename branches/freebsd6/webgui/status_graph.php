@@ -38,13 +38,21 @@ if ($_GET['if'])
 	
 if ($curif == "wan")
 	$ifnum = get_real_wan_interface();
+elseif ($curif == "SixXS")
+	if (isset($wancfg['aiccu']['ayiya'])) {
+		$ifnum = 'tun0';
+	} else {
+		$ifnum = 'gif0';
+	}
 else
 	$ifnum = $config['interfaces'][$curif]['if'];
 ?>
 <?php include("fbegin.inc"); ?>
 <?php
 $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
-	
+if (ipv6enabled() && ($config['interfaces']['wan']['ipaddr6'] == "aiccu")) {
+	$ifdescrs['SixXS'] = 'SixXS';
+}
 for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
 	$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 }

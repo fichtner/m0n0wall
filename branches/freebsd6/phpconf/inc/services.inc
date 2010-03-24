@@ -520,6 +520,14 @@ function services_dnsmasq_configure() {
 				" -s {$config['system']['domain']}";
 		}
 		
+		$dnsmasqcfg = $config['dnsmasq'];
+		if (is_array($dnsmasqcfg['hosts'])) {
+			foreach ($dnsmasqcfg['hosts'] as $host) {
+			if (($host['host']) && ($host['host'] == '*'))
+				$args .= " " . escapeshellarg('--address=/.' . $host['domain'] . '/' . $host['ip']);
+			}
+		}
+
 		if (isset($config['dnsmasq']['allservers'])) {
 			$args .= " --all-servers";
 		}

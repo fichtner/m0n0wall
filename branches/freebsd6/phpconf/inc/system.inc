@@ -108,7 +108,7 @@ function system_hosts_generate() {
 EOD;
 	
 	foreach ($hostscfg as $host) {
-		if ($host['host'])
+		if (($host['host']) && ($host['host'] != '*'))
 			$hosts .= "{$host['ip']}	{$host['host']}.{$host['domain']} {$host['host']}\n";
 		else
 			$hosts .= "{$host['ip']}	{$host['domain']}\n";

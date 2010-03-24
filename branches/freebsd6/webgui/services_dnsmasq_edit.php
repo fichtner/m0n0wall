@@ -60,7 +60,7 @@ if ($_POST) {
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
-	if (($_POST['host'] && !is_hostname($_POST['host']))) {
+	if (($_POST['host'] && (!is_hostname($_POST['host'])) && ($_POST['host'] != '*') )) {
 		$input_errors[] = "A valid host must be specified.";
 	}
 	if (($_POST['domain'] && !is_domain($_POST['domain']))) {
