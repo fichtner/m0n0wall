@@ -640,3 +640,51 @@
  		break;
  	}
  	return (ENXIO);
+--- sys/pci/if_vr.c.orig	2009-07-21 22:40:43.000000000 +0200
++++ sys/pci/if_vr.c	2010-04-11 18:09:12.000000000 +0200
+@@ -422,22 +422,34 @@
+ static void
+ vr_setcfg(struct vr_softc *sc, int media)
+ {
+-	int	restart = 0;
++	int	i;
+ 
+ 	VR_LOCK_ASSERT(sc);
++	
++	if (IFM_SUBTYPE(media) != IFM_NONE) {	
++		if (CSR_READ_2(sc, VR_COMMAND) & (VR_CMD_TX_ON|VR_CMD_RX_ON))
++			VR_CLRBIT16(sc, VR_COMMAND,
++			    (VR_CMD_TX_ON|VR_CMD_RX_ON));
+ 
+-	if (CSR_READ_2(sc, VR_COMMAND) & (VR_CMD_TX_ON|VR_CMD_RX_ON)) {
+-		restart = 1;
++		if ((media & IFM_GMASK) == IFM_FDX)
++			VR_SETBIT16(sc, VR_COMMAND, VR_CMD_FULLDUPLEX);
++		else
++			VR_CLRBIT16(sc, VR_COMMAND, VR_CMD_FULLDUPLEX);
++		
++ 		VR_SETBIT16(sc, VR_COMMAND, VR_CMD_TX_ON|VR_CMD_RX_ON);
++	} else {		
+ 		VR_CLRBIT16(sc, VR_COMMAND, (VR_CMD_TX_ON|VR_CMD_RX_ON));
++		for (i = VR_TIMEOUT; i > 0; i--) {
++			DELAY(10);
++			if (!(CSR_READ_2(sc, VR_COMMAND) &
++			    (VR_CMD_TX_ON|VR_CMD_RX_ON)))
++				break;
++		}
++		if (i == 0) {
++			device_printf(sc->vr_dev, "rx shutdown error!\n");
++			sc->vr_flags |= VR_F_RESTART;
++		}
+ 	}
+-
+-	if ((media & IFM_GMASK) == IFM_FDX)
+-		VR_SETBIT16(sc, VR_COMMAND, VR_CMD_FULLDUPLEX);
+-	else
+-		VR_CLRBIT16(sc, VR_COMMAND, VR_CMD_FULLDUPLEX);
+-
+-	if (restart)
+-		VR_SETBIT16(sc, VR_COMMAND, VR_CMD_TX_ON|VR_CMD_RX_ON);
+ }
+ 
+ static void

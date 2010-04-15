@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add kernel patch for vr(4) lockups after link flaps (e.g. on ALIX boards)
+
 - Add support for dns forward wildcard, use * as hostname
 - Add SixXS interface to traffic Graph
 
