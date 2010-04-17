@@ -111,7 +111,7 @@ if ($_POST) {
                   <td width="78%" class="vtable"> 
                     <input name="host" type="text" class="formfld" id="host" size="40" value="<?=htmlspecialchars($pconfig['host']);?>">
                     <br> <span class="vexpl">Name of the host, without
-                    domain part<br>
+                    domain part, or * for wildcard.<br>
                     e.g. <em>myhost</em></span></td>
                 </tr>
 				<tr>

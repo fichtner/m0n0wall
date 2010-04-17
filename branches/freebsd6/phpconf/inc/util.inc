@@ -137,6 +137,14 @@ function is_ipaddr6($ipaddr) {
 	}
 }
 
+function is_ipaddr6andprefix($ipaddr) {
+	if (Net_IPv6::getNetmaskSpec($ipaddr)) {
+		return Net_IPv6::checkIPv6($ipaddr);
+	} else {
+	return false;
+	}
+}
+
 /* returns MTU of the interface */
 function get_interface_mtu($interface) {
        $mtu = null;

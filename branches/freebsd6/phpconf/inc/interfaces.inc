@@ -1326,7 +1326,7 @@ function suggest_ipv6_lan_addr(){
 			$sugipv6lan .= "1" . substr($lograsrch,$prefixpos,strpos($lograsrch, "from",0)-$prefixpos);
 		} 
 	}
-	if (!is_ipaddr6 ($sugipv6lan)) {
+	if (!is_ipaddr6andprefix ($sugipv6lan) && ($sugipv6lan != "No RA found. Maybe try again in a few minutes.")) {
 		return "Error calculating IPv6 address!";
 	} else {
 		return $sugipv6lan;

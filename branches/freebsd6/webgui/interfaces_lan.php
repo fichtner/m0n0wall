@@ -239,10 +239,10 @@ function enable_change(enable_over) {
 	                <td valign="top" class="vncellreq">Suggested IPv6 address</td>
 	                <td class="vtable"> 
 	                <?php if (!isset($wancfg['ipv6ra'])): ?>
-					Router advertisements are not enabled on WAN interface!
+					Router advertisements are not enabled on WAN interface.
 	 				<?php else: ?>
 					<strong><?php echo suggest_ipv6_lan_addr() ?></strong><br>
-					This IPv6 Address is suggested from listening to prefix advertisements recieved on the WAN interface, and using the first address available in that prefix.
+					This IPv6 Address is suggested from listening to prefix advertisements received on the WAN interface, and using the first address available in that prefix.
 					<?php endif; ?>
 					</td>
 	            </tr>
