@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- allow both a v4 and a v6 entry for the same host in DNS forwarder overrides
+
 - fix nameserver handling when IPv6 PPP WAN is enabled
 
 - Fix auto suggested ipv6 address.

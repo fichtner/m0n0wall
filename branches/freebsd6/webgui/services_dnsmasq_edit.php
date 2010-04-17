@@ -75,7 +75,7 @@ if ($_POST) {
 		if (isset($id) && ($a_hosts[$id]) && ($a_hosts[$id] === $hostent))
 			continue;
 
-		if (($hostent['host'] == $_POST['host']) && ($hostent['domain'] == $_POST['domain'])) {
+		if (($hostent['host'] == $_POST['host']) && ($hostent['domain'] == $_POST['domain']) && ((is_ipaddr($_POST['ip']) && is_ipaddr($hostent['ip'])) || (is_ipaddr6($_POST['ip']) && is_ipaddr6($hostent['ip'])) )) {
 			$input_errors[] = "This host/domain already exists.";
 			break;
 		}
