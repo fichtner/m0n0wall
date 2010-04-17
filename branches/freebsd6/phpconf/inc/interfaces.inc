@@ -565,7 +565,8 @@ function interfaces_wan_configure() {
 		unlink_if_exists("{$g['varetc_path']}/mpd.conf");
 		unlink_if_exists("{$g['varetc_path']}/mpd.links");
 		unlink_if_exists("{$g['vardb_path']}/wanip");
-		unlink_if_exists("{$g['varetc_path']}/nameservers.conf");
+		unlink_if_exists("{$g['varetc_path']}/nameservers.inet.conf");
+		unlink_if_exists("{$g['varetc_path']}/nameservers.inet6.conf");
 	}
 	
 	/* remove all addresses first */

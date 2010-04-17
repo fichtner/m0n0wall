@@ -13,9 +13,9 @@ make_resolv_conf() {
     else
       rm -f /var/etc/defaultdomain.conf
     fi
-    rm -f /var/etc/nameservers.conf
+    rm -f /var/etc/nameservers.inet.conf
     for nameserver in $new_domain_name_servers; do
-      echo $nameserver >>/var/etc/nameservers.conf
+      echo $nameserver >>/var/etc/nameservers.inet.conf
     done
   fi
 }

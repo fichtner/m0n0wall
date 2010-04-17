@@ -51,7 +51,7 @@ function system_resolvconf_generate($dynupdate = false) {
 	
 	if (isset($syscfg['dnsallowoverride'])) {
 		/* get dynamically assigned DNS servers (if any) */
-		$nfd = @fopen("{$g['varetc_path']}/nameservers.conf", "r");
+		$nfd = @fopen("{$g['varetc_path']}/nameservers.inet.conf", "r");
 		if ($nfd) {
 			while (!feof($nfd)) {
 				$dnss = trim(fgets($nfd));
@@ -63,6 +63,22 @@ function system_resolvconf_generate($dynupdate = false) {
 			fclose($nfd);
 		}
 	}
+	
+	if (isset($syscfg['dnsallowoverride']) && ipv6enabled()) {
+		/* get dynamically assigned DNS servers (if any) */
+		$nfd = @fopen("{$g['varetc_path']}/nameservers.inet6.conf", "r");
+		if ($nfd) {
+			while (!feof($nfd)) {
+				$dnss = trim(fgets($nfd));
+				if ($dnss) {
+					$resolvconf .= "nameserver $dnss\n";
+					$havedns = true;
+				}
+			}
+			fclose($nfd);
+		}
+	}
+	
 	if (!$havedns && is_array($syscfg['dnsserver'])) {
 		foreach ($syscfg['dnsserver'] as $ns) {
 			if ($ns)
