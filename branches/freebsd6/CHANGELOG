@@ -2,6 +2,7 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add Farenheit support for system temperatures.
 
 - add kernel patch for vr(4) lockups after link flaps (e.g. on ALIX boards)
 

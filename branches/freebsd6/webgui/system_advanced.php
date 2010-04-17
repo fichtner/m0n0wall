@@ -32,7 +32,7 @@
 $pgtitle = array("System", "Advanced setup");
 require("guiconfig.inc");
 $pconfig['nospoofcheck'] = isset($config['bridge']['nospoofcheck']);
-$pconfig['mbmon'] = isset($config['system']['webgui']['mbmon']);
+$pconfig['mbmon'] = isset($config['system']['webgui']['mbmon']['enable']);
 $pconfig['cert'] = base64_decode($config['system']['webgui']['certificate']);
 $pconfig['key'] = base64_decode($config['system']['webgui']['private-key']);
 $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
@@ -96,7 +96,8 @@ if ($_POST) {
 
 	if (!$input_errors) {
 		$config['bridge']['nospoofcheck'] = $_POST['nospoofcheck'] ? true : false;
-		$config['system']['webgui']['mbmon'] = $_POST['mbmon'] ? true : false;
+		$config['system']['webgui']['mbmon']['enable'] = $_POST['mbmon'] ? true : false;
+		$config['system']['webgui']['mbmon']['type'] = $_POST['mbmontype'];
 		$oldcert = $config['system']['webgui']['certificate'];
 		$oldkey = $config['system']['webgui']['private-key'];
 		$config['system']['webgui']['certificate'] = base64_encode($_POST['cert']);
@@ -294,11 +295,21 @@ if ($_POST) {
                   <td colspan="2" valign="top" class="listtopic">Miscellaneous</td>
                 </tr>
 				<tr> 
-                  <td width="22%" valign="top" class="vncell">Motherboard Monitor</td>
-                  <td width="78%" class="vtable"> 
-                    <input name="mbmon" type="checkbox" id="mbmon" value="yes" <?php if ($pconfig['mbmon']) echo "checked"; ?>>
-                    <strong>Enable Motherboard Monitoring</strong><span class="vexpl"><br>
-                    This will display Motherboard information on the system status page for supported chipsets.  On some systems this may cause a delay in loading the system status page.</span></td>
+				<td width="22%" valign="top" class="vncell">Motherboard Monitor</td>
+                <td width="78%" class="vtable"> 
+				<table >
+					<tr>
+					<td > 
+                    <select class="formfld" name="mbmontype" align="bottom">
+					<option <?php if(!$config['system']['webgui']['mbmon']['type'] == 'F') echo('selected');?> value="C">&deg;C</option>
+					<option <?php if($config['system']['webgui']['mbmon']['type'] == 'F') echo('selected');?> value="F">&deg;F</option>
+					</select></td>
+					<td>
+						<input id="mbmon" <?php if ($pconfig['mbmon']) echo "checked"; ?>=""  name="mbmon" type="checkbox" value="yes"><strong> Enable Motherboard Monitoring</strong></td>
+						</tr>
+					</table>
+					<span class="vexpl">
+                    This will display Motherboard information on the system status page for supported chipsets.  On some systems this may cause a delay in loading the system status page or wrong temperatures.</span></td>
                 </tr>
 				<tr> 
                   <td width="22%" valign="top" class="vncell">Console menu </td>
