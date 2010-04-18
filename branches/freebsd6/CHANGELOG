@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- don't let missing DNS server information keep DHCPD from starting
+
+
+1.32
+----
+
 - allow both a v4 and a v6 entry for the same host in DNS forwarder overrides
 
 - fix nameserver handling when IPv6 PPP WAN is enabled

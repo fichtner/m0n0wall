@@ -227,21 +227,17 @@ EOD;
 			$dnscfg .= "	option domain-name \"{$dhcpifconf['domain']}\";\n";
 		}
 		
-		$dnscfg .= "	option domain-name-servers ";
-		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0])) {
-			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $dhcpifconf['dnsserver'];
-			if (is_ipaddr($dnsconfig['dns1'])) $dnscfg .=  $dnsconfig['dns1'] . ",";
-			if (is_ipaddr($dnsconfig['dns2'])) $dnscfg .=  $dnsconfig['dns2'] . ",";
-			if (is_ipaddr($dnsconfig['dns3'])) $dnscfg .=  $dnsconfig['dns3'] ;
-		} else if (isset($config['dnsmasq']['enable'])) {
-			$dnscfg .=  $ifcfg['ipaddr'] ;
-		} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-			list($dnsconfig['dns1'],$dnsconfig['dns2'],$dnsconfig['dns3']) = $syscfg['dnsserver'];
-			if (is_ipaddr($dnsconfig['dns1'])) $dnscfg .=  $dnsconfig['dns1'] . ",";
-			if (is_ipaddr($dnsconfig['dns2'])) $dnscfg .=  $dnsconfig['dns2'] . ",";
-			if (is_ipaddr($dnsconfig['dns3'])) $dnscfg .=  $dnsconfig['dns3'] ;
-		}
-		$dnscfg = rtrim($dnscfg,",") . ";\n" ;
+		$dnsservers = array();
+		if (is_array($dhcpifconf['dnsserver']) && ($dhcpifconf['dnsserver'][0]))
+			$dnsservers = $dhcpifconf['dnsserver'];
+		else if (isset($config['dnsmasq']['enable']))
+			$dnsservers = array($ifcfg['ipaddr']);
+		else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0]))
+			$dnsservers = $syscfg['dnsserver'];
+		
+		$dnsservers = array_filter($dnsservers, "is_ipaddr");
+		if (!empty($dnsservers))
+			$dnscfg .= "	option domain-name-servers " . join(",", $dnsservers) . ";\n";
 
 		$dhcpdconf .= "subnet $subnet netmask $subnetmask {\n";
 		$dhcpdconf .= "	pool {\n";
