@@ -136,6 +136,53 @@ EOD;
             fclose($fd);    
         }
         
+        /* write status page */
+        if ($config['captiveportal']['page']['statustext'])
+            $statustext = base64_decode($config['captiveportal']['page']['statustext']);
+        else {
+            /* example page with just logout, no password change */
+            $statustext = <<<EOD
+<html>
+<head><title>Wireless session information</title></head>
+<body>
+<b>You are currently connected</b>
+<p><form method="post" action="\$PORTAL_ACTION\$">
+<input name="logout_id" type="hidden" value="\$PORTAL_SESSIONID\$">
+<input name="logout_info" type="submit" value="Logout">
+</form>
+</body>
+</html>
+EOD;
+        }
+
+        $fd = @fopen("{$g['varetc_path']}/captiveportal-status.html", "w");
+        if ($fd) {
+            fwrite($fd, $statustext);
+            fclose($fd);
+        }
+
+        /* write logout page */
+        if ($config['captiveportal']['page']['logouttext'])
+            $logouttext = base64_decode($config['captiveportal']['page']['logouttext']);
+        else {
+            /* example page */
+            $logouttext = <<<EOD
+<html>
+<head><title>Disconnected</title></head>
+<body>
+<b>You've been disconnected.</b>
+<p><a href="/">Log in</a>
+</body>
+</html>
+EOD;
+        }
+
+        $fd = @fopen("{$g['varetc_path']}/captiveportal-logout.html", "w");
+        if ($fd) {
+            fwrite($fd, $logouttext);
+            fclose($fd);
+        }
+
         /* write elements */
         captiveportal_write_elements();
 

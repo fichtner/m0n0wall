@@ -44,6 +44,12 @@ if ($_GET['act'] == "viewhtml") {
 } else if ($_GET['act'] == "viewerrhtml") {
 	echo base64_decode($config['captiveportal']['page']['errtext']);
 	exit;
+} else if ($_GET['act'] == "viewstatushtml") {
+	echo base64_decode($config['captiveportal']['page']['statustext']);
+	exit;
+} else if ($_GET['act'] == "viewlogouthtml") {
+	echo base64_decode($config['captiveportal']['page']['logouttext']);
+	exit;
 }
 
 $pconfig['cinterface'] = $config['captiveportal']['interface'];
@@ -195,6 +201,10 @@ if ($_POST) {
 			$config['captiveportal']['page']['htmltext'] = base64_encode(file_get_contents($_FILES['htmlfile']['tmp_name']));
 		if (is_uploaded_file($_FILES['errfile']['tmp_name']))
 			$config['captiveportal']['page']['errtext'] = base64_encode(file_get_contents($_FILES['errfile']['tmp_name']));
+		if (is_uploaded_file($_FILES['statusfile']['tmp_name']))
+			$config['captiveportal']['page']['statustext'] = base64_encode(file_get_contents($_FILES['statusfile']['tmp_name']));
+		if (is_uploaded_file($_FILES['logoutfile']['tmp_name']))
+			$config['captiveportal']['page']['logouttext'] = base64_encode(file_get_contents($_FILES['logoutfile']['tmp_name']));
 			
 		write_config();
 		
@@ -249,6 +259,8 @@ function enable_change(enable_change) {
 	document.iform.radiussession_timeout.disabled = radius_endis;
 	document.iform.htmlfile.disabled = endis;
 	document.iform.errfile.disabled = endis;
+	document.iform.statusfile.disabled = endis;
+	document.iform.logoutfile.disabled = endis;
 	
 	document.iform.radiusacctport.disabled = (radius_endis || !document.iform.radacct_enable.checked) && !enable_change;
 	
@@ -610,6 +622,44 @@ You may include &quot;$PORTAL_MESSAGE$&quot;, which will be replaced by the erro
 You may also include a new login form in the error page to allow the user to attempt another login directly.</td>
 	</tr>
 	<tr> 
+	  <td width="22%" valign="top" class="vncell">Status page<br>
+		contents</td>
+	  <td class="vtable">
+		<input name="statusfile" type="file" class="formfld" id="statusfile"><br>
+		<?php if ($config['captiveportal']['page']['statustext']): ?>
+		<a href="?act=viewstatushtml" target="_blank">View current page</a>
+		  <br>
+		  <br>
+		<?php endif; ?>
+The status page currently allows users to logout or change their password (local users only).
+Example code for the form:<br>
+		  <br>
+		  <tt>&lt;form method=&quot;post&quot; action=&quot;$PORTAL_ACTION$&quot;&gt;<br>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;logout_id&quot; type=&quot;hidden&quot; value=&quot;$PORTAL_SESSIONID$&quot;&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;input name=&quot;logout&quot; type=&quot;submit&quot; value=&quot;Logout&quot;&gt;<br>
+		  &lt;/form&gt;<br>
+		  &lt;form method=&quot;post&quot; action=&quot;$PORTAL_ACTION$&quot;&gt;<br>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;oldpass&quot; type=&quot;password&quot;&gt;<br>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;newpass&quot; type=&quot;password&quot;&gt;<br>
+		  &nbsp;&nbsp;&nbsp;&lt;input name=&quot;newpass2&quot; type=&quot;password&quot;&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;input name=&quot;change_pass&quot; type=&quot;submit&quot; value=&quot;Change Password&quot;&gt;<br>
+		  &lt;/form&gt;</tt>
+</td>
+	</tr>
+	<tr>
+	  <td width="22%" valign="top" class="vncell">Logout page<br>
+		contents</td>
+	  <td class="vtable">
+		<input name="logoutfile" type="file" class="formfld" id="logoutfile"><br>
+		<?php if ($config['captiveportal']['page']['logouttext']): ?>
+		<a href="?act=viewlogouthtml" target="_blank">View current page</a>
+		  <br>
+		  <br>
+		<?php endif; ?>
+The contents of the HTML file that you upload here are displayed when a logout occurs.
+</td>
+	</tr>
+	<tr>
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"> 
 		<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)"> 

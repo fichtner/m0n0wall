@@ -45,23 +45,23 @@ if (!$clientip) {
     exit;
 }
 
-if (isset($config['captiveportal']['httpslogin']))
+if (isset($config['captiveportal']['httpslogin'])) {
     $ourhostname = $config['captiveportal']['httpsname'] . ":8001";
-else
+    $oururl = "https://{$ourhostname}/";
+} else {
     $ourhostname = $config['interfaces'][$config['captiveportal']['interface']]['ipaddr'] . ":8000";
+    $oururl = "http://{$ourhostname}/";
+}
 
 if ($orig_host != $ourhostname) {
     /* the client thinks it's connected to the desired web server, but instead
        it's connected to us. Issue a redirect... */
       
-    if (isset($config['captiveportal']['httpslogin']))
-        header("Location: https://{$ourhostname}/?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
-    else
-        header("Location: http://{$ourhostname}/?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
-    
+    header("Location: {$oururl}/?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
     exit;
 }
 
+$redirurl = $oururl;
 if (preg_match("/redirurl=(.*)/", $orig_request, $matches))
     $redirurl = urldecode($matches[1]);
 if ($_POST['redirurl'])
@@ -86,6 +86,8 @@ if (file_exists("{$g['vardb_path']}/captiveportal_radius.db")) {
 
 if ($_POST['logout_id']) {
     disconnect_client($_POST['logout_id']);
+    setcookie('sessionid', '', 1);
+    if ($_POST['logout_popup']) {
     echo <<<EOD
 <HTML>
 <HEAD><TITLE>Disconnecting...</TITLE></HEAD>
@@ -100,10 +102,60 @@ setTimeout('window.close();',5000) ;
 </SCRIPT>
 </BODY>
 </HTML>
-
 EOD;
+    } else
+        portal_reply_page($redirurl, "logout");
+    exit;
+}
+/* we received a cookie with a sessionid */
+if (isset($_COOKIE['sessionid'])) {
+    /* read in client database */
+    $cpdb = captiveportal_read_db();
+    $sessionid = $_COOKIE['sessionid'];
+
+    for ($i = 0; $i < count($cpdb); $i++) {
+        /* look for sessionid and ip */
+        if(($cpdb[$i][5] == $sessionid) && ($cpdb[$i][2] == $clientip)) {
+
+            /* change password requested */
+            if (($config['captiveportal']['auth_method'] == "local") && $_POST['change_pass'] && $_POST['oldpass'] && $_POST['newpass'] && $_POST['newpass2']) {
+                if ($_POST['newpass'] != $_POST['newpass2']) {
+                    $msg = "Error: Passwords do not match";
+                } else if ($_POST['newpass'] == $_POST['oldpass']) {
+                    $msg = "Error: Choose a different password";
+                } else {
+                    /* look for user */
+                    $a_user = &$config['captiveportal']['user'];
+                    for ($j = 0; $j < count($a_user); $j++) {
+                        if ($a_user[$j]['name'] == $cpdb[$i][4]) {
+                            if (md5($_POST['oldpass']) == $a_user[$j]['password']) {
+                                /* change password */
+                                $a_user[$j]['password'] = md5($_POST['newpass']);
+                            }
+                            else {
+                                $msg = "Error: Old password does not match";
+                                captiveportal_syslog("FAILED PASSWORD CHANGE: ".$cpdb[$i][4].", ".$clientmac.", ".$clientip);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (!isset($msg)) {
+                    write_config();
+                    captiveportal_syslog("PASSWORD CHANGE: ".$cpdb[$i][4].", ".$clientmac.", ".$clientip);
+                    $msg = "Password changed";
+                }
+            }
+            portal_reply_page($redirurl, "status", $msg);
+            exit;
+        }
+    }
+    /* sessionid not found */
+    unset($sessionid);
+    setcookie('sessionid', '', 1);
+}
 /* The $macfilter can be removed safely since we first check if the $clientmac is present, if not we fail */
-} else if ($clientmac && portal_mac_fixed($clientmac)) {
+if ($clientmac && portal_mac_fixed($clientmac)) {
     /* punch hole in ipfw for pass thru mac addresses */
     portal_allow($clientip, $clientmac, "unauthenticated");
     exit;
@@ -206,19 +258,21 @@ EOD;
 exit;
 
 function portal_reply_page($redirurl, $type = null, $message = null) {
-    global $g, $config;
+    global $g, $config, $oururl, $sessionid;
 
     /* Get captive portal layout */
     if ($type == "login") 
         $htmltext = file_get_contents("{$g['varetc_path']}/captiveportal.html");
+    else if ($type == "status")
+        $htmltext = file_get_contents("{$g['varetc_path']}/captiveportal-status.html");
+    else if ($type == "logout")
+        $htmltext = file_get_contents("{$g['varetc_path']}/captiveportal-logout.html");
     else 
         $htmltext = file_get_contents("{$g['varetc_path']}/captiveportal-error.html");
 
     /* substitute other variables */
-    if (isset($config['captiveportal']['httpslogin']))
-        $htmltext = str_replace("\$PORTAL_ACTION\$", "https://{$config['captiveportal']['httpsname']}:8001/", $htmltext);
-    else
-        $htmltext = str_replace("\$PORTAL_ACTION\$", "http://{$config['interfaces'][$config['captiveportal']['interface']]['ipaddr']}:8000/", $htmltext);
+    $htmltext = str_replace("\$PORTAL_ACTION\$", $oururl, $htmltext);
+    $htmltext = str_replace("\$PORTAL_SESSIONID\$", $sessionid, $htmltext);
 
     $htmltext = str_replace("\$PORTAL_REDIRURL\$", htmlspecialchars($redirurl), $htmltext);
     $htmltext = str_replace("\$PORTAL_MESSAGE\$", htmlspecialchars($message), $htmltext);
@@ -245,16 +299,16 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
     global $redirurl, $g, $config;
 
     /* See if a ruleno is passed, if not start locking the sessions because this means there isn't one atm */
-    if ($ruleno == null) {
+    if (is_null($ruleno)) {
         captiveportal_lock();
         $ruleno = captiveportal_get_next_ipfw_ruleno();
-    }
 
     /* if the pool is empty, return appropriate message and exit */
     if (is_null($ruleno)) {
         portal_reply_page($redirurl, "error", "System reached maximum login capacity");
         captiveportal_unlock();
         exit;
+    }
     }
 
     // Ensure we create an array if we are missing attributes
@@ -383,12 +437,13 @@ function portal_allow($clientip,$clientmac,$username,$password = null, $attribut
     else
         $my_redirurl = $redirurl;
 
-    if(isset($config['captiveportal']['logoutwin_enable'])) {
-
-        if (isset($config['captiveportal']['httpslogin']))
-            $logouturl = "https://{$config['captiveportal']['httpsname']}:8001/";
+    /* limit cookie validity */
+    if(isset($config['captiveportal']['timeout']))
+        $expiration = time() + 60*$config['captiveportal']['timeout'];
         else
-            $logouturl = "http://{$config['interfaces'][$config['captiveportal']['interface']]['ipaddr']}:8000/";
+        $expiration = 0;
+    setcookie('sessionid', $sessionid, $expiration);
+    if(isset($config['captiveportal']['logoutwin_enable'])) {
 
         echo <<<EOD
 <HTML>
@@ -406,9 +461,9 @@ if (LogoutWin) {
     LogoutWin.document.write('<BODY BGCOLOR="#435370">');
     LogoutWin.document.write('<DIV ALIGN="center" STYLE="color: #ffffff; font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">') ;
     LogoutWin.document.write('<B>Click the button below to disconnect</B><P>');
-    LogoutWin.document.write('<FORM METHOD="POST" ACTION="{$logouturl}">');
+    LogoutWin.document.write('<FORM METHOD="POST" ACTION="{$oururl}">');
     LogoutWin.document.write('<INPUT NAME="logout_id" TYPE="hidden" VALUE="{$sessionid}">');
-    LogoutWin.document.write('<INPUT NAME="logout" TYPE="submit" VALUE="Logout">');
+    LogoutWin.document.write('<INPUT NAME="logout_popup" TYPE="submit" VALUE="Logout">');
     LogoutWin.document.write('</FORM>');
     LogoutWin.document.write('</DIV></BODY>');
     LogoutWin.document.write('</HTML>');

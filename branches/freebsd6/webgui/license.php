@@ -176,6 +176,9 @@ require("guiconfig.inc");
 			  <br>
               Andrew White (<a href="mailto:andywhite@gmail.com">andywhite@gmail.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">IPv6 improvements</font></em><br>
+			  <br>
+              St&eacute;phane Billiart (<a href="mailto:stephane.billiart@gmail.com">stephane.billiart@gmail.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal improvements (logout, status page, password change)</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>
