@@ -275,6 +275,9 @@ auth.info;authpriv.info;daemon.info		%/var/log/system.log
 *.emerg						*
 
 EOD;
+		if (isset($config['syslog']['bindlan'])) {
+			$snmpdconf .= "agentaddress udp:161@{$config['interfaces']['lan']['ipaddr']}\n";
+		}
 
 		if (isset($syslogcfg['filter'])) {
 			$syslogconf .= <<<EOD
@@ -316,9 +319,11 @@ EOD;
 
 		fwrite($fd, $syslogconf);
 		fclose($fd);
-		
-		$retval = mwexec("/usr/sbin/syslogd -s -f {$g['varetc_path']}/syslog.conf");
-
+		if (isset($syslogcfg['bindlan'])) {
+			$retval = mwexec("/usr/sbin/syslogd -b {$config['interfaces']['lan']['ipaddr']} -s -f {$g['varetc_path']}/syslog.conf");
+		} else {
+			$retval = mwexec("/usr/sbin/syslogd -s -f {$g['varetc_path']}/syslog.conf");
+		}
 	} else {
 		$retval = mwexec("/usr/sbin/syslogd -ss");
 	}

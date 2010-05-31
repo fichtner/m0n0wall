@@ -45,6 +45,7 @@ $pconfig['enable'] = isset($config['syslog']['enable']);
 $pconfig['logdefaultblock'] = !isset($config['syslog']['nologdefaultblock']);
 $pconfig['rawfilter'] = isset($config['syslog']['rawfilter']);
 $pconfig['resolve'] = isset($config['syslog']['resolve']);
+$pconfig['bindlan'] = isset($config['syslog']['bindlan']);
 
 if (!$pconfig['nentries'])
 	$pconfig['nentries'] = 50;
@@ -80,6 +81,7 @@ if ($_POST) {
 		$config['syslog']['nologdefaultblock'] = $_POST['logdefaultblock'] ? false : true;
 		$config['syslog']['rawfilter'] = $_POST['rawfilter'] ? true : false;
 		$config['syslog']['resolve'] = $_POST['resolve'] ? true : false;
+		$config['syslog']['bindlan'] = $_POST['bindlan'] ? true : false;
 		
 		write_config();
 		
@@ -108,6 +110,7 @@ function enable_change(enable_over) {
 		document.iform.portalauth.disabled = 0;
 		document.iform.vpn.disabled = 0;
 		document.iform.system.disabled = 0;
+		document.iform.bindlan.disabled = 0;
 	} else {
 		document.iform.remoteserver.disabled = 1;
 		document.iform.remoteport.disabled = 1;
@@ -116,6 +119,7 @@ function enable_change(enable_over) {
 		document.iform.portalauth.disabled = 1;
 		document.iform.vpn.disabled = 1;
 		document.iform.system.disabled = 1;
+		document.iform.bindlan.disabled = 1;
 	}
 }
 // -->
@@ -209,6 +213,14 @@ function enable_change(enable_over) {
 	                      </table>
 						</td>
                       </tr>
+						<tr> 
+						<td width="22%" valign="top" class="vtable"></td>
+						<td width="78%" class="vtable"> 
+						  <input name="bindlan" type="checkbox" value="yes" <?php if ($pconfig['bindlan']) echo "checked"; ?>> <strong>Bind to LAN interface only</strong>
+						  <br>
+						  This option can be useful when trying to send syslog data
+						  through a VPN tunnel terminated on the WAN interface.</td>
+						</tr>
                       <tr> 
                         <td width="22%" valign="top">&nbsp;</td>
                         <td width="78%"> <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 

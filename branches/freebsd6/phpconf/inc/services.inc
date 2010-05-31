@@ -508,7 +508,7 @@ function services_dnsmasq_configure() {
 		/* generate hosts file */
 		system_hosts_generate();
 		
-		$args = "";
+		$args = "--edns-packet-max=4096";
 		
 		if (isset($config['dnsmasq']['regdhcp'])) {
 			
