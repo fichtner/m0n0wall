@@ -360,7 +360,7 @@ Enable Voucher support first using the checkbox above and hit Save at the bottom
        <td width="22%" valign="top" class="vncellreq">Expired Voucher Message</td>
        <td width="78%" class="vtable">
          <input name="msgexpired" type="text" class="formfld" id="msgexpired" size="80" value="<?=htmlspecialchars($pconfig['msgexpired']);?>">
-         Error message displayed for expired vouchers on paptive portal error page ($PORTAL_MESSAGE$).</td>
+         Error message displayed for expired vouchers on captive portal error page ($PORTAL_MESSAGE$).</td>
     </tr>
     <tr>
        <td width="22%" valign="top">&nbsp;</td>
