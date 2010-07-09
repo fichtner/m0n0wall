@@ -100,7 +100,7 @@ if (count($spd)):
             <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="inner content pane">
   <tr>
                 <td nowrap class="listhdrr">Source</td>
-                <td nowrap class="listhdrr">Destination</a></td>
+                <td nowrap class="listhdrr">Destination</td>
                 <td nowrap class="listhdrr">Direction</td>
                 <td nowrap class="listhdrr">Protocol</td>
                 <td nowrap class="listhdrr">Tunnel endpoints</td>
