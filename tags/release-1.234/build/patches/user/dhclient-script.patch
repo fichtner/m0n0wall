@@ -1,0 +1,54 @@
+--- dhclient-script.orig	Sat Nov 26 11:48:17 2005
++++ dhclient-script	Wed Jan 18 18:00:17 2006
+@@ -13,12 +13,13 @@
+ make_resolv_conf() {
+   if [ x"$new_domain_name_servers" != x ]; then
+     if [ "x$new_domain_name" != x ]; then
+-      echo search $new_domain_name >/etc/resolv.conf
++      echo $new_domain_name >/var/etc/defaultdomain.conf
+     else
+-      rm /etc/resolv.conf
++      rm -f /var/etc/defaultdomain.conf
+     fi
++    rm -f /var/etc/nameservers.conf
+     for nameserver in $new_domain_name_servers; do
+-      echo nameserver $nameserver >>/etc/resolv.conf
++      echo $nameserver >>/var/etc/nameservers.conf
+     done
+   fi
+ }
+@@ -69,7 +70,7 @@
+   eval "ifconfig $interface $medium"
+   eval "ifconfig $interface inet -alias 0.0.0.0 $medium" >/dev/null 2>&1
+   sleep 1
+-  exit_with_hooks 0
++  exit 0
+ fi
+ 
+ if [ x$reason = xPREINIT ]; then
+@@ -79,11 +80,11 @@
+   fi
+   ifconfig $interface inet 0.0.0.0 netmask 0.0.0.0 \
+ 		broadcast 255.255.255.255 up
+-  exit_with_hooks 0
++  exit 0
+ fi
+ 
+ if [ x$reason = xARPCHECK ] || [ x$reason = xARPSEND ]; then
+-  exit_with_hooks 0;
++  exit 0;
+ fi
+   
+ if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
+@@ -140,6 +141,11 @@
+ 	shift; shift
+       done
+     fi
++    if [ x"$new_ip_address" = x"$new_routers" ]; then
++        route delete default >/dev/null 2>&1
++        route add default -interface -link $interface >/dev/null 2>&1
++    fi
++
+   fi
+   if [ x$new_ip_address != x$alias_ip_address ] && [ x$alias_ip_address != x ];
+    then
