@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- add check for DHCP reservation entries for the same MAC address
+
 - add 'Bind to LAN' option for syslog, so you can syslog over a vpn tunnel.
 
 - change edns to 4096 from default of 1280 for dnsmasq, should help with DNSSEC
