@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- make dnsmasq use --stop-dns-rebind by default to increase security and
+  protect against dns rebind attacks that are scheduled to announce
 
 - add check for DHCP reservation entries for the same MAC address
 
