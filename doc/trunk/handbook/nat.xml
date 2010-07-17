@@ -212,13 +212,12 @@
     to NAT your internal hosts to your WAN IP address for outbound traffic.
     The only exception is for any hosts for which you have configured 1:1 NAT
     entries. Therefore, if you are using public IP addresses on any of the
-    interfaces behind your m0n0wall (with the exception of bridged interfaces)
-    you need to change m0n0wall's default NAT behavior by enabling advanced
-    outbound NAT.</para>
+    interfaces behind your m0n0wall you need to change m0n0wall's default NAT
+    behavior by enabling advanced outbound NAT.</para>
 
     <para>If you are using public IP addresses on all the interfaces behind
     your m0n0wall, check the "Enable advanced outbound NAT" box and click
-    Save. Now nothing will be NAT'ed by m0n0wall.</para>
+    Save. Now nothing will be NATed by m0n0wall.</para>
 
     <para>If you have a public IP subnet off one of your interfaces behind
     m0n0wall and a private IP subnet behind another interface, you will need
@@ -231,11 +230,12 @@
     of your choosing.</para>
 
     <note>
-      <para>If advanced outbound NAT is enabled in firmware 1.3 or higher, no
+      <para>If advanced outbound NAT is enabled, no
       outbound NAT rules will be automatically generated anymore. Instead,
-      only the mappings you specify below will be used. With advanced outbound
+      only the mappings you specify will be used. With advanced outbound
       NAT disabled, a mapping is automatically created for each interface's
-      subnet (except WAN) and any mappings specified below will be ignored. If
+      subnet (except WAN) and any mappings specified on the Outbound NAT screen
+      will be ignored. If
       you use target addresses other than the WAN interface's IP address, then
       depending on the way your WAN connection is setup, you may also need
       proxy ARP.</para>
