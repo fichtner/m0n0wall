@@ -280,15 +280,6 @@
       need proxy ARP.</para>
     </note>
 
-    <para>Forwarding traffic for additional IP adresses (also known as Virtual
-    IP addresses) that are not the IP address of the WAN interface is possible
-    by first listing these IP addresses in the Server NAT window. Then 1:1 NAT
-    is used to redirect traffic for these IP addresses to internal servers.
-    For example you may have 3 IP addresses registered with the Internet
-    Service Provider but only one of these can be assigned to the WAN
-    interface. Using Server NAT and 1:1 NAT you can assign the additional 2 IP
-    addresses to the WAN interface as well and redirect their traffic to
-    specific servers.</para>
   </sect1>
 
   <sect1>
