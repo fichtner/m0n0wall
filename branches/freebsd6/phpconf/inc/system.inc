@@ -548,7 +548,7 @@ function system_do_shell_commands($early = 0) {
 function system_do_extensions($early = false) {
 	global $config, $g;
 	
-	if (!is_dir("{$g['etc_path']}/inc/ext") || is_dir("{$g['www_path']}/ext"))
+	if (!is_dir("{$g['etc_path']}/inc/ext") || !is_dir("{$g['www_path']}/ext"))
 		return;
 	
 	$dh = @opendir("{$g['etc_path']}/inc/ext");

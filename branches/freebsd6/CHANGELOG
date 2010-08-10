@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix typo in system_do_extensions() that broke extensions support
+  (reported by Bernd Strehhuber)
+
 - make dnsmasq use --stop-dns-rebind by default to increase security and
   protect against dns rebind attacks that are scheduled to announce
 
