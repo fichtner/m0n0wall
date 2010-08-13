@@ -2,6 +2,10 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- prevent /ext directory from being listed through webGUI
+  (reported by Bernd Strehhuber)
+
 - fix typo in system_do_extensions() that broke extensions support
   (reported by Bernd Strehhuber)
 

@@ -170,7 +170,7 @@ if (is_dir("{$g['www_path']}/ext")){
       $dh = @opendir("{$g['www_path']}/ext");
       if ($dh) {
         while (($extd = readdir($dh)) !== false) {
-          if (($extd === ".") || ($extd === ".."))
+          if (($extd === ".") || ($extd === "..") || ($extd === "index.html"))
             continue;
           $extfiles=explode("\n",trim(file_get_contents("{$g['www_path']}/ext/" . $extd . "/menu2.inc")));
           $menu['Extensions'][array_shift($extfiles)]=$extfiles;
