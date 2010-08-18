@@ -172,7 +172,19 @@ function vpn_ipsec_configure($ipchg = false) {
 							chmod("{$g['varetc_path']}/{$x509cert['hash']}.0", 0600);
 							fwrite($fd1, $cert);
 							fclose($fd1);
-						}
+							/* check for CRL for this CA */
+							if (isset($cacert['crl'])) {
+								$crl = base64_decode($cacert['crl']);
+								$fd1 = fopen("{$g['varetc_path']}/{$x509cert['hash']}.r0", "w");
+								if (!$fd1) {
+									printf("Error: cannot open {$x509cert['hash']}.r0 in vpn.\n");
+									return 1;
+								}
+								chmod("{$g['varetc_path']}/{$x509cert['hash']}.r0", 0600);
+								fwrite($fd1, $crl);
+								fclose($fd1);
+							}
+						} /* if(is_array($x509cert) */
 					}
 				}
 						
