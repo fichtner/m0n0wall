@@ -532,16 +532,16 @@ function services_dnsmasq_configure() {
 			$args .= " --strict-order";
 		}
 		
-		if (!isset($config['dnsmasq']['disablestoprebind'])) {
-			$args .= " --stop-dns-rebind";
-		}
-		
 		if (isset($config['dnsmasq']['domainoverrides']) && is_array($config['dnsmasq']['domainoverrides'])) {
 			foreach($config['dnsmasq']['domainoverrides'] as $override) {
 				$args .= " " . escapeshellarg('--server=/' . $override['domain'] . '/' . $override['ip']);
 			}
 		}
 
+		if (isset($config['dnsmasq']['stoprebind'])) {
+			$args .= " --stop-dns-rebind";
+		}
+		
 		/* run dnsmasq */
 		mwexec("/usr/local/sbin/dnsmasq {$args}");
 
