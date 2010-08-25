@@ -57,7 +57,7 @@ if ($orig_host != $ourhostname) {
     /* the client thinks it's connected to the desired web server, but instead
        it's connected to us. Issue a redirect... */
       
-    header("Location: {$oururl}/?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
+    header("Location: {$oururl}?redirurl=" . urlencode("http://{$orig_host}{$orig_request}"));
     exit;
 }
 

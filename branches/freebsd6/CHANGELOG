@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix extra slash in captive portal redirect
+
 - replaced if_re driver by Realtek customized version to support
   RTL8111C (among others)
 
