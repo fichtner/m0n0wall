@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix typo in dns-rebind description
+
 - change dns-rebind to off by default, updated text description of this feature
 
 - fix extra slash in captive portal redirect

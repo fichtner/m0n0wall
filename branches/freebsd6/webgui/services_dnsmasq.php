@@ -127,10 +127,10 @@ if ($_GET['act'] == "del") {
 				<td class="vtable">
                       <input name="stoprebind" type="checkbox" id="stoprebind" value="yes" <?php if ($pconfig['stoprebind']) echo "checked";?>>
                       <strong>Block DNS Rebind attacks</strong><br>
-					  If this option is iset, the DNS forwarder will reject (and log) addresses from upstream nameservers 
+					  If this option is set, the DNS forwarder will reject (and log) addresses from upstream nameservers 
 					  which are in the private IP ranges. 
 					  This blocks an attack where a browser behind a firewall is used to probe machines on the local network. 
-					  If you use domain overrides, this may cause responses to be blocked if they are resolve to private IP ranges.</td>
+					  If you use domain overrides, this may cause responses to be blocked if they resolve within private IP ranges.</td>
                 </tr>
                 <tr> 
                   <td class="vtable">
