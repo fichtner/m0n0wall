@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- replaced if_re driver by Realtek customized version to support
+  RTL8111C (among others)
+
 - add support for (manually updated) CRLs for IPsec VPN
   (contributed by Sebastian Lemke)
 
