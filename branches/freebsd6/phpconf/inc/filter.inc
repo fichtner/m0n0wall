@@ -344,9 +344,13 @@ function filter_rules_generate($ipv6 = false) {
 			$lanip = calc_6to4_address("lan");
 			$lansn = 64;
 		}
+		if ($lanip == "DHCP-PD") {
+			$lansn = 64;
+			list($lanip,$lansn) = get_dhcppd_address($lancfg['if']);
+		}
 		
 		if (!$lanip) {
-			$lanip = "::1";	/* dummy until 6to4 address is known */
+			$lanip = "::1";	/* dummy until 6to4 or DHCP-PD address is known */
 			$lansa = "::";
 		} else {
 			$lansa = gen_subnet6($lanip, $lansn);
@@ -385,6 +389,9 @@ function filter_rules_generate($ipv6 = false) {
 					if ($oc['ipaddr6'] == "6to4") {
 						$oic['ip'] = calc_6to4_address('opt' . $i);
 						$oic['sn'] = 64;
+					} elseif ($oc['ipaddr6'] == "DHCP-PD") {
+						$oic['sn'] = 64;
+						list($oic['ip'],$oic['sn']) = get_dhcppd_address($oc['if']);
 					} else {
 						$oic['ip'] = $oc['ipaddr6'];
 						$oic['sn'] = $oc['subnet6'];
@@ -516,6 +523,13 @@ pass in quick proto ipv6-icmp from any to any icmp-type 2
 pass out quick proto ipv6-icmp from any to any icmp-type 2
 pass in quick proto ipv6-icmp from any to any icmp-type 3
 pass out quick proto ipv6-icmp from any to any icmp-type 3
+
+# allow our DHCPv6 client out to the WAN
+# XXX - should be more restrictive
+# (not possible at the moment - need 'me' like in ipfw)
+pass out quick on $wanif proto udp from any port = 546 to any port = 547
+pass in quick on $wanif proto udp from any to any port = 546
+
 
 EOD;
 		
@@ -655,7 +669,7 @@ pass in quick on $wanif proto udp from any port = 67 to any port = 68
 # LAN/OPT spoof check (needs to be after DHCP because of broadcast addresses)
 
 EOD;
-	}
+	} 
 
 	/* LAN spoof check */
 	/* omit if any interface is bridged to LAN and the filtering bridge is on */
@@ -742,6 +756,8 @@ block in $log quick on $wanif from any to 2002:c0a8::/32
 
 block in $log quick on $wanif from ff05::/16 to any
 block in $log quick on $wanif from any to ff05::/16
+
+pass in quick on $wanif proto udp from any to any  port = 546
 
 EOD;
 		}

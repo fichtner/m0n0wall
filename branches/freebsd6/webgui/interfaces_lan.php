@@ -44,6 +44,8 @@ if (ipv6enabled()) {
 	
 	if ($config['interfaces']['lan']['ipaddr6'] == "6to4") {
 		$pconfig['ipv6mode'] = "6to4";
+	} else if ($config['interfaces']['lan']['ipaddr6'] == "DHCP-PD") {
+		$pconfig['ipv6mode'] = "DHCP-PD";
 	} else if ($config['interfaces']['lan']['ipaddr6']) {
 		$pconfig['ipaddr6'] = $config['interfaces']['lan']['ipaddr6'];
 		$pconfig['subnet6'] = $config['interfaces']['lan']['subnet6'];
@@ -105,6 +107,12 @@ if ($_POST) {
 			
 			if ($_POST['ipv6mode'] == "6to4") {
 				$config['interfaces']['lan']['ipaddr6'] = "6to4";
+				unset($config['interfaces']['lan']['subnet6']);
+				$config['interfaces']['lan']['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$config['interfaces']['lan']['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
+				$config['interfaces']['lan']['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
+			} else if ($_POST['ipv6mode'] == "DHCP-PD") {
+				$config['interfaces']['lan']['ipaddr6'] = "DHCP-PD";
 				unset($config['interfaces']['lan']['subnet6']);
 				$config['interfaces']['lan']['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
 				$config['interfaces']['lan']['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
@@ -208,7 +216,7 @@ function enable_change(enable_over) {
                   <td valign="top" class="vncellreq">IPv6 mode</td>
                   <td class="vtable"> 
                     <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
-                      <?php $opts = array('disabled', 'static', '6to4');
+                      <?php $opts = array('disabled', 'static', '6to4','DHCP-PD');
 						foreach ($opts as $opt) {
 							echo "<option value=\"$opt\"";
 							if ($opt == $pconfig['ipv6mode']) echo "selected";

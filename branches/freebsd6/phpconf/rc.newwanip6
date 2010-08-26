@@ -34,11 +34,17 @@
 	require_once("functions.inc");
 	
 	/* WAN IPv6 address has changed - currently this script only gets
-	   called from AICCU */
+	   called from AICCU and dhcp6c (via /etc/dhcp6c-exit-hooks) */
 	
 	/* make sure to wait until the boot scripts have finished */
 	while (file_exists("{$g['varrun_path']}/booting")) {
 		sleep(1);
+	}
+	
+	/* dhcp6c-exit-hooks passes a sleep timer, so that this doesn't run before
+           ip address is assigned and therefore known to filter_configure() */
+	if ($argc) {
+		sleep($argv[1]);
 	}
 	
 	/* reload firewall/NAT rules (WAN IPv6 address may be referenced from

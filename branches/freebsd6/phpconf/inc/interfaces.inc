@@ -176,6 +176,8 @@ function interfaces_lan_configure6() {
 			$v6addr = calc_6to4_address("lan");
 			if ($v6addr)
 				mwexec("/sbin/ifconfig " . escapeshellarg($lancfg['if']) . " inet6 $v6addr prefixlen 64 alias");
+		} else if ($lancfg['ipaddr6'] == "DHCP-PD") {
+			services_dhcp6c_configure();
 		} else if ($lancfg['ipaddr6'] && $lancfg['subnet6']) {
 			mwexec('/sbin/ifconfig ' . escapeshellarg($lancfg['if']) .
 				' inet6 ' . escapeshellarg($lancfg['ipaddr6']) .
@@ -423,6 +425,8 @@ function interfaces_optional_configure_if6($opti) {
 				$v6addr = calc_6to4_address("opt" . $opti);
 				if ($v6addr)
 					mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . " inet6 $v6addr prefixlen 64 alias");
+			} else if ($optcfg['ipaddr6'] == "DHCP-PD") {
+					services_dhcp6c_configure();
 			} else if ($optcfg['ipaddr6'] && $optcfg['subnet6']) {
 				mwexec('/sbin/ifconfig ' . escapeshellarg($optcfg['if']) .
 					' inet6 ' . escapeshellarg($optcfg['ipaddr6']) .
@@ -693,6 +697,8 @@ function interfaces_wan_configure6($newwanip = false) {
 					interfaces_optional_configure6();
 				}
 			}
+		} else if ($wancfg['ipaddr6'] == "DHCP") {
+			services_dhcp6c_configure();
 		} else if ($wancfg['ipaddr6'] == "ppp") {
 			if ($newwanip) {
 				/* called from up-script -> add IPv6 default route */
@@ -1311,6 +1317,18 @@ function calc_6to4_address($if) {
 		return "2002:{$wan_v6nibbles}:{$nth}::1";
 	}
 	return false;
+}
+
+function calc_dhcppd_address($if) {
+	$addresses = get_interface_ipv6_adresses($if);
+
+	foreach ($addresses as $adr) {
+		if (!preg_match('/^fe80:/', $adr[0])) {
+			$ipv6addr=$adr;
+		}
+	}
+	return $ipv6addr;
+	
 }
 
 function suggest_ipv6_lan_addr(){

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# let the configuration system know that the
+# WAN IP address has changed
+/etc/rc.newwanip6 5 &
+

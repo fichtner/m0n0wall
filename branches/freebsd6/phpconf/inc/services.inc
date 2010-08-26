@@ -31,6 +31,101 @@
 /* include all configuration functions */
 require_once("functions.inc");
 
+function services_dhcp6c_stop() {
+	/* kill any running dhcp6c */
+	killbypid("{$g['varrun_path']}/dhcp6c.pid");
+	mwexec('/sbin/sysctl net.inet6.ip6.accept_rtadv=0');
+}
+
+function services_dhcp6c_configure() {
+	global $config, $g;
+	
+	/* kill any running dhcp6c */
+	killbypid("{$g['varrun_path']}/dhcp6c.pid");
+	
+	/* write dhcp6c_duid */
+	if ($config['interfaces']['wan']['v6duid']) {
+		
+		$dhcp6duid = $config['interfaces']['wan']['v6duid'] ;
+		$fd = fopen("{$g['vardb_path']}/dhcp6c_duid", "w");
+		if (!$fd) {
+			printf("Error: cannot open dhcp6c_duid in services_dhcp6c_configure().\n");
+			return 1;
+		}
+	
+		$duidbytes = explode(":",$dhcp6duid);
+	
+		foreach ($duidbytes as $duidpiece) {
+		    $tmpdhcp6duid .= pack("H*", $duidpiece);    
+		}
+
+		fwrite($fd, chr(strlen($tmpdhcp6duid)) . chr(0) . $tmpdhcp6duid);
+		fclose($fd);
+	}
+	
+	/* write dhcp6c.conf */
+	$wanif = get_real_wan_interface();
+	$fd = fopen("{$g['varetc_path']}/dhcp6c.conf", "w");
+	if (!$fd) {
+		printf("Error: cannot open dhcp6c.conf in services_dhcp6c_configure().\n");
+		return 1;
+	}
+	
+	if ($config['interfaces']['wan']['ipaddr6'] == "DHCP") {
+		mwexec('/sbin/sysctl net.inet6.ip6.accept_rtadv=1');
+		$d6wans = <<<EOD
+		request domain-name-servers;
+		script "/etc/dhcp6c-exit-hooks";
+		send ia-na 0;
+
+EOD;
+	}
+	$p = 1;
+	if ($config['interfaces']['lan']['ipaddr6'] == "DHCP-PD") {
+		$d6wanm = "\t\tsend ia-pd 0;\n";
+		$d6pds = "id-assoc pd 0 {\n";
+		$d6pde = "};\n";
+		$d6lan .= <<<EOD
+		prefix-interface {$config['interfaces']['lan']['if']} {
+			sla-id {$p};
+		};
+
+EOD;
+	$p++;
+	}
+			
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+		if ($config['interfaces']['opt' . $i]['ipaddr6'] == "DHCP-PD") {
+			$d6wanm = "\t\tsend ia-pd 0;\n";
+			$d6pds = "id-assoc pd 0 {\n";
+			$d6pde = "};\n";
+			$d6opt .= <<<EOD
+		prefix-interface {$config['interfaces']['opt' . $i]['if']} {
+			sla-id {$p};
+		};
+
+EOD;
+			$p++;
+		}
+	}
+
+	$dhcp6cconf = "interface {$wanif} {\n" . $d6wans . $d6wanm . "};\n" . $d6pds . $d6lan . $d6opt . $d6pde ;
+ 	$dhcp6cconf .= <<<EOD
+id-assoc na 0 {
+};
+EOD;
+	
+	fwrite($fd, $dhcp6cconf);
+	fclose($fd);
+
+	/* fire up dhcp6c */
+	$wanif = get_real_wan_interface();
+	mwexec("/usr/local/sbin/dhcp6c -c {$g['varetc_path']}/dhcp6c.conf -p {$g['varrun_path']}/dhcp6c.pid {$wanif}" );
+
+	return 0;
+
+}
+
 function services_dhcp6s_configure() {
 	global $config, $g;
 	
