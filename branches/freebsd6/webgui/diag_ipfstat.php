@@ -69,7 +69,7 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 	
 	$filter = '';
 	if ($_GET['sfilter']) {
-		if (is_ipaddr($_GET['sfilter'])) {
+		if (is_ipaddr4or6($_GET['sfilter'])) {
 			$filter = ' -S ' . $_GET['sfilter'];
 			$filterPassThru = '&sfilter=' . $_GET['sfilter'];
 		}
@@ -77,7 +77,7 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 			unset ($_GET['sfilter']);
 	}
 	if ($_GET['dfilter']) {
-		if (is_ipaddr($_GET['dfilter']))
+		if (is_ipaddr4or6($_GET['dfilter']))
 		{
 			$filter = ' -D ' . $_GET['dfilter'];
 			$filterPassThru = '&dfilter=' . $_GET['dfilter'];
@@ -88,7 +88,12 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 	
 }
 
-$fd = popen("/sbin/ipfstat -t" . $filter, "r");
+if ($_GET['ip']=='6') {
+	$fd = popen("/sbin/ipfstat -t -6" . $filter, "r");
+	$filterPassThru .= "&ip=6";
+} else {
+	$fd = popen("/sbin/ipfstat -t " . $filter, "r");
+}
 
 // See if the user has set a limit to the number of entries...  
 if (isset($config['diag']['ipfstatentries']))
@@ -144,12 +149,20 @@ while (!feof($fd)) {
 pclose($fd);
 
 // Clear the statistics snapshot files, which track the packets and bytes of connections
+
 if (isset($_GET['clear']))
 {
-	if (file_exists('/tmp/packets'))
-		unlink('/tmp/packets');
-	if (file_exists('/tmp/bytes'))
-		unlink('/tmp/bytes');
+	if ($_GET['ip']=='6') {
+		if (file_exists('/tmp/packets6'))
+			unlink('/tmp/packets6');
+		if (file_exists('/tmp/bytes6'))
+			unlink('/tmp/bytes6');
+	} else {
+		if (file_exists('/tmp/packets'))
+			unlink('/tmp/packets');
+		if (file_exists('/tmp/bytes'))
+			unlink('/tmp/bytes');
+	}
 		
 	// Redirect so we don't hit "clear" every time we refresh the screen.
 	header("Location: diag_ipfstat.php?".$filterPassThru);
@@ -227,7 +240,11 @@ if ($_GET['order']) {
 
 
 function writeStats($fname, &$data) {
-	$fname = "/tmp/" . $fname;
+	if ($_GET['ip']=='6') {
+		$fname = "/tmp/" . $fname . "6";
+	} else {
+		$fname = "/tmp/" . $fname;
+	}
 	if (file_exists($fname))
 		unlink($fname);
 	$file = fopen($fname, 'a');
@@ -236,7 +253,11 @@ function writeStats($fname, &$data) {
 }
 
 function readStats($fname, &$data) {
-	$fname = "/tmp/" . $fname;
+	if ($_GET['ip']=='6') {
+		$fname = "/tmp/" . $fname . "6";
+	} else {
+		$fname = "/tmp/" . $fname;
+	}
 	if (file_exists($fname))
 	{
 		$file = fopen($fname,'r');
@@ -283,7 +304,11 @@ function displayIP($ip, $col) {
 					return $ip;
 			}
 			else {
-				return '<a href="?sfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				if ($_GET['ip']=='6') {
+					return '<a href="?ip=6&sfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				} else {
+					return '<a href="?sfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				}
 			}
 			break;
 	
@@ -293,7 +318,11 @@ function displayIP($ip, $col) {
 					return $ip;				
 			}
 			else {
-				return '<a href="?dfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				if ($_GET['ip']=='6') {
+					return '<a href="?ip=6&dfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				} else {
+					return '<a href="?dfilter='.$ip.$viewPassThru.'">'. $ip .'</a>';
+				}
 			}			
 			break;
 	}
@@ -301,11 +330,16 @@ function displayIP($ip, $col) {
 }
 
 // Get timestamp of snapshot file, if it exists, for display later.
-if (!(file_exists('/tmp/packets'))) {
+if ($_GET['ip']=='6') {
+	$fname = "/tmp/packets6";
+} else {
+	$fname = "/tmp/packets";
+}
+if (!(file_exists($fname))) {
 	$lastSnapshot = "Never"; 
 }
 else { 
-	$lastSnapshot = strftime("%m/%d/%y %H:%M:%S",filectime('/tmp/packets'));
+	$lastSnapshot = strftime("%m/%d/%y %H:%M:%S",filectime($fname));
 }
 
 // Moved this down here due to the potential for redirects, up above.
@@ -313,7 +347,31 @@ include("fbegin.inc");
 
 // Produce proper HTML
 $filterPassThru = str_replace("&", "&amp;", $filterPassThru);
+if (ipv6enabled()) {
 
+?>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
+	  <tr><td class="tabnavtbl">
+	  <ul id="tabnav">
+<?php
+if ($_GET['ip'] == '6') { 
+?>
+	    <li class="tabinact1"><a href="diag_ipfstat.php">IPv4</a></li>
+		<li class="tabact">IPv6</li>
+<?php 
+} else {
+?>
+	    <li class="tabact">IPv4</li>
+		<li class="tabinact1"><a href="diag_ipfstat.php?ip=6">IPv6</a></li>	
+	<?php	
+}
+?>
+	  </ul>
+	  </td></tr>
+	  <tr> 
+	    <td class="tabcont">
+<?php
+}
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -324,12 +382,12 @@ $filterPassThru = str_replace("&", "&amp;", $filterPassThru);
     <?php if (($lastSnapshot!='Never') && (!isset($_GET['view']))) :?>  
     <td class="listlr"><a href="?view=1&amp;order=bytes&amp;sort=des<?=$filterPassThru;?>">View delta</a></td>
     <td class="listr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
-    <td class="listr"><a href="?clear=1">Clear snapshot</a></td>
+    <td class="listr"><a href="?clear=1<?=$filterPassThru;?>">Clear snapshot</a></td>
 	<td class="listr" colspan="5" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>    
     <?php endif ?>
     <?php if (($lastSnapshot!='Never') && (isset($_GET['view']))) :?>  
     <td class="listlr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
-    <td class="listr"><a href="?clear=1">Clear</a></td>
+    <td class="listr"><a href="?clear=1<?=$filterPassThru;?>">Clear</a></td>
 	<td class="listr" colspan="6" align="right"><span class="red">Viewing delta of statistics snapshot: <?=$lastSnapshot;?></span></td>    
     <?php endif ?>    
     <?php if ($lastSnapshot=='Never') :?>
@@ -373,5 +431,13 @@ $filterPassThru = str_replace("&", "&amp;", $filterPassThru);
 <input type="submit" class="formbtn" value="Unfilter View">
 </form>
 </p>
-<?php endif; ?>
+
+<?php
+if (ipv6enabled()) {
+?>
+	</tr>
+	</table>
+<?php
+}
+ endif; ?>
 <?php include("fend.inc"); ?>
