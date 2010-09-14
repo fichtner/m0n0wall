@@ -56,7 +56,7 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	if ($_POST['enable'] && !is_ipaddr($_POST['remoteserver'])) {
+	if ($_POST['enable'] && !is_ipaddr4or6($_POST['remoteserver'])) {
 		$input_errors[] = "A valid IP address must be specified.";
 	}
 	if ($_POST['remoteport'] && !is_port($_POST['remoteport'])) {

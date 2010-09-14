@@ -260,7 +260,11 @@ function system_syslogd_start() {
 			return 1;
 		}
 		
-		$syslogserver = $syslogcfg['remoteserver'];
+		if (is_ipaddr6($syslogcfg['remoteserver'])) {
+			$syslogserver = "[" . $syslogcfg['remoteserver'] . "]";
+		} else {
+			$syslogserver = $syslogcfg['remoteserver'];
+		}
 		if ($syslogcfg['remoteport'])
 			$syslogserver .= ":" . $syslogcfg['remoteport'];
 		
