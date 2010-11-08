@@ -40,7 +40,7 @@ $ifname=@$_GET["ifname"]?$_GET["ifname"]:"Interface $ifnum";  //Interface name t
 $scale_type="up";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
 $nb_plot=120;                   //NB plot in graph
 $time_interval=1;		//Refresh time Interval
-$fetch_link = "stats.cgi?$ifnum";
+$fetch_link = "stats.cgi?" . htmlspecialchars($ifnum);
 
 //SVG attributes
 $attribs['axis']='fill="black" stroke="black"';
@@ -58,7 +58,7 @@ $attribs['error']='fill="blue" font-family="Arial" font-size="4"';
 $attribs['collect_initial']='fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
 
 //Error text if we cannot fetch data : depends on which method is used
-$error_text = "Cannot get data about interface $ifnum";
+$error_text = "Cannot get data about interface " . htmlspecialchars($ifnum);
 
 $height=100;            //SVG internal height : do not modify
 $width=200;             //SVG internal width : do not modify
@@ -80,7 +80,7 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <text id="graph_out_lbl" x="5" y="16" <?=$attribs['out']?>>Out</text>
     <text id="graph_in_txt" x="20" y="8" <?=$attribs['in']?>> </text>
     <text id="graph_out_txt" x="20" y="16" <?=$attribs['out']?>> </text>
-    <text id="ifname" x="<?=$width?>" y="8" <?=$attribs['graphname']?> text-anchor="end"><?=$ifname?></text>
+    <text id="ifname" x="<?=$width?>" y="8" <?=$attribs['graphname']?> text-anchor="end"><?=htmlspecialchars($ifname);?></text>
     <text id="switch_unit" x="<?=$width*0.55?>" y="5" <?=$attribs['switch_unit']?>>Switch to bytes/s</text>
     <text id="switch_scale" x="<?=$width*0.55?>" y="11" <?=$attribs['switch_scale']?>>AutoScale (<?=$scale_type?>)</text>
     <text id="datetime" x="<?=$width*0.33?>" y="5" <?=$attribs['legend']?>> </text>
