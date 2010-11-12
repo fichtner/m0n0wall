@@ -196,7 +196,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
                   <td width="78%"> 
                     <input name="save" type="submit" class="formbtn" value="Save"> 
             		<?php if (isset($id) && $a_user[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>">
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
 		            <?php endif; ?>
                   </td>
                 </tr>
@@ -276,7 +276,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
       <form action="system_usermanager.php" method="post" name="iform" id="iform">
          <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="password change pane">
             <tr> 
-              <td colspan="2" valign="top" class="listtopic"><?=$_SERVER['REMOTE_USER']?>'s Password</td>
+              <td colspan="2" valign="top" class="listtopic"><?=htmlspecialchars($_SERVER['REMOTE_USER'])?>'s Password</td>
             </tr>
 		    <tr> 
 		      <td width="22%" valign="top" class="vncell">Password</td>

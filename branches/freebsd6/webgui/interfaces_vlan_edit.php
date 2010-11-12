@@ -102,7 +102,7 @@ if ($_POST) {
                     <select name="if" class="formfld">
                       <?php
 					  foreach ($portlist as $ifn => $ifinfo): ?>
-                      <option value="<?=$ifn;?>" <?php if ($ifn == $pconfig['if']) echo "selected"; ?>> 
+                      <option value="<?=htmlspecialchars($ifn);?>" <?php if ($ifn == $pconfig['if']) echo "selected"; ?>> 
 					  <?php if ($ifinfo['drvname'])
 							echo htmlspecialchars($ifn . " (" . $ifinfo['drvname'] . ", " .  $ifinfo['mac'] . ")");
 						else
@@ -131,7 +131,7 @@ if ($_POST) {
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save">
                     <?php if (isset($id) && $a_vlans[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>">
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
                     <?php endif; ?>
                   </td>
                 </tr>

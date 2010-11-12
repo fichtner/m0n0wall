@@ -389,7 +389,7 @@ function enable_change(enable_over) {
 					  <tr> 
 						<td width="22%" valign="top">&nbsp;</td>
 						<td width="78%"> 
-						  <input name="if" type="hidden" value="<?=$if;?>"> 
+						  <input name="if" type="hidden" value="<?=htmlspecialchars($if);?>"> 
 						  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
 						</td>
 					  </tr>
@@ -430,13 +430,13 @@ function enable_change(enable_over) {
                   <td class="listbg">
                     <?=htmlspecialchars($mapent['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="services_dhcp_edit.php?if=<?=$if;?>&amp;id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a>
-                     &nbsp;<a href="services_dhcp.php?if=<?=$if;?>&amp;act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this mapping?')"><img src="x.gif" title="delete mapping" width="17" height="17" border="0" alt="delete mapping"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="services_dhcp_edit.php?if=<?=urlencode($if);?>&amp;id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a>
+                     &nbsp;<a href="services_dhcp.php?if=<?=urlencode($if);?>&amp;act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this mapping?')"><img src="x.gif" title="delete mapping" width="17" height="17" border="0" alt="delete mapping"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="services_dhcp_edit.php?if=<?=$if;?>"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
+                  <td class="list"> <a href="services_dhcp_edit.php?if=<?=urlencode($if);?>"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
 				</tr>
               </table>
     </td>

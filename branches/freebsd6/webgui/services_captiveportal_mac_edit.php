@@ -116,7 +116,7 @@ if ($_POST) {
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save">
                     <?php if (isset($id) && $a_passthrumacs[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>">
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
                     <?php endif; ?>
                   </td>
                 </tr>

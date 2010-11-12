@@ -3,7 +3,7 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
-- fixed XSS vulnerability in graph.php
+- fixed various XSS vulnerabilities in webGUI
 
 - add ipv6 support for syslog destination
 

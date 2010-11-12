@@ -249,7 +249,7 @@ function enable_change(enable_over) {
 	                <?php if (!isset($wancfg['ipv6ra'])): ?>
 					Router advertisements are not enabled on WAN interface.
 	 				<?php else: ?>
-					<strong><?php echo suggest_ipv6_lan_addr() ?></strong><br>
+					<strong><?php echo htmlspecialchars(suggest_ipv6_lan_addr()) ?></strong><br>
 					This IPv6 Address is suggested from listening to prefix advertisements received on the WAN interface, and using the first address available in that prefix.
 					<?php endif; ?>
 					</td>

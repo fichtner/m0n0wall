@@ -71,7 +71,7 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 	if ($_GET['sfilter']) {
 		if (is_ipaddr4or6($_GET['sfilter'])) {
 			$filter = ' -S ' . $_GET['sfilter'];
-			$filterPassThru = '&sfilter=' . $_GET['sfilter'];
+			$filterPassThru = '&sfilter=' . urlencode($_GET['sfilter']);
 		}
 		else 
 			unset ($_GET['sfilter']);
@@ -80,7 +80,7 @@ if (($_GET['sfilter']) or ($_GET['dfilter'])) {
 		if (is_ipaddr4or6($_GET['dfilter']))
 		{
 			$filter = ' -D ' . $_GET['dfilter'];
-			$filterPassThru = '&dfilter=' . $_GET['dfilter'];
+			$filterPassThru = '&dfilter=' . urlencode($_GET['dfilter']);
 		}
 		else 
 			unset ($_GET['dfilter']);

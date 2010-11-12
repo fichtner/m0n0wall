@@ -622,7 +622,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             <?=htmlspecialchars($wkportdesc);?>
                             </option>
                             <?php endforeach; ?>
-                          </select> <input name="srcbeginport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['srcbeginport']) echo $pconfig['srcbeginport']; ?>"></td>
+                          </select> <input name="srcbeginport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['srcbeginport']) echo htmlspecialchars($pconfig['srcbeginport']); ?>"></td>
                       </tr>
                       <tr> 
                         <td>to:</td>
@@ -637,7 +637,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             <?=htmlspecialchars($wkportdesc);?>
                             </option>
                             <?php endforeach; ?>
-                          </select> <input name="srcendport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['srcendport']) echo $pconfig['srcendport']; ?>"></td>
+                          </select> <input name="srcendport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['srcendport']) echo htmlspecialchars($pconfig['srcendport']); ?>"></td>
                       </tr>
                     </table>
                     <br> 
@@ -709,7 +709,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             <?=htmlspecialchars($wkportdesc);?>
                             </option>
                             <?php endforeach; ?>
-                          </select> <input name="dstbeginport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['dstbeginport']) echo $pconfig['dstbeginport']; ?>"></td>
+                          </select> <input name="dstbeginport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['dstbeginport']) echo htmlspecialchars($pconfig['dstbeginport']); ?>"></td>
                       </tr>
                       <tr> 
                         <td>to:</td>
@@ -724,7 +724,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                             <?=htmlspecialchars($wkportdesc);?>
                             </option>
                             <?php endforeach; ?>
-                          </select> <input name="dstendport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['dstendport']) echo $pconfig['dstendport']; ?>"></td>
+                          </select> <input name="dstendport_cust" type="text" size="5" value="<?php if (!$bfound && $pconfig['dstendport']) echo htmlspecialchars($pconfig['dstendport']); ?>"></td>
                       </tr>
                     </table>
                     <br> <span class="vexpl">Specify the port or port range for 
@@ -765,9 +765,9 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save"> 
                     <?php if (isset($id) && $a_filter[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>"> 
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>"> 
                     <?php endif; ?>
-                    <input name="after" type="hidden" value="<?=$after;?>"> 
+                    <input name="after" type="hidden" value="<?=htmlspecialchars($after);?>"> 
                   </td>
                 </tr>
               </table>

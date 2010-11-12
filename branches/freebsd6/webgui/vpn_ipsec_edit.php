@@ -401,7 +401,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Remote subnet</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="remotenet" type="text" class="formfld" id="remotenet" size="20" value="<?=$pconfig['remotenet'];?>">
+                    <?=$mandfldhtml;?><input name="remotenet" type="text" class="formfld" id="remotenet" size="20" value="<?=htmlspecialchars($pconfig['remotenet']);?>">
                     / 
                     <select name="remotebits" class="formfld" id="remotebits">
                       <?php for ($i = 32; $i >= 0; $i--): ?>
@@ -414,7 +414,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Remote gateway</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="remotegw" type="text" class="formfld" id="remotegw" size="20" value="<?=$pconfig['remotegw'];?>"> 
+                    <?=$mandfldhtml;?><input name="remotegw" type="text" class="formfld" id="remotegw" size="20" value="<?=htmlspecialchars($pconfig['remotegw']);?>"> 
                     <br>
                     Enter the public IP address or host name of the remote gateway</td>
                 </tr>
@@ -453,7 +453,7 @@ function methodsel_change() {
                       <?=htmlspecialchars($modename);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=$pconfig['p1myident'];?>"> 
+                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=htmlspecialchars($pconfig['p1myident']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -496,7 +496,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                   <td width="78%" class="vtable"> 
-                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=$pconfig['p1lifetime'];?>">
+                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=htmlspecialchars($pconfig['p1lifetime']);?>">
                     seconds</td>
                 </tr>
                 <tr> 
@@ -596,7 +596,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                   <td width="78%" class="vtable"> 
-                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=$pconfig['p2lifetime'];?>">
+                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=htmlspecialchars($pconfig['p2lifetime']);?>">
                     seconds</td>
                 </tr>
                 <tr> 
@@ -604,7 +604,7 @@ function methodsel_change() {
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save"> 
                     <?php if (isset($id) && $a_ipsec[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>"> 
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>"> 
                     <?php endif; ?>
                   </td>
                 </tr>

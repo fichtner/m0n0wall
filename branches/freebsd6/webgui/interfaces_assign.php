@@ -207,7 +207,7 @@ if ($_GET['act'] == "add") {
 	  <td valign="middle" class="listr">
 		<select name="<?=$ifname;?>" class="formfld" id="<?=$ifname;?>">
 		  <?php foreach ($portlist as $portname => $portinfo): ?>
-		  <option value="<?=$portname;?>" <?php if ($portname == $iface['if']) echo "selected";?>> 
+		  <option value="<?=htmlspecialchars($portname);?>" <?php if ($portname == $iface['if']) echo "selected";?>> 
 		  <?php if ($portinfo['isvlan']) {
 		  			$descr = "VLAN {$portinfo['tag']} on {$portinfo['if']}";
 					if ($portinfo['descr'])

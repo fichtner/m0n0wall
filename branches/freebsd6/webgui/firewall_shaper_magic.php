@@ -384,14 +384,14 @@ if ($_POST) {
           <td width="22%" class="vncellreq">Downstream<br>
             speed </td>
           <td width="78%" class="vtable">
-              <?=$mandfldhtml;?><input name="maxdown" type="text" size="10" value="<?php if ($pconfig['maxdown']) echo $pconfig['maxdown']; ?>"> 
+              <?=$mandfldhtml;?><input name="maxdown" type="text" size="10" value="<?php if ($pconfig['maxdown']) echo htmlspecialchars($pconfig['maxdown']); ?>"> 
               kbps<br>
               Enter the speed of your WAN downstream link here.</td>
 		</tr>
         <tr valign="top">
           <td width="22%" class="vncellreq">Upstream<br>
             speed</td>
-          <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="maxup" type="text" size="10" value="<?php if ($pconfig['maxup']) echo $pconfig['maxup']; ?>">
+          <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="maxup" type="text" size="10" value="<?php if ($pconfig['maxup']) echo htmlspecialchars($pconfig['maxup']); ?>">
               kbps<br>
               Enter the speed of your WAN upstream link here.</td>
 		</tr>

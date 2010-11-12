@@ -207,7 +207,7 @@ function enable_change(enable_over) {
 		  <tr><td class="tabnavtbl">
 		  <ul id="tabnav">
 			<li class="tabact">Primary configuration</li>
-			<li class="tabinact1"><a href="interfaces_secondaries.php?if=opt<?=$index?>&amp;ifname=<?=urlencode("Optional $index (" . htmlspecialchars($optcfg['descr']) . ")"); ?>">Secondary IPs</a></li>
+			<li class="tabinact1"><a href="interfaces_secondaries.php?if=opt<?=htmlspecialchars($index)?>&amp;ifname=<?=urlencode("Optional " . htmlspecialchars($index) . " (" . htmlspecialchars($optcfg['descr']) . ")"); ?>">Secondary IPs</a></li>
 		  </ul>
 		  </td></tr>
 		  <tr> 
@@ -219,7 +219,7 @@ function enable_change(enable_over) {
                   <td width="22%" valign="top" class="vtable">&nbsp;</td>
                   <td width="78%" class="vtable">
 <input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)">
-                    <strong>Enable Optional <?=$index;?> interface</strong></td>
+                    <strong>Enable Optional <?=htmlspecialchars($index);?> interface</strong></td>
 				</tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>
@@ -316,7 +316,7 @@ function enable_change(enable_over) {
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
-                    <input name="index" type="hidden" value="<?=$index;?>"> 
+                    <input name="index" type="hidden" value="<?=htmlspecialchars($index);?>"> 
 				  <input name="Submit" type="submit" class="formbtn" value="Save" onclick="enable_change(true)"> 
                   </td>
                 </tr>
@@ -341,7 +341,7 @@ wlan_enable_change(false);
 //-->
 </script>
 <?php else: ?>
-<strong>Optional <?=$index;?> has been disabled because there is no OPT<?=$index;?> interface.</strong>
+<strong>Optional <?=htmlspecialchars($index);?> has been disabled because there is no OPT<?=htmlspecialchars($index);?> interface.</strong>
 <?php endif; ?>
 </table>
 <?php include("fend.inc"); ?>

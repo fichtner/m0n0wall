@@ -261,7 +261,7 @@ function methodsel_change() {
                       <?=htmlspecialchars($modename);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=$pconfig['p1myident'];?>"> 
+                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=htmlspecialchars($pconfig['p1myident']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -304,7 +304,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                         <td width="78%" class="vtable"> 
-                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=$pconfig['p1lifetime'];?>">
+                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=htmlspecialchars($pconfig['p1lifetime']);?>">
                     seconds</td>
                 </tr>
                 <tr> 
@@ -390,7 +390,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                         <td width="78%" class="vtable"> 
-                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=$pconfig['p2lifetime'];?>">
+                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=htmlspecialchars($pconfig['p2lifetime']);?>">
                     seconds</td>
                 </tr>
                 <tr> 

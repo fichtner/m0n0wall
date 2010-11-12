@@ -131,10 +131,10 @@ if ($_POST) {
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save">
                     <?php if (isset($id) && $a_secondaries[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>">
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
                     <?php endif; ?>
 					<?php if (isset($if)): ?>
-                    <input name="if" type="hidden" value="<?=$if;?>">
+                    <input name="if" type="hidden" value="<?=htmlspecialchars($if);?>">
                     <?php endif; ?>
 					<?php if (isset($ifname)): ?>
                     <input name="ifname" type="hidden" value="<?=htmlspecialchars($ifname);?>">

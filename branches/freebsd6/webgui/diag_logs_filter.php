@@ -50,42 +50,42 @@ if ($_POST['clear']) {
 
 if (isset($_GET['act']) && preg_match("/^[pb]+$/", $_GET['act'])) {
 	$action = $_GET['act'];
-	$ifstring  .= "&act=$action";
-	$srcstring .= "&act=$action";
-	$dststring .= "&act=$action";
-	$prstring  .= "&act=$action";
+	$ifstring  .= "&act=" . urlencode($action);
+	$srcstring .= "&act=" . urlencode($action);
+	$dststring .= "&act=" . urlencode($action);
+	$prstring  .= "&act=" . urlencode($action);
 }
 
 if (isset($_GET['if']) && ($_GET['if'] != "")) {
 	$iface = $_GET['if'];
-	$actstring .= "&if=$iface";
-	$srcstring .= "&if=$iface";
-	$dststring .= "&if=$iface";
-	$prstring  .= "&if=$iface";
+	$actstring .= "&if=" . urlencode($iface);
+	$srcstring .= "&if=" . urlencode($iface);
+	$dststring .= "&if=" . urlencode($iface);
+	$prstring  .= "&if=" . urlencode($iface);
 }
 
 if (isset($_GET['pr']) && in_array($_GET['pr'], $protocols)) {
 	$proto = $_GET['pr'];
-	$actstring .= "&pr=$proto";
-	$ifstring  .= "&pr=$proto";
-	$srcstring .= "&pr=$proto";
-	$dststring .= "&pr=$proto";
+	$actstring .= "&pr=" . urlencode($proto);
+	$ifstring  .= "&pr=" . urlencode($proto);
+	$srcstring .= "&pr=" . urlencode($proto);
+	$dststring .= "&pr=" . urlencode($proto);
 }
 
 if (isset($_GET['sp']) && (is_numeric($_GET['sp']))) {
 	$srcport = $_GET['sp'];
-	$actstring .= "&sp=$srcport";
-	$ifstring  .= "&sp=$srcport";
-	$dststring .= "&sp=$srcport";
-	$prstring  .= "&sp=$srcport";
+	$actstring .= "&sp=" . urlencode($srcport);
+	$ifstring  .= "&sp=" . urlencode($srcport);
+	$dststring .= "&sp=" . urlencode($srcport);
+	$prstring  .= "&sp=" . urlencode($srcport);
 }
 
 if (isset($_GET['dp']) && (is_numeric($_GET['dp']))) {
 	$dstport = $_GET['dp'];
-	$actstring .= "&dp=$dstport";
-	$ifstring  .= "&dp=$dstport";
-	$srcstring .= "&dp=$dstport";
-	$prstring  .= "&dp=$dstport";
+	$actstring .= "&dp=" . urlencode($dstport);
+	$ifstring  .= "&dp=" . urlencode($dstport);
+	$srcstring .= "&dp=" . urlencode($dstport);
+	$prstring  .= "&dp=" . urlencode($dstport);
 }
 
 

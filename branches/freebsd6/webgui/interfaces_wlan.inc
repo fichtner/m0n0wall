@@ -215,8 +215,8 @@ function wireless_config_print() {
                   <td class="vtable"><select name="standard" class="formfld" id="standard">
                       <?php
 					  foreach ($wlstandards as $sn): ?>
-                      <option value="<?=$sn;?>" <?php if ($sn == $pconfig['standard']) echo "selected";?>>
-                      <?="802.$sn";?>
+                      <option value="<?=htmlspecialchars($sn);?>" <?php if ($sn == $pconfig['standard']) echo "selected";?>>
+                      <?="802." . htmlspecialchars($sn);?>
                       </option>
                       <?php endforeach; ?>
                     </select></td>

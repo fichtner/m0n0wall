@@ -113,7 +113,7 @@ if ($_POST) {
                 <tr> 
                   <td valign="top" class="vncellreq">Identifier</td>
                   <td class="vtable">
- <input name="ident" type="text" class="formfld" id="ident" size="30" value="<?=$pconfig['ident'];?>">
+ <input name="ident" type="text" class="formfld" id="ident" size="30" value="<?=htmlspecialchars($pconfig['ident']);?>">
                     <br>
 This can be any text to describe the certificate authority.       
                   </td>
@@ -137,7 +137,7 @@ This can be any text to describe the certificate authority.
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save"> 
                     <?php if (isset($id) && $a_secret[$id]): ?>
-                    <input name="id" type="hidden" value="<?=$id;?>">
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
                     <?php endif; ?>
                   </td>
                 </tr>

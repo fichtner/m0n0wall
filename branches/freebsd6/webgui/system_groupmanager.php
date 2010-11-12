@@ -258,7 +258,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
               <td width="78%"> 
                 <input name="save" type="submit" class="formbtn" value="Save"> 
 		        <?php if (isset($id) && $a_group[$id]): ?>
-		        <input name="id" type="hidden" value="<?=$id;?>">
+		        <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
 		        <?php endif; ?>                
               </td>
             </tr>

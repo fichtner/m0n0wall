@@ -300,7 +300,7 @@ function fr_insline(id, on) {
 							$textss = $textse = "";
 						}
 				  ?>
-				  <a href="?if=<?=$if;?>&act=toggle&id=<?=$i;?><?=$typelink;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
+				  <a href="?if=<?=htmlspecialchars($if);?>&act=toggle&id=<?=$i;?><?=$typelink;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
 				  <?php if (isset($filterent['log'])):
 							$iconfn = "log_s";
 						if (isset($filterent['disabled']))
@@ -348,7 +348,7 @@ function fr_insline(id, on) {
 			  <span class="gray">
 			  No rules are currently defined for this interface.<br>
 			  All incoming connections on this interface will be blocked until you add pass rules.<br><br>
-			  Click the <a href="firewall_rules_edit.php?if=<?=$if;?><?=$typelink;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="middle" alt="add new rule"></a> button to add a new rule.</span>
+			  Click the <a href="firewall_rules_edit.php?if=<?=htmlspecialchars($if);?><?=$typelink;?>"><img src="plus.gif" title="add new rule" border="0" width="17" height="17" align="middle" alt="add new rule"></a> button to add a new rule.</span>
 			  </td>
 			  <?php endif; ?>
                 <tr id="fr<?=$nrules;?>"> 
@@ -369,7 +369,7 @@ function fr_insline(id, on) {
 				    </tr>
 					<tr>
 					  <td><?php if ($nrules == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0" alt="delete selected rules"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" alt="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?></td>
-					  <td><a href="firewall_rules_edit.php?if=<?=$if;?><?=$typelink;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0" alt="add new rule"></a></td>
+					  <td><a href="firewall_rules_edit.php?if=<?=htmlspecialchars($if);?><?=$typelink;?>"><img src="plus.gif" title="add new rule" width="17" height="17" border="0" alt="add new rule"></a></td>
 					</tr>
 				    </table>
 				  </td>
@@ -415,6 +415,6 @@ function fr_insline(id, on) {
   This means that if you use block rules, you'll have to pay attention 
   to the rule order. Everything that isn't explicitly passed is blocked 
   by default.
-  <input type="hidden" name="if" value="<?=$if;?>">
+  <input type="hidden" name="if" value="<?=htmlspecialchars($if);?>">
 </form>
 <?php include("fend.inc"); ?>

@@ -141,11 +141,11 @@ if ($_GET['order'])
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=ip">IP address</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=mac">MAC address</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=hostname">Hostname</a></td>
-    <td class="listhdrr"><a href="?all=<?=$_GET['all'];?>&amp;order=start">Start</a></td>
-    <td class="listhdr"><a href="?all=<?=$_GET['all'];?>&amp;order=end">End</a></td>
+    <td class="listhdrr"><a href="?all=<?=htmlspecialchars($_GET['all']);?>&amp;order=ip">IP address</a></td>
+    <td class="listhdrr"><a href="?all=<?=htmlspecialchars($_GET['all']);?>&amp;order=mac">MAC address</a></td>
+    <td class="listhdrr"><a href="?all=<?=htmlspecialchars($_GET['all']);?>&amp;order=hostname">Hostname</a></td>
+    <td class="listhdrr"><a href="?all=<?=htmlspecialchars($_GET['all']);?>&amp;order=start">Start</a></td>
+    <td class="listhdr"><a href="?all=<?=htmlspecialchars($_GET['all']);?>&amp;order=end">End</a></td>
     <td class="list"></td>
 	</tr>
 <?php
@@ -179,7 +179,7 @@ foreach ($leases as $data) {
 </table>
 <br>
 <form action="diag_dhcp_leases.php" method="GET">
-<input type="hidden" name="order" value="<?=$_GET['order'];?>">
+<input type="hidden" name="order" value="<?=htmlspecialchars($_GET['order']);?>">
 <?php if ($_GET['all']): ?>
 <input type="hidden" name="all" value="0">
 <input type="submit" class="formbtn" value="Show active leases only">

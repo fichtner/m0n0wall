@@ -162,7 +162,7 @@ if ($_POST) {
 	<tr> 
 	  <td width="22%" valign="top" class="vncell">Expiration date</td>
 	  <td width="78%" class="vtable"> 
-		<input name="expirationdate" type="text" class="formfld" id="expirationdate" size="10" value="<?=$pconfig['expirationdate'];?>">
+		<input name="expirationdate" type="text" class="formfld" id="expirationdate" size="10" value="<?=htmlspecialchars($pconfig['expirationdate']);?>">
 		<a href="javascript:NewCal('expirationdate','mmddyyyy')"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a> 
 		<br> 
 		<span class="vexpl">Leave blank if the account shouldn't expire, otherwise enter the expiration date in the following format: mm/dd/yyyy</span></td>
@@ -172,7 +172,7 @@ if ($_POST) {
 	  <td width="78%"> 
 		<input name="Submit" type="submit" class="formbtn" value="Save"> 
 		<?php if (isset($id) && $a_user[$id]): ?>
-		<input name="id" type="hidden" value="<?=$id;?>">
+		<input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
 		<?php endif; ?>
 	  </td>
 	</tr>

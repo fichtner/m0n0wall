@@ -91,11 +91,11 @@ $tabs = array('Users' => 'status_captiveportal.php',
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
   <tr>
-    <td class="listhdrr"><a href="?order=0&showact=<?=$_GET['showact'];?>">Voucher</a></td>
-    <td class="listhdrr"><a href="?order=1&showact=<?=$_GET['showact'];?>">Roll</a></td>
-    <td class="listhdrr"><a href="?order=2&showact=<?=$_GET['showact'];?>">Activated at</a></td>
-    <td class="listhdrr"><a href="?order=3&showact=<?=$_GET['showact'];?>">Expires in</a></td>
-    <td class="listhdr"><a href="?order=4&showact=<?=$_GET['showact'];?>">Expires at</a></td>
+    <td class="listhdrr"><a href="?order=0&showact=<?=htmlspecialchars($_GET['showact']);?>">Voucher</a></td>
+    <td class="listhdrr"><a href="?order=1&showact=<?=htmlspecialchars($_GET['showact']);?>">Roll</a></td>
+    <td class="listhdrr"><a href="?order=2&showact=<?=htmlspecialchars($_GET['showact']);?>">Activated at</a></td>
+    <td class="listhdrr"><a href="?order=3&showact=<?=htmlspecialchars($_GET['showact']);?>">Expires in</a></td>
+    <td class="listhdr"><a href="?order=4&showact=<?=htmlspecialchars($_GET['showact']);?>">Expires at</a></td>
     <td class="list"></td>
   </tr>
 <?php foreach ($db as $dbent): ?>

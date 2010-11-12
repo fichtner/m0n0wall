@@ -99,8 +99,8 @@ if (isBlank( $_POST['txtRecallBuffer'] )) {
 } else {
    puts( "   var arrRecallBuffer = new Array(" );
    $arrBuffer = explode( "&", $_POST['txtRecallBuffer'] );
-   for ($i=0; $i < (count( $arrBuffer ) - 1); $i++) puts( "      '" . $arrBuffer[$i] . "'," );
-   puts( "      '" . $arrBuffer[count( $arrBuffer ) - 1] . "'" );
+   for ($i=0; $i < (count( $arrBuffer ) - 1); $i++) puts( "      '" . htmlspecialchars($arrBuffer[$i]) . "'," );
+   puts( "      '" . htmlspecialchars($arrBuffer[count( $arrBuffer ) - 1]) . "'" );
    puts( "   );" );
 }
 
@@ -264,7 +264,7 @@ if (!isBlank($_POST['txtCommand'])) {
     <tr>
       <td valign="top">&nbsp;</td>
       <td valign="top" class="label">
-         <input type="hidden" name="txtRecallBuffer" value="<?=$_POST['txtRecallBuffer'] ?>">
+         <input type="hidden" name="txtRecallBuffer" value="<?=htmlspecialchars($_POST['txtRecallBuffer']) ?>">
          <input type="button" class="button" name="btnRecallPrev" value="<" onClick="btnRecall_onClick( this.form, -1 );">
          <input type="submit" class="button" value="Execute">
          <input type="button" class="button" name="btnRecallNext" value=">" onClick="btnRecall_onClick( this.form,  1 );">
