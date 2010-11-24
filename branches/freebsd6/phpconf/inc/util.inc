@@ -693,20 +693,25 @@ function check_dhcp_range($if_ipaddr, $if_subnet, $range_from, $range_to) {
 
 function check_v6dhcp_range($if_ipaddr6, $if_subnet6, $v6range_from, $v6range_to) {
 	$input_errors = array();
-	$if_v6subnet = gen_subnet6($if_ipaddr6, $if_subnet6);
-	if (!isInNetmask6($v6range_from, $if_v6subnet, $if_subnet6) || !isInNetmask6($v6range_to, $if_v6subnet, $if_subnet6)) {
-		$input_errors[] = "The specified IPv6 range lies outside of the current subnet (make sure the interface is configured with an IPv6 address before you enable the DHCP server).";
-	} else {
-		$v6range_from_array = explode(":",ipv6Uncompress($v6range_from));
-		$v6range_to_array = explode(":",ipv6Uncompress($v6range_to));
-		for ($i=0; $i<=7; $i++)		{
-		  if ($v6range_from_array[$i] > $v6range_to_array[$i]) {
-				$input_errors[] = "The IPv6 range is invalid (start address higher than end address).";
-			  break;
-			} elseif ($v6range_from_array[$i] < $v6range_to_array[$i]) {
-			break;
-		  }
+	
+	if (is_ipaddr6($if_ipaddr6)) {
+		/* check that range lies in current interface subnet */
+		$if_v6subnet = gen_subnet6($if_ipaddr6, $if_subnet6);
+		if (!isInNetmask6($v6range_from, $if_v6subnet, $if_subnet6) || !isInNetmask6($v6range_to, $if_v6subnet, $if_subnet6)) {
+			$input_errors[] = "The specified IPv6 range lies outside of the current subnet (make sure the interface is configured with an IPv6 address before you enable the DHCP server).";
 		}
+	}
+	
+	/* check range start/end */
+	$v6range_from_array = explode(":",ipv6Uncompress($v6range_from));
+	$v6range_to_array = explode(":",ipv6Uncompress($v6range_to));
+	for ($i=0; $i<=7; $i++)		{
+	  if ($v6range_from_array[$i] > $v6range_to_array[$i]) {
+			$input_errors[] = "The IPv6 range is invalid (start address higher than end address).";
+		  break;
+		} elseif ($v6range_from_array[$i] < $v6range_to_array[$i]) {
+		break;
+	  }
 	}
 	return $input_errors;
 }

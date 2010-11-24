@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fixed DHCPv6 server setup when target interface is configured in 6to4 mode
+  (reported by Brian Lloyd)
+
 - fixed various XSS vulnerabilities in webGUI
 
 - add ipv6 support for syslog destination
