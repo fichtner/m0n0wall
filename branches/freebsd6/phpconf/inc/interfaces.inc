@@ -673,6 +673,7 @@ function interfaces_wan_configure6($newwanip = false) {
 	remove_all_ipv6_addresses($wancfg['if']);
 	remove_all_ipv6_addresses("stf0");
 	remove_all_ipv6_addresses("gif0");
+	services_dhcp6c_stop();
 	
 	/* kill any running aiccu */
 	killbypid("{$g['varrun_path']}/aiccu.pid");
@@ -704,6 +705,9 @@ function interfaces_wan_configure6($newwanip = false) {
 				/* called from up-script -> add IPv6 default route */
 				mwexec('/sbin/route delete -inet6 default');
 				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
+			}
+			if ($config['interfaces']['lan']['ipaddr6'] == "DHCP-PD") {
+				services_dhcp6c_configure();
 			}
 		} else if ($wancfg['ipaddr6'] == "aiccu") {
 			/* fire up AICCU, which will take care of setting the IP address
@@ -1064,8 +1068,6 @@ function interfaces_rtadvd_configure() {
 
 	$wasrunning = file_exists("{$g['varrun_path']}/rtadvd.pid");
 
-	mwexec('/sbin/sysctl net.inet6.ip6.accept_rtadv=0');
-
 	if (!ipv6enabled())
 		return 0;
 
@@ -1319,11 +1321,11 @@ function calc_6to4_address($if) {
 	return false;
 }
 
-function calc_dhcppd_address($if) {
+function get_dhcppd_address($if) {
 	$addresses = get_interface_ipv6_adresses($if);
 
 	foreach ($addresses as $adr) {
-		if (!preg_match('/^fe80:/', $adr[0])) {
+		if ((!preg_match('/^fe80:/', $adr[0])) || (!preg_match('/autoconf$/',$adr[0]))) {
 			$ipv6addr=$adr;
 		}
 	}

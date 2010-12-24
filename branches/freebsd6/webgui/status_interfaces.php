@@ -239,24 +239,25 @@ function get_interface_info($ifdescr) {
 					}
 
 					/* GRE tunnel on WAN? need to run ifconfig on gif0 then */
-					if ($config['interfaces']['wan']['tunnel6'] || ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && !isset($config['interfaces']['wan']['aiccu']['ayiya']) ) ) {
-						unset($ifconfiginfo);
-						exec("/sbin/ifconfig gif0", $ifconfiginfo);
-
-						foreach ($ifconfiginfo as $ici) {
-							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
-								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
-							}
+					if ($config['interfaces']['wan']['tunnel6'] || ($config['interfaces']['wan']['ipaddr6'] == "aiccu" ) ) {
+						$tunif = 'gif0';
+						if  ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && isset($config['interfaces']['wan']['aiccu']['ayiya']) ) {
+							$tunif = 'tun0';
 						}
-					}
-					if ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && isset($config['interfaces']['wan']['aiccu']['ayiya']) ) {
 						unset($ifconfiginfo);
-						exec("/sbin/ifconfig tun0", $ifconfiginfo);
 
-						foreach ($ifconfiginfo as $ici) {
-							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
-								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
+						exec("/sbin/ifconfig $tunif 2>/dev/null", $ifconfiginfo, $error);
+						if (!$error){
+							foreach ($ifconfiginfo as $ici) {
+								if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+									$ifaddr6a[] = $matches[1] . "/" . $matches[2];
+								}
+								if (preg_match("/inet6 (\S+) --> (\S+) prefixlen (\d+)/", $ici, $matches)) {
+									$ifaddr6a[] = $matches[1] . "/" . $matches[3];
+								}
 							}
+						} else {
+							$ifaddr6a[] = "AICCU down ? check logs. $tunif not found";
 						}
 					}
 				}
@@ -264,7 +265,7 @@ function get_interface_info($ifdescr) {
 		}
 	}
 	
-	return array ($ifinfo, $ifaddr6s,$ifaddr4s);
+	return array ($ifinfo, $ifaddr6s,$ifaddr4s,$ifaddr6a);
 }
 
 ?>
@@ -279,7 +280,7 @@ function get_interface_info($ifdescr) {
 					}
 					
 			      foreach ($ifdescrs as $ifdescr => $ifname): 
-				 list( $ifinfo, $ifaddr6s, $ifaddr4s) = get_interface_info($ifdescr);
+				 list( $ifinfo, $ifaddr6s, $ifaddr4s, $ifaddr6a) = get_interface_info($ifdescr);
 				  ?>
               <?php if ($i): ?>
               <tr>
@@ -355,14 +356,14 @@ function get_interface_info($ifdescr) {
                   &nbsp; </td>
               </tr><?php endif; ?>
 			  <?php if (!empty($ifaddr6s)): ?>
-					 <tr> 
-		                <td width="22%" class="vncellt">IPv6 address</td>
-		                <td width="78%" class="listr">
-					 	<?php foreach ($ifaddr6s as $if6info):
-				 		echo "$if6info<br>";
-				    	endforeach; ?></td>
-		              </tr>
-                <?php endif; ?>
+			  <tr> 
+		        <td width="22%" class="vncellt">IPv6 address</td>
+		        <td width="78%" class="listr">
+				  <?php foreach ($ifaddr6s as $if6info):
+				    echo "$if6info<br>";
+				  endforeach; ?></td>
+		      </tr>
+              <?php endif; ?>
 			  <?php if ($ifinfo['gateway6']): ?>
               <tr> 
                 <td width="22%" class="vncellt">IPv6 gateway</td>
@@ -370,7 +371,15 @@ function get_interface_info($ifdescr) {
                   <?=htmlspecialchars($ifinfo['gateway6']);?>
                   &nbsp; </td>
               </tr><?php endif; ?>
-
+	          <?php if ($config['interfaces']['wan']['ipaddr6'] == "aiccu" && $ifdescr == "wan"): ?>
+              <tr> 
+                <td width="22%" class="vncellt">AICCU address</td>
+                <td width="78%" class="listr"> 
+                  <?php foreach ($ifaddr6a as $if6infoa):
+				    echo "$if6infoa<br>";
+				  endforeach; ?></td>
+              </tr>
+              <?php endif; ?>
 			  <?php if ($ifdescr == "wan" && !empty($resolvers)): ?>
               <tr>
                 <td width="22%" class="vncellt">ISP DNS servers</td>

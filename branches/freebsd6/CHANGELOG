@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix for DHCP-PD, missing function.
+  add sla-id and sla-len option for dhcp-pd (ipv6).  Add AICCU to interface status page.
+  add error handling to interface status page for AICCU being down.
 
 - fixed DHCPv6 server setup when target interface is configured in 6to4 mode
   (reported by Brian Lloyd)

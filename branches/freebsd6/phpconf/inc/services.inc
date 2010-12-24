@@ -85,9 +85,20 @@ EOD;
 		$d6wanm = "\t\tsend ia-pd 0;\n";
 		$d6pds = "id-assoc pd 0 {\n";
 		$d6pde = "};\n";
+		if ($config['interfaces']['lan']['slaid']) {
+			$d6pdi = $config['interfaces']['lan']['slaid'];
+		} else {
+			$d6pdi = $p;
+		}
+		if ($config['interfaces']['lan']['slalen']) {
+			$d6pdl = $config['interfaces']['lan']['slalen'];
+		} else {
+			$d6pdl = 16;
+		}
 		$d6lan .= <<<EOD
 		prefix-interface {$config['interfaces']['lan']['if']} {
-			sla-id {$p};
+			sla-id {$d6pdi};
+			sla-len {$d6pdl};
 		};
 
 EOD;
@@ -99,9 +110,20 @@ EOD;
 			$d6wanm = "\t\tsend ia-pd 0;\n";
 			$d6pds = "id-assoc pd 0 {\n";
 			$d6pde = "};\n";
+			if ($config['interfaces']['opt' . $i]['slaid']) {
+				$d6pdi = $config['interfaces']['opt' . $i]['slaid'];
+			} else {
+				$d6pdi = $p;
+			}
+			if ($config['interfaces']['opt' . $i]['slalen']) {
+				$d6pdl = $config['interfaces']['opt' . $i]['slalen'];
+			} else {
+				$d6pdl = 16;
+			}
 			$d6opt .= <<<EOD
 		prefix-interface {$config['interfaces']['opt' . $i]['if']} {
-			sla-id {$p};
+			sla-id {$d6pdi};
+			sla-len {$d6pdl};
 		};
 
 EOD;
