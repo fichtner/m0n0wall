@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <resolv.h>
 
 /*
 	Resolves each host name in a given list at regular intervals, and runs
@@ -54,6 +55,7 @@ void usage(void) {
 int check_hostname(char *hostname, struct in_addr *ip) {
 	struct hostent *he;
 	
+	res_init();
 	he = gethostbyname(hostname);
 	
 	if (he == NULL) {
