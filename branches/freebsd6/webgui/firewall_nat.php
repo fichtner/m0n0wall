@@ -107,6 +107,8 @@ if ($_GET['act'] == "del") {
                   <?php
 						if (!$natent['interface'] || ($natent['interface'] == "wan"))
 							echo "WAN";
+						elseif (!$natent['interface'] || ($natent['interface'] == "lan"))
+							echo "LAN";
 						else
 							echo htmlspecialchars($config['interfaces'][$natent['interface']]['descr']);
 				  ?>
@@ -127,8 +129,11 @@ if ($_GET['act'] == "del") {
                   </td>
                   <td class="listr"> 
                     <?=$natent['target'];?>
-					<?php if ($natent['external-address'])
+					<?php if ($natent['external-address'] == 'wan') {
+						echo "<br>(ext.: WAN IP)";
+						} elseif ($natent['external-address']) {
 						echo "<br>(ext.: " . $natent['external-address'] . ")";
+						}
 					?>
                   </td>
                   <td class="listr"> 

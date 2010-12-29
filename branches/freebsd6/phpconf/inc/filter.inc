@@ -269,9 +269,13 @@ function filter_nat_rules_generate() {
 			if (!$target)
 				continue;	/* unresolvable alias */
 			
-			if ($rule['external-address'])
-				$extaddr = $rule['external-address'] . "/32";
-			else
+			if ($rule['external-address']) {
+				if ($rule['external-address'] == 'wan') {
+					$extaddr = get_current_wan_address(false) . "/32";
+				} else {
+					$extaddr = $rule['external-address'] . "/32";
+				}
+			} else
 				$extaddr = "0/0";
 			
 			if (!$rule['interface'] || ($rule['interface'] == "wan"))

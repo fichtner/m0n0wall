@@ -2,6 +2,7 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add LAN NAT and NAT target of WAN IP options
 
 - updated kernel patch for ipfilter 4.1.33
 
