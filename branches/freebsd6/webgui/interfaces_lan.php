@@ -118,7 +118,9 @@ if ($_POST) {
 			} else if ($_POST['ipv6mode'] == "DHCP-PD") {
 				$config['interfaces']['lan']['ipaddr6'] = "DHCP-PD";
 				unset($config['interfaces']['lan']['subnet6']);
-				$config['interfaces']['lan']['slaid'] = $_POST['slaid'];
+				unset($config['interfaces']['lan']['slaid']);
+				if ($_POST['slaid'] != null) 
+					$config['interfaces']['lan']['slaid'] = $_POST['slaid'];
 				$config['interfaces']['lan']['slalen'] = 64 - $_POST['ispfix'];
 				$pconfig['slalen'] = 64 - $_POST['ispfix'];
 				$config['interfaces']['lan']['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
@@ -269,7 +271,7 @@ function enable_change(enable_over) {
                       </option>
                       <?php endfor; ?>
                     </select><br>
-					   Select site-level aggregator ID and ISP prefix length.<?php echo 64 - $pconfig['slalen'] ?><br>
+					   Select site-level aggregator ID and ISP prefix length.<br>
 					   If ID is 1 and the client is delegated an IPv6 prefix 2001:db8:ffff and prefix 48, this will result in
 					   a single IPv6 prefix, 2001:db8:ffff:1::/64 .</td>
                 </tr>
