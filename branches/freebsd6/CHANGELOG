@@ -2,7 +2,20 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- add additional image type "generic-pc-serial"; same as generic-pc
+  but with forced serial console (at the speed that the BIOS set it to)
+
+- reintroduced original FreeBSD if_re driver (to fix missing support
+  for 8139C+) and added Realtek patched driver under a new name
+  (if_rg) with probe return value set to BUS_PROBE_VENDOR to ensure
+  that the Realtek patched driver is only used if the stock FreeBSD
+  if_re/if_rl can't handle the device
+
 - Fixup for sla-id being 0
+
+1.33b1
+------
 
 - add LAN NAT and NAT target of WAN IP options
 

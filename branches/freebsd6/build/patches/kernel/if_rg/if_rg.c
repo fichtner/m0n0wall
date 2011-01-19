@@ -72,7 +72,7 @@
 #include <sys/endian.h>
 
 #include <dev/mii/mii.h>
-#include <dev/re/if_rereg.h>
+#include <dev/rg/if_rgreg.h>
 #if OS_VER < VERSION(5,3)
 #include <pci/pcireg.h>
 #include <pci/pcivar.h>
@@ -100,7 +100,7 @@
  * on the part of RealTek. Memory mapped mode does appear to work on
  * uniprocessor systems though.
  */
-#define RE_USEIOSPACE
+#define RG_USEIOSPACE
 
 
 #ifndef lint
@@ -109,25 +109,25 @@ static const char rcsid[] =
 #endif
 
 #define EE_SET(x)					\
-	CSR_WRITE_1(sc, RE_EECMD,			\
-		CSR_READ_1(sc, RE_EECMD) | x)
+	CSR_WRITE_1(sc, RG_EECMD,			\
+		CSR_READ_1(sc, RG_EECMD) | x)
 
 #define EE_CLR(x)					\
-	CSR_WRITE_1(sc, RE_EECMD,			\
-		CSR_READ_1(sc, RE_EECMD) & ~x)
+	CSR_WRITE_1(sc, RG_EECMD,			\
+		CSR_READ_1(sc, RG_EECMD) & ~x)
 
-#ifdef RE_USEIOSPACE
-#define RE_RES			SYS_RES_IOPORT
-#define RE_RID			RE_PCI_LOIO
+#ifdef RG_USEIOSPACE
+#define RG_RES			SYS_RES_IOPORT
+#define RG_RID			RG_PCI_LOIO
 #else
-#define RE_RES			SYS_RES_MEMORY
-#define RE_RID			RE_PCI_LOMEM
+#define RG_RES			SYS_RES_MEMORY
+#define RG_RID			RG_PCI_LOMEM
 #endif
 
 /*
  * Various supported device vendors/types and their names.
  */
-static struct re_type re_devs[] = {
+static struct rg_type rg_devs[] = {
 	{ RT_VENDORID, RT_DEVICEID_8169,
 		"Realtek PCI GBE Family Controller" },
 	{ RT_VENDORID, RT_DEVICEID_8169SC,
@@ -139,85 +139,85 @@ static struct re_type re_devs[] = {
 	{ 0, 0, NULL }
 };
 
-static int	re_probe			__P((device_t));
-static int	re_attach			__P((device_t));
-static int	re_detach			__P((device_t));
-static int	re_shutdown			__P((device_t));
+static int	rg_probe			__P((device_t));
+static int	rg_attach			__P((device_t));
+static int	rg_detach			__P((device_t));
+static int	rg_shutdown			__P((device_t));
 
-static void MP_WritePhyUshort			__P((struct re_softc*, u_int8_t, u_int16_t));
-static u_int16_t MP_ReadPhyUshort		__P((struct re_softc *,u_int8_t));
-static void MP_WriteEPhyUshort			__P((struct re_softc*, u_int8_t, u_int16_t));
-static u_int16_t MP_ReadEPhyUshort		__P((struct re_softc *,u_int8_t));
-static u_int8_t MP_ReadEfuse			__P((struct re_softc *,u_int16_t));
+static void MP_WritePhyUshort			__P((struct rg_softc*, u_int8_t, u_int16_t));
+static u_int16_t MP_ReadPhyUshort		__P((struct rg_softc *,u_int8_t));
+static void MP_WriteEPhyUshort			__P((struct rg_softc*, u_int8_t, u_int16_t));
+static u_int16_t MP_ReadEPhyUshort		__P((struct rg_softc *,u_int8_t));
+static u_int8_t MP_ReadEfuse			__P((struct rg_softc *,u_int16_t));
 
-static void re_8169s_init			__P((struct re_softc *));
-static void re_init				__P((void *));
-static int 	re_var_init			__P((struct re_softc *));
-static void re_reset				__P((struct re_softc *));
-static void re_stop				__P((struct re_softc *));
+static void rg_8169s_init			__P((struct rg_softc *));
+static void rg_init				__P((void *));
+static int 	rg_var_init			__P((struct rg_softc *));
+static void rg_reset				__P((struct rg_softc *));
+static void rg_stop				__P((struct rg_softc *));
 
-static void re_start				__P((struct ifnet *));
-static int re_encap				__P((struct re_softc *, struct mbuf * ));
-static void WritePacket				__P((struct re_softc *, caddr_t, int, int, int));
-static int CountFreeTxDescNum			__P((struct re_descriptor));
+static void rg_start				__P((struct ifnet *));
+static int rg_encap				__P((struct rg_softc *, struct mbuf * ));
+static void WritePacket				__P((struct rg_softc *, caddr_t, int, int, int));
+static int CountFreeTxDescNum			__P((struct rg_descriptor));
 static int CountMbufNum				__P((struct mbuf *, int *));
-static void re_txeof				__P((struct re_softc *));
+static void rg_txeof				__P((struct rg_softc *));
 
-static void	re_rxeof			__P((struct re_softc *));
+static void	rg_rxeof			__P((struct rg_softc *));
 
-static void re_intr				__P((void *));
-static void re_setmulti				__P((struct re_softc *));
-static int	re_ioctl			__P((struct ifnet *, u_long, caddr_t));
-static void re_tick				__P((void *));
+static void rg_intr				__P((void *));
+static void rg_setmulti				__P((struct rg_softc *));
+static int	rg_ioctl			__P((struct ifnet *, u_long, caddr_t));
+static void rg_tick				__P((void *));
 #if OS_VER<VERSION(7,0)
-static void re_watchdog				__P((struct ifnet *));
+static void rg_watchdog				__P((struct ifnet *));
 #endif
 
-static int	re_ifmedia_upd			__P((struct ifnet *));
-static void re_ifmedia_sts			__P((struct ifnet *, struct ifmediareq *));
+static int	rg_ifmedia_upd			__P((struct ifnet *));
+static void rg_ifmedia_sts			__P((struct ifnet *, struct ifmediareq *));
 
-static void re_eeprom_ShiftOutBits		__P((struct re_softc *, int, int));
-static u_int16_t re_eeprom_ShiftInBits		__P((struct re_softc *));
-static void re_eeprom_EEpromCleanup		__P((struct re_softc *));
-static void re_eeprom_getword			__P((struct re_softc *, int, u_int16_t *));
-static void re_read_eeprom			__P((struct re_softc *, caddr_t, int, int, int));
-static void re_int_task				(void *, int);
+static void rg_eeprom_ShiftOutBits		__P((struct rg_softc *, int, int));
+static u_int16_t rg_eeprom_ShiftInBits		__P((struct rg_softc *));
+static void rg_eeprom_EEpromCleanup		__P((struct rg_softc *));
+static void rg_eeprom_getword			__P((struct rg_softc *, int, u_int16_t *));
+static void rg_read_eeprom			__P((struct rg_softc *, caddr_t, int, int, int));
+static void rg_int_task				(void *, int);
 
-static void re_phy_power_up(device_t dev);
+static void rg_phy_power_up(device_t dev);
 #if 0
-static void re_phy_power_down(device_t dev);
+static void rg_phy_power_down(device_t dev);
 #endif
 
 
-static device_method_t re_methods[] = {
+static device_method_t rg_methods[] = {
 	/* Device interface */
-	DEVMETHOD(device_probe,		re_probe),
-	DEVMETHOD(device_attach,	re_attach),
-	DEVMETHOD(device_detach,	re_detach),
-	DEVMETHOD(device_shutdown,	re_shutdown),
+	DEVMETHOD(device_probe,		rg_probe),
+	DEVMETHOD(device_attach,	rg_attach),
+	DEVMETHOD(device_detach,	rg_detach),
+	DEVMETHOD(device_shutdown,	rg_shutdown),
 	{ 0, 0 }
 };
 
-static driver_t re_driver = {
-	"re",
-	re_methods,
-	sizeof(struct re_softc)
+static driver_t rg_driver = {
+	"rg",
+	rg_methods,
+	sizeof(struct rg_softc)
 };
 
-static devclass_t re_devclass;
+static devclass_t rg_devclass;
 
-DRIVER_MODULE(if_re, pci, re_driver, re_devclass, 0, 0);
+DRIVER_MODULE(if_rg, pci, rg_driver, rg_devclass, 0, 0);
 
-static void re_phy_power_up(dev)
+static void rg_phy_power_up(dev)
 	device_t		dev;
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 
 	sc = device_get_softc(dev);
 
 	MP_WritePhyUshort(sc, 0x1f, 0x0000);
 	MP_WritePhyUshort(sc, 0x00, 0x1000);
-	switch (sc->re_type) {
+	switch (sc->rg_type) {
 	case MACFG_4:
 	case MACFG_5:
 	case MACFG_6:
@@ -245,7 +245,7 @@ static void re_phy_power_up(dev)
 	};
 }
 
-static void re_dma_map_buf(void *arg, bus_dma_segment_t *segs, int nseg, int error)
+static void rg_dma_map_buf(void *arg, bus_dma_segment_t *segs, int nseg, int error)
 {
 	union RxDesc *rxptr = arg;
 
@@ -259,9 +259,9 @@ static void re_dma_map_buf(void *arg, bus_dma_segment_t *segs, int nseg, int err
 	*((uint64_t *)&rxptr->so0.RxBuffL) = htole64(segs->ds_addr);
 }
 
-static void re_dma_map_rxdesc(void *arg, bus_dma_segment_t *segs, int nseg, int error)
+static void rg_dma_map_rxdesc(void *arg, bus_dma_segment_t *segs, int nseg, int error)
 {
-	struct re_softc *sc = arg;
+	struct rg_softc *sc = arg;
 	uint32_t ds_addr[2];
 
 	if(error)
@@ -272,9 +272,9 @@ static void re_dma_map_rxdesc(void *arg, bus_dma_segment_t *segs, int nseg, int 
 	CSR_WRITE_4(sc, 0xe8, ds_addr[1]);
 }
 
-static void re_dma_map_txdesc(void *arg, bus_dma_segment_t *segs, int nseg, int error)
+static void rg_dma_map_txdesc(void *arg, bus_dma_segment_t *segs, int nseg, int error)
 {
-	struct re_softc *sc = arg;
+	struct rg_softc *sc = arg;
 	uint32_t ds_addr[2];
 
 	if(error)
@@ -286,15 +286,15 @@ static void re_dma_map_txdesc(void *arg, bus_dma_segment_t *segs, int nseg, int 
 }
 
 #if 0
-static void re_phy_power_down(dev)
+static void rg_phy_power_down(dev)
 	device_t		dev;
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 
 	sc = device_get_softc(dev);
 
 	MP_WritePhyUshort(sc, 0x1f, 0x0000);
-	switch (sc->re_type) {
+	switch (sc->rg_type) {
 	case MACFG_21:
 	case MACFG_22:
 	case MACFG_23:
@@ -328,16 +328,16 @@ static void re_phy_power_down(dev)
  * Probe for a RealTek 8129/8139 chip. Check the PCI vendor and device
  * IDs against our list and return a device name if we find a match.
  */
-static int re_probe(dev)	/* Search for Realtek NIC chip */
+static int rg_probe(dev)	/* Search for Realtek NIC chip */
 	device_t		dev;
 {
-	struct re_type		*t; t = re_devs;
-	while(t->re_name != NULL) {
-		if ((pci_get_vendor(dev) == t->re_vid) &&
-		    (pci_get_device(dev) == t->re_did))
+	struct rg_type		*t; t = rg_devs;
+	while(t->rg_name != NULL) {
+		if ((pci_get_vendor(dev) == t->rg_vid) &&
+		    (pci_get_device(dev) == t->rg_did))
 		{
-			device_set_desc(dev, t->re_name);
-			return(0);
+			device_set_desc(dev, t->rg_name);
+			return(BUS_PROBE_VENDOR);
 		}
 		t++;
 	}
@@ -349,14 +349,14 @@ static int re_probe(dev)	/* Search for Realtek NIC chip */
  * Attach the interface. Allocate softc structures, do ifmedia
  * setup and ethernet/BPF attach.
  */
-static int re_attach(device_t dev)
+static int rg_attach(device_t dev)
 {
 	/*int			s;*/
 	u_char			eaddr[ETHER_ADDR_LEN];
 	u_int32_t		command;
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	struct ifnet		*ifp;
-	u_int16_t		re_did = 0;
+	u_int16_t		rg_did = 0;
 	int			unit, error = 0, rid, i;
 //	int			mac_version;
 //	int			mode;
@@ -366,40 +366,40 @@ static int re_attach(device_t dev)
 
 	sc = device_get_softc(dev);
 	unit = device_get_unit(dev);
-	bzero(sc, sizeof(struct re_softc));
-	RE_LOCK_INIT(sc,device_get_nameunit(dev));
+	bzero(sc, sizeof(struct rg_softc));
+	RG_LOCK_INIT(sc,device_get_nameunit(dev));
 	sc->dev = dev;
 
 	sc->driver_detach = 0;
 
-	sc->re_device_id = pci_get_device(dev);
-	sc->re_revid = pci_get_revid(dev);
+	sc->rg_device_id = pci_get_device(dev);
+	sc->rg_revid = pci_get_revid(dev);
 	pci_enable_busmaster(dev);
 	/*
 	 * Handle power management nonsense.
 	 */
-	command = pci_read_config(dev, RE_PCI_CAPID, 4) & 0x000000FF;
+	command = pci_read_config(dev, RG_PCI_CAPID, 4) & 0x000000FF;
 	if (command == 0x01) {
 
-		command = pci_read_config(dev, RE_PCI_PWRMGMTCTRL, 4);
-		if (command & RE_PSTATE_MASK) {
+		command = pci_read_config(dev, RG_PCI_PWRMGMTCTRL, 4);
+		if (command & RG_PSTATE_MASK) {
 			u_int32_t		iobase, membase, irq;
 
 			/* Save important PCI config data. */
-			iobase = pci_read_config(dev, RE_PCI_LOIO, 4);
-			membase = pci_read_config(dev, RE_PCI_LOMEM, 4);
-			irq = pci_read_config(dev, RE_PCI_INTLINE, 4);
+			iobase = pci_read_config(dev, RG_PCI_LOIO, 4);
+			membase = pci_read_config(dev, RG_PCI_LOMEM, 4);
+			irq = pci_read_config(dev, RG_PCI_INTLINE, 4);
 
 			/* Reset the power state. */
 			printf("re%d: chip is is in D%d power mode "
-			"-- setting to D0\n", unit, command & RE_PSTATE_MASK);
+			"-- setting to D0\n", unit, command & RG_PSTATE_MASK);
 			command &= 0xFFFFFFFC;
-			pci_write_config(dev, RE_PCI_PWRMGMTCTRL, command, 4);
+			pci_write_config(dev, RG_PCI_PWRMGMTCTRL, command, 4);
 
 			/* Restore PCI config data. */
-			pci_write_config(dev, RE_PCI_LOIO, iobase, 4);
-			pci_write_config(dev, RE_PCI_LOMEM, membase, 4);
-			pci_write_config(dev, RE_PCI_INTLINE, irq, 4);
+			pci_write_config(dev, RG_PCI_LOIO, iobase, 4);
+			pci_write_config(dev, RG_PCI_LOMEM, membase, 4);
+			pci_write_config(dev, RG_PCI_INTLINE, irq, 4);
 		}
 	}
 
@@ -411,7 +411,7 @@ static int re_attach(device_t dev)
 	pci_write_config(dev, PCIR_COMMAND, command, 4);
 	command = pci_read_config(dev, PCIR_COMMAND, 4);
 
-#ifdef RE_USEIOSPACE
+#ifdef RG_USEIOSPACE
 	if (!(command & PCIM_CMD_PORTEN)) {
 		printf("re%d: failed to enable I/O ports!\n", unit);
 		error = ENXIO;
@@ -425,42 +425,42 @@ static int re_attach(device_t dev)
 	}
 #endif
 
-	rid = RE_RID;
-	sc->re_res = bus_alloc_resource(dev, RE_RES, &rid,
+	rid = RG_RID;
+	sc->rg_res = bus_alloc_resource(dev, RG_RES, &rid,
 	    0, ~0, 1, RF_ACTIVE);
 
-	if (sc->re_res == NULL) {
+	if (sc->rg_res == NULL) {
 		device_printf(dev,"couldn't map ports/memory\n");
 		error = ENXIO;
 		goto fail;
 	}
 
-	sc->re_btag = rman_get_bustag(sc->re_res);
-	sc->re_bhandle = rman_get_bushandle(sc->re_res);
+	sc->rg_btag = rman_get_bustag(sc->rg_res);
+	sc->rg_bhandle = rman_get_bushandle(sc->rg_res);
 
 	rid = 0;
-	sc->re_irq = bus_alloc_resource(dev, SYS_RES_IRQ, &rid, 0, ~0, 1,
+	sc->rg_irq = bus_alloc_resource(dev, SYS_RES_IRQ, &rid, 0, ~0, 1,
 	    RF_SHAREABLE | RF_ACTIVE);
 
-	if (sc->re_irq == NULL) {
+	if (sc->rg_irq == NULL) {
 		device_printf(dev,"couldn't map interrupt\n");
 		error = ENXIO;
 		goto fail;
 	}
 
-	callout_handle_init(&sc->re_stat_ch);
+	callout_handle_init(&sc->rg_stat_ch);
 
 	/*
 	 * Reset the adapter. Only take the lock here as it's needed in
-	 * order to call re_reset().
+	 * order to call rg_reset().
 	 */
-	RE_LOCK(sc);
-	re_reset(sc);
-	RE_UNLOCK(sc);
+	RG_LOCK(sc);
+	rg_reset(sc);
+	RG_UNLOCK(sc);
 
 	/* Get station address from the EEPROM. */
 	for (i = 0; i < ETHER_ADDR_LEN; i++)
-		eaddr[i] = CSR_READ_1(sc, RE_IDR0 + i);
+		eaddr[i] = CSR_READ_1(sc, RG_IDR0 + i);
 
 	/*
 	 * A RealTek chip was detected. Inform the world.
@@ -469,7 +469,7 @@ static int re_attach(device_t dev)
 	device_printf(dev,"Ethernet address: %6D\n", eaddr, ":");
 	printf("\nThis product is covered by one or more of the following patents: US5,307,459, US5,434,872, US5,732,094, US6,570,884, US6,115,776, and US6,327,625.\n");
 
-	sc->re_unit = unit;
+	sc->rg_unit = unit;
 
 #if OS_VER<VERSION(6,0)
 	bcopy(eaddr, (char *)&sc->arpcom.ac_enaddr, ETHER_ADDR_LEN);
@@ -479,146 +479,146 @@ static int re_attach(device_t dev)
 	 * Now read the exact device type from the EEPROM to find
 	 * out if it's an 8129 or 8139.
 	 */
-	re_read_eeprom(sc, (caddr_t)&re_did, RE_EE_PCI_DID, 1, 0);
+	rg_read_eeprom(sc, (caddr_t)&rg_did, RG_EE_PCI_DID, 1, 0);
 
-	switch(CSR_READ_4(sc, RE_TXCFG) & 0xFCF00000)
+	switch(CSR_READ_4(sc, RG_TXCFG) & 0xFCF00000)
 	{
 		case 0x00800000:
 		case 0x04000000:
-			sc->re_type = MACFG_3;
+			sc->rg_type = MACFG_3;
 			break;
 
 		case 0x10000000:
-			sc->re_type = MACFG_4;
+			sc->rg_type = MACFG_4;
 			break;
 
 		case 0x18000000:
-			sc->re_type = MACFG_5;
+			sc->rg_type = MACFG_5;
 			break;
 
 		case 0x98000000:
-			sc->re_type = MACFG_6;
+			sc->rg_type = MACFG_6;
 			break;
 
 		case 0x34000000:
 		case 0xB4000000:
-			sc->re_type = MACFG_11;
+			sc->rg_type = MACFG_11;
 			break;
 
 		case 0x34200000:
 		case 0xB4200000:
-			sc->re_type = MACFG_12;
+			sc->rg_type = MACFG_12;
 			break;
 
 		case 0x34300000:
 		case 0xB4300000:
-			sc->re_type = MACFG_13;
+			sc->rg_type = MACFG_13;
 			break;
 
 		case 0x34900000:
 		case 0x24900000:
-			sc->re_type = MACFG_14;
+			sc->rg_type = MACFG_14;
 			break;
 
 		case 0x34A00000:
 		case 0x24A00000:
-			sc->re_type = MACFG_15;
+			sc->rg_type = MACFG_15;
 			break;
 
 		case 0x34B00000:
 		case 0x24B00000:
-			sc->re_type = MACFG_16;
+			sc->rg_type = MACFG_16;
 			break;
 
 		case 0x34C00000:
 		case 0x24C00000:
-			sc->re_type = MACFG_17;
+			sc->rg_type = MACFG_17;
 			break;
 
 		case 0x34D00000:
 		case 0x24D00000:
-			sc->re_type = MACFG_18;
+			sc->rg_type = MACFG_18;
 			break;
 
 		case 0x34E00000:
 		case 0x24E00000:
-			sc->re_type = MACFG_19;
+			sc->rg_type = MACFG_19;
 			break;
 
 		case 0x30000000:
-			sc->re_type = MACFG_21;
+			sc->rg_type = MACFG_21;
 			break;
 
 		case 0x38000000:
-			sc->re_type = MACFG_22;
+			sc->rg_type = MACFG_22;
 			break;
 
 		case 0x38500000:
 		case 0xB8500000:
 		case 0x38700000:
 		case 0xB8700000:
-			sc->re_type = MACFG_23;
+			sc->rg_type = MACFG_23;
 			break;
 
 		case 0x3C000000:
-			sc->re_type = MACFG_24;
+			sc->rg_type = MACFG_24;
 			break;
 
 		case 0x3C200000:
-			sc->re_type = MACFG_25;
+			sc->rg_type = MACFG_25;
 			break;
 
 		case 0x3C400000:
-			sc->re_type = MACFG_26;
+			sc->rg_type = MACFG_26;
 			break;
 
 		case 0x3C900000:
-			sc->re_type = MACFG_27;
+			sc->rg_type = MACFG_27;
 			break;
 
 		case 0x3CB00000:
-			sc->re_type = MACFG_28;
+			sc->rg_type = MACFG_28;
 			break;
 
 		case 0x28100000:
-			sc->re_type = MACFG_31;
+			sc->rg_type = MACFG_31;
 			break;
 
 		case 0x28200000:
-			sc->re_type = MACFG_32;
+			sc->rg_type = MACFG_32;
 			break;
 
 		case 0x28300000:
-			sc->re_type = MACFG_33;
+			sc->rg_type = MACFG_33;
 			break;
 
 		case 0x2C100000:
-			sc->re_type = MACFG_36;
+			sc->rg_type = MACFG_36;
 			break;
 
 		case 0x2C200000:
-			sc->re_type = MACFG_37;
+			sc->rg_type = MACFG_37;
 			break;
 
 		case 0x24000000:
-			sc->re_type = MACFG_41;
+			sc->rg_type = MACFG_41;
 			break;
 
 		case 0x40900000:
-			sc->re_type = MACFG_42;
+			sc->rg_type = MACFG_42;
 			break;
 
 		default:
-	printf("%x\t",(CSR_READ_4(sc, RE_TXCFG) & 0xFCF00000));
+	printf("%x\t",(CSR_READ_4(sc, RG_TXCFG) & 0xFCF00000));
 			device_printf(dev,"unknown device\n");
-			sc->re_type = MACFG_FF;
+			sc->rg_type = MACFG_FF;
 			error = ENXIO;
 			goto fail;
 	}
 
-	if(sc->re_type==MACFG_3)
+	if(sc->rg_type==MACFG_3)
 	{	/* Change PCI Latency time*/
-		pci_write_config(dev, RE_PCI_LATENCY_TIMER, 0x40, 1);
+		pci_write_config(dev, RG_PCI_LATENCY_TIMER, 0x40, 1);
 	}
 
 	error = bus_dma_tag_create(
@@ -636,12 +636,12 @@ static int re_attach(device_t dev)
 		BUS_SPACE_MAXSIZE_32BIT,	/* maxsegsize */
 		0,				/* flags */
 		NULL, NULL,			/* lockfunc, lockarg */
-		&sc->re_parent_tag);
+		&sc->rg_parent_tag);
 
-	i = roundup2(sizeof(union RxDesc)*RE_RX_BUF_NUM, RE_DESC_ALIGN);
+	i = roundup2(sizeof(union RxDesc)*RG_RX_BUF_NUM, RG_DESC_ALIGN);
 	error = bus_dma_tag_create(
-		sc->re_parent_tag,
-		RE_DESC_ALIGN, 0,		/* alignment, boundary */
+		sc->rg_parent_tag,
+		RG_DESC_ALIGN, 0,		/* alignment, boundary */
 		BUS_SPACE_MAXADDR,		/* lowaddr */
 		BUS_SPACE_MAXADDR,		/* highaddr */
 		NULL, NULL,			/* filter, filterarg */
@@ -650,27 +650,27 @@ static int re_attach(device_t dev)
 		i,				/* maxsegsize */
 		0,				/* flags */
 		NULL, NULL,			/* lockfunc, lockarg */
-		&sc->re_desc.rx_desc_tag);
+		&sc->rg_desc.rx_desc_tag);
 	if (error)
 	{
 		device_printf(dev,"bus_dma_tag_create fail\n");
 		goto fail;
 	}
 
-	error = bus_dmamem_alloc(sc->re_desc.rx_desc_tag,
-			(void**) &sc->re_desc.rx_desc,
+	error = bus_dmamem_alloc(sc->rg_desc.rx_desc_tag,
+			(void**) &sc->rg_desc.rx_desc,
 			BUS_DMA_WAITOK|BUS_DMA_COHERENT|BUS_DMA_ZERO,
-			&sc->re_desc.rx_desc_dmamap);
+			&sc->rg_desc.rx_desc_dmamap);
 	if (error)
 	{
 		device_printf(dev,"bus_dmamem_alloc fail\n");
 		goto fail;
 	}
 
-	i = roundup2(sizeof(union TxDesc)*RE_TX_BUF_NUM, RE_DESC_ALIGN);
+	i = roundup2(sizeof(union TxDesc)*RG_TX_BUF_NUM, RG_DESC_ALIGN);
 	error = bus_dma_tag_create(
-			sc->re_parent_tag,
-			RE_DESC_ALIGN, 0,		/* alignment, boundary */
+			sc->rg_parent_tag,
+			RG_DESC_ALIGN, 0,		/* alignment, boundary */
 			BUS_SPACE_MAXADDR,		/* lowaddr */
 			BUS_SPACE_MAXADDR,		/* highaddr */
 			NULL, NULL,			/* filter, filterarg */
@@ -679,17 +679,17 @@ static int re_attach(device_t dev)
 			i,				/* maxsegsize */
 			0,				/* flags */
 			NULL, NULL,			/* lockfunc, lockarg */
-			&sc->re_desc.tx_desc_tag);
+			&sc->rg_desc.tx_desc_tag);
 	if (error)
 	{
 		device_printf(dev,"bus_dma_tag_create fail\n");
 		goto fail;
 	}
 
-	error = bus_dmamem_alloc(sc->re_desc.tx_desc_tag,
-			(void**) &sc->re_desc.tx_desc,
+	error = bus_dmamem_alloc(sc->rg_desc.tx_desc_tag,
+			(void**) &sc->rg_desc.tx_desc,
 			BUS_DMA_WAITOK|BUS_DMA_COHERENT|BUS_DMA_ZERO,
-			&sc->re_desc.tx_desc_dmamap);
+			&sc->rg_desc.tx_desc_dmamap);
 
 	if (error)
 	{
@@ -697,20 +697,20 @@ static int re_attach(device_t dev)
 		goto fail;
 	}
 
-	error = bus_dma_tag_create(sc->re_parent_tag, 1, 0,
+	error = bus_dma_tag_create(sc->rg_parent_tag, 1, 0,
 	    BUS_SPACE_MAXADDR, BUS_SPACE_MAXADDR, NULL,
-	    NULL, MCLBYTES * RE_NTXSEGS, RE_NTXSEGS, 4096, 0,
-	    NULL, NULL, &sc->re_desc.re_tx_mtag);
+	    NULL, MCLBYTES * RG_NTXSEGS, RG_NTXSEGS, 4096, 0,
+	    NULL, NULL, &sc->rg_desc.rg_tx_mtag);
 
 	if (error)
 	{
-		device_printf(dev,"re_tx_mtag fail\n");
+		device_printf(dev,"rg_tx_mtag fail\n");
 		goto fail;
 	}
 
 	error = bus_dma_tag_create(
-			sc->re_parent_tag,
-			RE_DESC_ALIGN, 0,		/* alignment, boundary */
+			sc->rg_parent_tag,
+			RG_DESC_ALIGN, 0,		/* alignment, boundary */
 			BUS_SPACE_MAXADDR,		/* lowaddr */
 			BUS_SPACE_MAXADDR,		/* highaddr */
 			NULL, NULL,			/* filter, filterarg */
@@ -718,24 +718,24 @@ static int re_attach(device_t dev)
 			MCLBYTES,			/* maxsegsize */
 			0,				/* flags */
 			NULL, NULL,			/* lockfunc, lockarg */
-			&sc->re_desc.re_rx_mtag);
+			&sc->rg_desc.rg_rx_mtag);
 	if (error)
 	{
-		device_printf(dev,"re_rx_mtag fail\n");
+		device_printf(dev,"rg_rx_mtag fail\n");
 		goto fail;
 	}
 
-	for(i=0;i<RE_RX_BUF_NUM;i++)
+	for(i=0;i<RG_RX_BUF_NUM;i++)
 	{
-		sc->re_desc.rx_buf[i] = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
-		if(!sc->re_desc.rx_buf[i])
+		sc->rg_desc.rx_buf[i] = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
+		if(!sc->rg_desc.rx_buf[i])
 		{
 			device_printf(dev, "m_getcl fail!!!\n");
 			error = ENXIO;
 			goto fail;
 		}
 
-		error = bus_dmamap_create(sc->re_desc.re_rx_mtag, BUS_DMA_NOWAIT, &sc->re_desc.re_rx_dmamap[i]);
+		error = bus_dmamap_create(sc->rg_desc.rg_rx_mtag, BUS_DMA_NOWAIT, &sc->rg_desc.rg_rx_dmamap[i]);
 		if(error)
 		{
 			device_printf(dev, "bus_dmamap_create fail!!!\n");
@@ -743,9 +743,9 @@ static int re_attach(device_t dev)
 		}
 	}
 
-	for(i=0;i<RE_TX_BUF_NUM;i++)
+	for(i=0;i<RG_TX_BUF_NUM;i++)
 	{
-		error = bus_dmamap_create(sc->re_desc.re_tx_mtag, BUS_DMA_NOWAIT, &sc->re_desc.re_tx_dmamap[i]);
+		error = bus_dmamap_create(sc->rg_desc.rg_tx_mtag, BUS_DMA_NOWAIT, &sc->rg_desc.rg_tx_dmamap[i]);
 		if(error)
 		{
 			device_printf(dev, "bus_dmamap_create fail!!!\n");
@@ -753,28 +753,28 @@ static int re_attach(device_t dev)
 		}
 	}
 
-	sc->re_8169_MacVersion=(CSR_READ_4(sc, RE_TXCFG)&0x7c800000)>>25;		/* Get bit 26~30 	*/
-	sc->re_8169_MacVersion|=((CSR_READ_4(sc, RE_TXCFG)&0x00800000)!=0 ? 1:0);	/* Get bit 23 		*/
-	DBGPRINT1(sc->re_unit,"8169 Mac Version %d",sc->re_8169_MacVersion);
+	sc->rg_8169_MacVersion=(CSR_READ_4(sc, RG_TXCFG)&0x7c800000)>>25;		/* Get bit 26~30 	*/
+	sc->rg_8169_MacVersion|=((CSR_READ_4(sc, RG_TXCFG)&0x00800000)!=0 ? 1:0);	/* Get bit 23 		*/
+	DBGPRINT1(sc->rg_unit,"8169 Mac Version %d",sc->rg_8169_MacVersion);
 
 	/* Rtl8169s single chip detected */
-	if(sc->re_8169_MacVersion > 0) {
-		sc->re_8169_PhyVersion=(MP_ReadPhyUshort(sc, 0x03)&0x000f);
-		DBGPRINT1(sc->re_unit,"8169 Phy Version %d",sc->re_8169_PhyVersion);
+	if(sc->rg_8169_MacVersion > 0) {
+		sc->rg_8169_PhyVersion=(MP_ReadPhyUshort(sc, 0x03)&0x000f);
+		DBGPRINT1(sc->rg_unit,"8169 Phy Version %d",sc->rg_8169_PhyVersion);
 
-		if(sc->re_8169_MacVersion == 1) {
+		if(sc->rg_8169_MacVersion == 1) {
 			CSR_WRITE_1(sc, 0x82, 0x01);
 			MP_WritePhyUshort(sc, 0x0b, 0x00);
 		}
 
-		re_phy_power_up(dev);
-		re_8169s_init(sc);
+		rg_phy_power_up(dev);
+		rg_8169s_init(sc);
 	}
 
 #if OS_VER<VERSION(6,0)
 	ifp = &sc->arpcom.ac_if;
 #else
-	ifp = sc->re_ifp = if_alloc(IFT_ETHER);
+	ifp = sc->rg_ifp = if_alloc(IFT_ETHER);
 	if (ifp == NULL) {
 		device_printf(dev, "can not if_alloc()\n");
 		error = ENOSPC;
@@ -790,14 +790,14 @@ static int re_attach(device_t dev)
 #endif
 	ifp->if_mtu = ETHERMTU;
 	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
-	ifp->if_ioctl = re_ioctl;
+	ifp->if_ioctl = rg_ioctl;
 	ifp->if_output = ether_output;
-	ifp->if_start = re_start;
+	ifp->if_start = rg_start;
 #if OS_VER<VERSION(7,0)
-	ifp->if_watchdog = re_watchdog;
+	ifp->if_watchdog = rg_watchdog;
 #endif
-	ifp->if_init = re_init;
-	switch(sc->re_device_id)
+	ifp->if_init = rg_init;
+	switch(sc->rg_device_id)
 	{
 		case RT_DEVICEID_8169:
 		case RT_DEVICEID_8169SC:
@@ -814,7 +814,7 @@ static int re_attach(device_t dev)
 	IFQ_SET_READY(&ifp->if_snd);
 
 #if OS_VER>=VERSION(7,0)
-	TASK_INIT(&sc->re_inttask, 0, re_int_task, sc);
+	TASK_INIT(&sc->rg_inttask, 0, rg_int_task, sc);
 #endif
 
 	/*
@@ -829,11 +829,11 @@ static int re_attach(device_t dev)
 
 
 #if OS_VER<VERSION(7,0)
-	error = bus_setup_intr(dev, sc->re_irq, INTR_TYPE_NET,
-	    re_intr, sc, &sc->re_intrhand);
+	error = bus_setup_intr(dev, sc->rg_irq, INTR_TYPE_NET,
+	    rg_intr, sc, &sc->rg_intrhand);
 #else
-	error = bus_setup_intr(dev, sc->re_irq, INTR_TYPE_NET|INTR_MPSAFE,
-			NULL, re_intr, sc, &sc->re_intrhand);
+	error = bus_setup_intr(dev, sc->rg_irq, INTR_TYPE_NET|INTR_MPSAFE,
+			NULL, rg_intr, sc, &sc->rg_intrhand);
 #endif
 
 	if (error)
@@ -851,12 +851,12 @@ static int re_attach(device_t dev)
 	 * Specify the media types supported by this adapter and register
 	 * callbacks to update media and link information
 	 */
-	ifmedia_init(&sc->media, IFM_IMASK, re_ifmedia_upd, re_ifmedia_sts);
+	ifmedia_init(&sc->media, IFM_IMASK, rg_ifmedia_upd, rg_ifmedia_sts);
 	ifmedia_add(&sc->media, IFM_ETHER | IFM_10_T, 0, NULL);
 	ifmedia_add(&sc->media, IFM_ETHER | IFM_10_T | IFM_FDX, 0, NULL);
 	ifmedia_add(&sc->media, IFM_ETHER | IFM_100_TX, 0, NULL);
 	ifmedia_add(&sc->media, IFM_ETHER | IFM_100_TX | IFM_FDX, 0, NULL);
-	switch(sc->re_device_id)
+	switch(sc->rg_device_id)
 	{
 		case RT_DEVICEID_8169:
 		case RT_DEVICEID_8169SC:
@@ -871,18 +871,18 @@ static int re_attach(device_t dev)
 	ifmedia_add(&sc->media, IFM_ETHER | IFM_AUTO, 0, NULL);
 	ifmedia_set(&sc->media, IFM_ETHER | IFM_AUTO);
 	sc->media.ifm_media = IFM_ETHER | IFM_AUTO;
-	re_ifmedia_upd(ifp);
+	rg_ifmedia_upd(ifp);
 
 fail:
 	if (error)
-		re_detach(dev);
+		rg_detach(dev);
 
 	return(error);
 }
 
-static int re_detach(device_t dev)
+static int rg_detach(device_t dev)
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	struct ifnet		*ifp;
 	/*int			s;*/
 	int			i;
@@ -891,23 +891,23 @@ static int re_detach(device_t dev)
 
 	sc = device_get_softc(dev);
 
-	if (sc->re_intrhand)
-		bus_teardown_intr(dev, sc->re_irq, sc->re_intrhand);
-	if (sc->re_irq)
-		bus_release_resource(dev, SYS_RES_IRQ, 0, sc->re_irq);
-	if (sc->re_res)
-		bus_release_resource(dev, RE_RES, RE_RID, sc->re_res);
+	if (sc->rg_intrhand)
+		bus_teardown_intr(dev, sc->rg_irq, sc->rg_intrhand);
+	if (sc->rg_irq)
+		bus_release_resource(dev, SYS_RES_IRQ, 0, sc->rg_irq);
+	if (sc->rg_res)
+		bus_release_resource(dev, RG_RES, RG_RID, sc->rg_res);
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 
 	/* These should only be active if attach succeeded */
 	if (device_is_attached(dev))
 	{
-		RE_LOCK(sc);
-		re_stop(sc);
-		RE_UNLOCK(sc);
+		RG_LOCK(sc);
+		rg_stop(sc);
+		RG_UNLOCK(sc);
 #if OS_VER>=VERSION(7,0)
-		taskqueue_drain(taskqueue_fast, &sc->re_inttask);
+		taskqueue_drain(taskqueue_fast, &sc->rg_inttask);
 #endif
 #if OS_VER < VERSION(4,9)
 		ether_ifdetach(ifp, ETHER_BPF_SUPPORTED);
@@ -923,68 +923,68 @@ static int re_detach(device_t dev)
 #endif
 	bus_generic_detach(dev);
 
-	if(sc->re_desc.re_rx_mtag)
+	if(sc->rg_desc.rg_rx_mtag)
 	{
-		for(i=0;i<RE_RX_BUF_NUM;i++)
+		for(i=0;i<RG_RX_BUF_NUM;i++)
 		{
-			if(sc->re_desc.rx_buf[i]!=NULL)
+			if(sc->rg_desc.rx_buf[i]!=NULL)
 			{
-				bus_dmamap_sync(sc->re_desc.re_rx_mtag,
-					sc->re_desc.re_rx_dmamap[i],
+				bus_dmamap_sync(sc->rg_desc.rg_rx_mtag,
+					sc->rg_desc.rg_rx_dmamap[i],
 					BUS_DMASYNC_POSTREAD);
-				bus_dmamap_unload(sc->re_desc.re_rx_mtag,
-					sc->re_desc.re_rx_dmamap[i]);
-				bus_dmamap_destroy(sc->re_desc.re_rx_mtag,
-					sc->re_desc.re_rx_dmamap[i]);
-				m_freem(sc->re_desc.rx_buf[i]);
+				bus_dmamap_unload(sc->rg_desc.rg_rx_mtag,
+					sc->rg_desc.rg_rx_dmamap[i]);
+				bus_dmamap_destroy(sc->rg_desc.rg_rx_mtag,
+					sc->rg_desc.rg_rx_dmamap[i]);
+				m_freem(sc->rg_desc.rx_buf[i]);
 			}
 		}
-		bus_dma_tag_destroy(sc->re_desc.re_rx_mtag);
+		bus_dma_tag_destroy(sc->rg_desc.rg_rx_mtag);
 	}
 
-	if(sc->re_desc.re_tx_mtag)
+	if(sc->rg_desc.rg_tx_mtag)
 	{
-		for(i=0;i<RE_TX_BUF_NUM;i++)
+		for(i=0;i<RG_TX_BUF_NUM;i++)
 		{
-			bus_dmamap_destroy(sc->re_desc.re_tx_mtag,
-				sc->re_desc.re_tx_dmamap[i]);
+			bus_dmamap_destroy(sc->rg_desc.rg_tx_mtag,
+				sc->rg_desc.rg_tx_dmamap[i]);
 		}
-		bus_dma_tag_destroy(sc->re_desc.re_tx_mtag);
+		bus_dma_tag_destroy(sc->rg_desc.rg_tx_mtag);
 	}
 
-	if(sc->re_desc.rx_desc_tag)
+	if(sc->rg_desc.rx_desc_tag)
 	{
-		bus_dmamap_sync(sc->re_desc.rx_desc_tag,
-			sc->re_desc.rx_desc_dmamap,
+		bus_dmamap_sync(sc->rg_desc.rx_desc_tag,
+			sc->rg_desc.rx_desc_dmamap,
 			BUS_DMASYNC_POSTREAD|BUS_DMASYNC_POSTWRITE );
-		bus_dmamap_unload(sc->re_desc.rx_desc_tag,
-			sc->re_desc.rx_desc_dmamap);
-		bus_dmamem_free(sc->re_desc.rx_desc_tag,
-			sc->re_desc.rx_desc,
-			sc->re_desc.rx_desc_dmamap);
-		bus_dma_tag_destroy(sc->re_desc.rx_desc_tag);
+		bus_dmamap_unload(sc->rg_desc.rx_desc_tag,
+			sc->rg_desc.rx_desc_dmamap);
+		bus_dmamem_free(sc->rg_desc.rx_desc_tag,
+			sc->rg_desc.rx_desc,
+			sc->rg_desc.rx_desc_dmamap);
+		bus_dma_tag_destroy(sc->rg_desc.rx_desc_tag);
 	}
 
-	if(sc->re_desc.tx_desc_tag)
+	if(sc->rg_desc.tx_desc_tag)
 	{
-		bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-			sc->re_desc.tx_desc_dmamap,
+		bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+			sc->rg_desc.tx_desc_dmamap,
 			BUS_DMASYNC_POSTREAD|BUS_DMASYNC_POSTWRITE );
-		bus_dmamap_unload(sc->re_desc.tx_desc_tag,
-			sc->re_desc.tx_desc_dmamap);
-		bus_dmamem_free(sc->re_desc.tx_desc_tag,
-			sc->re_desc.tx_desc,
-			sc->re_desc.tx_desc_dmamap);
-		bus_dma_tag_destroy(sc->re_desc.tx_desc_tag);
+		bus_dmamap_unload(sc->rg_desc.tx_desc_tag,
+			sc->rg_desc.tx_desc_dmamap);
+		bus_dmamem_free(sc->rg_desc.tx_desc_tag,
+			sc->rg_desc.tx_desc,
+			sc->rg_desc.tx_desc_dmamap);
+		bus_dma_tag_destroy(sc->rg_desc.tx_desc_tag);
 	}
 
-	if (sc->re_parent_tag)
+	if (sc->rg_parent_tag)
 	{
-		bus_dma_tag_destroy(sc->re_parent_tag);
+		bus_dma_tag_destroy(sc->rg_parent_tag);
 	}
 
 	/*splx(s);*/
-	RE_LOCK_DESTROY(sc);
+	RG_LOCK_DESTROY(sc);
 
 	return(0);
 }
@@ -993,23 +993,23 @@ static int re_detach(device_t dev)
  * Stop all chip I/O so that the kernel's probe routines don't
  * get confused by errant DMAs when rebooting.
  */
-static int re_shutdown(dev)	/* The same with re_stop(sc) */
+static int rg_shutdown(dev)	/* The same with rg_stop(sc) */
 	device_t		dev;
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 
 	sc = device_get_softc(dev);
 
-	RE_LOCK(sc);
-	re_stop(sc);
-	RE_UNLOCK(sc);
+	RG_LOCK(sc);
+	rg_stop(sc);
+	RG_UNLOCK(sc);
 
 	return 0;
 }
 
-static void re_init(void *xsc)		/* Software & Hardware Initialize */
+static void rg_init(void *xsc)		/* Software & Hardware Initialize */
 {
-	struct re_softc		*sc = xsc;
+	struct rg_softc		*sc = xsc;
 	struct ifnet		*ifp;
 #if OS_VER<VERSION(6,0)
 	int			i;
@@ -1020,82 +1020,82 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 	u_int32_t	macver;
 
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 	/*s = splimp();*/
-	RE_LOCK(sc);
+	RG_LOCK(sc);
 
-/*	RE_LOCK_ASSERT(sc);*/
+/*	RG_LOCK_ASSERT(sc);*/
 
-	/*mii = device_get_softc(sc->re_miibus);*/
+	/*mii = device_get_softc(sc->rg_miibus);*/
 
 	/*
 	 * Cancel pending I/O and free all RX/TX buffers.
 	 */
-	re_stop(sc);
+	rg_stop(sc);
 
 	/* Init our MAC address */
 #if OS_VER<VERSION(6,0)
 	for (i = 0; i < ETHER_ADDR_LEN; i++) {
-		CSR_WRITE_1(sc, RE_IDR0 + i, sc->arpcom.ac_enaddr[i]);
+		CSR_WRITE_1(sc, RG_IDR0 + i, sc->arpcom.ac_enaddr[i]);
 	}
 #elif OS_VER<VERSION(7,0)
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_WRITECFG);
-	CSR_WRITE_STREAM_4(sc, RE_IDR0,
-	    *(u_int32_t *)(&IFP2ENADDR(sc->re_ifp)[0]));
-	CSR_WRITE_STREAM_4(sc, RE_IDR4,
-	    *(u_int32_t *)(&IFP2ENADDR(sc->re_ifp)[4]));
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_OFF);
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_WRITECFG);
+	CSR_WRITE_STREAM_4(sc, RG_IDR0,
+	    *(u_int32_t *)(&IFP2ENADDR(sc->rg_ifp)[0]));
+	CSR_WRITE_STREAM_4(sc, RG_IDR4,
+	    *(u_int32_t *)(&IFP2ENADDR(sc->rg_ifp)[4]));
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_OFF);
 #else
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_WRITECFG);
-	CSR_WRITE_STREAM_4(sc, RE_IDR0,
-	    *(u_int32_t *)(&IF_LLADDR(sc->re_ifp)[0]));
-	CSR_WRITE_STREAM_4(sc, RE_IDR4,
-	    *(u_int32_t *)(&IF_LLADDR(sc->re_ifp)[4]));
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_OFF);
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_WRITECFG);
+	CSR_WRITE_STREAM_4(sc, RG_IDR0,
+	    *(u_int32_t *)(&IF_LLADDR(sc->rg_ifp)[0]));
+	CSR_WRITE_STREAM_4(sc, RG_IDR4,
+	    *(u_int32_t *)(&IF_LLADDR(sc->rg_ifp)[4]));
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_OFF);
 #endif
 
 	/* Init descriptors. */
-	re_var_init(sc);
+	rg_var_init(sc);
 
 	/*disable Link Down Power Saving(non-LDPS)*/
-	/*CSR_WRITE_1(sc, RE_LDPS, 0x05);*/
-	/*ldps=CSR_READ_1(sc, RE_LDPS);*/
+	/*CSR_WRITE_1(sc, RG_LDPS, 0x05);*/
+	/*ldps=CSR_READ_1(sc, RG_LDPS);*/
 
-	CSR_WRITE_2(sc,RE_CPCR,0x2082);
-	CSR_WRITE_2(sc,RE_IM,0x5151);
+	CSR_WRITE_2(sc,RG_CPCR,0x2082);
+	CSR_WRITE_2(sc,RG_IM,0x5151);
 
 	/*
 	 * Enable interrupts.
 	 */
-	CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
+	CSR_WRITE_2(sc, RG_IMR, RG_INTRS);
 
 
 	/* Start RX/TX process. */
-	CSR_WRITE_4(sc, RE_MISSEDPKT, 0);
+	CSR_WRITE_4(sc, RG_MISSEDPKT, 0);
 
 	/* Enable receiver and transmitter. */
-/*	CSR_WRITE_1(sc, RE_COMMAND, RE_CMD_TX_ENB|RE_CMD_RX_ENB);*/
+/*	CSR_WRITE_1(sc, RG_COMMAND, RG_CMD_TX_ENB|RG_CMD_RX_ENB);*/
 
-	macver = CSR_READ_4(sc, RE_TXCFG) & 0xFC800000;
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_WRITECFG);
+	macver = CSR_READ_4(sc, RG_TXCFG) & 0xFC800000;
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_WRITECFG);
 	if(macver==0x00800000)
 	{
-		CSR_WRITE_2(sc, RE_CPlusCmd, 0x0003|((sc->re_type==MACFG_3 && sc->re_8169_MacVersion==1) ? 0x4008:0));
-		CSR_WRITE_4(sc, RE_RXCFG, 0xFF00);
+		CSR_WRITE_2(sc, RG_CPlusCmd, 0x0003|((sc->rg_type==MACFG_3 && sc->rg_8169_MacVersion==1) ? 0x4008:0));
+		CSR_WRITE_4(sc, RG_RXCFG, 0xFF00);
 	}
 	else if(macver==0x04000000)
 	{
-		CSR_WRITE_2(sc, RE_CPlusCmd, 0x0003|((sc->re_type==MACFG_3 && sc->re_8169_MacVersion==1) ? 0x4008:0));
-		CSR_WRITE_4(sc, RE_RXCFG, 0xFF00);
+		CSR_WRITE_2(sc, RG_CPlusCmd, 0x0003|((sc->rg_type==MACFG_3 && sc->rg_8169_MacVersion==1) ? 0x4008:0));
+		CSR_WRITE_4(sc, RG_RXCFG, 0xFF00);
 	}
 	else if(macver==0x10000000)
 	{
-		CSR_WRITE_2(sc, RE_CPlusCmd, 0x0003|((sc->re_type==MACFG_3 && sc->re_8169_MacVersion==1) ? 0x4008:0));
-		CSR_WRITE_4(sc, RE_RXCFG, 0xFF00);
+		CSR_WRITE_2(sc, RG_CPlusCmd, 0x0003|((sc->rg_type==MACFG_3 && sc->rg_8169_MacVersion==1) ? 0x4008:0));
+		CSR_WRITE_4(sc, RG_RXCFG, 0xFF00);
 	}
 	else if(macver==0x18000000)
 	{
-		if(CSR_READ_1(sc, RE_CFG2)&1)
+		if(CSR_READ_1(sc, RG_CFG2)&1)
 		{
 			CSR_WRITE_4(sc, 0x7C, 0x000FFFFF);
 		}
@@ -1103,13 +1103,13 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		{
 			CSR_WRITE_4(sc, 0x7C, 0x000FFF00);
 		}
-		CSR_WRITE_2(sc, RE_CPlusCmd,0x0008);
+		CSR_WRITE_2(sc, RG_CPlusCmd,0x0008);
 		CSR_WRITE_2(sc, 0xe2,0x0000);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xFF00);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xFF00);
 	}
 	else if(macver==0x98000000)
 	{
-		if(CSR_READ_1(sc, RE_CFG2)&1)
+		if(CSR_READ_1(sc, RG_CFG2)&1)
 		{
 			CSR_WRITE_4(sc, 0x7C, 0x003FFFFF);
 		}
@@ -1117,32 +1117,32 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		{
 			CSR_WRITE_4(sc, 0x7C, 0x003FFF00);
 		}
-		CSR_WRITE_2(sc, RE_CPlusCmd,0x0008);
+		CSR_WRITE_2(sc, RG_CPlusCmd,0x0008);
 		CSR_WRITE_2(sc, 0xe2,0x0000);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xFF00);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xFF00);
 	}
 	else if(macver==0x30000000)
 	{
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2000);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xE700);
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2000);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xE700);
 	}
 	else if(macver==0x38000000)
 	{
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2000);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xE700);
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2000);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xE700);
 	}
 	else if(macver==0x34000000 || macver==0xB4000000)
 	{
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2000);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xE700);
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2000);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xE700);
 	}
 	else if(macver==0x34800000 || macver==0x24800000)
 	{
 		if(pci_read_config(sc->dev, 0x81, 1)==1)
 		{
-			CSR_WRITE_1(sc, RE_DBG_reg, 0x98);
-			CSR_WRITE_1(sc, RE_CFG2, CSR_READ_1(sc, RE_CFG2) | 0x80);
-			CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | 0x04);
+			CSR_WRITE_1(sc, RG_DBG_reg, 0x98);
+			CSR_WRITE_1(sc, RG_CFG2, CSR_READ_1(sc, RG_CFG2) | 0x80);
+			CSR_WRITE_1(sc, RG_CFG4, CSR_READ_1(sc, RG_CFG4) | 0x04);
 			pci_write_config(sc->dev, 0x81, 1, 1);
 		}
 
@@ -1152,22 +1152,22 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
 		/*set configuration space offset 0x70f to 0x3f*/
-		CSR_WRITE_4(sc, RE_CSIDR, 0x3F000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x3F000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
 
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05EF);
-		CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~(1 << 0));
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05EF);
+		CSR_WRITE_1(sc, RG_CFG3, CSR_READ_1(sc, RG_CFG3) & ~(1 << 0));
 
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2020);
-		if(sc->re_type==MACFG_14)
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2020);
+		if(sc->rg_type==MACFG_14)
 		{
 			MP_WriteEPhyUshort(sc, 0x03, 0xC2F9);
 		}
-		else if(sc->re_type==MACFG_15)
+		else if(sc->rg_type==MACFG_15)
 		{
 			MP_WriteEPhyUshort(sc, 0x03, 0x07D9);
 		}
-		else if(sc->re_type==MACFG_17)
+		else if(sc->rg_type==MACFG_17)
 		{
 			data16 = MP_ReadEPhyUshort(sc, 0x01);
 			data16 |= 0x0180;
@@ -1179,7 +1179,7 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 
 			MP_WriteEPhyUshort(sc, 0x06, 0xAF35);
 		}
-		else if(sc->re_type==MACFG_18)
+		else if(sc->rg_type==MACFG_18)
 		{
 			CSR_WRITE_1(sc, 0xF5, CSR_READ_1(sc, 0xF5)|0x04);
 			MP_WriteEPhyUshort(sc, 0x19, 0xEC90);
@@ -1187,7 +1187,7 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 			MP_WriteEPhyUshort(sc, 0x03, 0x05D9);
 			MP_WriteEPhyUshort(sc, 0x06, 0xAF35);
 		}
-		else if(sc->re_type==MACFG_19)
+		else if(sc->rg_type==MACFG_19)
 		{
 			CSR_WRITE_1(sc, 0xF4, CSR_READ_1(sc, 0xF4)|0x08);
 			CSR_WRITE_1(sc, 0xF5, CSR_READ_1(sc, 0xF5)|0x04);
@@ -1205,19 +1205,19 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
 		/*set configuration space offset 0x70f to 0x3f*/
-		CSR_WRITE_4(sc, RE_CSIDR, 0x27000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x27000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
 
-		CSR_WRITE_1(sc, RE_CFG1, CSR_READ_1(sc, RE_CFG1)|0x10);
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05F3);
-		CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~(1 << 0));
+		CSR_WRITE_1(sc, RG_CFG1, CSR_READ_1(sc, RG_CFG1)|0x10);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05F3);
+		CSR_WRITE_1(sc, RG_CFG3, CSR_READ_1(sc, RG_CFG3) & ~(1 << 0));
 
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2020);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xC700);
-		if(sc->re_type==MACFG_24)
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2020);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xC700);
+		if(sc->rg_type==MACFG_24)
 		{
 			/*set mac register offset 0xd1 to 0xf8*/
-			CSR_WRITE_1(sc, RE_DBG_reg, 0xF8);
+			CSR_WRITE_1(sc, RG_DBG_reg, 0xF8);
 
 			data16 = MP_ReadEPhyUshort(sc, 0x02) & ~0x1800;
 			data16 |= 0x1000;
@@ -1229,7 +1229,7 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 			data16 = MP_ReadEPhyUshort(sc, 0x06) & ~0x0080;
 			MP_WriteEPhyUshort(sc, 0x06, data16);
 		}
-		else if(sc->re_type==MACFG_25)
+		else if(sc->rg_type==MACFG_25)
 		{
 			data16 = MP_ReadEPhyUshort(sc, 0x01) | 0x0001;
 			MP_WriteEPhyUshort(sc, 0x01, data16);
@@ -1247,12 +1247,12 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
 		/*set configuration space offset 0x70f to 0x3f*/
-		CSR_WRITE_4(sc, RE_CSIDR, 0x27000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2020);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x27000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2020);
 
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05F3);
-		CSR_WRITE_4(sc, RE_RXCFG, 0xC700);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05F3);
+		CSR_WRITE_4(sc, RG_RXCFG, 0xC700);
 	}
 	else if(macver==0x28000000)
 	{
@@ -1262,24 +1262,24 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
 		/*set configuration space offset 0x70f to 0x3f*/
-		CSR_WRITE_4(sc, RE_CSIDR, 0x27000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x27000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
 
-		CSR_WRITE_1(sc, RE_CFG1, CSR_READ_1(sc, RE_CFG1)|0x10);
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05F3);
-		CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~0x11);
-		CSR_WRITE_1(sc, RE_DBG_reg, CSR_READ_1(sc, RE_DBG_reg)|0x82);
+		CSR_WRITE_1(sc, RG_CFG1, CSR_READ_1(sc, RG_CFG1)|0x10);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05F3);
+		CSR_WRITE_1(sc, RG_CFG3, CSR_READ_1(sc, RG_CFG3) & ~0x11);
+		CSR_WRITE_1(sc, RG_DBG_reg, CSR_READ_1(sc, RG_DBG_reg)|0x82);
 
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2020);
-		CSR_WRITE_4(sc, RE_RXCFG, 0x8700);
-		if(sc->re_type==MACFG_31)
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2020);
+		CSR_WRITE_4(sc, RG_RXCFG, 0x8700);
+		if(sc->rg_type==MACFG_31)
 		{
 			MP_WriteEPhyUshort(sc, 0x01, 0x7C7D);
 			MP_WriteEPhyUshort(sc, 0x02, 0x091F);
 			MP_WriteEPhyUshort(sc, 0x06, 0xB271);
 			MP_WriteEPhyUshort(sc, 0x07, 0xCE00);
 		}
-		else if(sc->re_type==MACFG_32)
+		else if(sc->rg_type==MACFG_32)
 		{
 			MP_WriteEPhyUshort(sc, 0x01, 0x7C7D);
 			MP_WriteEPhyUshort(sc, 0x02, 0x091F);
@@ -1288,7 +1288,7 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 			MP_WriteEPhyUshort(sc, 0x07, 0xAF00);
 			MP_WriteEPhyUshort(sc, 0x1E, 0xB8EB);
 		}
-		else if(sc->re_type==MACFG_33)
+		else if(sc->rg_type==MACFG_33)
 		{
 			MP_WriteEPhyUshort(sc, 0x01, 0x6C7F);
 			MP_WriteEPhyUshort(sc, 0x02, 0x011F);
@@ -1306,22 +1306,22 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		data8 |= 0x50;
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
-		CSR_WRITE_4(sc, RE_CSIDR, 0x27000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x27000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
 
-		CSR_WRITE_1 (sc, RE_MTPS, 0x0C);
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05F3);
+		CSR_WRITE_1 (sc, RG_MTPS, 0x0C);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05F3);
 
 		CSR_WRITE_1(sc, 0xF3, CSR_READ_1(sc, 0xF3)|0x20);
 		CSR_WRITE_1(sc, 0xF3, CSR_READ_1(sc, 0xF3)&~0x20);
 		CSR_WRITE_1(sc, 0xD0, CSR_READ_1(sc, 0xD0)|0xC0);
 		CSR_WRITE_1(sc, 0xF1, CSR_READ_1(sc, 0xF1)|0xF3);
-		CSR_WRITE_1(sc, RE_CFG5, (CSR_READ_1(sc, RE_CFG5)&~0x08)|0x01);
-		CSR_WRITE_1(sc, RE_CFG2, CSR_READ_1(sc, RE_CFG2)|0x80);
-		CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~(1 << 0));
-		CSR_WRITE_4(sc, RE_RXCFG, 0x8700);
+		CSR_WRITE_1(sc, RG_CFG5, (CSR_READ_1(sc, RG_CFG5)&~0x08)|0x01);
+		CSR_WRITE_1(sc, RG_CFG2, CSR_READ_1(sc, RG_CFG2)|0x80);
+		CSR_WRITE_1(sc, RG_CFG3, CSR_READ_1(sc, RG_CFG3) & ~(1 << 0));
+		CSR_WRITE_4(sc, RG_RXCFG, 0x8700);
 
-		if(sc->re_type==MACFG_36 || sc->re_type==MACFG_37)
+		if(sc->rg_type==MACFG_36 || sc->rg_type==MACFG_37)
 		{
 			/* set EPHY registers */
 			data16 = MP_ReadEPhyUshort(sc, 0x00) & ~0x0200;
@@ -1379,9 +1379,9 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 	{
 		if(pci_read_config(sc->dev, 0x81, 1)==1)
 		{
-			CSR_WRITE_1(sc, RE_DBG_reg, 0x98);
-			CSR_WRITE_1(sc, RE_CFG2, CSR_READ_1(sc, RE_CFG2) | 0x80);
-			CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | 0x04);
+			CSR_WRITE_1(sc, RG_DBG_reg, 0x98);
+			CSR_WRITE_1(sc, RG_CFG2, CSR_READ_1(sc, RG_CFG2) | 0x80);
+			CSR_WRITE_1(sc, RG_CFG4, CSR_READ_1(sc, RG_CFG4) | 0x04);
 			pci_write_config(sc->dev, 0x81, 1, 1);
 		}
 		data8 = pci_read_config(sc->dev, 0x79, 1);
@@ -1390,32 +1390,32 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		pci_write_config(sc->dev, 0x79, data8, 1);
 
 		/*set configuration space offset 0x70f to 0x3f*/
-		CSR_WRITE_4(sc, RE_CSIDR, 0x3F000000);
-		CSR_WRITE_4(sc, RE_CSIAR, 0x8000870C);
+		CSR_WRITE_4(sc, RG_CSIDR, 0x3F000000);
+		CSR_WRITE_4(sc, RG_CSIAR, 0x8000870C);
 
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05EF);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05EF);
 
-		CSR_WRITE_2 (sc, RE_CPlusCmd,0x2020);
+		CSR_WRITE_2 (sc, RG_CPlusCmd,0x2020);
 
 		MP_WriteEPhyUshort(sc, 0x06, 0xAF25);
 		MP_WriteEPhyUshort(sc, 0x07, 0x8E68);
 	}
 	else if(macver==0x40800000)
 	{
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x05F3);
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x05F3);
 		if(pci_read_config(sc->dev, 0x80, 1)&0x03)
 		{
-			CSR_WRITE_1(sc, RE_CFG5, CSR_READ_1(sc, RE_CFG5) | 1);
+			CSR_WRITE_1(sc, RG_CFG5, CSR_READ_1(sc, RG_CFG5) | 1);
 			CSR_WRITE_1(sc, 0xF1, CSR_READ_1(sc, 0xF1) | 0x80);
 			CSR_WRITE_1(sc, 0xF2, CSR_READ_1(sc, 0xF2) | 0x80);
-			CSR_WRITE_1(sc, RE_CFG2, CSR_READ_1(sc, RE_CFG2) | 0x80);
+			CSR_WRITE_1(sc, RG_CFG2, CSR_READ_1(sc, RG_CFG2) | 0x80);
 		}
 		CSR_WRITE_1(sc, 0xF1, CSR_READ_1(sc, 0xF1) | 0x28);
 		CSR_WRITE_1(sc, 0xF2, CSR_READ_1(sc, 0xF2) & ~0x01);
 		CSR_WRITE_1(sc, 0xD3, CSR_READ_1(sc, 0xD3) | 0x0C);
 		CSR_WRITE_1(sc, 0xD0, CSR_READ_1(sc, 0xD0) | 0x40);
 		CSR_WRITE_2(sc, 0xE0, CSR_READ_2(sc, 0xE0) & ~0xDF9C);
-		if(sc->re_type==MACFG_42)
+		if(sc->rg_type==MACFG_42)
 		{
 			/* set EPHY registers */
 			data16 = MP_ReadEPhyUshort(sc, 0x07);
@@ -1452,56 +1452,56 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 		}
 	}
 
-	CSR_WRITE_1(sc, RE_EECMD, RE_EEMODE_OFF);
+	CSR_WRITE_1(sc, RG_EECMD, RG_EEMODE_OFF);
 	CSR_WRITE_1(sc, 0xec, 0x3f);
 
 	/* Enable transmit and receive.*/
-	CSR_WRITE_1(sc, RE_COMMAND, RE_CMD_TX_ENB|RE_CMD_RX_ENB);
+	CSR_WRITE_1(sc, RG_COMMAND, RG_CMD_TX_ENB|RG_CMD_RX_ENB);
 
 	/* Set the initial TX configuration.*/
-	CSR_WRITE_4(sc, RE_TXCFG, RE_TXCFG_CONFIG);
+	CSR_WRITE_4(sc, RG_TXCFG, RG_TXCFG_CONFIG);
 
 	/* Set the initial RX configuration.*/
 	/* Set the individual bit to receive frames for this host only. */
-	rxcfg = CSR_READ_4(sc, RE_RXCFG);
-	rxcfg |= RE_RXCFG_RX_INDIV;
+	rxcfg = CSR_READ_4(sc, RG_RXCFG);
+	rxcfg |= RG_RXCFG_RX_INDIV;
 
 	/* If we want promiscuous mode, set the allframes bit. */
 	if (ifp->if_flags & IFF_PROMISC) {
-		rxcfg |= RE_RXCFG_RX_ALLPHYS;
+		rxcfg |= RG_RXCFG_RX_ALLPHYS;
 	} else {
-		rxcfg &= ~RE_RXCFG_RX_ALLPHYS;
+		rxcfg &= ~RG_RXCFG_RX_ALLPHYS;
 	}
 
 	/*
 	 * Set capture broadcast bit to capture broadcast frames.
 	 */
 	if (ifp->if_flags & IFF_BROADCAST) {
-		rxcfg |= RE_RXCFG_RX_BROAD;
+		rxcfg |= RG_RXCFG_RX_BROAD;
 	} else {
-		rxcfg &= ~RE_RXCFG_RX_BROAD;
+		rxcfg &= ~RG_RXCFG_RX_BROAD;
 	}
 
-	CSR_WRITE_4(sc, RE_RXCFG, rxcfg);
+	CSR_WRITE_4(sc, RG_RXCFG, rxcfg);
 
 	/*
 	 * Program the multicast filter, if necessary.
 	 */
-	re_setmulti(sc);
+	rg_setmulti(sc);
 
-	if ((sc->re_type == MACFG_3) || (sc->re_type == MACFG_4)) {
-		CSR_WRITE_2(sc, RE_RxMaxSize, 0x800);	/* RMS */
+	if ((sc->rg_type == MACFG_3) || (sc->rg_type == MACFG_4)) {
+		CSR_WRITE_2(sc, RG_RxMaxSize, 0x800);	/* RMS */
 	}
 
-	CSR_WRITE_1(sc, RE_CFG1, RE_CFG1_DRVLOAD|RE_CFG1_FULLDUPLEX);
+	CSR_WRITE_1(sc, RG_CFG1, RG_CFG1_DRVLOAD|RG_CFG1_FULLDUPLEX);
 
 	ifp->if_drv_flags |= IFF_DRV_RUNNING;
 	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 
 	/*(void)splx(s);*/
-	RE_UNLOCK(sc);
+	RG_UNLOCK(sc);
 
-	sc->re_stat_ch = timeout(re_tick, sc, hz);
+	sc->rg_stat_ch = timeout(rg_tick, sc, hz);
 
 	return;
 }
@@ -1509,91 +1509,91 @@ static void re_init(void *xsc)		/* Software & Hardware Initialize */
 /*
  * Initialize the transmit descriptors.
  */
-static int re_var_init(struct re_softc *sc)
+static int rg_var_init(struct rg_softc *sc)
 {
 	int			i;
 	union RxDesc *rxptr;
 	union TxDesc *txptr;
 
-	sc->re_desc.rx_cur_index = 0;
-	sc->re_desc.rx_last_index = 0;
-	rxptr = sc->re_desc.rx_desc;
-	for(i=0;i<RE_RX_BUF_NUM;i++)
+	sc->rg_desc.rx_cur_index = 0;
+	sc->rg_desc.rx_last_index = 0;
+	rxptr = sc->rg_desc.rx_desc;
+	for(i=0;i<RG_RX_BUF_NUM;i++)
 	{
 		memset(&rxptr[i], 0, sizeof(union RxDesc));
 		rxptr[i].so0.OWN=1;
-		if(i==(RE_RX_BUF_NUM-1))
+		if(i==(RG_RX_BUF_NUM-1))
 			rxptr[i].so0.EOR=1;
-		rxptr[i].so0.Frame_Length = RE_BUF_SIZE;
+		rxptr[i].so0.Frame_Length = RG_BUF_SIZE;
 
 		/* Init the RX buffer pointer register. */
-		bus_dmamap_load(sc->re_desc.re_rx_mtag,
-			sc->re_desc.re_rx_dmamap[i],
-			sc->re_desc.rx_buf[i]->m_data, MCLBYTES,
-			re_dma_map_buf,
+		bus_dmamap_load(sc->rg_desc.rg_rx_mtag,
+			sc->rg_desc.rg_rx_dmamap[i],
+			sc->rg_desc.rx_buf[i]->m_data, MCLBYTES,
+			rg_dma_map_buf,
 			&rxptr[i],
 			0 );
-		bus_dmamap_sync(sc->re_desc.re_rx_mtag,
-			sc->re_desc.re_rx_dmamap[i],
+		bus_dmamap_sync(sc->rg_desc.rg_rx_mtag,
+			sc->rg_desc.rg_rx_dmamap[i],
 			BUS_DMASYNC_PREWRITE);
 	}
 
-	bus_dmamap_load(sc->re_desc.rx_desc_tag,
-		sc->re_desc.rx_desc_dmamap,
-		sc->re_desc.rx_desc,
-		sizeof(union RxDesc)*RE_RX_BUF_NUM,
-		re_dma_map_rxdesc,
+	bus_dmamap_load(sc->rg_desc.rx_desc_tag,
+		sc->rg_desc.rx_desc_dmamap,
+		sc->rg_desc.rx_desc,
+		sizeof(union RxDesc)*RG_RX_BUF_NUM,
+		rg_dma_map_rxdesc,
 		sc,
 		0 );
-	bus_dmamap_sync(sc->re_desc.rx_desc_tag,
-		sc->re_desc.rx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.rx_desc_tag,
+		sc->rg_desc.rx_desc_dmamap,
 		BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE );
 
-	sc->re_desc.tx_cur_index=0;
-	sc->re_desc.tx_last_index=0;
-	txptr=sc->re_desc.tx_desc;
-	for(i=0;i<RE_TX_BUF_NUM;i++)
+	sc->rg_desc.tx_cur_index=0;
+	sc->rg_desc.tx_last_index=0;
+	txptr=sc->rg_desc.tx_desc;
+	for(i=0;i<RG_TX_BUF_NUM;i++)
 	{
 		memset(&txptr[i], 0, sizeof(union TxDesc));
-		if(i==(RE_TX_BUF_NUM-1))
+		if(i==(RG_TX_BUF_NUM-1))
 			txptr[i].so1.EOR=1;
 	}
 
-	bus_dmamap_load(sc->re_desc.tx_desc_tag,
-		sc->re_desc.tx_desc_dmamap,
-		sc->re_desc.tx_desc,
-		sizeof(union RxDesc)*RE_TX_BUF_NUM,
-		re_dma_map_txdesc,
+	bus_dmamap_load(sc->rg_desc.tx_desc_tag,
+		sc->rg_desc.tx_desc_dmamap,
+		sc->rg_desc.tx_desc,
+		sizeof(union RxDesc)*RG_TX_BUF_NUM,
+		rg_dma_map_txdesc,
 		sc,
 		0 );
-//	bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-//		sc->re_desc.tx_desc_dmamap,
+//	bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+//		sc->rg_desc.tx_desc_dmamap,
 //		BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE );
 
 	return(0);
 }
 
-static void re_reset(struct re_softc *sc)
+static void rg_reset(struct rg_softc *sc)
 {
 	register int		i;
 
-	CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG)&~0x3F);
+	CSR_WRITE_4(sc, RG_RXCFG, CSR_READ_4(sc, RG_RXCFG)&~0x3F);
 
-	if(sc->re_type>=MACFG_11)
+	if(sc->rg_type>=MACFG_11)
 	{
-		CSR_WRITE_1(sc, RE_COMMAND, 0x8C);
+		CSR_WRITE_1(sc, RG_COMMAND, 0x8C);
 	}
 
 	DELAY(200);
-	CSR_WRITE_1(sc, RE_COMMAND, RE_CMD_RESET);
+	CSR_WRITE_1(sc, RG_COMMAND, RG_CMD_RESET);
 
-	for (i = 0; i < RE_TIMEOUT; i++) {
+	for (i = 0; i < RG_TIMEOUT; i++) {
 		DELAY(10);
-		if (!(CSR_READ_1(sc, RE_COMMAND) & RE_CMD_RESET))
+		if (!(CSR_READ_1(sc, RG_COMMAND) & RG_CMD_RESET))
 			break;
 	}
 
-	if (i == RE_TIMEOUT)
+	if (i == RG_TIMEOUT)
 		device_printf(sc->dev,"reset never completed!\n");
 
 	return;
@@ -1603,40 +1603,40 @@ static void re_reset(struct re_softc *sc)
  * Stop the adapter and free any mbufs allocated to the
  * RX and TX lists.
  */
-static void re_stop(struct re_softc *sc)		/* Stop Driver */
+static void rg_stop(struct rg_softc *sc)		/* Stop Driver */
 {
 	struct ifnet		*ifp;
 
-/*	RE_LOCK_ASSERT(sc);*/
+/*	RG_LOCK_ASSERT(sc);*/
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 	ifp->if_timer = 0;
 
-	untimeout(re_tick, sc, sc->re_stat_ch);
+	untimeout(rg_tick, sc, sc->rg_stat_ch);
 
-	CSR_WRITE_2(sc, RE_IMR, 0x0000);
-	re_reset(sc);
+	CSR_WRITE_2(sc, RG_IMR, 0x0000);
+	rg_reset(sc);
 
 	/*
 	 * Free the TX list buffers.
 	 */
-	while(sc->re_desc.tx_last_index!=sc->re_desc.tx_cur_index)
+	while(sc->rg_desc.tx_last_index!=sc->rg_desc.tx_cur_index)
 	{
-		if(sc->re_desc.re_tx_mtag)
+		if(sc->rg_desc.rg_tx_mtag)
 		{
-			bus_dmamap_sync(sc->re_desc.re_tx_mtag,
-				sc->re_desc.re_tx_dmamap[sc->re_desc.tx_last_index],
+			bus_dmamap_sync(sc->rg_desc.rg_tx_mtag,
+				sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_last_index],
 				BUS_DMASYNC_POSTWRITE);
-			bus_dmamap_unload(sc->re_desc.re_tx_mtag,
-				sc->re_desc.re_tx_dmamap[sc->re_desc.tx_last_index] );
+			bus_dmamap_unload(sc->rg_desc.rg_tx_mtag,
+				sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_last_index] );
 		}
 
-		if(sc->re_desc.tx_buf[sc->re_desc.tx_last_index]!=NULL)
+		if(sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index]!=NULL)
 		{
-			m_freem(sc->re_desc.tx_buf[sc->re_desc.tx_last_index]);
-			sc->re_desc.tx_buf[sc->re_desc.tx_last_index] = NULL;
+			m_freem(sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index]);
+			sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index] = NULL;
 		}
-		sc->re_desc.tx_last_index = (sc->re_desc.tx_last_index+1)%RE_TX_BUF_NUM;
+		sc->rg_desc.tx_last_index = (sc->rg_desc.tx_last_index+1)%RG_TX_BUF_NUM;
 	}
 
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
@@ -1647,23 +1647,23 @@ static void re_stop(struct re_softc *sc)		/* Stop Driver */
 /*
  * Main transmit routine.
  */
-static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
+static void rg_start(struct ifnet *ifp)	/* Transmit Packet*/
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	struct mbuf		*m_head = NULL;
 
 #if 0	/*print the destination and source MAC addresses of tx packets*/
 	int i;
 #endif
 
-	sc = ifp->if_softc;	/* Paste to ifp in function re_attach(dev) */
+	sc = ifp->if_softc;	/* Paste to ifp in function rg_attach(dev) */
 
-	RE_LOCK(sc);
+	RG_LOCK(sc);
 
-/*	RE_LOCK_ASSERT(sc);*/
+/*	RG_LOCK_ASSERT(sc);*/
 
 	if((sc->driver_detach == 1)||(sc->rx_fifo_overflow != 0)){
-		RE_UNLOCK(sc);
+		RG_UNLOCK(sc);
 		return;
 	}
 
@@ -1676,7 +1676,7 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
 			break;
 		}
 
-		if(CountMbufNum(m_head,&limit)>CountFreeTxDescNum(sc->re_desc))	/* No enough descriptor */
+		if(CountMbufNum(m_head,&limit)>CountFreeTxDescNum(sc->rg_desc))	/* No enough descriptor */
 		{
 			IFQ_DRV_PREPEND(&ifp->if_snd, m_head);
 			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
@@ -1693,7 +1693,7 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
 #endif
 		}
 
-		if(limit)	/* At least one mbuf data size small than RE_MINI_DESC_SIZE */
+		if(limit)	/* At least one mbuf data size small than RG_MINI_DESC_SIZE */
 		{
 #ifdef _DEBUG_
 			ptr=m_head;
@@ -1705,13 +1705,13 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
 			}
 			printf("\n===== Reach limit ======\n");
 #endif
-			if (re_encap(sc, m_head))
+			if (rg_encap(sc, m_head))
 			{
 				IFQ_DRV_PREPEND(&ifp->if_snd, m_head);
 				ifp->if_drv_flags |= IFF_DRV_OACTIVE;
 				break;
 			}
-			m_head = sc->re_desc.tx_buf[sc->re_desc.tx_cur_index];
+			m_head = sc->rg_desc.tx_buf[sc->rg_desc.tx_cur_index];
 			WritePacket(sc,m_head->m_data,m_head->m_len,1,1);
 			continue;
 		}
@@ -1732,10 +1732,10 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
 				if(TxLen >= PktLen)
 				{
 					ls=1;
-					sc->re_desc.tx_buf[sc->re_desc.tx_cur_index] = m_head;
+					sc->rg_desc.tx_buf[sc->rg_desc.tx_cur_index] = m_head;
 				}
 				else
-					sc->re_desc.tx_buf[sc->re_desc.tx_cur_index] = NULL;
+					sc->rg_desc.tx_buf[sc->rg_desc.tx_cur_index] = NULL;
 
 				WritePacket(sc,ptr->m_data,ptr->m_len,fs,ls);
 				fs=0;
@@ -1748,7 +1748,7 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
 	}
 	ifp->if_timer = 5;
 
-	RE_UNLOCK(sc);
+	RG_UNLOCK(sc);
 
 	return;
 }
@@ -1757,20 +1757,20 @@ static void re_start(struct ifnet *ifp)	/* Transmit Packet*/
  * Encapsulate an mbuf chain in a descriptor by coupling the mbuf data
  * pointers to the fragment pointers.
  */
-static int re_encap(struct re_softc *sc,struct mbuf *m_head)		/* Only used in ~C+ mode */
+static int rg_encap(struct rg_softc *sc,struct mbuf *m_head)		/* Only used in ~C+ mode */
 {
 	struct mbuf		*m_new = NULL;
 
 	m_new = m_defrag(m_head, M_DONTWAIT);
 
 	if (m_new == NULL) {
-		printf("re%d: no memory for tx list", sc->re_unit);
+		printf("re%d: no memory for tx list", sc->rg_unit);
 		return (1);
 	}
 	m_head = m_new;
 
 	/* Pad frames to at least 60 bytes. */
-	if (m_head->m_pkthdr.len < RE_MIN_FRAMELEN) {	/* Case length < 60 bytes */
+	if (m_head->m_pkthdr.len < RG_MIN_FRAMELEN) {	/* Case length < 60 bytes */
 		/*
 		 * Make security concious people happy: zero out the
 		 * bytes in the pad area, since we don't know what
@@ -1778,25 +1778,25 @@ static int re_encap(struct re_softc *sc,struct mbuf *m_head)		/* Only used in ~C
 		 * have left in it.
 		 */
 		bzero(mtod(m_head, char *) + m_head->m_pkthdr.len,
-		     RE_MIN_FRAMELEN - m_head->m_pkthdr.len);
-		m_head->m_pkthdr.len = RE_MIN_FRAMELEN;
+		     RG_MIN_FRAMELEN - m_head->m_pkthdr.len);
+		m_head->m_pkthdr.len = RG_MIN_FRAMELEN;
 		m_head->m_len = m_head->m_pkthdr.len;
 	}
 
-	sc->re_desc.tx_buf[sc->re_desc.tx_cur_index] = m_head;
+	sc->rg_desc.tx_buf[sc->rg_desc.tx_cur_index] = m_head;
 
 	return(0);
 }
 
-static void WritePacket(struct re_softc	*sc, caddr_t addr, int len,int fs_flag,int ls_flag)
+static void WritePacket(struct rg_softc	*sc, caddr_t addr, int len,int fs_flag,int ls_flag)
 {
 	union TxDesc *txptr;
 
-	bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-		sc->re_desc.tx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+		sc->rg_desc.tx_desc_dmamap,
 		BUS_DMASYNC_POSTWRITE);
 
-	txptr=&(sc->re_desc.tx_desc[sc->re_desc.tx_cur_index]);
+	txptr=&(sc->rg_desc.tx_desc[sc->rg_desc.tx_cur_index]);
 
 	txptr->ul[0]&=0x40000000;
 	txptr->ul[1]=0;
@@ -1806,33 +1806,33 @@ static void WritePacket(struct re_softc	*sc, caddr_t addr, int len,int fs_flag,i
 	if(ls_flag)
 		txptr->so1.LS=1;
 	txptr->so1.Frame_Length = len;
-	bus_dmamap_load(sc->re_desc.re_tx_mtag,
-		sc->re_desc.re_tx_dmamap[sc->re_desc.tx_cur_index],
+	bus_dmamap_load(sc->rg_desc.rg_tx_mtag,
+		sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_cur_index],
 		addr,
 		len,
-		re_dma_map_buf, txptr,
+		rg_dma_map_buf, txptr,
 		0 );
-	bus_dmamap_sync(sc->re_desc.re_tx_mtag,
-		sc->re_desc.re_tx_dmamap[sc->re_desc.tx_cur_index],
+	bus_dmamap_sync(sc->rg_desc.rg_tx_mtag,
+		sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_cur_index],
 		BUS_DMASYNC_PREREAD);
 	txptr->so1.OWN = 1;
 
-	bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-		sc->re_desc.tx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+		sc->rg_desc.tx_desc_dmamap,
 		BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE );
 
 	if (ls_flag) {
-		CSR_WRITE_1(sc, RE_TPPOLL, RE_NPQ);
+		CSR_WRITE_1(sc, RG_TPPOLL, RG_NPQ);
 	}
 
-	sc->re_desc.tx_cur_index = (sc->re_desc.tx_cur_index+1)%RE_TX_BUF_NUM;
+	sc->rg_desc.tx_cur_index = (sc->rg_desc.tx_cur_index+1)%RG_TX_BUF_NUM;
 }
 
-static int CountFreeTxDescNum(struct re_descriptor desc)
+static int CountFreeTxDescNum(struct rg_descriptor desc)
 {
 	int ret=desc.tx_last_index-desc.tx_cur_index;
 	if(ret<=0)
-		ret+=RE_TX_BUF_NUM;
+		ret+=RG_TX_BUF_NUM;
 	ret--;
 	return ret;
 }
@@ -1842,13 +1842,13 @@ static int CountMbufNum(struct mbuf *m_head, int *limit)
 	int ret=0;
 	struct mbuf *ptr=m_head;
 
-	*limit=0;	/* 0:no limit find, 1:intermediate mbuf data size < RE_MINI_DESC_SIZE byte */
+	*limit=0;	/* 0:no limit find, 1:intermediate mbuf data size < RG_MINI_DESC_SIZE byte */
 	while(ptr!=NULL)
 	{
 		if(ptr->m_len >0)
 		{
 			ret++;
-			if(ptr->m_len<RE_MINI_DESC_SIZE && ptr->m_next!=NULL)	/* except last descriptor */
+			if(ptr->m_len<RG_MINI_DESC_SIZE && ptr->m_next!=NULL)	/* except last descriptor */
 				*limit=1;
 		}
 		ptr=ptr->m_next;
@@ -1860,48 +1860,48 @@ static int CountMbufNum(struct mbuf *m_head, int *limit)
  * A frame was downloaded to the chip. It's safe for us to clean up
  * the list buffers.
  */
-static void re_txeof(struct re_softc *sc)	/* Transmit OK/ERR handler */
+static void rg_txeof(struct rg_softc *sc)	/* Transmit OK/ERR handler */
 {
 	union TxDesc *txptr;
 	struct ifnet		*ifp;
 
 	/*	printf("X");*/
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 
 	/* Clear the timeout timer. */
 	ifp->if_timer = 0;
 
-	bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-		sc->re_desc.tx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+		sc->rg_desc.tx_desc_dmamap,
 		BUS_DMASYNC_POSTREAD|BUS_DMASYNC_POSTWRITE);
 
-	txptr=&(sc->re_desc.tx_desc[sc->re_desc.tx_last_index]);
-	while(txptr->so1.OWN==0 && sc->re_desc.tx_last_index!=sc->re_desc.tx_cur_index)
+	txptr=&(sc->rg_desc.tx_desc[sc->rg_desc.tx_last_index]);
+	while(txptr->so1.OWN==0 && sc->rg_desc.tx_last_index!=sc->rg_desc.tx_cur_index)
 	{
 #ifdef _DEBUG_
 			printf("**** Tx OK  ****\n");
 #endif
-		bus_dmamap_sync(sc->re_desc.re_tx_mtag,
-			sc->re_desc.re_tx_dmamap[sc->re_desc.tx_last_index],
+		bus_dmamap_sync(sc->rg_desc.rg_tx_mtag,
+			sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_last_index],
 			BUS_DMASYNC_POSTWRITE);
-		bus_dmamap_unload(sc->re_desc.re_tx_mtag,
-			sc->re_desc.re_tx_dmamap[sc->re_desc.tx_last_index] );
+		bus_dmamap_unload(sc->rg_desc.rg_tx_mtag,
+			sc->rg_desc.rg_tx_dmamap[sc->rg_desc.tx_last_index] );
 
-		if(sc->re_desc.tx_buf[sc->re_desc.tx_last_index]!=NULL)
+		if(sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index]!=NULL)
 		{
-			m_freem(sc->re_desc.tx_buf[sc->re_desc.tx_last_index]);	/* Free Current MBuf in a Mbuf list*/
-			sc->re_desc.tx_buf[sc->re_desc.tx_last_index] = NULL;
+			m_freem(sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index]);	/* Free Current MBuf in a Mbuf list*/
+			sc->rg_desc.tx_buf[sc->rg_desc.tx_last_index] = NULL;
 		}
 
-		sc->re_desc.tx_last_index = (sc->re_desc.tx_last_index+1)%RE_TX_BUF_NUM;
-		txptr=&sc->re_desc.tx_desc[sc->re_desc.tx_last_index];
+		sc->rg_desc.tx_last_index = (sc->rg_desc.tx_last_index+1)%RG_TX_BUF_NUM;
+		txptr=&sc->rg_desc.tx_desc[sc->rg_desc.tx_last_index];
 		ifp->if_opackets++;
 		ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
 	}
 
-	bus_dmamap_sync(sc->re_desc.tx_desc_tag,
-		sc->re_desc.tx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.tx_desc_tag,
+		sc->rg_desc.tx_desc_dmamap,
 		BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
 
 	return;
@@ -1934,8 +1934,8 @@ static void re_txeof(struct re_softc *sc)	/* Transmit OK/ERR handler */
  * bytes of space preceecing it so that it will be safe for us to do the
  * 2-byte backstep even if reading from the ring at offset 0.
  */
-static void re_rxeof(sc)	/* Receive Data OK/ERR handler */
-	struct re_softc		*sc;
+static void rg_rxeof(sc)	/* Receive Data OK/ERR handler */
+	struct rg_softc		*sc;
 {
 	struct ether_header	*eh;
 	struct mbuf		*m;
@@ -1944,15 +1944,15 @@ static void re_rxeof(sc)	/* Receive Data OK/ERR handler */
 	int bError;
 	struct mbuf *buf;
 
-/*		RE_LOCK_ASSERT(sc);*/
+/*		RG_LOCK_ASSERT(sc);*/
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 
-	bus_dmamap_sync(sc->re_desc.rx_desc_tag,
-		sc->re_desc.rx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.rx_desc_tag,
+		sc->rg_desc.rx_desc_dmamap,
 		BUS_DMASYNC_POSTREAD|BUS_DMASYNC_POSTWRITE);
 
-	rxptr=&(sc->re_desc.rx_desc[sc->re_desc.rx_cur_index]);
+	rxptr=&(sc->rg_desc.rx_desc[sc->rg_desc.rx_cur_index]);
 	while(rxptr->so0.OWN==0)	/* Receive OK */
 	{
 		bError = 0;
@@ -1971,14 +1971,14 @@ static void re_rxeof(sc)	/* Receive Data OK/ERR handler */
 			goto update_desc;
 		}
 
-		bus_dmamap_sync(sc->re_desc.re_rx_mtag,
-			sc->re_desc.re_rx_dmamap[sc->re_desc.rx_cur_index],
+		bus_dmamap_sync(sc->rg_desc.rg_rx_mtag,
+			sc->rg_desc.rg_rx_dmamap[sc->rg_desc.rx_cur_index],
 			BUS_DMASYNC_POSTREAD );
-		bus_dmamap_unload(sc->re_desc.re_rx_mtag,
-			sc->re_desc.re_rx_dmamap[sc->re_desc.rx_cur_index] );
+		bus_dmamap_unload(sc->rg_desc.rg_rx_mtag,
+			sc->rg_desc.rg_rx_dmamap[sc->rg_desc.rx_cur_index] );
 
-		m = sc->re_desc.rx_buf[sc->re_desc.rx_cur_index];
-		sc->re_desc.rx_buf[sc->re_desc.rx_cur_index] = buf;
+		m = sc->rg_desc.rx_buf[sc->rg_desc.rx_cur_index];
+		sc->rg_desc.rx_buf[sc->rg_desc.rx_cur_index] = buf;
 		m->m_pkthdr.len = m->m_len = rxptr->so0.Frame_Length-ETHER_CRC_LEN;
 		m->m_pkthdr.rcvif = ifp;
 
@@ -1988,7 +1988,7 @@ static void re_rxeof(sc)	/* Receive Data OK/ERR handler */
 			printf("Rcv Packet, Len=%d \n",m->m_len);
 #endif
 
-		RE_UNLOCK(sc);
+		RG_UNLOCK(sc);
 
 /*#if OS_VER < VERSION(5,1)*/
 #if OS_VER < VERSION(4,9)
@@ -1998,111 +1998,111 @@ static void re_rxeof(sc)	/* Receive Data OK/ERR handler */
 #else
 		(*ifp->if_input)(ifp, m);
 #endif
-		RE_LOCK(sc);
+		RG_LOCK(sc);
 
 update_desc:
 		rxptr->ul[0]&=0x40000000;	/* keep EOR bit */
 		rxptr->ul[1]=0;
 
-		rxptr->so0.Frame_Length = RE_BUF_SIZE;
+		rxptr->so0.Frame_Length = RG_BUF_SIZE;
 		if(!bError)
 		{
-			bus_dmamap_load(sc->re_desc.re_rx_mtag,
-				sc->re_desc.re_rx_dmamap[sc->re_desc.rx_cur_index],
-				sc->re_desc.rx_buf[sc->re_desc.rx_cur_index]->m_data,
+			bus_dmamap_load(sc->rg_desc.rg_rx_mtag,
+				sc->rg_desc.rg_rx_dmamap[sc->rg_desc.rx_cur_index],
+				sc->rg_desc.rx_buf[sc->rg_desc.rx_cur_index]->m_data,
 				MCLBYTES,
-				re_dma_map_buf, rxptr,
+				rg_dma_map_buf, rxptr,
 				0 );
-			bus_dmamap_sync(sc->re_desc.re_rx_mtag,
-				sc->re_desc.re_rx_dmamap[sc->re_desc.rx_cur_index],
+			bus_dmamap_sync(sc->rg_desc.rg_rx_mtag,
+				sc->rg_desc.rg_rx_dmamap[sc->rg_desc.rx_cur_index],
 				BUS_DMASYNC_PREWRITE);
 		}
 		rxptr->so0.OWN=1;
-		sc->re_desc.rx_cur_index = (sc->re_desc.rx_cur_index+1)%RE_RX_BUF_NUM;
-		rxptr=&sc->re_desc.rx_desc[sc->re_desc.rx_cur_index];
+		sc->rg_desc.rx_cur_index = (sc->rg_desc.rx_cur_index+1)%RG_RX_BUF_NUM;
+		rxptr=&sc->rg_desc.rx_desc[sc->rg_desc.rx_cur_index];
 	}
 
-	bus_dmamap_sync(sc->re_desc.rx_desc_tag,
-		sc->re_desc.rx_desc_dmamap,
+	bus_dmamap_sync(sc->rg_desc.rx_desc_tag,
+		sc->rg_desc.rx_desc_dmamap,
 		BUS_DMASYNC_PREREAD|BUS_DMASYNC_PREWRITE);
 
 	return;
 }
 
-static void re_intr(void *arg)	/* Interrupt Handler */
+static void rg_intr(void *arg)	/* Interrupt Handler */
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 
 	sc = arg;
 
-	if ((CSR_READ_2(sc, RE_ISR) & RE_INTRS) == 0){
+	if ((CSR_READ_2(sc, RG_ISR) & RG_INTRS) == 0){
 		return;// (FILTER_STRAY);
 	}
 
 	/* Disable interrupts. */
-	CSR_WRITE_2(sc, RE_IMR, 0x0000);
+	CSR_WRITE_2(sc, RG_IMR, 0x0000);
 
 #if OS_VER<VERSION(7,0)
-	re_int_task(arg, 0);
+	rg_int_task(arg, 0);
 #else
-	taskqueue_enqueue_fast(taskqueue_fast, &sc->re_inttask);
+	taskqueue_enqueue_fast(taskqueue_fast, &sc->rg_inttask);
 #endif
 //	return (FILTER_HANDLED);
 }
 
-static void re_int_task(void *arg, int npending)
+static void rg_int_task(void *arg, int npending)
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	struct ifnet		*ifp;
 	u_int16_t		status;
 	u_int8_t		link_status;
 
 	sc = arg;
 
-	RE_LOCK(sc);
+	RG_LOCK(sc);
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 
-	status = CSR_READ_2(sc, RE_ISR);
+	status = CSR_READ_2(sc, RG_ISR);
 
 	if (status){
-		CSR_WRITE_2(sc, RE_ISR, status & 0xffbf);
+		CSR_WRITE_2(sc, RG_ISR, status & 0xffbf);
 	}
 
 	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
 	{
-		RE_UNLOCK(sc);
+		RG_UNLOCK(sc);
 		return;
 	}
 
-	if ((status & RE_ISR_RX_OK) || (status & RE_ISR_RX_ERR) ||(status & RE_ISR_FIFO_OFLOW) || (status & RE_ISR_RX_OVERRUN)){
-		re_rxeof(sc);
+	if ((status & RG_ISR_RX_OK) || (status & RG_ISR_RX_ERR) ||(status & RG_ISR_FIFO_OFLOW) || (status & RG_ISR_RX_OVERRUN)){
+		rg_rxeof(sc);
 	}
 
-	if (sc->re_type == MACFG_21){
-		if (status & RE_ISR_FIFO_OFLOW){
+	if (sc->rg_type == MACFG_21){
+		if (status & RG_ISR_FIFO_OFLOW){
 			sc->rx_fifo_overflow = 1;
 			CSR_WRITE_2(sc, 0x00e2, 0x0000);
 			CSR_WRITE_4(sc, 0x0048, 0x4000);
 			CSR_WRITE_4(sc, 0x0058, 0x4000);
 		}else{
 			sc->rx_fifo_overflow = 0;
-			CSR_WRITE_4(sc,RE_CPCR,0x51512082);
+			CSR_WRITE_4(sc,RG_CPCR,0x51512082);
 		}
 
-		if (status & RE_ISR_PCS_TIMEOUT){
-			if((status & RE_ISR_FIFO_OFLOW) &&
-			   (!(status & (RE_ISR_RX_OK | RE_ISR_TX_OK | RE_ISR_RX_OVERRUN)))){
-				re_reset(sc);
-				re_init(sc);
+		if (status & RG_ISR_PCS_TIMEOUT){
+			if((status & RG_ISR_FIFO_OFLOW) &&
+			   (!(status & (RG_ISR_RX_OK | RG_ISR_TX_OK | RG_ISR_RX_OVERRUN)))){
+				rg_reset(sc);
+				rg_init(sc);
 				sc->rx_fifo_overflow = 0;
-				CSR_WRITE_2(sc, RE_ISR, RE_ISR_FIFO_OFLOW);
+				CSR_WRITE_2(sc, RG_ISR, RG_ISR_FIFO_OFLOW);
 			}
 		}
 	}
 
-	if(status & RE_ISR_LINKCHG){
-		link_status = CSR_READ_1(sc, RE_PHY_STATUS);
+	if(status & RG_ISR_LINKCHG){
+		link_status = CSR_READ_1(sc, RG_PHY_STATUS);
 		if(link_status & 0x02)
 		{
 			ifp->if_link_state = LINK_STATE_UP;
@@ -2113,16 +2113,16 @@ static void re_int_task(void *arg, int npending)
 		}
 	}
 
-	if ((status & RE_ISR_TX_OK) || (status & RE_ISR_TX_ERR)){
-		re_txeof(sc);
+	if ((status & RG_ISR_TX_OK) || (status & RG_ISR_TX_ERR)){
+		rg_txeof(sc);
 	}
 
-	if (status & RE_ISR_SYSTEM_ERR) {
-		re_reset(sc);
-		re_init(sc);
+	if (status & RG_ISR_SYSTEM_ERR) {
+		rg_reset(sc);
+		rg_init(sc);
 	}
 
-	switch(sc->re_type)
+	switch(sc->rg_type)
 	{
 		case MACFG_21:
 		case MACFG_22:
@@ -2135,27 +2135,27 @@ static void re_int_task(void *arg, int npending)
 			break;
 	}
 
-	RE_UNLOCK(sc);
+	RG_UNLOCK(sc);
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-		re_start(ifp);
+		rg_start(ifp);
 
 #if OS_VER>=VERSION(7,0)
-	if (CSR_READ_2(sc, RE_ISR) & RE_INTRS) {
-		taskqueue_enqueue_fast(taskqueue_fast, &sc->re_inttask);
+	if (CSR_READ_2(sc, RG_ISR) & RG_INTRS) {
+		taskqueue_enqueue_fast(taskqueue_fast, &sc->rg_inttask);
 		return;
 	}
 #endif
 
 	/* Re-enable interrupts. */
-	CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
+	CSR_WRITE_2(sc, RG_IMR, RG_INTRS);
 }
 
 /*
  * Program the 64-bit multicast hash filter.
  */
-static void re_setmulti(sc)
-	struct re_softc		*sc;
+static void rg_setmulti(sc)
+	struct rg_softc		*sc;
 {
 	struct ifnet		*ifp;
 	int			h = 0;
@@ -2164,21 +2164,21 @@ static void re_setmulti(sc)
 	u_int32_t		rxfilt;
 	int			mcnt = 0;
 
-	ifp = RE_GET_IFNET(sc);
+	ifp = RG_GET_IFNET(sc);
 
-	rxfilt = CSR_READ_4(sc, RE_RXCFG);
+	rxfilt = CSR_READ_4(sc, RG_RXCFG);
 
 	if (ifp->if_flags & IFF_ALLMULTI || ifp->if_flags & IFF_PROMISC) {
-		rxfilt |= RE_RXCFG_RX_MULTI;
-		CSR_WRITE_4(sc, RE_RXCFG, rxfilt);
-		CSR_WRITE_4(sc, RE_MAR0, 0xFFFFFFFF);
-		CSR_WRITE_4(sc, RE_MAR4, 0xFFFFFFFF);
+		rxfilt |= RG_RXCFG_RX_MULTI;
+		CSR_WRITE_4(sc, RG_RXCFG, rxfilt);
+		CSR_WRITE_4(sc, RG_MAR0, 0xFFFFFFFF);
+		CSR_WRITE_4(sc, RG_MAR4, 0xFFFFFFFF);
 		return;
 	}
 
 	/* first, zot all the existing hash bits */
-	CSR_WRITE_4(sc, RE_MAR0, 0);
-	CSR_WRITE_4(sc, RE_MAR4, 0);
+	CSR_WRITE_4(sc, RG_MAR0, 0);
+	CSR_WRITE_4(sc, RG_MAR4, 0);
 
 	/* now program new ones */
 #if OS_VER > VERSION(6,0)
@@ -2206,23 +2206,23 @@ static void re_setmulti(sc)
 #endif
 
 	if (mcnt)
-		rxfilt |= RE_RXCFG_RX_MULTI;
+		rxfilt |= RG_RXCFG_RX_MULTI;
 	else
-		rxfilt &= ~RE_RXCFG_RX_MULTI;
+		rxfilt &= ~RG_RXCFG_RX_MULTI;
 
-	CSR_WRITE_4(sc, RE_RXCFG, rxfilt);
-	CSR_WRITE_4(sc, RE_MAR0, hashes[0]);
-	CSR_WRITE_4(sc, RE_MAR4, hashes[1]);
+	CSR_WRITE_4(sc, RG_RXCFG, rxfilt);
+	CSR_WRITE_4(sc, RG_MAR0, hashes[0]);
+	CSR_WRITE_4(sc, RG_MAR4, hashes[1]);
 
 	return;
 }
 
-static int re_ioctl(ifp, command, data)
+static int rg_ioctl(ifp, command, data)
 	struct ifnet		*ifp;
 	u_long			command;
 	caddr_t			data;
 {
-	struct re_softc		*sc = ifp->if_softc;
+	struct rg_softc		*sc = ifp->if_softc;
 	struct ifreq		*ifr = (struct ifreq *) data;
 	/*int			s;*/
 	int			error = 0;
@@ -2236,20 +2236,20 @@ static int re_ioctl(ifp, command, data)
 		error = ether_ioctl(ifp, command, data);
 		break;
 	case SIOCSIFFLAGS:
-		RE_LOCK(sc);
+		RG_LOCK(sc);
 		if (ifp->if_flags & IFF_UP) {
-			re_init(sc);
+			rg_init(sc);
 		} else if (ifp->if_drv_flags & IFF_DRV_RUNNING) {
-			re_stop(sc);
+			rg_stop(sc);
 		}
 		error = 0;
-		RE_UNLOCK(sc);
+		RG_UNLOCK(sc);
 		break;
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
-		RE_LOCK(sc);
-		re_setmulti(sc);
-		RE_UNLOCK(sc);
+		RG_LOCK(sc);
+		rg_setmulti(sc);
+		RG_UNLOCK(sc);
 		error = 0;
 		break;
 	case SIOCGIFMEDIA:
@@ -2266,24 +2266,24 @@ static int re_ioctl(ifp, command, data)
 	return(error);
 }
 
-static void re_tick(xsc)
+static void rg_tick(xsc)
 	void			*xsc;
 {	/*called per second*/
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	int			s;
 
 	s = splimp();
 
 	sc = xsc;
-	/*mii = device_get_softc(sc->re_miibus);
+	/*mii = device_get_softc(sc->rg_miibus);
 
 	mii_tick(mii);*/
 
 	splx(s);
 
-	if (sc->re_type == MACFG_3 &&
-	    sc->re_8169_MacVersion != 0 &&
-	    sc->re_8169_PhyVersion == 0) {
+	if (sc->rg_type == MACFG_3 &&
+	    sc->rg_8169_MacVersion != 0 &&
+	    sc->rg_8169_PhyVersion == 0) {
 		static int count = 0;
 
 		if (CSR_READ_1 (sc, 0x6C) & 0x02)
@@ -2296,25 +2296,25 @@ static void re_tick(xsc)
 		}
 	}
 
-	sc->re_stat_ch = timeout (re_tick, sc, hz);
+	sc->rg_stat_ch = timeout (rg_tick, sc, hz);
 
 	return;
 }
 
 #if OS_VER<VERSION(7,0)
-static void re_watchdog(ifp)
+static void rg_watchdog(ifp)
 	struct ifnet		*ifp;
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 
 	sc = ifp->if_softc;
 
-	printf("re%d: watchdog timeout\n", sc->re_unit);
+	printf("re%d: watchdog timeout\n", sc->rg_unit);
 	ifp->if_oerrors++;
 
-	re_txeof(sc);
-	re_rxeof(sc);
-	re_init(sc);
+	rg_txeof(sc);
+	rg_rxeof(sc);
+	rg_init(sc);
 
 	return;
 }
@@ -2323,9 +2323,9 @@ static void re_watchdog(ifp)
 /*
  * Set media options.
  */
-static int re_ifmedia_upd(struct ifnet *ifp)
+static int rg_ifmedia_upd(struct ifnet *ifp)
 {
-	struct re_softc	*sc = ifp->if_softc;
+	struct rg_softc	*sc = ifp->if_softc;
 	struct ifmedia	*ifm = &sc->media;
 	int anar;
 	int gbcr;
@@ -2379,24 +2379,24 @@ static int re_ifmedia_upd(struct ifnet *ifp)
 			anar = ANAR_10;
 		}
 
-		if (sc->re_type == MACFG_13) {
+		if (sc->rg_type == MACFG_13) {
 			MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
 		}
 
 		break;
 	default:
-		printf("re%d: Unsupported media type\n", sc->re_unit);
+		printf("re%d: Unsupported media type\n", sc->rg_unit);
 		return(0);
 	}
 
 	MP_WritePhyUshort(sc, 0x1F, 0x0000);
-	if(sc->re_device_id==RT_DEVICEID_8169 || sc->re_device_id==RT_DEVICEID_8169SC || sc->re_device_id==RT_DEVICEID_8168)
+	if(sc->rg_device_id==RT_DEVICEID_8169 || sc->rg_device_id==RT_DEVICEID_8169SC || sc->rg_device_id==RT_DEVICEID_8168)
 	{
 		MP_WritePhyUshort(sc, MII_ANAR, anar | 0x0800 | ANAR_FC);
 		MP_WritePhyUshort(sc, MII_100T2CR, gbcr);
 		MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
 	}
-	else if(sc->re_type==MACFG_36)
+	else if(sc->rg_type==MACFG_36)
 	{
 		MP_WritePhyUshort(sc, MII_ANAR, anar | 0x0800 | ANAR_FC);
 		MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
@@ -2412,11 +2412,11 @@ static int re_ifmedia_upd(struct ifnet *ifp)
 /*
  * Report current media status.
  */
-static void re_ifmedia_sts(ifp, ifmr)
+static void rg_ifmedia_sts(ifp, ifmr)
 	struct ifnet		*ifp;
 	struct ifmediareq	*ifmr;
 {
-	struct re_softc		*sc;
+	struct rg_softc		*sc;
 	unsigned char msr;
 
 	sc = ifp->if_softc;
@@ -2447,13 +2447,13 @@ static void re_ifmedia_sts(ifp, ifmr)
 	return;
 }
 
-static void re_8169s_init(struct re_softc *sc)
+static void rg_8169s_init(struct rg_softc *sc)
 {
 	u_int16_t Data;
 	u_int32_t Data_u32;
 	int	i;
 
-	if(sc->re_type==MACFG_3){
+	if(sc->rg_type==MACFG_3){
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x06, 0x006e);
 		MP_WritePhyUshort(sc, 0x08, 0x0708);
@@ -2515,10 +2515,10 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x00, 0x9200);
 
 		CSR_WRITE_1(sc, 0x82, 0x0d);
-	} else if(sc->re_type==MACFG_4) {
+	} else if(sc->rg_type==MACFG_4) {
 		MP_WritePhyUshort(sc, 0x1f, 0x0002);
 		MP_WritePhyUshort(sc, 0x01, 0x90D0);
-	} else if(sc->re_type==MACFG_5) {
+	} else if(sc->rg_type==MACFG_5) {
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x04, 0x0000);
 		MP_WritePhyUshort(sc, 0x03, 0x00a1);
@@ -2563,7 +2563,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x10, 0xf01b);
 
-	} else if(sc->re_type==MACFG_6) {
+	} else if(sc->rg_type==MACFG_6) {
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x04, 0x0000);
 		MP_WritePhyUshort(sc, 0x03, 0x00a1);
@@ -2611,7 +2611,7 @@ static void re_8169s_init(struct re_softc *sc)
 
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x17, 0x0CC0);
-	} else if (sc->re_type == MACFG_14) {
+	} else if (sc->rg_type == MACFG_14) {
 		MP_WritePhyUshort(sc, 0x1f, 0x0000);
 		MP_WritePhyUshort(sc, 0x11, 0x15C0);
 		MP_WritePhyUshort(sc, 0x19, 0x2080);
@@ -2620,7 +2620,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x08, 0x441D);
 		MP_WritePhyUshort(sc, 0x01, 0x9100);
 
-	} else if (sc->re_type == MACFG_15) {
+	} else if (sc->rg_type == MACFG_15) {
 //		MP_WritePhyUshort(sc, 0x1f, 0x0000);
 //		MP_WritePhyUshort(sc, 0x11, 0x15C0);
 //		MP_WritePhyUshort(sc, 0x19, 0x2080);
@@ -2634,13 +2634,13 @@ static void re_8169s_init(struct re_softc *sc)
 		Data |= 0x8000;
 		MP_WritePhyUshort(sc, 0x10, Data);
 
-	} else if (sc->re_type == MACFG_17) {
+	} else if (sc->rg_type == MACFG_17) {
 		MP_WritePhyUshort(sc, 0x1f, 0x0000);
 		Data = MP_ReadPhyUshort(sc, 0x10);
 		Data |= 0x8000;
 		MP_WritePhyUshort(sc, 0x10, Data);
 
-	} else if (sc->re_type == MACFG_24) {
+	} else if (sc->rg_type == MACFG_24) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x12, 0x2300);
 
@@ -2661,7 +2661,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x14, MP_ReadPhyUshort(sc, 0x14) | (1 << 5));
 		MP_WritePhyUshort(sc, 0x0d, MP_ReadPhyUshort(sc, 0x0d) | (1 << 5));
 
-	} else if (sc->re_type == MACFG_25) {
+	} else if (sc->rg_type == MACFG_25) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x12, 0x2300);
 		MP_WritePhyUshort(sc, 0x03, 0x802f);
@@ -2689,7 +2689,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x17, 0x0CC0);
 
-	} else if (sc->re_type == MACFG_26) {
+	} else if (sc->rg_type == MACFG_26) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x12, 0x2300);
 		MP_WritePhyUshort(sc, 0x17, 0x0CC0);
@@ -2709,7 +2709,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x14, MP_ReadPhyUshort(sc, 0x14) | (1 << 5));
 		MP_WritePhyUshort(sc, 0x0d, MP_ReadPhyUshort(sc, 0x0d) | (1 << 5));
 
-	} else if (sc->re_type == MACFG_27) {
+	} else if (sc->rg_type == MACFG_27) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
 		MP_WritePhyUshort(sc, 0x0d, MP_ReadPhyUshort(sc, 0x0d) | (1 << 5));
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
@@ -2721,14 +2721,14 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x17, 0x0CC0);
 
-	} else if (sc->re_type == MACFG_28) {
+	} else if (sc->rg_type == MACFG_28) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
 		MP_WritePhyUshort(sc, 0x0d, MP_ReadPhyUshort(sc, 0x0d) | (1 << 5));
 
 		MP_WritePhyUshort(sc, 0x1f, 0x0001);
 		MP_WritePhyUshort(sc, 0x17, 0x0CC0);
 
-	} else if (sc->re_type == MACFG_31) {
+	} else if (sc->rg_type == MACFG_31) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x06, 0x4064);
 		MP_WritePhyUshort(sc, 0x07, 0x2863);
@@ -3191,7 +3191,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
 		MP_WritePhyUshort(sc, 0x0D, 0xF880);
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
-	} else if (sc->re_type == MACFG_32) {
+	} else if (sc->rg_type == MACFG_32) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x06, 0x4064);
 		MP_WritePhyUshort(sc, 0x07, 0x2863);
@@ -3283,7 +3283,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x05, 0x83D4);
 		MP_WritePhyUshort(sc, 0x06, 0x8200);
 
-	} else if (sc->re_type == MACFG_33) {
+	} else if (sc->rg_type == MACFG_33) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0001);
 		MP_WritePhyUshort(sc, 0x06, 0x4064);
 		MP_WritePhyUshort(sc, 0x07, 0x2863);
@@ -3705,10 +3705,10 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
 		MP_WritePhyUshort(sc, 0x0D, 0xF880);
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
-	} else if (sc->re_type == MACFG_36 || sc->re_type == MACFG_37) {
+	} else if (sc->rg_type == MACFG_36 || sc->rg_type == MACFG_37) {
 		CSR_WRITE_1(sc, 0xF3, CSR_READ_1(sc, 0xF3)|0x04);
 
-		if(sc->re_type == MACFG_36)
+		if(sc->rg_type == MACFG_36)
 		{
 			MP_WritePhyUshort(sc, 0x1f, 0x0000);
 			MP_WritePhyUshort(sc, 0x00, 0x1800);
@@ -5208,7 +5208,7 @@ static void re_8169s_init(struct re_softc *sc)
 			MP_WritePhyUshort(sc, 0x16, 0x2185);
 			MP_WritePhyUshort(sc, 0x1f, 0x0000);
 		}
-		else if(sc->re_type == MACFG_37)
+		else if(sc->rg_type == MACFG_37)
 		{
 			MP_WritePhyUshort(sc, 0x1f, 0x0000);
 			MP_WritePhyUshort(sc, 0x00, 0x1800);
@@ -5685,7 +5685,7 @@ static void re_8169s_init(struct re_softc *sc)
 		MP_WritePhyUshort(sc, 0x05, 0x8ADE);
 		MP_WritePhyUshort(sc, 0x06, 0x8025);
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
-	} else if (sc->re_type == MACFG_41) {
+	} else if (sc->rg_type == MACFG_41) {
 		MP_WritePhyUshort(sc, 0x1F, 0x0000);
 		MP_WritePhyUshort(sc, 0x11, MP_ReadPhyUshort(sc, 0x11) | 0x1000);
 		MP_WritePhyUshort(sc, 0x1F, 0x0002);
@@ -5702,40 +5702,40 @@ static void re_8169s_init(struct re_softc *sc)
 					break;
 			}
 		}
-	} else if (sc->re_type == MACFG_42) {
-		CSR_WRITE_4(sc, RE_ERIAR, 0x000041D0 );
+	} else if (sc->rg_type == MACFG_42) {
+		CSR_WRITE_4(sc, RG_ERIAR, 0x000041D0 );
 		for(i=0; i<10; i++)
 		{
 			DELAY(400);
-			if(CSR_READ_4(sc, RE_ERIAR)&0x80000000)
+			if(CSR_READ_4(sc, RG_ERIAR)&0x80000000)
 				break;
 		}
-		Data_u32 = CSR_READ_4(sc, RE_ERIDR) & 0xFFFF0000;
+		Data_u32 = CSR_READ_4(sc, RG_ERIDR) & 0xFFFF0000;
 		Data_u32 |= 0x4D02;
-		CSR_WRITE_4(sc, RE_ERIDR, Data_u32 );
-		CSR_WRITE_4(sc, RE_ERIAR, 0x000021D0 );
+		CSR_WRITE_4(sc, RG_ERIDR, Data_u32 );
+		CSR_WRITE_4(sc, RG_ERIAR, 0x000021D0 );
 		for(i=0; i<10; i++)
 		{
 			DELAY(400);
-			if((CSR_READ_4(sc, RE_ERIAR)&0x80000000)==0)
+			if((CSR_READ_4(sc, RG_ERIAR)&0x80000000)==0)
 				break;
 		}
 
-		CSR_WRITE_4(sc, RE_ERIAR, 0x000041DC );
+		CSR_WRITE_4(sc, RG_ERIAR, 0x000041DC );
 		for(i=0; i<10; i++)
 		{
 			DELAY(400);
-			if(CSR_READ_4(sc, RE_ERIAR)&0x80000000)
+			if(CSR_READ_4(sc, RG_ERIAR)&0x80000000)
 				break;
 		}
-		Data_u32 = CSR_READ_4(sc, RE_ERIDR) & 0xFFFF0000;
+		Data_u32 = CSR_READ_4(sc, RG_ERIDR) & 0xFFFF0000;
 		Data_u32 |= 0x0050;
-		CSR_WRITE_4(sc, RE_ERIDR, Data_u32 );
-		CSR_WRITE_4(sc, RE_ERIAR, 0x000021DC );
+		CSR_WRITE_4(sc, RG_ERIDR, Data_u32 );
+		CSR_WRITE_4(sc, RG_ERIAR, 0x000021DC );
 		for(i=0; i<10; i++)
 		{
 			DELAY(400);
-			if((CSR_READ_4(sc, RE_ERIAR)&0x80000000)==0)
+			if((CSR_READ_4(sc, RG_ERIAR)&0x80000000)==0)
 				break;
 		}
 
@@ -6284,38 +6284,38 @@ static void re_8169s_init(struct re_softc *sc)
 	MP_WritePhyUshort(sc, 0x1F, 0x0000);
 }
 
-void MP_WritePhyUshort(struct re_softc *sc,u_int8_t RegAddr,u_int16_t RegData)
+void MP_WritePhyUshort(struct rg_softc *sc,u_int8_t RegAddr,u_int16_t RegData)
 {
 	u_int32_t		TmpUlong=0x80000000;
 	u_int32_t		Timeout=0;
 
 	TmpUlong |= ( ((u_int32_t)RegAddr)<<16 | (u_int32_t)RegData );
 
-	CSR_WRITE_4(sc, RE_PHYAR, TmpUlong );
+	CSR_WRITE_4(sc, RG_PHYAR, TmpUlong );
 
 	/* Wait for writing to Phy ok */
 	for(Timeout=0; Timeout<5; Timeout++)
 	{
 		DELAY( 1000 );
-		if((CSR_READ_4(sc, RE_PHYAR)&PHYAR_Flag)==0)
+		if((CSR_READ_4(sc, RG_PHYAR)&PHYAR_Flag)==0)
 			break;
 	}
 }
 
-u_int16_t MP_ReadPhyUshort(struct re_softc *sc,u_int8_t RegAddr)
+u_int16_t MP_ReadPhyUshort(struct rg_softc *sc,u_int8_t RegAddr)
 {
 	u_int16_t		RegData;
 	u_int32_t		TmpUlong;
 	u_int32_t		Timeout=0;
 
 	TmpUlong = ( (u_int32_t)RegAddr << 16);
-	CSR_WRITE_4(sc, RE_PHYAR, TmpUlong );
+	CSR_WRITE_4(sc, RG_PHYAR, TmpUlong );
 
 	/* Wait for writing to Phy ok */
 	for(Timeout=0; Timeout<5; Timeout++)
 	{
 		DELAY( 1000 );
-		TmpUlong = CSR_READ_4(sc, RE_PHYAR);
+		TmpUlong = CSR_READ_4(sc, RG_PHYAR);
 		if((TmpUlong&PHYAR_Flag)!=0)
 			break;
 	}
@@ -6325,38 +6325,38 @@ u_int16_t MP_ReadPhyUshort(struct re_softc *sc,u_int8_t RegAddr)
 	return RegData;
 }
 
-void MP_WriteEPhyUshort(struct re_softc *sc, u_int8_t RegAddr, u_int16_t RegData)
+void MP_WriteEPhyUshort(struct rg_softc *sc, u_int8_t RegAddr, u_int16_t RegData)
 {
 	u_int32_t		TmpUlong=0x80000000;
 	u_int32_t		Timeout=0;
 
 	TmpUlong |= ( ((u_int32_t)RegAddr<<16) | (u_int32_t)RegData );
 
-	CSR_WRITE_4(sc, RE_EPHYAR, TmpUlong );
+	CSR_WRITE_4(sc, RG_EPHYAR, TmpUlong );
 
 	/* Wait for writing to Phy ok */
 	for(Timeout=0; Timeout<5; Timeout++)
 	{
 		DELAY( 1000 );
-		if((CSR_READ_4(sc, RE_EPHYAR)&PHYAR_Flag)==0)
+		if((CSR_READ_4(sc, RG_EPHYAR)&PHYAR_Flag)==0)
 			break;
 	}
 }
 
-u_int16_t MP_ReadEPhyUshort(struct re_softc *sc, u_int8_t RegAddr)
+u_int16_t MP_ReadEPhyUshort(struct rg_softc *sc, u_int8_t RegAddr)
 {
 	u_int16_t		RegData;
 	u_int32_t		TmpUlong;
 	u_int32_t		Timeout=0;
 
 	TmpUlong = ( (u_int32_t)RegAddr << 16);
-	CSR_WRITE_4(sc, RE_EPHYAR, TmpUlong );
+	CSR_WRITE_4(sc, RG_EPHYAR, TmpUlong );
 
 	/* Wait for writing to Phy ok */
 	for(Timeout=0; Timeout<5; Timeout++)
 	{
 		DELAY( 1000 );
-		TmpUlong = CSR_READ_4(sc, RE_EPHYAR);
+		TmpUlong = CSR_READ_4(sc, RG_EPHYAR);
 		if((TmpUlong&PHYAR_Flag)!=0)
 			break;
 	}
@@ -6366,7 +6366,7 @@ u_int16_t MP_ReadEPhyUshort(struct re_softc *sc, u_int8_t RegAddr)
 	return RegData;
 }
 
-u_int8_t MP_ReadEfuse(struct re_softc *sc, u_int16_t RegAddr)
+u_int8_t MP_ReadEfuse(struct rg_softc *sc, u_int16_t RegAddr)
 {
 	u_int8_t		RegData;
 	u_int32_t		TmpUlong;
@@ -6424,26 +6424,26 @@ u_int8_t MP_ReadEfuse(struct re_softc *sc, u_int16_t RegAddr)
 
 #define RaiseClock(_sc,_x)				\
 	(_x) = (_x) | EESK;					\
-	CSR_WRITE_1((_sc), RE_EECMD, (_x));	\
+	CSR_WRITE_1((_sc), RG_EECMD, (_x));	\
 	DELAY(CLOCK_RATE);
 
 #define LowerClock(_sc,_x)				\
 	(_x) = (_x) & ~EESK;					\
-	CSR_WRITE_1((_sc), RE_EECMD, (_x));	\
+	CSR_WRITE_1((_sc), RG_EECMD, (_x));	\
 	DELAY(CLOCK_RATE);
 
 /*
  * Shift out bit(s) to the EEPROM.
  */
-static void re_eeprom_ShiftOutBits(sc, data, count)
-	struct re_softc		*sc;
+static void rg_eeprom_ShiftOutBits(sc, data, count)
+	struct rg_softc		*sc;
 	int			data;
 	int 			count;
 {
 	u_int16_t x,mask;
 
 	mask = 0x01 << (count - 1);
-	x = CSR_READ_1(sc, RE_EECMD);
+	x = CSR_READ_1(sc, RG_EECMD);
 
 	x &= ~(EEDO | EEDI);
 
@@ -6453,7 +6453,7 @@ static void re_eeprom_ShiftOutBits(sc, data, count)
 		if(data & mask)
 			x |= EEDI;
 
-		CSR_WRITE_1(sc, RE_EECMD, x);
+		CSR_WRITE_1(sc, RG_EECMD, x);
 		DELAY(CLOCK_RATE);
 		RaiseClock(sc,x);
 		LowerClock(sc,x);
@@ -6461,17 +6461,17 @@ static void re_eeprom_ShiftOutBits(sc, data, count)
 	} while(mask);
 
 	x &= ~EEDI;
-	CSR_WRITE_1(sc, RE_EECMD, x);
+	CSR_WRITE_1(sc, RG_EECMD, x);
 }
 
 /*
  * Shift in bit(s) from the EEPROM.
  */
-static u_int16_t re_eeprom_ShiftInBits(sc)
-	struct re_softc		*sc;
+static u_int16_t rg_eeprom_ShiftInBits(sc)
+	struct rg_softc		*sc;
 {
 	u_int16_t x,d,i;
-	x = CSR_READ_1(sc, RE_EECMD);
+	x = CSR_READ_1(sc, RG_EECMD);
 
 	x &= ~( EEDO | EEDI);
 	d = 0;
@@ -6481,7 +6481,7 @@ static u_int16_t re_eeprom_ShiftInBits(sc)
 		d = d << 1;
 		RaiseClock(sc, x);
 
-		x = CSR_READ_1(sc, RE_EECMD);
+		x = CSR_READ_1(sc, RG_EECMD);
 
 		x &= ~(EEDI);
 		if(x & EEDO)
@@ -6496,14 +6496,14 @@ static u_int16_t re_eeprom_ShiftInBits(sc)
 /*
  * Clean up EEprom read/write setting
  */
-static void re_eeprom_EEpromCleanup(sc)
-	struct re_softc		*sc;
+static void rg_eeprom_EEpromCleanup(sc)
+	struct rg_softc		*sc;
 {
 	u_int16_t x;
-	x = CSR_READ_1(sc, RE_EECMD);
+	x = CSR_READ_1(sc, RG_EECMD);
 
 	x &= ~(EECS | EEDI);
-	CSR_WRITE_1(sc, RE_EECMD, x);
+	CSR_WRITE_1(sc, RG_EECMD, x);
 
 	RaiseClock(sc, x);
 	LowerClock(sc, x);
@@ -6512,41 +6512,41 @@ static void re_eeprom_EEpromCleanup(sc)
 /*
  * Read a word of data stored in the EEPROM at address 'addr.'
  */
-static void re_eeprom_getword(sc, addr, dest)
-	struct re_softc		*sc;
+static void rg_eeprom_getword(sc, addr, dest)
+	struct rg_softc		*sc;
 	int			addr;
 	u_int16_t		*dest;
 {
 	u_int16_t x;
 
 	/* select EEPROM, reset bits, set EECS*/
-	x = CSR_READ_1(sc, RE_EECMD);
+	x = CSR_READ_1(sc, RG_EECMD);
 
 	x &= ~(EEDI | EEDO | EESK | CR9346_EEM0);
 	x |= CR9346_EEM1 | EECS;
-	CSR_WRITE_1(sc, RE_EECMD, x);
+	CSR_WRITE_1(sc, RG_EECMD, x);
 
 	/* write the read opcode and register number in that order*/
 	/* The opcode is 3bits in length, reg is 6 bits long*/
-	re_eeprom_ShiftOutBits(sc, EEPROM_READ_OPCODE, 3);
+	rg_eeprom_ShiftOutBits(sc, EEPROM_READ_OPCODE, 3);
 
-	if (CSR_READ_4(sc, RE_RXCFG) & RE_RXCFG_RX_9356SEL)
-		re_eeprom_ShiftOutBits(sc, addr,8);	/*93c56=8*/
+	if (CSR_READ_4(sc, RG_RXCFG) & RG_RXCFG_RX_9356SEL)
+		rg_eeprom_ShiftOutBits(sc, addr,8);	/*93c56=8*/
 	else
-		re_eeprom_ShiftOutBits(sc, addr,6);	/*93c46=6*/
+		rg_eeprom_ShiftOutBits(sc, addr,6);	/*93c46=6*/
 
 	/* Now read the data (16 bits) in from the selected EEPROM word*/
-	*dest=re_eeprom_ShiftInBits(sc);
+	*dest=rg_eeprom_ShiftInBits(sc);
 
-	re_eeprom_EEpromCleanup(sc);
+	rg_eeprom_EEpromCleanup(sc);
 	return;
 }
 
 /*
  * Read a sequence of words from the EEPROM.
  */
-static void re_read_eeprom(sc, dest, off, cnt, swap)
-	struct re_softc		*sc;
+static void rg_read_eeprom(sc, dest, off, cnt, swap)
+	struct rg_softc		*sc;
 	caddr_t			dest;
 	int			off;
 	int			cnt;
@@ -6557,7 +6557,7 @@ static void re_read_eeprom(sc, dest, off, cnt, swap)
 
 	for (i = 0; i < cnt; i++)
 	{
-		re_eeprom_getword(sc, off + i, &word);
+		rg_eeprom_getword(sc, off + i, &word);
 		ptr = (u_int16_t *)(dest + (i * 2));
 		if (swap)
 			*ptr = ntohs(word);

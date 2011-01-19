@@ -631,7 +631,7 @@ function system_dmesg_save() {
 function system_set_harddisk_standby() {
 	global $g, $config;
 
-	if ($g['platform'] != "generic-pc")
+	if ($g['platform'] != "generic-pc" && $g['platform'] != "generic-pc-serial")
 		return;
 
 	if (isset($config['system']['harddiskstandby']) && 
@@ -764,6 +764,9 @@ function system_identify_specific_platform() {
 	
 	if ($g['platform'] == 'generic-pc')
 		return array('name' => 'generic-pc', 'descr' => "Generic PC");
+
+	if ($g['platform'] == 'generic-pc-serial')
+		return array('name' => 'generic-pc-serial', 'descr' => "Generic PC (serial console)");
 	
 	if ($g['platform'] == 'generic-pc-cdrom')
 		return array('name' => 'generic-pc-cdrom', 'descr' => "Generic PC (CD-ROM)");

@@ -39,7 +39,7 @@ $pconfig['disableconsolemenu'] = isset($config['system']['disableconsolemenu']);
 $pconfig['disablefirmwarecheck'] = isset($config['system']['disablefirmwarecheck']);
 $pconfig['allowipsecfrags'] = isset($config['filter']['allowipsecfrags']);
 $pconfig['expanddiags'] = isset($config['system']['webgui']['expanddiags']);
-if ($g['platform'] == "generic-pc")
+if ($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial")
 	$pconfig['harddiskstandby'] = $config['system']['harddiskstandby'];
 $pconfig['bypassstaticroutes'] = isset($config['filter']['bypassstaticroutes']);
 $pconfig['noantilockout'] = isset($config['system']['webgui']['noantilockout']);
@@ -106,7 +106,7 @@ if ($_POST) {
 		$config['system']['disablefirmwarecheck'] = $_POST['disablefirmwarecheck'] ? true : false;
 		$config['filter']['allowipsecfrags'] = $_POST['allowipsecfrags'] ? true : false;
 		$config['system']['webgui']['expanddiags'] = $_POST['expanddiags'] ? true : false;
-		if ($g['platform'] == "generic-pc") {
+		if ($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial") {
 			$oldharddiskstandby = $config['system']['harddiskstandby'];
 			$config['system']['harddiskstandby'] = $_POST['harddiskstandby'];
 		}
@@ -136,7 +136,7 @@ if ($_POST) {
 				|| ($config['system']['polling'] != $oldpolling)) {
 			touch($d_sysrebootreqd_path);
 		}
-		if (($g['platform'] == "generic-pc") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
+		if (($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
 			if (!$config['system']['harddiskstandby']) {
 				// Reboot needed to deactivate standby due to a stupid ATA-protocol
 				touch($d_sysrebootreqd_path);
@@ -334,7 +334,7 @@ if ($_POST) {
     is performed at the interval specified here, and if the IP address that the host name resolved to has changed,
     the IPsec tunnel is reconfigured. The default is 60 seconds.</span></td>
 			    </tr>
-<?php if ($g['platform'] == "generic-pc"): ?>
+<?php if ($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial"): ?>
 				<tr> 
                   <td width="22%" valign="top" class="vncell">Hard disk standby time </td>
                   <td width="78%" class="vtable"> 
