@@ -1,7 +1,7 @@
 </td></tr></table></td>
   </tr>
   <tr align="center" valign="top" bgcolor="#435370"> 
-    <td colspan="2" class="cpline">m0n0wall&reg; is &copy; 2002-2010 by Manuel Kasper. 
+    <td colspan="2" class="cpline">m0n0wall&reg; is &copy; 2002-2011 by Manuel Kasper. 
       All rights reserved.&nbsp; [<a href="/license.php" class="tblnk">view license</a>]</td>
   </tr>
 </table>
