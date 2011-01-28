@@ -50,9 +50,37 @@ function shaper_configure() {
 		   a rule has matched */
 		mwexec("/sbin/sysctl net.inet.ip.fw.one_pass=1");
 		
-		/* load shaper rules */
+		/* remove old shaper rules */
 		mwexec("/sbin/ipfw -f delete set 4");
-		mwexec("/sbin/ipfw -f pipe flush");
+		
+		/* remove old pipes/queues - note that we cannot use flush
+		   if the captive portal per-user bandwidth shaping is also
+		   enabled, since we'd delete any per-user shaping pipes as well */
+		if (isset($config['captiveportal']['peruserbw'])) {
+			/* delete pipes/queues one by one */
+			$delpipes = array();
+			$delqueues = array();
+			$p = popen("/sbin/ipfw pipe show", "r");
+			while (!feof($p)) {
+				$line = trim(fgets($p));
+				if (preg_match("/^(\d+):/", $line, $matches)) {
+					if ($matches[1] < 50000)	/* per-user rules from 50000 */
+						$delpipes[] = $matches[1];
+				} else if (preg_match("/^q(\d+):/", $line, $matches))
+					$delqueues[] = $matches[1];
+			}
+			pclose($p);
+			
+			foreach ($delpipes as $delpipe)
+				mwexec("/sbin/ipfw pipe delete $delpipe");
+			foreach ($delqueues as $delqueue)
+				mwexec("/sbin/ipfw queue delete $delqueue");
+		} else {
+			/* "pipe flush" removes queues as well, and vice versa */
+			mwexec("/sbin/ipfw -f pipe flush");
+		}
+		
+		/* load shaper rules */
 		
 		/* XXX - seems like ipfw cannot accept rules directly on stdin,
 		   so we have to write them to a temporary file first */

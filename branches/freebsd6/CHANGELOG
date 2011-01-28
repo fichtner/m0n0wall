@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix broken captive portal sessions when per-user bandwidth limitation is used
+  and changes in the webGUI are made that require reloading the traffic shaper
+  (reported by Robert Solomon)
+
 - disallow webGUI passwords with colons (:) as mini_httpd has trouble
   handling them
 
