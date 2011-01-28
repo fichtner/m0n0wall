@@ -88,7 +88,9 @@ if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
     		
     	if (($_POST['password']) && ($_POST['password'] != $_POST['password2']))
     		$input_errors[] = "The passwords do not match.";
-    		
+		if ($_POST['password'] && strpos($_POST['password'], ":") !== false)
+			$input_errors[] = "The password may not contain colons (:).";
+
        	if (!$input_errors && !(isset($id) && $a_user[$id])) {
     		/* make sure there are no dupes */
     		foreach ($a_user as $userent) {

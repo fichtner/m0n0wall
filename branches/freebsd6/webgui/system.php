@@ -92,6 +92,9 @@ if ($_POST) {
 	if (($_POST['password']) && ($_POST['password'] != $_POST['password2'])) {
 		$input_errors[] = "The passwords do not match.";
 	}
+	if ($_POST['password'] && strpos($_POST['password'], ":") !== false) {
+		$input_errors[] = "The password may not contain colons (:).";
+	}
 	
 	$t = (int)$_POST['timeupdateinterval'];
 	if (($t < 0) || (($t > 0) && ($t < 6)) || ($t > 1440)) {
