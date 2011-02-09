@@ -140,19 +140,26 @@ function filter_nat_rules_generate_if($if, $src, $dst, $target, $portmap = true)
 	else
 		$natrule = "map $if $src $dst -> {$tgt} proxy port 21 ftp/tcp\n";
 	
-	if ($portmap) {
-		$rangelow = 1024;
-		$rangehigh = 64535;
-		
-		if ($config['nat']['portrange-low'] && $config['nat']['portrange-high']) {
-			$rangelow = $config['nat']['portrange-low'];
-			$rangehigh = $config['nat']['portrange-high'];
-		}
-		
-		$natrule .= "map $if $src $dst -> {$tgt} portmap tcp/udp $rangelow:$rangehigh\n";
+	$rangelow = 1024;
+	$rangehigh = 64535;
+	
+	if ($config['nat']['portrange-low'] && $config['nat']['portrange-high']) {
+		$rangelow = $config['nat']['portrange-low'];
+		$rangehigh = $config['nat']['portrange-high'];
 	}
 	
-	$natrule .= "map $if $src $dst -> {$tgt}\n";
+	$portmaprule = "map $if $src $dst -> {$tgt} portmap tcp/udp $rangelow:$rangehigh\n";
+	$ipmaprule = "map $if $src $dst -> {$tgt}\n";
+	
+	/* depending on whether or not port mapping is disabled, we put the (generic) IP
+	   rule or the portmap rule first. If the portmap rule comes first, we will always
+	   have mapped/randomized ports. Otherwise, the port will only be mapped if there
+	   is already another mapping for the same port.
+	*/
+	if ($portmap)
+		$natrule .= $portmaprule . $ipmaprule;
+	else
+		$natrule .= $ipmaprule . $portmaprule;
 	
 	return $natrule;
 }

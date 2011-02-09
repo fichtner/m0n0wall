@@ -3,6 +3,12 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- modify "disable port mapping" option so that it will actually avoid port
+  mapping whenever possible, but fall back to port mapping if another mapping
+  for the same port already exists
+  (inspired by a patch submitted by Adam Swift)
+
+
 1.33b2
 ------
 

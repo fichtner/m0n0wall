@@ -283,12 +283,12 @@ function typesel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Portmap</td>
                   <td width="78%" class="vtable">
-					<input name="noportmap" type="checkbox" id="noportmap" value="1" <?php if ($pconfig['noportmap']) echo "checked"; ?>> <strong>Disable port mapping</strong>
+					<input name="noportmap" type="checkbox" id="noportmap" value="1" <?php if ($pconfig['noportmap']) echo "checked"; ?>> <strong>Avoid port mapping</strong>
                     <br>
-                     <span class="vexpl">This option disables remapping of the source port number for outbound packets. This may help with software
-                     	that insists on the source ports being left unchanged when applying NAT (such as some IPsec VPN gateways). However,
-                     	with this option enabled, two clients behind NAT cannot communicate with the same server at the same time using the
-                     	same source ports.</span></td>
+                     <span class="vexpl">This option avoids remapping of the source port number for outbound packets whenever possible
+						(i.e. when there is no other mapping for the same port). This may help with software
+                     	that insists on the source ports being left unchanged when applying NAT (such as some IPsec VPN gateways, games and VoIP applications).
+					 </span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>
