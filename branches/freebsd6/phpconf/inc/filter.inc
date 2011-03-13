@@ -500,8 +500,8 @@ EOD;
 			$ipfrules .= "# allow link-local traffic on {$on}\n";
 			$ipfrules .= "pass in quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
 			$ipfrules .= "pass out quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
-			if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
-					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
+			if ((isset($config['dhcpd'][$on]['v6enable']) && !$oc['bridge']) ||
+					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['v6enable']))) {
 
 				$ipfrules .= <<<EOD
 

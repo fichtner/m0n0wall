@@ -1084,7 +1084,17 @@ function interfaces_rtadvd_configure() {
 			$raflags .= "o";
 		}
 		$rtadvdifs .= ' ' . $config['interfaces']['lan']['if'];
-		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4\n";
+		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:rtplen#";
+		if ($config['interfaces']['lan']['ipv6mode'] == "DHCP-PD") {
+			$rtadvdconf .= 64 - $config['interfaces']['lan']['slalen'];
+		} else {
+			$rtadvdconf .= $config['interfaces']['lan']['subnet6'];
+		}
+		if (isset($config['interfaces']['lan']['ipv6ramtu'])) {
+			$rtadvdconf .= ":mtu#" . $config['interfaces']['lan']['ipv6ramtu'];
+		}
+		$rtadvdconf .= "\n";
+
 	}
 	
 	if (isset($config['interfaces']['wan']['ipv6ra'])) {
@@ -1106,7 +1116,16 @@ function interfaces_rtadvd_configure() {
 			}
 			$rtadvdifs .= ' ' . $optcfg['if'];
 			/* maybe this can be configurable in the future */
-			$rtadvdconf .= $optcfg['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4\n";
+			$rtadvdconf .= $optcfg['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:rtplen#";
+			if ($config['interfaces']['opt' . $i]['ipv6mode'] == "DHCP-PD") {
+				$rtadvdconf .= 64 - $config['interfaces']['opt' . $i]['slalen'];
+			} else {
+				$rtadvdconf .= $config['interfaces']['opt' . $i]['subnet6'];
+			}
+			if (isset($config['interfaces']['opt' . $i]['ipv6ramtu'])) {
+				$rtadvdconf .= ":mtu#" . $config['interfaces']['opt' . $i]['ipv6ramtu'];
+			}
+			$rtadvdconf .= "\n";
 		}
 	}
 

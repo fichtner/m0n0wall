@@ -2,6 +2,10 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Add MTU option for ipv6 RA 
+  ipv6 RA uses configured subnet length instead of default /64
+  
+- Fix DHCPv6 server filter problem for opt interface if dhcpdv4 is not enabled
 
 - modify "disable port mapping" option so that it will actually avoid port
   mapping whenever possible, but fall back to port mapping if another mapping
