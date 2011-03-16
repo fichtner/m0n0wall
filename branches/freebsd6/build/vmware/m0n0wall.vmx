@@ -1,5 +1,5 @@
 config.version = "8"
-virtualHW.version = "6"
+virtualHW.version = "7"
 memsize = "128"
 MemAllowAutoScaleDown = "FALSE"
 ide0:0.present = "TRUE"
