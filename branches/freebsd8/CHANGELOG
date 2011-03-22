@@ -2,6 +2,11 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- add kernel patch to hide GEOM error about slice 
+- remove wget's as this is in svn.m0n0.ch now, so no need when we have a svn co in the script
+- add autodetect lan interface when using a default config (first if that is UP)
+
 1.8.b00
 -----
 - branch of freebsd6 to freebsd8
