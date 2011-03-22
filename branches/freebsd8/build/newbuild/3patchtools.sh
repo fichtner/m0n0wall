@@ -24,5 +24,5 @@
         cp /usr/m0n0wall/build81/freebsd8/build/tools/dhclient-script /usr/m0n0wall/build81/m0n0fs/sbin
         chmod a+rx /usr/m0n0wall/build81/m0n0fs/sbin/dhclient-script
 
-# lets strip out symbols lazy way , lots of harmless errors to dev null
+# lets strip out any missed symbols lazy way , lots of harmless errors to dev null
 		find /usr/m0n0wall/build81/m0n0fs/ | xargs strip -s 2> /dev/null

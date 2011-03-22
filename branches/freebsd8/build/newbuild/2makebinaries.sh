@@ -2,8 +2,7 @@
 
 # set port options for ports that need user input
 		cd /usr/m0n0wall/build81/tmp
-		wget http://svn.m0n0.ch/wall/branches/freebsd8/build/newbuild/files/portoptions.tgz
-		tar -zxvf /usr/m0n0wall/build81/tmp/portoptions.tgz -C /
+		tar -zxvf /usr/m0n0wall/build81/freebsd8/build/newbuild/files/portoptions.tgz -C /
  
 # autconf
         rm /usr/local/bin/autoconf
@@ -75,8 +74,7 @@
         install -s work/dnsmasq-*/src/dnsmasq /usr/m0n0wall/build81/m0n0fs/usr/local/sbin/
 # ipsec-tools
         cd /usr/ports/security/ipsec-tools
-		wget http://svn.m0n0.ch/wall/branches/freebsd8/build/newbuild/patches/ipsec-tools.Makefile.patch
-		patch < ipsec-tools.Makefile.patch
+		patch < /usr/m0n0wall/build81/freebsd8/build/newbuild/patches/ipsec-tools.Makefile.patch
         make
         install -s work/ipsec-tools-*/src/racoon/.libs/racoon /usr/m0n0wall/build81/m0n0fs/usr/local/sbin
         install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 /usr/m0n0wall/build81/m0n0fs/usr/local/lib
@@ -136,8 +134,7 @@
         --disable-shared-version --disable-shared \
         '--with-out-transports=TCP Unix' \
         '--with-mib-modules=mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
-	--with-defaults
-	wget http://svn.m0n0.ch/wall/branches/freebsd8/build/newbuild/patches/ucd-snmp.config.h.patch
-	patch < ucd-snmp.config.h.patch
-        make
+		--with-defaults
+		patch < /usr/m0n0wall/build81/freebsd8/build/newbuild/patches/ucd-snmp.config.h.patch
+	    make
         install -s agent/snmpd /usr/m0n0wall/build81/m0n0fs/usr/local/sbin

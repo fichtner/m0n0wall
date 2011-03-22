@@ -32,6 +32,7 @@
 require_once("globals.inc");
 require_once("util.inc");
 require_once("xmlparse.inc");
+require_once("functions.inc");
 
 /* read platform */
 if (file_exists("{$g['etc_path']}/platform")) {
@@ -160,9 +161,23 @@ if (!$noparseconfig) {
 			if ($g['booting']) {
 				if (strstr($g['platform'], "cdrom")) {
 					/* try copying the default config. to the floppy/USB stick */
-					reset_factory_defaults();
-					
 					echo "No XML configuration file found - using factory defaults.\n";
+					reset_factory_defaults();
+						
+					echo "Detecting LAN interface.\n";
+				
+				    $iflist = get_interface_list();
+				
+				    foreach ($iflist as $iface => $ifa) {
+				    	if ($ifa['up']) {
+				        	$config = parse_xml_config("{$g['conf_path']}/config.xml", $g['xml_rootobj']);
+							$config['interfaces']['lan']['if'] = $iface;
+							write_config();
+							echo "LAN set as {$iface} .\n";
+							break;
+						}
+					}
+								
 				} else {
 					echo "XML configuration file not found. m0n0wall cannot continue booting.\n"; 
 					mwexec("/sbin/halt");

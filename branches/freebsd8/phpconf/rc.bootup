@@ -121,7 +121,7 @@
 	/* start rtadvd */
 	interfaces_rtadvd_configure();
 	
-	/* start DHCPvv6 service */
+	/* start DHCPv6 service */
 	services_dhcp6s_configure();
 	
 	/* start DHCP relay */

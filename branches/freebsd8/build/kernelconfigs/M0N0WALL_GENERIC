@@ -18,19 +18,20 @@ options 	SOFTUPDATES		# Enable FFS soft updates support
 options 	MD_ROOT			# MD is a potential root device
 options 	MSDOSFS			# MSDOS Filesystem
 options 	CD9660			# ISO 9660 Filesystem
+options 	COMPAT_43TTY		# BSD 4.3 TTY compat (sgtty)
 options 	COMPAT_43		# Compatible with BSD 4.3 [KEEP THIS!]
+options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
 options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
 options 	SYSVSHM			# SYSV-style shared memory
 options 	SYSVMSG			# SYSV-style message queues
 options 	SYSVSEM			# SYSV-style semaphores
 options 	_KPOSIX_PRIORITY_SCHEDULING # POSIX P1003_1B real-time extensions
 options 	KBD_INSTALL_CDEV	# install a CDEV entry in /dev
-options 	ADAPTIVE_GIANT		# Giant mutex is adaptive.
 
 options		NO_SWAPPING
 options         DEVICE_POLLING
 
-options		FAST_IPSEC              #new IPsec (cannot define w/ IPSEC)
+options		IPSEC
 options		IPSEC_NAT_T
 device		enc
 
@@ -115,7 +116,6 @@ device		pccard		# PC Card (16-bit) bus
 device		cardbus		# CardBus (32-bit) bus
 
 # Serial (COM) ports
-device		sio		# 8250, 16[45]50 based serial ports
 
 # PCI Ethernet NICs.
 device		de		# DEC/Intel DC21x4x (``Tulip'')
@@ -139,7 +139,6 @@ device		nge		# NatSemi DP83820 gigabit Ethernet
 device		nve		# nVidia nForce MCP on-board Ethernet Networking
 device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
 device		re		# RealTek 8139C+/8169/8169S/8110S
-device		rg		# RealTek custom driver for 8111C etc.
 device		rl		# RealTek 8129/8139
 device		sf		# Adaptec AIC-6915 (``Starfire'')
 device		sis		# Silicon Integrated Systems SiS 900/SiS 7016
@@ -162,7 +161,6 @@ device		ex		# Intel EtherExpress Pro/10 and Pro/10+
 device		ep		# Etherlink III based cards
 device		fe		# Fujitsu MB8696x based cards
 device		ie		# EtherExpress 8/16, 3C507, StarLAN 10 etc.
-device		lnc		# NE2100, NE32-VL Lance Ethernet cards
 device		sn		# SMC's 9000 series of Ethernet chips
 device		xe		# Xircom pccard Ethernet
 
@@ -173,10 +171,11 @@ device          wlan_ccmp               #802.11 CCMP support
 device          wlan_tkip               #802.11 TKIP support
 device          wlan_xauth              #802.11 external authenticator support
 device          wlan_acl
-device          ath
-device          ath_hal         # Atheros HAL (includes binary component)
-device          ath_rate_sample # SampleRate rate control for the ath driver
 device		an		# Aironet 4500/4800 802.11 wireless NICs.
+device          ath             # Atheros pci/cardbus NIC's
+device          ath_hal         # pci/cardbus chip support
+options         AH_SUPPORT_AR5416       # enable AR5416 tx/rx descriptors
+device          ath_rate_sample # SampleRate tx rate control for ath
 device		ral		# Ralink Technology RT2500 wireless NICs.
 device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 
@@ -189,7 +188,7 @@ device		pty		# Pseudo-ttys (telnet etc)
 device		md		# Memory "disks"
 device		gif		# IPv6 and IPv4 tunneling
 device		stf		# 6to4 IPv6 over IPv4 encapsulation
-
+device		firmware	# firmware assist module
 device		if_bridge	#Bridge interface
 device          vlan
 
@@ -224,7 +223,6 @@ device		uhci		# UHCI PCI->USB interface
 device		ohci		# OHCI PCI->USB interface
 device		ehci		# EHCI PCI->USB interface (USB 2.0)
 device		usb		# USB Bus (required)
-device		ugen		# Generic
 device		uhid		# "Human Interface Devices"
 device		ukbd		# Keyboard
 device		umass		# Disks/Mass storage - Requires scbus and da
