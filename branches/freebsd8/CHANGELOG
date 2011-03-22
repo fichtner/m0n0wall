@@ -2,6 +2,17 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+1.8.b00
+-----
+- branch of freebsd6 to freebsd8
+  freebsd6 is now frozen except for major fixes
+
+- newbuild scripts within build directory patches to freebsd 8.1 and creates working iso
+  based on same filesytem type as freebsd6 / 1.33
+
+
+1.33
+-----
 - Add MTU option for ipv6 RA 
   ipv6 RA uses configured subnet length instead of default /64
   

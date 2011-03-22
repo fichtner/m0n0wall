@@ -1,0 +1,13 @@
+--- sys/modules/ipfw/Makefile.orig	2006-09-19 17:45:21.000000000 +0200
++++ sys/modules/ipfw/Makefile	2008-02-23 19:43:06.000000000 +0100
+@@ -13,8 +13,8 @@
+ #CFLAGS+= -DIPFIREWALL_VERBOSE_LIMIT=100
+ #
+ #If you want it to pass all packets by default
+-#CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
+-#
++CFLAGS+= -DIPFIREWALL_DEFAULT_TO_ACCEPT
++CFLAGS+= -DIPFIREWALL_FORWARD
+ 
+ .if !defined(KERNBUILDDIR)
+ .if !defined(NO_INET6)

@@ -1,0 +1,22 @@
+critical areas
+	kernel patches for a few things
+		dummynet now in sys/netinet/ipfw/ip_dummynet.c  patch fails as dummynet is VERY different, ip_input.c patch is irrelevent until this is fixed if still required.
+
+		
+
+areas to investigate impact
+    GEOM errors on boot
+    lnc kernel driver is gone from 8.1 etc
+	trys to mount md0 not md0a, this is ok as scripts build for md0
+	mklibs complains . file not found, this is because of links
+	atareinit.c not found to compile in freebsd8 repo
+	if_vlan.ko and if_tap.ko not to be found except in /boot/kernel
+	disklabel doesn't have -s option anymore
+	freebsd8 repo m0n0wall.files has bin/[:bin/test
+
+
+areas to improve
+	support for ALIX/WRAP GENERICwithSerial
+	support for different image outputs
+	scripts to reverse the build scripts so you can do a clean build
+

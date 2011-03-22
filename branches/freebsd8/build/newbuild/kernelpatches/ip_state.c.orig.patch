@@ -1,0 +1,21 @@
+--- sys/contrib/ipfilter/netinet/ip_state.c.orig	2007-11-18 12:03:29.000000000 +0100
++++ sys/contrib/ipfilter/netinet/ip_state.c	2008-07-26 15:43:35.000000000 +0200
+@@ -150,15 +150,15 @@
+ #define	FIVE_DAYS	(5 * ONE_DAY)
+ #define	DOUBLE_HASH(x)	(((x) + ips_seed[(x) % fr_statesize]) % fr_statesize)
+
+-u_long	fr_tcpidletimeout = FIVE_DAYS,
++u_long	fr_tcpidletimeout = IPF_TTLVAL(9000),
+ 	fr_tcpclosewait = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcplastack = IPF_TTLVAL(30),
+ 	fr_tcptimeout = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcptimewait = IPF_TTLVAL(2 * TCP_MSL),
+ 	fr_tcpclosed = IPF_TTLVAL(30),
+-	fr_tcphalfclosed = IPF_TTLVAL(2 * 3600),	/* 2 hours */
++	fr_tcphalfclosed = IPF_TTLVAL(240),
+ 	fr_udptimeout = IPF_TTLVAL(120),
+-	fr_udpacktimeout = IPF_TTLVAL(12),
++	fr_udpacktimeout = IPF_TTLVAL(240),
+ 	fr_icmptimeout = IPF_TTLVAL(60),
+ 	fr_icmpacktimeout = IPF_TTLVAL(6),
+ 	fr_iptimeout = IPF_TTLVAL(60);

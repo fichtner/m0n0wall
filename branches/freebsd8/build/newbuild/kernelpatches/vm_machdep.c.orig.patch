@@ -1,0 +1,15 @@
+--- sys/i386/i386/vm_machdep.c.orig	2007-04-30 19:45:44.000000000 +0200
++++ sys/i386/i386/vm_machdep.c	2008-02-23 19:44:49.000000000 +0100
+@@ -605,6 +605,12 @@
+ 		outl(0xcfc, 0xf);
+ 	}
+ 
++	if (strcmp(cpu_vendor, "AuthenticAMD") == 0 &&
++	    (cpu_id & 0xfff0) == 0x05a0) {
++		/* PC Engines ALIX reset via CS5536 DIVIL_SOFT_RESET */
++		wrmsr(0x51400017, 1LL);
++	}
++
+ #ifdef PC98
+ 	/*
+ 	 * Attempt to do a CPU reset via CPU reset port.

@@ -1,0 +1,11 @@
+--- sys/kern/vfs_mount.c.orig	2007-05-10 11:18:07.000000000 +0200
++++ sys/kern/vfs_mount.c	2008-02-23 19:43:42.000000000 +0100
+@@ -1602,7 +1602,7 @@
+ 		strcpy(path, ROOTNAME);
+ 
+ 	error = kernel_vmount(
+-	    MNT_RDONLY | MNT_ROOTFS,
++	    MNT_ROOTFS,
+ 	    "fstype", vfsname,
+ 	    "fspath", "/",
+ 	    "from", path,

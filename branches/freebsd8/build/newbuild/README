@@ -1,0 +1,11 @@
+Build m0n0wall on FreeBSD 8.1
+
+Install freebsd 8.1 with developer features and login , su to root then.
+
+fetch http://svn.m0n0.ch/wall/branches/freebsd8/build/newbuild/go.sh
+
+then execute go.sh
+
+This will give you a bash prompt where you should execute 'bash doall.sh'  or execute each of the 5 shell scripts.
+
+if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build81/images/

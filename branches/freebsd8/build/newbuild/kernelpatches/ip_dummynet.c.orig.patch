@@ -1,0 +1,10 @@
+--- sys/netinet/ip_dummynet.c.orig	2008-10-31 14:01:31.000000000 +0100
++++ sys/netinet/ip_dummynet.c	2009-04-20 18:47:05.000000000 +0200
+@@ -899,6 +899,7 @@
+ 			ip = mtod(m, struct ip *);
+ 			ip->ip_len = htons(ip->ip_len);
+ 			ip->ip_off = htons(ip->ip_off);
++			m->m_flags |= M_IPIN_SKIPPFIL;
+ 			netisr_dispatch(NETISR_IP, m);
+ 			break;
+ #ifdef INET6

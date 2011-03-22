@@ -1,0 +1,32 @@
+--- sys/dev/usb/ehci_pci.c.orig	2008-10-02 04:57:24.000000000 +0200
++++ sys/dev/usb/ehci_pci.c	2009-04-20 18:46:14.000000000 +0200
+@@ -95,8 +95,10 @@
+ static const char *ehci_device_m5239 = "ALi M5239 USB 2.0 controller";
+ 
+ /* AMD */
+-#define PCI_EHCI_DEVICEID_8111		0x10227463
++#define PCI_EHCI_DEVICEID_8111		0x74631022
++#define PCI_EHCI_DEVICEID_CS5536	0x20951022
+ static const char *ehci_device_8111 = "AMD 8111 USB 2.0 controller";
++static const char *ehci_device_CS5536 = "AMD CS5536 USB 2.0 controller";
+ 
+ /* ATI */
+ #define PCI_EHCI_DEVICEID_SB200		0x43451002
+@@ -214,6 +216,8 @@
+ 		return (ehci_device_m5239);
+ 	case PCI_EHCI_DEVICEID_8111:
+ 		return (ehci_device_8111);
++	case PCI_EHCI_DEVICEID_CS5536:
++		return (ehci_device_CS5536);
+ 	case PCI_EHCI_DEVICEID_SB200:
+ 		return (ehci_device_sb200);
+ 	case PCI_EHCI_DEVICEID_SB400:
+@@ -429,6 +433,8 @@
+ 				continue;
+ 			}
+ 			bsc = device_get_softc(nbus[0]);
++			if (bsc == 0 || bsc->bdev == 0)
++				continue;
+ 			free(nbus, M_TEMP);
+ 			DPRINTF(("ehci_pci_attach: companion %s\n",
+ 			    USBDEVNAME(bsc->bdev)));
