@@ -1084,7 +1084,7 @@ function interfaces_rtadvd_configure() {
 			$raflags .= "o";
 		}
 		$rtadvdifs .= ' ' . $config['interfaces']['lan']['if'];
-		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:rtplen#";
+		$rtadvdconf .= $config['interfaces']['lan']['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:prefixlen#";
 		if ($config['interfaces']['lan']['ipv6mode'] == "DHCP-PD") {
 			$rtadvdconf .= 64 - $config['interfaces']['lan']['slalen'];
 		} else {

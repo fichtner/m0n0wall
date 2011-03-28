@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- update GEOM patch to hide more errors about slice types etc.
+- fix rtadvd.conf to use prefix length instead of rtplen
 
 - add kernel patch to hide GEOM error about slice 
 - remove wget's as this is in svn.m0n0.ch now, so no need when we have a svn co in the script
