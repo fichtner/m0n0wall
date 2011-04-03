@@ -186,6 +186,7 @@ $menu['Diagnostics']['Logs']			= array('diag_logs.php',
 							  					'diag_logs_vpn.php',
 							  					'diag_logs_settings.php');  
 $menu['Diagnostics']['DHCP Leases'] 	= array('diag_dhcp_leases.php');
+$menu['Diagnostics']['CPU Graph']		= array('status_graph_cpu.php');
 $menu['Diagnostics']['IPsec'] 			= array('diag_ipsec_sad.php',
 												'diag_ipsec_spd.php');
 $menu['Diagnostics']['Ping/Traceroute'] = array('diag_ping.php',

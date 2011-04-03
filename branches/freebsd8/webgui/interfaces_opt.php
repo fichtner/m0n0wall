@@ -48,12 +48,22 @@ $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
 if (ipv6enabled()) {
 	$pconfig['ipv6ra'] = isset($optcfg['ipv6ra']);
-	$pconfig['ipv6ram'] = isset($optcfg['ipv6ram']);
 	$pconfig['ipv6ramtu'] = isset($optcfg['ipv6ramtu']);
-	$pconfig['ipv6rao'] = isset($optcfg['ipv6rao']);
+	
+	if (isset($optcfg['ipv6rao'])) {
+		$pconfig['raflags'] = "Other";
+	} else if (isset($optcfg['ipv6ram'])) {
+		$pconfig['raflags'] = "Managed";
+	} else {
+		$pconfig['raflags'] = "None";
+	}
 	
 	if ($optcfg['ipaddr6'] == "6to4") {
 		$pconfig['ipv6mode'] = "6to4";
+	} else if ($optcfg['ipaddr6'] == "DHCP-PD") {
+		$pconfig['ipv6mode'] = "DHCP-PD";
+		$pconfig['slalen'] = $optcfg['slalen'];
+		$pconfig['slaid'] = $optcfg['slaid'];
 	} else if ($optcfg['ipaddr6']) {
 		$pconfig['ipaddr6'] = $optcfg['ipaddr6'];
 		$pconfig['subnet6'] = $optcfg['subnet6'];
@@ -108,6 +118,9 @@ if ($_POST) {
 				if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['ipaddr6'])) {
 					$input_errors[] = "A valid IPv6 address must be specified.";
 				}
+				if ($_POST['ipv6ramtu'] < 56 || $_POST['ipv6ramtu'] >1500) {
+					$input_errors[] = "A valid RA MTU must be specified (56 - 1500).";
+				}
 			}
 		}
 	}
@@ -128,6 +141,16 @@ if ($_POST) {
 		$optcfg['enable'] = $_POST['enable'] ? true : false;
 		
 		if (ipv6enabled()) {
+			if ($_POST['raflags'] == "Managed") {
+				unset($optcfg['ipv6rao']);
+				$optcfg['ipv6ram'] = true;
+			} else if ($_POST['raflags'] == "Other") {
+				unset($optcfg['ipv6ram']);
+				$optcfg['ipv6rao'] = true;
+			} else if ($_POST['raflags'] == "None") {
+				unset($optcfg['ipv6rao']);
+				unset($optcfg['ipv6ram']);
+			}
 			if ($_POST['ipv6mode'] == "6to4") {
 				$optcfg['ipaddr6'] = "6to4";
 				unset($optcfg['subnet6']);
@@ -135,6 +158,16 @@ if ($_POST) {
 				$optcfg['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
 				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'] ? true : false;
 				$optcfg['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
+			} else if ($_POST['ipv6mode'] == "DHCP-PD") {
+				$optcfg['ipaddr6'] = "DHCP-PD";
+				unset($optcfg['subnet6']);
+				unset($optcfg['slaid']);
+				if ($_POST['slaid'] != null) 
+					$optcfg['slaid'] = $_POST['slaid'];
+				$optcfg['slalen'] = 64 - $_POST['ispfix'];
+				$pconfig['slalen'] = 64 - $_POST['ispfix'];
+				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'] ;
 			} else if ($_POST['ipv6mode'] == "static") {
 				$optcfg['ipaddr6'] = $_POST['ipaddr6'];
 				$optcfg['subnet6'] = $_POST['subnet6'];
@@ -146,9 +179,7 @@ if ($_POST) {
 				unset($optcfg['ipaddr6']);
 				unset($optcfg['subnet6']);
 				unset($optcfg['ipv6ra']);
-				unset($optcfg['ipv6ram']);
 				unset($optcfg['ipv6ramtu']);
-				unset($optcfg['ipv6rao']);
 			}
 		}
 
@@ -187,13 +218,15 @@ function enable_change(enable_over) {
 	
 <?php if (ipv6enabled()): ?>
 	var ipv6_enable = (document.iform.ipv6mode.selectedIndex == 1);
+	var pd = (document.iform.ipv6mode.selectedIndex == 3 || enable_over);
 	document.iform.ipv6mode.disabled = !((all_enable && !bridge_enable) || enable_over);
 	document.iform.ipaddr6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.subnet6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.ipv6ra.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
-	document.iform.ipv6ram.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
 	document.iform.ipv6ramtu.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
-	document.iform.ipv6rao.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+	document.iform.raflags.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+	document.iform.ispfix.disabled = !(pd  && !bridge_enable);
+	document.iform.slaid.disabled = !(pd  && !bridge_enable);
 <?php endif; ?>
 
 	if (document.iform.mode) {
@@ -274,7 +307,7 @@ function enable_change(enable_over) {
                   <td valign="top" class="vncellreq">IPv6 mode</td>
                   <td class="vtable"> 
                     <select name="ipv6mode" class="formfld" id="ipv6mode" onchange="enable_change(false)">
-                      <?php $opts = array('disabled', 'static', '6to4');
+                      <?php $opts = array('disabled', 'static', '6to4','DHCP-PD');
 						foreach ($opts as $opt) {
 							echo "<option value=\"$opt\"";
 							if ($opt == $pconfig['ipv6mode']) echo "selected";
@@ -301,20 +334,46 @@ function enable_change(enable_over) {
                     </select></td>
                 </tr>
                 <tr> 
+                  <td valign="top" class="vncellreq">IPv6 Prefix Delegation</td>
+                  <td class="vtable"> 
+                    <input name="slaid" type="text" class="formfld" id="slaid" size="4" value="<?=htmlspecialchars($pconfig['slaid']);?>">
+                    / 
+                    <select name="ispfix" class="formfld" id="ispfix">
+                      <?php for ($l = 64; $l > 0; --$l): ?>
+                      <option value="<?=$l;?>" <?php
+                        if ($l == 64 - $pconfig['slalen'] || (!isset($pconfig['slalen']) && $l == 48)) echo "selected";
+                      ?>>
+                      <?=$l;?>
+                      </option>
+                      <?php endfor; ?>
+                    </select><br>
+					   Select site-level aggregator ID and ISP prefix length (decimal notation).<br>
+					   If ID is 11 and the client is delegated an IPv6 prefix 2001:db8:ffff and prefix 48, this will result in
+					   a single IPv6 prefix, 2001:db8:ffff:A::/64 .</td>
+                </tr>
+               <tr> 
                   <td valign="top" class="vncellreq">IPv6 RA</td>
                   <td class="vtable"> 
-					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
+					<input type="checkbox" name="ipv6ra" id="ipv6ra" onchange="enable_change(false)" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?> > <strong>Send IPv6 router advertisements</strong><br>
 					If this option is checked, other hosts on this interface will be able to automatically configure
 					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option should normally be enabled.<br>
-					<input type="checkbox" name="ipv6ram" id="ipv6ram" value="1" <?php if ($pconfig['ipv6ram']) echo "checked";?>> <strong>Managed address configuration</strong><br>
-					If this option is checked, other hosts on this interface will use DHCPv6 for address allocation and non address allocation configuration.<br>
-					<input type="checkbox" name="ipv6rao" id="ipv6rao" value="1" <?php if ($pconfig['ipv6rao']) echo "checked";?>> <strong>Other stateful configuration</strong><br>
-					If this option is checked, other hosts on this interface will use DHCPv6 for non address allocation configuration, such as DNS.<br>
-					<strong>MTU</strong> <input name="ipv6ramtu" type="text" class="formfld" id="ipv6ramtu" size="4" value="<?=htmlspecialchars($pconfig['ipv6ramtu']);?>"> bytes <br>
+					This option should normally be enabled. <?php echo $pconfig['raflags']?> <br>
+                    <strong>Flags</strong> <select name="raflags" class="formfld" id="raflags">
+                      <?php $opts = array('None', 'Managed', 'Other');
+						foreach ($opts as $opt) {
+							echo "<option value=\"$opt\"";
+							if ($opt == $pconfig['raflags']) echo " selected";
+							echo ">$opt</option>\n";
+						}
+						?>
+                    </select><br>
+					If Managed is selected, other hosts on this interface will use DHCPv6 for BOTH address and non address allocation configuration.<br>
+					If Other is selected, other hosts on this interface will use DHCPv6 for non address allocation only, like DNS.<br>
+                    <strong>MTU</strong> <input name="ipv6ramtu" type="text" class="formfld" id="ipv6ramtu" size="4" value="<?=htmlspecialchars($pconfig['ipv6ramtu']);?>"> bytes <br>
                     Enter the MTU you want advertised here.<br>
-                  </td>
+				</td>
                 </tr>
+
                 <?php endif; ?>
 				<?php /* Wireless interface? */
 				if (isset($optcfg['wireless']))
@@ -331,11 +390,7 @@ function enable_change(enable_over) {
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"><span class="vexpl"><span class="red"><strong>Note:<br>
                     </strong></span>be sure to add firewall rules to permit traffic 
-                    through the interface. Firewall rules for an interface in 
-                    bridged mode have no effect on packets to hosts other than 
-                    m0n0wall itself, unless &quot;Enable filtering bridge&quot; 
-                    is checked on the <a href="system_advanced.php">System: 
-                    Advanced functions</a> page.</span></td>
+                    through the interface.	</span></td>
                 </tr>
               </table>
 </form>

@@ -511,15 +511,6 @@ function type_change() {
                       <?php endfor; ?>
                     </select></td>
                 </tr>
-				<tr> 
-                  <td valign="top" class="vncellreq">IPv6 RA</td>
-                  <td class="vtable"> 
-					<input type="checkbox" name="ipv6ra" id="ipv6ra" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?>> <strong>Send IPv6 router advertisements</strong><br>
-					If this option is checked, other hosts on this interface will be able to automatically configure
-					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option is NOT normally enabled on the WAN interface when connected to an ISP.
-                  </td>
-                </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">IPv6 gateway</td>
                   <td class="vtable"> 
@@ -543,7 +534,7 @@ function type_change() {
                       </tr>
                       <tr> 
                         <td>Password:&nbsp;&nbsp;</td>
-                        <td><input name="aiccu_password" type="text" class="formfld" id="aiccu_password" size="20" value="<?=htmlspecialchars($pconfig['aiccu_password']);?>"></td>
+                        <td><input name="aiccu_password" type="password" class="formfld" id="aiccu_password" size="20" value="<?=htmlspecialchars($pconfig['aiccu_password']);?>"></td>
 					  </tr>
 					  <tr> 
                         <td>Tunnel ID:&nbsp;&nbsp;</td>
@@ -571,7 +562,7 @@ function type_change() {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Password</td>
-                  <td class="vtable"><?=$mandfldhtml;?><input name="password" type="text" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="password" type="password" class="formfld" id="password" size="20" value="<?=htmlspecialchars($pconfig['password']);?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -599,7 +590,7 @@ function type_change() {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Password</td>
-                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_password" type="text" class="formfld" id="pptp_password" size="20" value="<?=htmlspecialchars($pconfig['pptp_password']);?>"> 
+                  <td class="vtable"><?=$mandfldhtml;?><input name="pptp_password" type="password" class="formfld" id="pptp_password" size="20" value="<?=htmlspecialchars($pconfig['pptp_password']);?>"> 
                   </td>
                 </tr>
                 <tr> 

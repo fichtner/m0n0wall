@@ -2,6 +2,16 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- remove lan ipv6 suggest from UI.
+- remove wan ipv6 RA from UI.
+- add accept_rtadv flags to interfaces for dhcp or ppp on WAN for ipv6 , and disable for opt and lan.
+- change ipv6 RA UI to dropdown (if previous config had both set, display as 'Managed').
+- change password fields in wan to type=password html tag.
+- add system date to status page,add info for via padlock, cpu info , cpu utilisation and change bar graph style
+- move cpu graph to diagnostics
+- add dhcp-pd to optional interfaces
+- move enable ipv6 from advanced (no support) to setup page
+
 - update GEOM patch to hide more errors about slice types etc.
 - fix rtadvd.conf to use prefix length instead of rtplen
 

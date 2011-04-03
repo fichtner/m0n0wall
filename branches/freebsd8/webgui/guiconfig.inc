@@ -526,5 +526,20 @@ function dynamic_tab_menu(&$tabs) {
    		}
     }	
  }
-
+function pc_gauge($gval, $width) {
+				echo '<table class="gaugetable" width="' . $width . '%" cellpadding="0" cellspacing="0" >';
+				echo '	<td align="left" width="' . $gval . '%" class="leftgauge">';
+				
+				if ($gval < 100) { 
+					if ($gval > 60) {
+						echo '&nbsp;' . $gval .'%</td>';
+						echo '	<td align="left" width="' . (100-$gval) . '%" class="rightgauge">';
+					} else {
+						echo '	</td>';
+						echo '	<td align="left" width="' . (100-$gval) . '%" class="rightgauge">&nbsp;' . $gval .'%';
+					}
+					echo '	</td>';
+				}
+				echo '</table>';
+}
 ?>

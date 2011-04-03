@@ -38,8 +38,11 @@ unset($hwcrypto);
 $dmesg = system_get_dmesg_boot();
 if (preg_match("/^hifn.: (.*?),/m", $dmesg, $matches))
 	$hwcrypto = $matches[1];
-
+if (preg_match("/VIA Padlock/m", $dmesg, $matches))
+	$hwcrypto = "VIA Padlock";
 $specplatform = system_identify_specific_platform();
+if (preg_match("/^CPU.*/m", $dmesg, $matches) )
+	$cpudetail = " - " . $matches[0];
 
 if ($_POST) {
 	$config['system']['notes'] = base64_encode($_POST['notes']);
@@ -47,6 +50,15 @@ if ($_POST) {
 	header("Location: index.php");
 	exit;
 }
+	exec("export QUERY_STRING=cpu;export REQUEST_METHOD=GET;/usr/local/www/stats.cgi" ,$cpuutil);
+    $cpuu = $cpuutil[2];
+
+	exec("/sbin/sysctl -n vm.stats.vm.v_active_count vm.stats.vm.v_inactive_count " .
+    	"vm.stats.vm.v_wire_count vm.stats.vm.v_cache_count vm.stats.vm.v_free_count", $memory);
+    $totalMem = $memory[0] + $memory[1] + $memory[2] + $memory[3] + $memory[4];
+    $freeMem = $memory[4];
+    $usedMem = $totalMem - $freeMem;
+    $memUsage = round(($usedMem * 100) / $totalMem, 0);
 
 ?>
 <?php include("fbegin.inc"); ?>
@@ -71,7 +83,7 @@ if ($_POST) {
                 <td width="25%" valign="top" class="vncellt">Version</td>
                 <td width="75%" class="listr"> <strong> 
                   <?php readfile("/etc/version"); ?>
-                  </strong><br>
+                  </strong>
                   built on 
                   <?php readfile("/etc/version.buildtime"); ?>
                 </td>
@@ -79,7 +91,7 @@ if ($_POST) {
               <tr> 
                 <td width="25%" class="vncellt">Platform</td>
                 <td width="75%" class="listr"> 
-                  <?=htmlspecialchars($specplatform['descr']); ?>
+                  <?=htmlspecialchars($specplatform['descr']); ?> <?=htmlspecialchars($cpudetail); ?> 
                 </td>
               </tr><?php if ($hwcrypto): ?>
               <tr> 
@@ -88,6 +100,12 @@ if ($_POST) {
                   <?=htmlspecialchars($hwcrypto);?>
                 </td>
               </tr><?php endif; ?>
+              <tr> 
+                <td width="25%" class="vncellt">System Date</td>
+                <td width="75%" class="listr"> 
+                   <?=exec("/bin/date");?>
+                </td>
+              </tr>
               <tr> 
                 <td width="25%" class="vncellt">Uptime</td>
                 <td width="75%" class="listr"> 
@@ -114,38 +132,26 @@ if ($_POST) {
 					echo htmlspecialchars($uptimestr);
 				  ?>
                 </td>
-              </tr><?php if ($config['lastchange']): ?>
+              </tr>
+              <?php if ($config['lastchange']): ?>
               <tr> 
                 <td width="25%" class="vncellt">Last config change</td>
                 <td width="75%" class="listr"> 
                   <?=htmlspecialchars(date("D M j G:i:s T Y", $config['lastchange']));?>
                 </td>
-              </tr><?php endif; ?>
-			  <tr> 
+              </tr>
+              <?php endif; ?>
+   			  <tr> 
                 <td width="25%" class="vncellt">CPU usage</td>
                 <td width="75%" class="listr">
-				<a href="status_graph_cpu.php">view graph</a></td>
+                <?php pc_gauge($cpuu,50) ?>
+                </td>		
               </tr>
-			  <tr> 
+   			  <tr> 
                 <td width="25%" class="vncellt">Memory usage</td>
                 <td width="75%" class="listr">
-<?php
-
-exec("/sbin/sysctl -n vm.stats.vm.v_active_count vm.stats.vm.v_inactive_count " .
-	"vm.stats.vm.v_wire_count vm.stats.vm.v_cache_count vm.stats.vm.v_free_count", $memory);
-
-$totalMem = $memory[0] + $memory[1] + $memory[2] + $memory[3] + $memory[4];
-$freeMem = $memory[4];
-$usedMem = $totalMem - $freeMem;
-$memUsage = round(($usedMem * 100) / $totalMem, 0);
-		  
-echo " <img src='bar_left.gif' height='15' width='4' border='0' align='middle' alt=''>";
-echo "<img src='bar_blue.gif' height='15' width='" . $memUsage . "' border='0' align='middle' alt=''>";
-echo "<img src='bar_gray.gif' height='15' width='" . (100 - $memUsage) . "' border='0' align='middle' alt=''>";
-echo "<img src='bar_right.gif' height='15' width='5' border='0' align='middle' alt=''> ";
-echo $memUsage . "%";
-?>
-                </td>
+			  	<?php pc_gauge($memUsage,50) ?>
+			  	</td>
               </tr>
 			  <?php
 					if ( isset($config['system']['webgui']['mbmon']['enable']) ) {

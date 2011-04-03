@@ -39,7 +39,7 @@ if ($_GET['if'])
 if ($curif == "wan")
 	$ifnum = get_real_wan_interface();
 elseif ($curif == "SixXS")
-	if (isset($wancfg['aiccu']['ayiya'])) {
+	if (isset($config['interfaces']['wan']['aiccu']['ayiya'])) {
 		$ifnum = 'tun0';
 	} else {
 		$ifnum = 'gif0';

@@ -32,6 +32,7 @@
 $pgtitle = array("System", "General setup");
 require("guiconfig.inc");
 
+$pconfig['enableipv6'] = isset($config['system']['enableipv6']);
 $pconfig['hostname'] = $config['system']['hostname'];
 $pconfig['domain'] = $config['system']['domain'];
 list($pconfig['dns1'],$pconfig['dns2'],$pconfig['dns3']) = $config['system']['dnsserver'];
@@ -128,6 +129,7 @@ if ($_POST) {
 		
 		$olddnsallowoverride = $config['system']['dnsallowoverride'];
 		$config['system']['dnsallowoverride'] = $_POST['dnsallowoverride'] ? true : false;
+		$config['system']['enableipv6'] = $_POST['enableipv6'] ? true : false;
 		
 		if ($_POST['password']) {
 			$config['system']['password'] = crypt($_POST['password']);
@@ -184,7 +186,7 @@ if ($_POST) {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 		<form action="system.php" method="post">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
-                <tr> 
+                  <tr> 
                   <td width="22%" valign="top" class="vncellreq">Hostname</td>
                   <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="hostname" type="text" class="formfld" id="hostname" size="40" value="<?=htmlspecialchars($pconfig['hostname']);?>"> 
                     <br> <span class="vexpl">name of the firewall host, without 
@@ -195,6 +197,15 @@ if ($_POST) {
                   <td width="22%" valign="top" class="vncellreq">Domain</td>
                   <td width="78%" class="vtable"><?=$mandfldhtml;?><input name="domain" type="text" class="formfld" id="domain" size="40" value="<?=htmlspecialchars($pconfig['domain']);?>"> 
                     <br> <span class="vexpl">e.g. <em>mycorp.com</em> </span></td>
+                </tr>
+                 <tr> 
+                  <td width="22%" valign="top" class="vncell">IPv6 support</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="enableipv6" type="checkbox" id="enableipv6" value="yes" <?php if ($pconfig['enableipv6']) echo "checked"; ?>>
+                    <strong>Enable IPv6 support</strong><br>
+                    After enabling IPv6 support, configure IPv6 addresses on your LAN and WAN interfaces, then add 
+                    IPv6 firewall rules.<br>
+                    Note: you <strong>must set an IPv6 address on the LAN interface</strong> for the IPv6 support to work.
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">DNS servers</td>

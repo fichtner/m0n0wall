@@ -169,7 +169,7 @@ function interfaces_lan_configure6() {
 	
 	$lancfg = $config['interfaces']['lan'];
 	remove_all_ipv6_addresses($lancfg['if']);
-
+	mwexec('/sbin/ifconfig ' . $lancfg['if'] . ' inet6 -accept_rtadv');
 	if (ipv6enabled()) {
 		if ($lancfg['ipaddr6'] == "6to4") {
 			/* take second /64 from 6to4 prefix on WAN interface */
@@ -419,7 +419,7 @@ function interfaces_optional_configure_if6($opti) {
 	
 	if (isset($optcfg['enable'])) {
 		remove_all_ipv6_addresses($optcfg['if']);
-		
+		mwexec('/sbin/ifconfig ' . $optcfg['if'] . ' inet6 -accept_rtadv');
 		if (ipv6enabled()) {
 			if ($optcfg['ipaddr6'] == "6to4") {
 				$v6addr = calc_6to4_address("opt" . $opti);
@@ -669,12 +669,14 @@ function interfaces_wan_configure6($newwanip = false) {
 	global $config, $g;
 	
 	$wancfg = $config['interfaces']['wan'];
+	$wanif = get_real_wan_interface(true);
 	
 	remove_all_ipv6_addresses($wancfg['if']);
 	remove_all_ipv6_addresses("stf0");
 	remove_all_ipv6_addresses("gif0");
 	services_dhcp6c_stop();
-	
+	mwexec('/sbin/ifconfig ' . $wanif . ' inet6 -accept_rtadv');	
+
 	/* kill any running aiccu */
 	killbypid("{$g['varrun_path']}/aiccu.pid");
 	
@@ -700,11 +702,14 @@ function interfaces_wan_configure6($newwanip = false) {
 			}
 		} else if ($wancfg['ipaddr6'] == "DHCP") {
 			services_dhcp6c_configure();
+			mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv');
+
 		} else if ($wancfg['ipaddr6'] == "ppp") {
 			if ($newwanip) {
 				/* called from up-script -> add IPv6 default route */
 				mwexec('/sbin/route delete -inet6 default');
 				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
+				mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv');
 			}
 			if ($config['interfaces']['lan']['ipaddr6'] == "DHCP-PD") {
 				services_dhcp6c_configure();
@@ -1116,7 +1121,7 @@ function interfaces_rtadvd_configure() {
 			}
 			$rtadvdifs .= ' ' . $optcfg['if'];
 			/* maybe this can be configurable in the future */
-			$rtadvdconf .= $optcfg['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:rtplen#";
+			$rtadvdconf .= $optcfg['if'] . ":raflags=\"" . $raflags . "\":maxinterval#10:mininterval#4:prefixlen#";
 			if ($config['interfaces']['opt' . $i]['ipv6mode'] == "DHCP-PD") {
 				$rtadvdconf .= 64 - $config['interfaces']['opt' . $i]['slalen'];
 			} else {

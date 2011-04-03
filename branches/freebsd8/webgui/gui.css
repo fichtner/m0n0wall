@@ -376,3 +376,24 @@ ul#tabnav li.tabact {
 	color: #808080;
 	padding-right: 4px;
 }
+.leftgauge {
+	border-bottom: 1px solid #FFFFFF;
+	border-left: 1px solid #FFFFFF;
+	border-top: 1px solid #FFFFFF;
+	margin: 0px;
+	background-color: #3366FF;
+	font-size: 11px;
+	white-space: nowrap;
+	color: #FFFFFF;
+	padding-right: 4px;
+}
+.rightgauge {
+	margin: 0px;
+	font-size: 11px;
+	white-space: nowrap;
+	color: 3366FF;
+	padding-right: 4px;
+}
+.gaugetable {
+	border: 1px solid #C0C0C0;
+}

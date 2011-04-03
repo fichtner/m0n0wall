@@ -48,7 +48,6 @@ $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
 $pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
-$pconfig['enableipv6'] = isset($config['system']['enableipv6']);
 $pconfig['portrangelow'] = $config['nat']['portrange-low'];
 $pconfig['portrangehigh'] = $config['nat']['portrange-high'];
 
@@ -124,7 +123,6 @@ if ($_POST) {
 			unset($config['diag']['ipfstatentries']);
 		else
 			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
-		$config['system']['enableipv6'] = $_POST['enableipv6'] ? true : false;
 		$config['nat']['portrange-low'] = $_POST['portrangelow'];
 		$config['nat']['portrange-high'] = $_POST['portrangehigh'];
 		
@@ -169,24 +167,6 @@ if ($_POST) {
               and there's <strong>NO</strong> support for them.</span></p>
             <form action="system_advanced.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
-                <tr> 
-                  <td colspan="2" valign="top" class="listtopic">IPv6 support</td>
-                </tr>
-                <tr> 
-                  <td width="22%" valign="top" class="vncell">&nbsp;</td>
-                  <td width="78%" class="vtable"> 
-                    <input name="enableipv6" type="checkbox" id="enableipv6" value="yes" <?php if ($pconfig['enableipv6']) echo "checked"; ?>>
-                    <strong>Enable IPv6 support</strong><br>
-                    After enabling IPv6 support, configure IPv6 addresses on your LAN and WAN interfaces, then add 
-                    IPv6 firewall rules.<br>
-                    Note: you <strong>must set an IPv6 address on the LAN interface</strong> for the IPv6 support to work.
-                </tr>
-                <tr> 
-                  <td width="22%" valign="top">&nbsp;</td>
-                  <td width="78%"> 
-                    <input name="Submit" type="submit" class="formbtn" value="Save"> 
-                  </td>
-                </tr>
                 <tr> 
                   <td colspan="2" class="list" height="12"></td>
                 </tr>
