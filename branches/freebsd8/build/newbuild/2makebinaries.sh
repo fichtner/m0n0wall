@@ -78,7 +78,7 @@
         make
         install -s work/ipsec-tools-*/src/racoon/.libs/racoon /usr/m0n0wall/build81/m0n0fs/usr/local/sbin
         install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 /usr/m0n0wall/build81/m0n0fs/usr/local/lib
-		install work/ipsec-tools-*/src/setkey/setkey /usr/m0n0wall/build81/m0n0fs/sbin
+		install work/ipsec-tools-*/src/setkey/setkey /usr/m0n0wall/build81/m0n0fs/usr/local/sbin
 
 # dhcp6
 		cd /usr/ports/net/dhcp6

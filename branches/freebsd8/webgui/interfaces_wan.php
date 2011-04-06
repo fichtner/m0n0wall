@@ -66,7 +66,7 @@ $pconfig['blockpriv'] = isset($wancfg['blockpriv']);
 $pconfig['spoofmac'] = $wancfg['spoofmac'];
 
 if (ipv6enabled()) {
-		$pconfig['ipv6ra'] = isset($wancfg['ipv6ra']);
+
 		
 	if ($wancfg['ipaddr6'] == "6to4" || $wancfg['ipaddr6'] == "ppp" || $wancfg['ipaddr6'] == "aiccu" || $wancfg['ipaddr6'] == "DHCP") {
 		$pconfig['ipv6mode'] = $wancfg['ipaddr6'];
@@ -198,7 +198,6 @@ if ($_POST) {
 		unset($wancfg['subnet6']);
 		unset($wancfg['gateway6']);
 		unset($wancfg['tunnel6']);
-		unset($wancfg['ipv6ra']);
 		unset($config['pppoe']['username']);
 		unset($config['pppoe']['password']);
 		unset($config['pppoe']['provider']);
@@ -241,7 +240,7 @@ if ($_POST) {
 		$wancfg['spoofmac'] = $_POST['spoofmac'];
 		
 		if (ipv6enabled()) {
-		$wancfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
+
 			if ($_POST['ipv6mode'] == "6to4" || $_POST['ipv6mode'] == "ppp") {
 				$wancfg['ipaddr6'] = $_POST['ipv6mode'];
 			} else if ($_POST['ipv6mode'] == "DHCP"){
@@ -292,7 +291,6 @@ function enable_change(enable_over) {
 	document.iform.aiccu_password.disabled = !aiccu_en;
 	document.iform.aiccu_tunnelid.disabled = !aiccu_en;
 	document.iform.aiccu_ayiya.disabled = !aiccu_en;
-	document.iform.ipv6ra.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
 	document.iform.v6duid.disabled = !dhcp6c_en;
 <?php endif; ?>
 	

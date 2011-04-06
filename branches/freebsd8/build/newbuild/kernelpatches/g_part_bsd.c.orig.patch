@@ -1,28 +1,29 @@
---- sys/geom/part/g_part_bsd.c.orig     2010-12-21 17:09:25.000000000 +0000
-+++ sys/geom/part/g_part_bsd.c  2011-03-16 01:56:11.000000000 +0000
-@@ -387,11 +387,13 @@
-                goto invalid_label;
-        if (heads != basetable->gpt_heads && !basetable->gpt_fixgeom)
-                basetable->gpt_heads = heads;
-+       /*
-        if (sectors != basetable->gpt_sectors || heads != basetable->gpt_heads)
-                printf("GEOM: %s: geometry does not match label"
-                    " (%uh,%us != %uh,%us).\n", pp->name, heads, sectors,
-                    basetable->gpt_heads, basetable->gpt_sectors);
-
-+       */
-        chs = le32dec(buf + 60);
-        if (chs < 1)
-                goto invalid_label;
-@@ -400,9 +402,11 @@
-                chs = msize;
-                le32enc(buf + 60, msize);
-        }
-+       /*
-        if (chs != msize)
-                printf("GEOM: %s: media size does not match label.\n",
-                    pp->name);
-+       */
-
-        basetable->gpt_first = 0;
-        basetable->gpt_last = msize - 1;
+--- sys/geom/part/g_part_bsd.c.orig	2011-03-29 00:05:06.000000000 +0000
++++ sys/geom/part/g_part_bsd.c	2011-03-29 00:06:21.000000000 +0000
+@@ -387,11 +387,11 @@
+ 		goto invalid_label;
+ 	if (heads != basetable->gpt_heads && !basetable->gpt_fixgeom)
+ 		basetable->gpt_heads = heads;
+-	if (sectors != basetable->gpt_sectors || heads != basetable->gpt_heads)
++	/* if (sectors != basetable->gpt_sectors || heads != basetable->gpt_heads)
+ 		printf("GEOM: %s: geometry does not match label"
+ 		    " (%uh,%us != %uh,%us).\n", pp->name, heads, sectors,
+ 		    basetable->gpt_heads, basetable->gpt_sectors);
+-
++	*/
+ 	chs = le32dec(buf + 60);
+ 	if (chs < 1)
+ 		goto invalid_label;
+@@ -400,10 +400,10 @@
+ 		chs = msize;
+ 		le32enc(buf + 60, msize);
+ 	}
+-	if (chs != msize)
++	/* if (chs != msize)
+ 		printf("GEOM: %s: media size does not match label.\n",
+ 		    pp->name);
+-
++	*/
+ 	basetable->gpt_first = 0;
+ 	basetable->gpt_last = msize - 1;
+ 	basetable->gpt_isleaf = 1;
