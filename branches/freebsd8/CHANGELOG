@@ -2,6 +2,11 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix GEOM patch (again)
+- update rc.firmware and php.ini for larger firmware image
+- fix setkey location for racoon
+- fix wan page javascript
+ 
 - remove lan ipv6 suggest from UI.
 - remove wan ipv6 RA from UI.
 - add accept_rtadv flags to interfaces for dhcp or ppp on WAN for ipv6 , and disable for opt and lan.
