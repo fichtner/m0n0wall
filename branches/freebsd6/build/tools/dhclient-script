@@ -8,11 +8,6 @@ fi
 
 make_resolv_conf() {
   if [ x"$new_domain_name_servers" != x ]; then
-    if [ "x$new_domain_name" != x ]; then
-      echo $new_domain_name >/var/etc/defaultdomain.conf
-    else
-      rm -f /var/etc/defaultdomain.conf
-    fi
     rm -f /var/etc/nameservers.inet.conf
     for nameserver in $new_domain_name_servers; do
       echo $nameserver >>/var/etc/nameservers.inet.conf
@@ -104,7 +99,7 @@ if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
 	shift; shift
       done
     fi
-    arp -n -a | sed -n -e 's/^.*(\(.*\)) at .*$/arp -d \1/p' |sh
+    arp -a -d >/dev/null 2>&1
   fi
   if [ x$old_ip_address = x ] || [ x$old_ip_address != x$new_ip_address ] || \
      [ x$reason = xBOUND ] || [ x$reason = xREBOOT ]; then
