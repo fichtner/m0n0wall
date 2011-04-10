@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add padlock and glxsb  hardware crypto support to kernel
+- add printf and sed and setkey (.libs) as required by IPSEC
+
 - remove domain name handling from dhclient-script; it's not used and looks suspicious in light of CVE-2011-0997
 - fix GEOM patch (again)
 - update rc.firmware and php.ini for larger firmware image

@@ -2,12 +2,9 @@ critical areas
 	kernel patches for a few things
 		dummynet now in sys/netinet/ipfw/ip_dummynet.c  patch fails as dummynet is VERY different, ip_input.c patch is irrelevent until this is fixed if still required.
 
-		
-
 areas to investigate impact
-    GEOM errors on boot, this is patched to remove this as was done with 4.11 kernel patch in 1.23 repo
+	printf and sed required for setkey as is .libs/setkey
     lnc kernel driver is gone from 8.1 etc
-	trys to mount md0 not md0a, this is ok as scripts build for md0
 	atareinit.c not found to compile in freebsd8 repo
 	if_vlan.ko and if_tap.ko not to be found except in /boot/kernel
 	
