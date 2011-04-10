@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add cpu geode/soekris to kernel 
+
 - add padlock and glxsb  hardware crypto support to kernel
 - add printf and sed and setkey (.libs) as required by IPSEC
 
