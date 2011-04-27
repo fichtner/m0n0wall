@@ -12,4 +12,4 @@ areas to investigate impact
 areas to improve
 	support for Serial as ALIX and WRAP will be nanoBSD based on GENERIC kernel
 	scripts to reverse the build scripts so you can do a clean build
-
+	avoid copying 1/2/3/4/5...sh scripts to /usr/m0n0wall/build82, but instead run them from /usr/m0n0wall/build82/build/newbuild directly (-> adjust paths etc.)

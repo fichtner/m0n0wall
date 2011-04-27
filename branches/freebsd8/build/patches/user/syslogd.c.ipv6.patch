@@ -14,7 +14,7 @@
 +					*tp++ = *p++;
 +				}
 +				p++;
-+
++			}
  			*tp = '\0';
  		}
  		/* See if we copied a domain and have a port */

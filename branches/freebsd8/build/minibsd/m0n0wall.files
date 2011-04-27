@@ -27,12 +27,7 @@ sbin/dmesg
 sbin/fastboot:sbin/fasthalt:sbin/halt:sbin/reboot
 sbin/ifconfig
 sbin/init
-sbin/ipf
-sbin/ipfs
-sbin/ipfstat
 sbin/ipfw
-sbin/ipmon
-sbin/ipnat
 sbin/kldload
 sbin/kldunload
 sbin/ldconfig
@@ -47,6 +42,7 @@ sbin/ping
 sbin/ping6
 sbin/reboot
 sbin/route
+sbin/setkey
 sbin/shutdown
 sbin/sysctl
 sbin/umount

@@ -2,6 +2,53 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- major changes to build scripts: scripts no longer attempt to check
+  out anything from the repository or directly download (curl/wget)
+  from it. Instead, the user is expected to do an svn checkout to a
+  local directory first and invoke go.sh from inside the local working
+  copy. This makes it possible to apply local changes to the working
+  copy and create a build from it easily prior to checking in changes.
+  The working copy is exported to /usr/m0n0wall/build82 (so any new
+  files need to be "svn add"ed first, or they won't get exported - no
+  commit necessary though). Accordingly, all files (config.xml,
+  loader.rc etc.) are now taken from the (exported) working copy.
+
+- update scripts etc. for FreeBSD 8.2
+
+- add check for existing programs before installing packages
+
+- add "set -e" to all scripts to exit on any errors to avoid them
+  going unnoticed
+
+- remove dev.tgz - it's not necessary since we have devfs
+
+- remove debug.mpsafenet from loader.rc - dummynet + IPv6 should no
+  longer needs this in 8.2 according to the man page (needs testing
+  though)
+
+- remove bpalogin - has become obsolete long ago
+
+- add kernel patch for ipfilter 4.1.34 and modify build scripts to
+  install userland components (/sbin/ipf etc.) from ipfilter
+  distribution rather than FreeBSD base
+
+- add ip_fil4.1.34.tar.gz source to repo as it's pretty hard to find
+  on the web (original and most mirror FTP sites down), and who knows
+  when it will go away
+
+- fix mklibs.pl not to output "ot found" lines, but warn instead if
+  a library is missing
+
+- remove setkey from ipsec-tools as the stock FreeBSD one should
+  work fine now that NAT-T is in the standard distribution
+
+- remove vm_machdep, ehci_pci, geode and if_vr kernel patches - no
+  longer required
+
+- remove vfs_mount patch - now handled by /etc/rc
+
+- fix syslogd ipv6 patch line breaks
+
 - add cpu geode/soekris to kernel 
 
 - add padlock and glxsb  hardware crypto support to kernel

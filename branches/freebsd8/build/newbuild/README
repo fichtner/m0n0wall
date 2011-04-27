@@ -1,11 +1,26 @@
-Build m0n0wall on FreeBSD 8.1
+Build m0n0wall on FreeBSD 8.2
 
-Install freebsd 8.1 with developer features and login , su to root then.
+Install freebsd 8.2 with developer features and login, su to root then.
 
-fetch http://svn.m0n0.ch/wall/branches/freebsd8/build/newbuild/go.sh
+Consider using cvsup to update the source tree to the latest
+RELENG_8_2, and the ports collection to the latest version before
+proceeding (see
+http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html).
 
-then execute go.sh
+Install subversion:
 
-This will give you a bash prompt where you should execute 'bash doall.sh'  or execute each of the 5 shell scripts.
+# pkg_add -r subversion
 
-if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build81/images/
+Checkout the latest freebsd8 branch from the repository:
+
+# svn co http://svn.m0n0.ch/wall/branches/freebsd8
+
+Make any required changes/updates/fixes/... in the repository
+(no need to commit yet), then cd into build/newbuild and start go.sh:
+
+# cd build/newbuild
+# sh go.sh
+
+This will give you a bash prompt where you should execute './doall.sh'  or execute each of the 5 shell scripts.
+
+if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build82/images/

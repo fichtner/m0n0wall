@@ -32,8 +32,11 @@ undef %hlib;
 @liblist = sort keys %hlib;
 
 foreach $lib (@liblist) {
-	$lib = substr($lib, 1);
+	chomp($lib);
+	if ($lib eq "not found") {
+		print STDERR "Warning: one or more libraries were not found!\n";
+	} else {
+		print substr($lib, 1) . "\n";
+	}
 }
-
-print @liblist;
 

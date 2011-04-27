@@ -61,8 +61,8 @@ function vpn_ipsec_configure($ipchg = false) {
 	}
 	
 	/* flush SPD and SAD */
-	mwexec("/usr/local/sbin/setkey -FP");
-	mwexec("/usr/local/sbin/setkey -F");
+	mwexec("/sbin/setkey -FP");
+	mwexec("/sbin/setkey -F");
 	
 	/* mark enc0 interface as up to enable filtering of decapsulated IPsec packets */
 	mwexec("/sbin/ifconfig enc0 up");
