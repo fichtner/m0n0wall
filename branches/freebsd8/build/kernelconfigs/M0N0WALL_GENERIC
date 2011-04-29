@@ -4,7 +4,7 @@ cpu		I586_CPU
 cpu		I686_CPU
 ident		M0N0WALL_GENERIC
 
-makeoptions	MODULES_OVERRIDE="dummynet ipfw acpi"
+makeoptions	MODULES_OVERRIDE="dummynet ipfw acpi if_tap if_vlan"
 
 options		HZ=1000
 

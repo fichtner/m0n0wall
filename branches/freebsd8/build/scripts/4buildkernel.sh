@@ -22,9 +22,7 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/g_part_bsd.c.orig.patch
 
 
-# kernel compile	got to remove rg lnc ugen ADAPTIVE_GIANT and sio
-#					rename FAST_IPSEC to IPSEC
-#					add COMPAT_FREEBSD7 AH_SUPPORT_AR5416 and COMPAT43_TTYS
+# kernel compile
         cd /sys/i386/conf
         cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC* /sys/i386/conf/
         config M0N0WALL_GENERIC
@@ -35,8 +33,8 @@ fi
         gzip -9 kernel
         mv kernel.gz $MW_BUILDPATH/tmp/
         cd modules/usr/src/sys/modules
-        cp /boot/kernel/if_tap.ko /boot/kernel/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
-		cp /boot/kernel/acpi.ko $MW_BUILDPATH/tmp
+        cp if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
+		cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
 
 # make libs
 		cd $MW_BUILDPATH/tmp

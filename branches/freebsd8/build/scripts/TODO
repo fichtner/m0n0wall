@@ -4,10 +4,8 @@ critical areas
 
 areas to investigate impact
     lnc kernel driver is gone from 8.1 etc
-	if_vlan.ko and if_tap.ko not to be found except in /boot/kernel
 	
 	
 areas to improve
 	support for Serial as ALIX and WRAP will be nanoBSD based on GENERIC kernel
 	scripts to reverse the build scripts so you can do a clean build
-	try to avoid building all the gnutls/libgpg stuff just for sixxs-aiccu
