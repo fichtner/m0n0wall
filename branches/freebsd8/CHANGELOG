@@ -2,6 +2,30 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- patch sixxs-aiccu port makefile not to use gnutls (it's too big)
+
+- sync up M0N0WALL_GENERIC kernel config with current state of GENERIC
+  config in FreeBSD 8.2 (most importantly: add uart driver for serial
+  console support)
+
+- move newbuild stuff to build/scripts and put the patches in the
+  appropriate subdirs of build/patches
+
+- make go.sh smarter: if it finds that it's been run from within a
+  working copy, it will use the current working copy. Otherwise it
+  will attempt to install subversion and check out the current repo
+  automatically
+
+- remove old kernel patches
+
+- atareinit is not needed anymore
+
+- update ipfstat patch and modify build scripts so that the patch is
+  used in stage 2 (and not in stage 3 anymore)
+
+- introduce environment variable "$MW_BUILDPATH" to avoid hard-coding
+  /usr/m0n0wall/build82 in all the scripts
+
 - major changes to build scripts: scripts no longer attempt to check
   out anything from the repository or directly download (curl/wget)
   from it. Instead, the user is expected to do an svn checkout to a

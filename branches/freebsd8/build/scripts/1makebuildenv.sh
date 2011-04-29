@@ -2,6 +2,11 @@
 
 set -e
 
+if [ ! -d $MW_BUILDPATH ]; then
+	echo "\$MW_BUILDPATH is not set"
+	exit 1
+fi
+
 # get build env ready
 	if [ ! -x /usr/local/bin/mkisofs ]; then
 		pkg_add -r cdrtools
@@ -13,17 +18,22 @@ set -e
 		pkg_add -r autoconf268
 	fi
 
+	cd $MW_BUILDPATH
+
+# ensure system time is correct
+	ntpdate pool.ntp.org
+
 # make filesystem structure for image
 	mkdir  m0n0fs tmp images
 	cd m0n0fs
 	mkdir -p etc/rc.d/ bin cf conf.default dev etc ftmp mnt proc root sbin tmp var libexec lib usr/bin usr/lib usr/libexec usr/local usr/sbin usr/share usr/local/bin usr/local/captiveportal usr/local/lib usr/local/sbin/.libs usr/local/www usr/share/misc boot/kernel
  
 # insert svn files to filesystem
-	cp -r ../freebsd8/phpconf/rc.* etc/
-	cp -r ../freebsd8/phpconf/inc etc/
-	cp -r ../freebsd8/etc/* etc
-	cp -r ../freebsd8/webgui/ usr/local/www/
-	cp -r ../freebsd8/captiveportal usr/local/
+	cp -r $MW_BUILDPATH/freebsd8/phpconf/rc.* etc/
+	cp -r $MW_BUILDPATH/freebsd8/phpconf/inc etc/
+	cp -r $MW_BUILDPATH/freebsd8/etc/* etc
+	cp -r $MW_BUILDPATH/freebsd8/webgui/ usr/local/www/
+	cp -r $MW_BUILDPATH/freebsd8/captiveportal usr/local/
  
 # set permissions
 	chmod -R 0755 usr/local/www/* usr/local/captiveportal/*
@@ -39,25 +49,22 @@ set -e
 	echo "1.8.0b0" > etc/version
  
 # get and set current default configuration
-	cp ../freebsd8/phpconf/config.xml conf.default/config.xml
+	cp $MW_BUILDPATH/freebsd8/phpconf/config.xml conf.default/config.xml
  
 # insert termcap and zoneinfo files
 	cp /usr/share/misc/termcap usr/share/misc
  
 # do zoneinfo.tgz and dev fs
 	cd tmp 
-	cp /usr/m0n0wall/build82/freebsd8/build/newbuild/files/zoneinfo.tgz /usr/m0n0wall/build82/m0n0fs/usr/share
-	perl /usr/m0n0wall/build82/freebsd8/build/minibsd/mkmini.pl /usr/m0n0wall/build82/freebsd8/build/minibsd/m0n0wall.files  / /usr/m0n0wall/build82/m0n0fs/
+	cp $MW_BUILDPATH/freebsd8/build/files/zoneinfo.tgz $MW_BUILDPATH/m0n0fs/usr/share
+	perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl $MW_BUILDPATH/freebsd8/build/minibsd/m0n0wall.files  / $MW_BUILDPATH/m0n0fs/
 
 # create php.ini	
-	cp /usr/m0n0wall/build82/freebsd8/build/newbuild/files/php.ini /usr/m0n0wall/build82/m0n0fs/usr/local/lib/php.ini
+	cp $MW_BUILDPATH/freebsd8/build/files/php.ini $MW_BUILDPATH/m0n0fs/usr/local/lib/php.ini
 
 # create login.conf
-	cp /usr/m0n0wall/build82/freebsd8/build/newbuild/files/login.conf /usr/m0n0wall/build82/m0n0fs/etc/
+	cp $MW_BUILDPATH/freebsd8/build/files/login.conf $MW_BUILDPATH/m0n0fs/etc/
 	
 # create missing etc files
-	tar -xzf /usr/m0n0wall/build82/freebsd8/build/newbuild/files/etcadditional.tgz -C /usr/m0n0wall/build82/m0n0fs/
-	cp /usr/m0n0wall/build82/freebsd8/build/newbuild/files/rc /usr/m0n0wall/build82/m0n0fs/etc
-	
-	cd ..
-	
+	tar -xzf $MW_BUILDPATH/freebsd8/build/files/etcadditional.tgz -C $MW_BUILDPATH/m0n0fs/
+	cp $MW_BUILDPATH/freebsd8/build/files/rc $MW_BUILDPATH/m0n0fs/etc

@@ -1,5 +1,5 @@
---- contrib/ipfilter/tools/ipfstat.c.orig	2007-11-18 12:03:27.000000000 +0100
-+++ contrib/ipfilter/tools/ipfstat.c	2008-03-01 17:26:29.000000000 +0100
+--- tools/ipfstat.c.orig	2009-07-21 11:13:58.000000000 +0200
++++ tools/ipfstat.c	2011-04-29 10:30:14.000000000 +0200
 @@ -59,9 +59,6 @@
  #  ifdef ERR
  #   undef ERR
@@ -19,7 +19,7 @@
  static	char	*getip __P((int, i6addr_t *));
  static	char	*ttl_to_string __P((long));
  static	int	sort_p __P((const void *, const void *));
-@@ -1187,8 +1182,6 @@
+@@ -1182,8 +1177,6 @@
  
  
  #ifdef STATETOP
@@ -28,7 +28,7 @@
  static void topipstates(saddr, daddr, sport, dport, protocol, ver,
  		        refreshtime, topclosed)
  i6addr_t saddr;
-@@ -1200,39 +1193,17 @@
+@@ -1195,39 +1188,17 @@
  int refreshtime;
  int topclosed;
  {
@@ -40,6 +40,7 @@
 +	int i, tsentry, ret = 0;
 +	int len, srclen, dstlen, forward = 1;
  	ips_stat_t ipsst, *ipsstp = &ipsst;
+ 	int token_type = IPFGENITER_STATE;
  	statetop_t *tstable = NULL, *tp;
  	const char *errstr = "";
  	ipstate_t ips;
@@ -67,12 +68,10 @@
 -	/* init hostname */
 -	gethostname(hostnm, sizeof(hostnm) - 1);
 -	hostnm[sizeof(hostnm) - 1] = '\0';
--
-+	
+ 
  	/* init ipfobj_t stuff */
  	bzero((caddr_t)&ipfo, sizeof(ipfo));
- 	ipfo.ipfo_rev = IPFILTER_VERSION;
-@@ -1240,15 +1211,12 @@
+@@ -1236,15 +1207,12 @@
  	ipfo.ipfo_size = sizeof(*ipsstp);
  	ipfo.ipfo_ptr = (void *)ipsstp;
  
@@ -89,7 +88,7 @@
  		}
  
  		/* clear the history */
-@@ -1390,132 +1358,11 @@
+@@ -1388,132 +1356,11 @@
  			}
  		}
  
@@ -188,14 +187,14 @@
 -		printw("Src: %s, Dest: %s, Proto: %s, Sorted by: %s\n\n",
 -		       str1, str2, str3, str4);
 -
--		/* 
+-		/*
 -		 * For an IPv4 IP address we need at most 15 characters,
 -		 * 4 tuples of 3 digits, separated by 3 dots. Enforce this
 -		 * length, so the colums do not change positions based
 -		 * on the size of the IP address. This length makes the
--		 * output fit in a 80 column terminal. 
+-		 * output fit in a 80 column terminal.
 -		 * We are lacking a good solution for IPv6 addresses (that
--		 * can be longer that 15 characters), so we do not enforce 
+-		 * can be longer that 15 characters), so we do not enforce
 -		 * a maximum on the IP field size.
 -		 */
 -		if (srclen < 15)
@@ -222,7 +221,7 @@
  		for (i = 0; i <= tsentry; i++) {
  			/* print src/dest and port */
  			if ((tp->st_p == IPPROTO_TCP) ||
-@@ -1532,14 +1379,11 @@
+@@ -1530,14 +1377,11 @@
  				sprintf(str2, "%s", getip(tp->st_v,
  				    &tp->st_dst));
  			}
@@ -239,7 +238,7 @@
  
  			/* print protocol */
  			proto = getprotobynumber(tp->st_p);
-@@ -1552,16 +1396,18 @@
+@@ -1550,16 +1394,18 @@
  			/* just print icmp for IPv6-ICMP */
  			if (tp->st_p == IPPROTO_ICMPV6)
  				strcpy(str1, "icmp");
@@ -262,7 +261,7 @@
  
  			if (reverse)
  				tp--;
-@@ -1569,55 +1415,6 @@
+@@ -1567,55 +1413,6 @@
  				tp++;
  		}
  
@@ -318,7 +317,7 @@
  	free(tstable);
  	if (ret != 0)
  		perror(errstr);
-@@ -1844,18 +1641,6 @@
+@@ -1842,18 +1639,6 @@
  
  
  #ifdef STATETOP

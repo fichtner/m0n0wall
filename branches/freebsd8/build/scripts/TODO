@@ -3,13 +3,11 @@ critical areas
 		dummynet now in sys/netinet/ipfw/ip_dummynet.c  patch fails as dummynet is VERY different, ip_input.c patch is irrelevent until this is fixed if still required.
 
 areas to investigate impact
-	printf and sed required for setkey as is .libs/setkey
     lnc kernel driver is gone from 8.1 etc
-	atareinit.c not found to compile in freebsd8 repo
 	if_vlan.ko and if_tap.ko not to be found except in /boot/kernel
 	
 	
 areas to improve
 	support for Serial as ALIX and WRAP will be nanoBSD based on GENERIC kernel
 	scripts to reverse the build scripts so you can do a clean build
-	avoid copying 1/2/3/4/5...sh scripts to /usr/m0n0wall/build82, but instead run them from /usr/m0n0wall/build82/build/newbuild directly (-> adjust paths etc.)
+	try to avoid building all the gnutls/libgpg stuff just for sixxs-aiccu
