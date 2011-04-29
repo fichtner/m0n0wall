@@ -142,7 +142,7 @@ function vpn_ipsec_configure($ipchg = false) {
 				fclose($fd);
 			
 				/* load SPD */
-				mwexec("/usr/local/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
+				mwexec("/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
 			}
 			
 			/* generate racoon.conf */
