@@ -1,5 +1,15 @@
 --- tools/ipfstat.c.orig	2009-07-21 11:13:58.000000000 +0200
 +++ tools/ipfstat.c	2011-04-29 10:30:14.000000000 +0200
+@@ -46,6 +46,9 @@
+ #  endif
+ # endif
+ #endif
++
++#define STATETOP 1
++
+ #if defined(STATETOP) && !defined(linux)
+ # include <netinet/ip_var.h>
+ # include <netinet/tcp_fsm.h>
 @@ -59,9 +59,6 @@
  #  ifdef ERR
  #   undef ERR
