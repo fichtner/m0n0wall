@@ -94,10 +94,6 @@ function interfaces_lan_configure() {
 		echo "Configuring LAN interface... ";
 	
 	$lancfg = $config['interfaces']['lan'];
-		
-	/* wireless configuration? */
-	if (is_array($lancfg['wireless']))
-		interfaces_wireless_configure($lancfg['if'], $lancfg['wireless']);
 	
 	/* MAC spoofing? */
 	if ($lancfg['spoofmac'])
@@ -366,11 +362,7 @@ function interfaces_optional_configure_if($opti) {
 		echo "Configuring OPT{$opti}{$optdescr} interface... ";
 	}
 	
-	if (isset($optcfg['enable'])) {
-		/* wireless configuration? */
-		if (is_array($optcfg['wireless']))
-			interfaces_wireless_configure($optcfg['if'], $optcfg['wireless']);
-		
+	if (isset($optcfg['enable'])) {		
 		/* MAC spoofing? */
 		if ($optcfg['spoofmac'])
 			mwexec("/sbin/ifconfig " . escapeshellarg($optcfg['if']) . 
@@ -439,64 +431,54 @@ function interfaces_optional_configure_if6($opti) {
 	return 0;
 }
 
-function interfaces_wireless_configure($if, $wlcfg) {
+function interfaces_wlan_configure() {
 	global $config, $g;
 	
 	/* wireless configuration */
-	
-	/* the mode/standard (11a/b/g) needs to be set separately */
-	if ($wlcfg['standard']) {
-		mwexec("/sbin/ifconfig " . escapeshellarg($if) . " mode " .
-			escapeshellarg($wlcfg['standard']));
-	}
-	
-	$ifcargs = escapeshellarg($if) . 
-		" ssid " . escapeshellarg($wlcfg['ssid']) . " channel " . 
-		escapeshellarg($wlcfg['channel']) . " ";
-	
-	switch ($wlcfg['mode']) {
-		case 'hostap':
-			$ifcargs .= "-mediaopt adhoc mediaopt hostap ";
-			break;
-		case 'ibss':
-		case 'IBSS':
-			if (strstr($if, "an"))
-				$ifcargs .= "mediaopt adhoc ";
-			else
-				$ifcargs .= "-mediaopt hostap mediaopt adhoc ";
-			break;
-		case 'bss':
-		case 'BSS':
-			if (strstr($if, "an"))
-				$ifcargs .= "-mediaopt adhoc ";
-			else
-				$ifcargs .= "-mediaopt hostap -mediaopt adhoc ";
-			break;
-	}
-	
-	$ifcargs .= "up";
-	
-	mwexec("/sbin/ifconfig " . $ifcargs);
-	
-	/* need to set AP-specific parameters in a separate ifconfig call */
-	if ($wlcfg['mode'] == "hostap") {
-		$ifcargs = escapeshellarg($if);
+	if (is_array($config['wlans']['wlan']) && count($config['wlans']['wlan'])) {
+		$i = 0;
 		
-		if (isset($wlcfg['hidessid']))
-			$ifcargs .= " hidessid";
-		else
-			$ifcargs .= " -hidessid";
+		foreach ($config['wlans']['wlan'] as $wlan) {
+			$wlanmode = "ap";
+			switch ($wlan['mode']) {
+				case 'ibss':
+				case 'IBSS':
+					$wlanmode = "ibss";
+					break;
+				case 'bss':
+				case 'BSS':
+					$wlanmode = "sta";
+					break;
+			}
 			
-		mwexec("/sbin/ifconfig " . $ifcargs);
+			/* create subinterface */
+			$ifcargs = "wlan$i create wlandev " . 
+				escapeshellarg($wlan['if']) . " wlanmode " . $wlanmode;
+			
+			if ($wlan['standard'])
+				$ifcargs .= " mode " . escapeshellarg($wlan['standard']);
+
+			$ifcargs .= " ssid " . escapeshellarg($wlan['ssid']) . " channel " . 
+				escapeshellarg($wlan['channel']);
+
+			if ($wlanmode == "ap" && isset($wlcfg['hidessid']))
+				$ifcargs .= " hidessid";
+				
+			$ifcargs .= " up";
+
+			mwexec("/sbin/ifconfig " . $ifcargs);
+
+			/* configure encryption (if needed) */
+			interfaces_wlan_configure_encryption("wlan$i", $wlan);
+			
+			$i++;
+		}
 	}
-	
-	/* configure encryption (if needed) */
-	interfaces_wireless_configure_encryption($if, $wlcfg);
 	
 	return 0;
 }
 
-function interfaces_wireless_configure_encryption($if, $wlcfg) {
+function interfaces_wlan_configure_encryption($if, $wlcfg) {
 	global $config, $g;
 	
 	/* kill any running hostapd */
@@ -515,7 +497,7 @@ function interfaces_wireless_configure_encryption($if, $wlcfg) {
 			/* write config to temporary file */
 			$fd = fopen("{$g['varetc_path']}/hostapd-$if.conf", "w");
 			if (!$fd) {
-				echo("Error: cannot open hostapd-$if.conf in interfaces_wireless_configure_encryption().\n");
+				echo("Error: cannot open hostapd-$if.conf in interfaces_wlan_configure_encryption().\n");
 				return 1;
 			}
 	
@@ -576,10 +558,6 @@ function interfaces_wan_configure() {
 	/* remove all addresses first */
 	while (mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " -alias") == 0);
 	mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . " down");
-	
-	/* wireless configuration? */
-	if (is_array($wancfg['wireless']))
-		interfaces_wireless_configure($wancfg['if'], $wancfg['wireless']);
 	
 	if ($wancfg['spoofmac'])
 		mwexec("/sbin/ifconfig " . escapeshellarg($wancfg['if']) . 

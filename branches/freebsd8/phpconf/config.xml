@@ -2,7 +2,7 @@
 <!-- m0n0wall default system configuration -->
 <!-- $Id$ -->
 <m0n0wall>
-	<version>1.8</version>
+	<version>1.9</version>
 	<lastchange></lastchange>
 	<system>
 		<hostname>m0n0wall</hostname>
@@ -61,9 +61,6 @@
 			<ipaddr6>xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx|6to4</ipaddr6>
 			<subnet6></subnet6>
 			<ipv6ra />
-			<wireless>
-				*see below (opt[n])*
-			</wireless>
 			-->
 		</lan>
 		<wan>
@@ -87,9 +84,6 @@
 				<tunnelid></tunnelid>
 			</aiccu>
 			<ispointtopoint/>
-			<wireless>
-				*see below (opt[n])*
-			</wireless>
 			-->
 		</wan>
 		<!--
@@ -105,32 +99,6 @@
 			<media></media>
 			<mediaopt></mediaopt>
 			<bridge>lan|wan|opt[n]</bridge>
-			<wireless>
-				<standard>11a|11b|11g</standard>
-				<mode>hostap *or* bss *or* ibss</mode>
-				<ssid></ssid>
-				<channel></channel>
-				<wep>
-					<enable/>
-					<key>
-						<txkey/>
-						<value></value>
-					</key>
-				</wep>
-				<hidessid/>
-				<wpa>
-					<mode>none|psk|enterprise</mode>
-					<version>1|2|3</version>
-					<cipher>tkip|ccmp|both</cipher>
-					<psk></psk>
-					<radius>
-						<server></server>
-						<authport></authport>
-						<acctport></acctport>
-						<secret></secret>
-					</radius>
-				</wpa>
-			</wireless>
 		</opt[n]>
 		-->
 	</interfaces>
@@ -142,6 +110,37 @@
 			<descr></descr>
 		</vlan>
 	</vlans>
+	-->
+	<!--
+	<wlans>
+		<wlan>
+			<if>ath0</if>
+			<standard>11a|11b|11g</standard>
+			<mode>hostap *or* bss *or* ibss</mode>
+			<ssid></ssid>
+			<channel></channel>
+			<wep>
+				<enable/>
+				<key>
+					<txkey/>
+					<value></value>
+				</key>
+			</wep>
+			<hidessid/>
+			<wpa>
+				<mode>none|psk|enterprise</mode>
+				<version>1|2|3</version>
+				<cipher>tkip|ccmp|both</cipher>
+				<psk></psk>
+				<radius>
+					<server></server>
+					<authport></authport>
+					<acctport></acctport>
+					<secret></secret>
+				</radius>
+			</wpa>
+		</wlan>
+	</wlans>
 	-->
 	<staticroutes>
 		<!--

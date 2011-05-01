@@ -47,9 +47,9 @@ $g = array(
     "xml_rootobj" => "m0n0wall",
     "pppoe_interface" => "ng0",
     "debug" => false,
-    "latest_config" => "1.8",
-    "wireless_regex" => "/^(wi|ath|an|ral|ural)/",
-    "wireless_hostap_regex" => "/^(wi|ath|ral|ural)/"
+    "latest_config" => "1.9",
+    "wireless_regex" => "/^(wi|an|ath|ral|rum|ural|zyd)/",
+    "wireless_hostap_regex" => "/^(wi|ath|ral|rum|ural)/"
 );
 
 ?>

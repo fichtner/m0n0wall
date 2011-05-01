@@ -73,12 +73,6 @@ if (ipv6enabled()) {
 	}
 }
 
-/* Wireless interface? */
-if (isset($optcfg['wireless'])) {
-	require("interfaces_wlan.inc");
-	wireless_config_init();
-}
-
 if ($_POST) {
 
 	unset($input_errors);
@@ -122,14 +116,6 @@ if ($_POST) {
 					$input_errors[] = "A valid RA MTU must be specified (56 - 1500).";
 				}
 			}
-		}
-	}
-	
-	/* Wireless interface? */
-	if (isset($optcfg['wireless'])) {
-		$wi_input_errors = wireless_config_post();
-		if ($wi_input_errors) {
-			$input_errors = array_merge($input_errors, $wi_input_errors);
 		}
 	}
 	
@@ -228,16 +214,9 @@ function enable_change(enable_over) {
 	document.iform.ispfix.disabled = !(pd  && !bridge_enable);
 	document.iform.slaid.disabled = !(pd  && !bridge_enable);
 <?php endif; ?>
-
-	if (document.iform.mode) {
-		 wlan_enable_change(enable_over);
-	}
 }
 //-->
 </script>
-<?php if (isset($optcfg['wireless'])): ?>
-<script type="text/javascript" src="interfaces_wlan.js"></script>
-<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if ($optcfg['if']): ?>
@@ -375,10 +354,6 @@ function enable_change(enable_over) {
                 </tr>
 
                 <?php endif; ?>
-				<?php /* Wireless interface? */
-				if (isset($optcfg['wireless']))
-					wireless_config_print();
-				?>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 
@@ -397,9 +372,6 @@ function enable_change(enable_over) {
 <script type="text/javascript">
 <!--
 enable_change(false);
-<?php if (isset($optcfg['wireless'])): ?>         
-wlan_enable_change(false);
-<?php endif; ?>
 //-->
 </script>
 <?php else: ?>

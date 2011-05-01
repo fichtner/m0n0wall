@@ -38,8 +38,8 @@ require("guiconfig.inc");
 	while "interface" refers to LAN, WAN, or OPTn.
 */
 
-/* get list without VLAN interfaces */
-$portlist = get_interface_list();
+/* get list without VLAN/WLAN virtual interfaces */
+$portlist = get_interface_list(true, false);
 
 /* add VLAN interfaces */
 if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
@@ -47,6 +47,16 @@ if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
 	foreach ($config['vlans']['vlan'] as $vlan) {
 		$portlist['vlan' . $i] = $vlan;
 		$portlist['vlan' . $i]['isvlan'] = true;
+		$i++;
+	}
+}
+
+/* add WLAN interfaces */
+if (is_array($config['wlans']['wlan']) && count($config['wlans']['wlan'])) {
+	$i = 0;
+	foreach ($config['wlans']['wlan'] as $wlan) {
+		$portlist['wlan' . $i] = $wlan;
+		$portlist['wlan' . $i]['iswlan'] = true;
 		$i++;
 	}
 }
@@ -186,6 +196,7 @@ if ($_GET['act'] == "add") {
   <ul id="tabnav">
     <li class="tabact">Interface assignments</li>
     <li class="tabinact"><a href="interfaces_vlan.php">VLANs</a></li>
+    <li class="tabinact"><a href="interfaces_wlan.php">WLANs</a></li>
   </ul>
   </td></tr>
   <tr> 
@@ -210,6 +221,11 @@ if ($_GET['act'] == "add") {
 		  <option value="<?=htmlspecialchars($portname);?>" <?php if ($portname == $iface['if']) echo "selected";?>> 
 		  <?php if ($portinfo['isvlan']) {
 		  			$descr = "VLAN {$portinfo['tag']} on {$portinfo['if']}";
+					if ($portinfo['descr'])
+						$descr .= " (" . $portinfo['descr'] . ")";
+					echo htmlspecialchars($descr);
+				  } else if ($portinfo['iswlan']) {
+		  			$descr = "WLAN \"{$portinfo['ssid']}\" on {$portinfo['if']}";
 					if ($portinfo['descr'])
 						$descr .= " (" . $portinfo['descr'] . ")";
 					echo htmlspecialchars($descr);

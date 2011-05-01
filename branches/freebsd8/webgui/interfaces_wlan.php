@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2011 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -32,54 +32,54 @@
 $pgtitle = array("Interfaces", "Assign network ports");
 require("guiconfig.inc");
 
-if (!is_array($config['vlans']['vlan']))
-	$config['vlans']['vlan'] = array();
+if (!is_array($config['wlans']['wlan']))
+	$config['wlans']['wlan'] = array();
 
-$a_vlans = &$config['vlans']['vlan'] ;
+$a_wlans = &$config['wlans']['wlan'] ;
 
-function vlan_inuse($num) {
+function wlan_inuse($num) {
 	global $config, $g;
 
-	if ($config['interfaces']['lan']['if'] == "vlan{$num}")
+	if ($config['interfaces']['lan']['if'] == "wlan{$num}")
 		return true;
-	if ($config['interfaces']['wan']['if'] == "vlan{$num}")
+	if ($config['interfaces']['wan']['if'] == "wlan{$num}")
 		return true;
 	
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-		if ($config['interfaces']['opt' . $i]['if'] == "vlan{$num}")
+		if ($config['interfaces']['opt' . $i]['if'] == "wlan{$num}")
 			return true;
 	}
 	
 	return false;
 }
 
-function renumber_vlan($if, $delvlan) {
-	if (!preg_match("/^vlan/", $if))
+function renumber_wlan($if, $delwlan) {
+	if (!preg_match("/^wlan/", $if))
 		return $if;
 	
-	$vlan = substr($if, 4);
-	if ($vlan > $delvlan)
-		return "vlan" . ($vlan - 1);
+	$wlan = substr($if, 4);
+	if ($wlan > $delwlan)
+		return "wlan" . ($wlan - 1);
 	else
 		return $if;
 }
 
 if ($_GET['act'] == "del") {
 	/* check if still in use */
-	if (vlan_inuse($_GET['id'])) {
-		$input_errors[] = "This VLAN cannot be deleted because it is still being used as an interface.";
+	if (wlan_inuse($_GET['id'])) {
+		$input_errors[] = "This WLAN cannot be deleted because it is still being used as an interface.";
 	} else {
-		unset($a_vlans[$_GET['id']]);
+		unset($a_wlans[$_GET['id']]);
 		
-		/* renumber all interfaces that use VLANs */
-		$config['interfaces']['lan']['if'] = renumber_vlan($config['interfaces']['lan']['if'], $_GET['id']);
-		$config['interfaces']['wan']['if'] = renumber_vlan($config['interfaces']['wan']['if'], $_GET['id']);
+		/* renumber all interfaces that use WLANs */
+		$config['interfaces']['lan']['if'] = renumber_wlan($config['interfaces']['lan']['if'], $_GET['id']);
+		$config['interfaces']['wan']['if'] = renumber_wlan($config['interfaces']['wan']['if'], $_GET['id']);
 		for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-			$config['interfaces']['opt' . $i]['if'] = renumber_vlan($config['interfaces']['opt' . $i]['if'], $_GET['id']);
+			$config['interfaces']['opt' . $i]['if'] = renumber_wlan($config['interfaces']['opt' . $i]['if'], $_GET['id']);
 		
 		write_config();
 		touch($d_sysrebootreqd_path);
-		header("Location: interfaces_vlan.php");
+		header("Location: interfaces_wlan.php");
 		exit;
 	}
 }
@@ -92,8 +92,8 @@ if ($_GET['act'] == "del") {
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
     <li class="tabinact1"><a href="interfaces_assign.php">Interface assignments</a></li>
-    <li class="tabact">VLANs</li>
-    <li class="tabinact"><a href="interfaces_wlan.php">WLANs</a></li>
+    <li class="tabinact"><a href="interfaces_vlan.php">VLANs</a></li>
+    <li class="tabact">WLANs</li>
   </ul>
   </td></tr>
   <tr> 
@@ -101,36 +101,28 @@ if ($_GET['act'] == "del") {
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
                   <td width="20%" class="listhdrr">Interface</td>
-                  <td width="20%" class="listhdrr">VLAN tag</td>
+                  <td width="20%" class="listhdrr">SSID</td>
                   <td width="50%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
-			  <?php $i = 0; foreach ($a_vlans as $vlan): ?>
+			  <?php $i = 0; foreach ($a_wlans as $wlan): ?>
                 <tr>
                   <td class="listlr">
-					<?=htmlspecialchars($vlan['if']);?>
+					<?=htmlspecialchars($wlan['if']);?>
                   </td>
                   <td class="listr">
-					<?=htmlspecialchars($vlan['tag']);?>
+					<?=htmlspecialchars($wlan['ssid']);?>
                   </td>
                   <td class="listbg">
-                    <?=htmlspecialchars($vlan['descr']);?>&nbsp;
+                    <?=htmlspecialchars($wlan['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="interfaces_vlan_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit VLAN" width="17" height="17" border="0" alt="edit VLAN"></a>
-                     &nbsp;<a href="interfaces_vlan.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this VLAN?')"><img src="x.gif" title="delete VLAN" width="17" height="17" border="0" alt="delete VLAN"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="interfaces_wlan_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit WLAN" width="17" height="17" border="0" alt="edit WLAN"></a>
+                     &nbsp;<a href="interfaces_wlan.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this WLAN?')"><img src="x.gif" title="delete WLAN" width="17" height="17" border="0" alt="delete WLAN"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
                   <td class="list" colspan="3">&nbsp;</td>
-                  <td class="list"> <a href="interfaces_vlan_edit.php"><img src="plus.gif" title="add VLAN" width="17" height="17" border="0" alt="add VLAN"></a></td>
-				</tr>
-				<tr>
-				<td colspan="3" class="list"><span class="vexpl"><span class="red"><strong>
-				  Note:<br>
-				  </strong></span>
-				  Not all drivers/NICs support 802.1Q VLAN tagging properly. On cards that do not explicitly support it, VLAN tagging will still work, but the reduced MTU may cause problems. See the m0n0wall homepage for information on supported cards.</span>
-				  </td>
-				<td class="list">&nbsp;</td>
+                  <td class="list"> <a href="interfaces_wlan_edit.php"><img src="plus.gif" title="add WLAN" width="17" height="17" border="0" alt="add WLAN"></a></td>
 				</tr>
               </table>
 			  </td>

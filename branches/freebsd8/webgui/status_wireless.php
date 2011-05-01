@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2011 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,15 @@
 $pgtitle = array("Status", "Wireless");
 require("guiconfig.inc");
 
-function get_wireless_info($ifdescr) {
+function get_wireless_info($wlan, $i) {
 	
 	global $config, $g;
 	
 	$ifinfo = array();
-	$ifinfo['if'] = $config['interfaces'][$ifdescr]['if'];
 	
-	if ($config['interfaces'][$ifdescr]['wireless']['mode'] != "hostap") {
+	if ($wlan['mode'] != "hostap") {
 		/* get scan list */
-		exec("/sbin/ifconfig -v " . $ifinfo['if'] . " list scan", $scanlist);
+		exec("/sbin/ifconfig -v wlan$i list scan", $scanlist);
 		
 		$ifinfo['scanlist'] = array();
 		$title = array_shift($scanlist);
@@ -67,11 +66,9 @@ function get_wireless_info($ifdescr) {
 				$ifinfo['scanlist'][] = $slent;
 			}
 		}
-	}
-	
-	/* if in hostap mode: get associated stations */
-	if ($config['interfaces'][$ifdescr]['wireless']['mode'] == "hostap") {
-		exec("/sbin/ifconfig -v " . $ifinfo['if'] . " list sta", $aslist);
+	} else {
+		/* if in hostap mode: get associated stations */
+		exec("/sbin/ifconfig -v wlan$i list sta", $aslist);
 		
 		$ifinfo['aslist'] = array();
 		array_shift($aslist);
@@ -94,34 +91,22 @@ function get_wireless_info($ifdescr) {
 
 ?>
 <?php include("fbegin.inc"); ?>
-<?php $i = 0; $ifdescrs = array();
-
-	if (is_array($config['interfaces']['wan']['wireless']))
-			$ifdescrs['wan'] = 'WAN';
-			
-	if (is_array($config['interfaces']['lan']['wireless']))
-			$ifdescrs['lan'] = 'LAN';
-	
-	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-		if (is_array($config['interfaces']['opt' . $j]['wireless']) &&
-			isset($config['interfaces']['opt' . $j]['enable']))
-			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
-	}
-		
-	if (count($ifdescrs) > 0): ?>
+<?php 		
+	if (count($config['wlans']['wlan']) > 0): ?>
             <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="wi-fi info pane">
               <?php
-			      foreach ($ifdescrs as $ifdescr => $ifname): 
-				  $ifinfo = get_wireless_info($ifdescr);
+			      for ($i = 0; $i < count($config['wlans']['wlan']); $i++):
+				  $wlan = $config['wlans']['wlan'][$i];
+				  $ifinfo = get_wireless_info($wlan, $i);
 			  ?>
-              <?php if ($i): ?>
+              <?php if ($i > 0): ?>
               <tr> 
                 <td colspan="8" class="list" height="12"></td>
               </tr>
               <?php endif; ?>
               <tr> 
                 <td colspan="2" class="listtopic"> 
-                  <?=htmlspecialchars($ifname);?> interface (SSID &quot;<?=htmlspecialchars($config['interfaces'][$ifdescr]['wireless']['ssid']);?>&quot;)</td>
+                  <?=htmlspecialchars($wlan['descr']);?> (SSID &quot;<?=htmlspecialchars($wlan['ssid']);?>&quot;)</td>
               </tr>
               <?php if (isset($ifinfo['scanlist'])): ?>
               <tr> 
@@ -196,7 +181,7 @@ function get_wireless_info($ifdescr) {
                     </tr>
                     <?php endforeach; ?>
                   </table><br>
-                  Flags: A = authorized, E = Extended Rate (802.11g), P = Power save mode<br>
+                  Flags: A = authorized, E = Extended Rate (802.11g), H = HT (802.11n), P = Power save mode, Q = QoS<br>
                   Capabilities: E = ESS (infrastructure mode), I = IBSS (ad-hoc mode), P = privacy (WEP/TKIP/AES),
                   	S = Short preamble, s = Short slot time
                   <?php else: ?>
@@ -204,7 +189,7 @@ function get_wireless_info($ifdescr) {
                   <?php endif; ?>
                   </td>
               </tr><?php endif; ?>
-              <?php $i++; endforeach; ?>
+              <?php endfor; ?>
             </table>
 <?php else: ?>
 <strong>No supported wireless interfaces were found for status display.</strong>

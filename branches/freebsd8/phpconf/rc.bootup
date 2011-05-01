@@ -75,6 +75,9 @@
 	/* set up VLAN virtual interfaces */
 	interfaces_vlan_configure();
 	
+	/* set up WLAN subinterfaces */
+	interfaces_wlan_configure();
+	
 	/* set up LAN interface */
 	interfaces_lan_configure();
 	

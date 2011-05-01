@@ -329,7 +329,7 @@ function is_port($port) {
 
 /* returns a list of interfaces with MAC addresses
    (skips VLAN and other virtual interfaces) */
-function get_interface_list() {
+function get_interface_list($ethernet = true, $wireless = true) {
 	
 	global $g;
 	
@@ -349,33 +349,44 @@ function get_interface_list() {
 		if (substr($ifname, -1) == "*")
 			$ifname = substr($ifname, 0, strlen($ifname) - 1);
 		
-		if (!preg_match("/^(ppp|sl|gif|faith|lo|ng|vlan|tun|enc)\d/", $ifname)) {
-			$iflist[$ifname] = array();
+		if (preg_match("/^(ppp|sl|gif|faith|lo|ng|vlan|wlan|tun|enc)\d/", $ifname))
+			continue;
+		
+		if (preg_match($g['wireless_regex'], $ifname)) {
+			/* this is a wireless interface - should we include it? */
+			if (!$wireless)
+				continue;
+		} else {
+			/* this is not a wireless interface (so we assume it's Ethernet) */
+			if (!$ethernet)
+				continue;
+		}
 			
-			$iflist[$ifname]['mac'] = chop($alink[3]);
-			$iflist[$ifname]['up'] = false;
-			
-			/* find out if the link on this interface is up */
-			unset($ifinfo);
-			exec("/sbin/ifconfig {$ifname}", $ifinfo);
-			
-			foreach ($ifinfo as $ifil) {
-				if (preg_match("/status: (.*)$/", $ifil, $matches)) {
-					if ($matches[1] == "active")
-						$iflist[$ifname]['up'] = true;
-					break;
-				}
+		$iflist[$ifname] = array();
+		
+		$iflist[$ifname]['mac'] = chop($alink[3]);
+		$iflist[$ifname]['up'] = false;
+		
+		/* find out if the link on this interface is up */
+		unset($ifinfo);
+		exec("/sbin/ifconfig {$ifname}", $ifinfo);
+		
+		foreach ($ifinfo as $ifil) {
+			if (preg_match("/status: (.*)$/", $ifil, $matches)) {
+				if ($matches[1] == "active")
+					$iflist[$ifname]['up'] = true;
+				break;
 			}
-			
-			/* try to figure out driver name */
-			if (preg_match("/$ifname:\s+<(.+?)>/", $dmesg, $matches)) {
-				/* truncate at 40 characters; some of these get really long
-				   and mess up the CLI and webGUI display */
-				$drvname = $matches[1];
-				if (strlen($drvname) > 40)
-					$drvname = substr($drvname, 0, 40) . "...";
-				$iflist[$ifname]['drvname'] = $drvname;
-			}
+		}
+		
+		/* try to figure out driver name */
+		if (preg_match("/$ifname:\s+<(.+?)>/", $dmesg, $matches)) {
+			/* truncate at 40 characters; some of these get really long
+			   and mess up the CLI and webGUI display */
+			$drvname = $matches[1];
+			if (strlen($drvname) > 40)
+				$drvname = substr($drvname, 0, 40) . "...";
+			$iflist[$ifname]['drvname'] = $drvname;
 		}
 	}
 	

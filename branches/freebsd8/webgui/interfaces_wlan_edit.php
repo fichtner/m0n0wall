@@ -1,9 +1,10 @@
+#!/usr/local/bin/php
 <?php 
 /*
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2011 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -28,8 +29,168 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$wlstandards = wireless_get_standards($optcfg['if']);
-$wlchannels = wireless_get_channellist($optcfg['if']);
+$pgtitle = array("Interfaces", "Assign network ports", "Edit WLAN");
+require("guiconfig.inc");
+
+if (!is_array($config['wlans']['wlan']))
+	$config['wlans']['wlan'] = array();
+
+$a_wlans = &$config['wlans']['wlan'];
+
+$portlist = get_interface_list(false, true);
+
+/* if there's only one interface, we can "pre-select" it */
+if (count($portlist) == 1) {
+	$pconfig = array();
+	foreach ($portlist as $pn => $pv) {
+		$pconfig['if'] = $pn;
+		break;
+	}
+}
+
+$id = $_GET['id'];
+if (isset($_POST['id']))
+	$id = $_POST['id'];
+
+if (isset($id) && $a_wlans[$id]) {
+	$pconfig['if'] = $a_wlans[$id]['if'];
+	$pconfig['descr'] = $a_wlans[$id]['descr'];
+	$pconfig['standard'] = $a_wlans[$id]['standard'];
+	$pconfig['mode'] = $a_wlans[$id]['mode'];
+	$pconfig['ssid'] = $a_wlans[$id]['ssid'];
+	$pconfig['channel'] = $a_wlans[$id]['channel'];
+	$pconfig['wep_enable'] = isset($a_wlans[$id]['wep']['enable']);
+	$pconfig['hidessid'] = isset($a_wlans[$id]['hidessid']);
+	
+	$pconfig['wpamode'] = $a_wlans[$id]['wpa']['mode'];
+	$pconfig['wpaversion'] = $a_wlans[$id]['wpa']['version'];
+	$pconfig['wpacipher'] = $a_wlans[$id]['wpa']['cipher'];
+	$pconfig['wpapsk'] = $a_wlans[$id]['wpa']['psk'];
+	$pconfig['radiusip'] = $a_wlans[$id]['wpa']['radius']['server'];
+	$pconfig['radiusauthport'] = $a_wlans[$id]['wpa']['radius']['authport'];
+	$pconfig['radiusacctport'] = $a_wlans[$id]['wpa']['radius']['acctport'];
+	$pconfig['radiussecret'] = $a_wlans[$id]['wpa']['radius']['secret'];
+	
+	if (is_array($a_wlans[$id]['wep']['key'])) {
+		$i = 1;
+		foreach ($a_wlans[$id]['wep']['key'] as $wepkey) {
+			$pconfig['key' . $i] = $wepkey['value'];
+			if (isset($wepkey['txkey']))
+				$pconfig['txkey'] = $i;
+			$i++;
+		}
+		if (!isset($wepkey['txkey']))
+			$pconfig['txkey'] = 1;
+	}
+}
+
+if ($_POST) {
+
+	unset($input_errors);
+	$pconfig = $_POST;
+
+	if (!$_POST['chgifonly']) {
+		/* input validation */
+		$reqdfields = "if mode ssid channel";
+		$reqdfieldsn = "Parent interface,Mode,SSID,Channel";
+	
+		if ($_POST['wpamode'] != "none") {
+			$reqdfields .= " wpaversion wpacipher";
+			$reqdfieldsn .= ",WPA version,WPA cipher";
+		
+			if ($_POST['wpamode'] == "psk") {
+				$reqdfields .= " wpapsk";
+				$reqdfieldsn .= ",WPA PSK";
+			} else if ($_POST['wpamode'] == "enterprise") {
+				$reqdfields .= " radiusip radiussecret";
+				$reqdfieldsn .= ",RADIUS IP,RADIUS Shared secret";
+			}
+		}
+	
+		do_input_validation($_POST, explode(" ", $reqdfields), explode(",", $reqdfieldsn), &$input_errors);
+	
+		if ($_POST['radiusip'] && !is_ipaddr($_POST['radiusip']))
+			$input_errors[] = "A valid RADIUS IP address must be specified.";
+		if ($_POST['radiusauthport'] && !is_port($_POST['radiusauthport']))
+			$input_errors[] = "A valid RADIUS authentication port number must be specified.";
+		if ($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))
+			$input_errors[] = "A valid RADIUS accounting port number must be specified.";
+
+		if ($_POST['wpapsk'] && !(strlen($_POST['wpapsk']) >= 8 && strlen($_POST['wpapsk']) <= 63))
+			$input_errors[] = "The WPA PSK must be between 8 and 63 characters long.";
+	
+		/* XXX - check whether multiple WLANs are supported on the physical interface */
+
+		if (!$input_errors) {
+			/* if an 11a channel is selected, the mode must be 11a too, and vice versa */
+			$is_chan_11a = (strpos($wlchannels[$_POST['channel']]['mode'], "11a") !== false);
+			$is_std_11a = ($_POST['standard'] == "11a");
+			if ($is_chan_11a && !$is_std_11a)
+				$input_errors[] = "802.11a channels can only be selected if the standard is set to 802.11a too.";
+			else if (!$is_chan_11a && $is_std_11a)
+				$input_errors[] = "802.11a can only be selected if an 802.11a channel is selected too.";
+		
+			/* currently, WPA is only supported in AP (hostap) mode */
+			if ($_POST['wpamode'] != "none" && $pconfig['mode'] != "hostap")
+				$input_errors[] = "WPA is only supported in hostap mode.";
+		}
+
+		if (!$input_errors) {
+			$wlan = array();
+			$wlan['if'] = $_POST['if'];
+			$wlan['descr'] = $_POST['descr'];
+		
+			$wlan['standard'] = $_POST['standard'];
+			$wlan['mode'] = $_POST['mode'];
+			$wlan['ssid'] = $_POST['ssid'];
+			$wlan['channel'] = $_POST['channel'];
+			$wlan['wep']['enable'] = $_POST['wep_enable'] ? true : false;
+			$wlan['hidessid'] = $_POST['hidessid'] ? true : false;
+		
+			$wlan['wep']['key'] = array();
+			for ($i = 1; $i <= 4; $i++) {
+				if ($_POST['key' . $i]) {
+					$newkey = array();
+					$newkey['value'] = $_POST['key' . $i];
+					if ($_POST['txkey'] == $i)
+						$newkey['txkey'] = true;
+					$wlan['wep']['key'][] = $newkey;
+				}
+			}
+		
+			$wlan['wpa'] = array();
+			$wlan['wpa']['mode'] = $_POST['wpamode'];
+			$wlan['wpa']['version'] = $_POST['wpaversion'];
+			$wlan['wpa']['cipher'] = $_POST['wpacipher'];
+			$wlan['wpa']['psk'] = $_POST['wpapsk'];
+			$wlan['wpa']['radius'] = array();
+			$wlan['wpa']['radius']['server'] = $_POST['radiusip'];
+			$wlan['wpa']['radius']['authport'] = $_POST['radiusauthport'];
+			$wlan['wpa']['radius']['acctport'] = $_POST['radiusacctport'];
+			$wlan['wpa']['radius']['secret'] = $_POST['radiussecret'];
+
+			if (isset($id) && $a_wlans[$id])
+				$a_wlans[$id] = $wlan;
+			else
+				$a_wlans[] = $wlan;
+		
+			write_config();		
+			touch($d_sysrebootreqd_path);
+			header("Location: interfaces_wlan.php");
+			exit;
+		}
+	}
+}
+
+/* If a physical interface has been selected at this point, we can
+   determine the supported standards and channels */
+if ($pconfig['if']) {
+	$wlstandards = wireless_get_standards($pconfig['if']);
+	$wlchannels = wireless_get_channellist($pconfig['if']);
+} else {
+	$wlstandards = array();
+	$wlchannels = array();
+}
 
 function wireless_get_standards($if) {
 	$standards = array();
@@ -53,7 +214,30 @@ function wireless_get_channellist($if) {
 	
 	$chanlist = array();
 	
-	$fd = popen("/sbin/ifconfig $if list chan", "r");
+	/* cannot get channels from physical interface anymore - need a
+	   subinterface. Find out if there is already one for this physical
+	   interface; if not, create one and destroy it again afterwards */
+	unset($subif);
+	$fd = popen("/sbin/sysctl -a net.wlan", "r");
+	if ($fd) {
+		while (!feof($fd)) {
+			$line = trim(fgets($fd));
+			if (preg_match("/^net\.wlan\.(\d+)\.%parent: (\S+)$/", $line, $matches)) {
+				if ($matches[2] == $if) {
+					$subif = "wlan" . $matches[1];
+					break;
+				}
+			}
+		}
+		pclose($fd);
+	}
+	
+	if (!isset($subif)) {
+		$subif = "wlan999";
+		mwexec("/sbin/ifconfig wlan999 create wlandev " . escapeshellarg($if));
+	}
+	
+	$fd = popen("/sbin/ifconfig $subif list chan", "r");
 	if ($fd) {
 		while (!feof($fd)) {
 			$line = trim(fgets($fd));
@@ -62,7 +246,7 @@ function wireless_get_channellist($if) {
 			$chans = explode("Channel", $line);
 			
 			foreach ($chans as $chan) {
-				if (preg_match("/(\d+)\s+:\s+(\d+)\s+Mhz\s+(.+)/", $chan, $matches)) {
+				if (preg_match("/(\d+)\s+:\s+(\d+)\s+MHz\s+(.+)/i", $chan, $matches)) {
 					$chaninfo = array();
 					$chaninfo['chan'] = $matches[1];
 					$chaninfo['freq'] = $matches[2];
@@ -75,141 +259,76 @@ function wireless_get_channellist($if) {
 		pclose($fd);
 	}
 	
+	if ($subif == "wlan999")
+		mwexec("/sbin/ifconfig wlan999 destroy");
+	
 	ksort($chanlist, SORT_NUMERIC);
 	
 	return $chanlist;
 }
 
-function wireless_config_init() {
-	global $optcfg, $pconfig;
-	
-	$pconfig['standard'] = $optcfg['wireless']['standard'];
-	$pconfig['mode'] = $optcfg['wireless']['mode'];
-	$pconfig['ssid'] = $optcfg['wireless']['ssid'];
-	$pconfig['channel'] = $optcfg['wireless']['channel'];
-	$pconfig['wep_enable'] = isset($optcfg['wireless']['wep']['enable']);
-	$pconfig['hidessid'] = isset($optcfg['wireless']['hidessid']);
-	
-	$pconfig['wpamode'] = $optcfg['wireless']['wpa']['mode'];
-	$pconfig['wpaversion'] = $optcfg['wireless']['wpa']['version'];
-	$pconfig['wpacipher'] = $optcfg['wireless']['wpa']['cipher'];
-	$pconfig['wpapsk'] = $optcfg['wireless']['wpa']['psk'];
-	$pconfig['radiusip'] = $optcfg['wireless']['wpa']['radius']['server'];
-	$pconfig['radiusauthport'] = $optcfg['wireless']['wpa']['radius']['authport'];
-	$pconfig['radiusacctport'] = $optcfg['wireless']['wpa']['radius']['acctport'];
-	$pconfig['radiussecret'] = $optcfg['wireless']['wpa']['radius']['secret'];
-	
-	if (is_array($optcfg['wireless']['wep']['key'])) {
-		$i = 1;
-		foreach ($optcfg['wireless']['wep']['key'] as $wepkey) {
-			$pconfig['key' . $i] = $wepkey['value'];
-			if (isset($wepkey['txkey']))
-				$pconfig['txkey'] = $i;
-			$i++;
-		}
-		if (!isset($wepkey['txkey']))
-			$pconfig['txkey'] = 1;
-	}
-}
-
-function wireless_config_post() {
-	global $optcfg, $pconfig, $wlchannels;
-
-	unset($input_errors);
-
-	/* input validation */
-	if ($_POST['enable']) {
-		$reqdfields = "mode ssid channel";
-		$reqdfieldsn = "Mode,SSID,Channel";
-		
-		if ($_POST['wpamode'] != "none") {
-			$reqdfields .= " wpaversion wpacipher";
-			$reqdfieldsn .= ",WPA version,WPA cipher";
-			
-			if ($_POST['wpamode'] == "psk") {
-				$reqdfields .= " wpapsk";
-				$reqdfieldsn .= ",WPA PSK";
-			} else if ($_POST['wpamode'] == "enterprise") {
-				$reqdfields .= " radiusip radiussecret";
-				$reqdfieldsn .= ",RADIUS IP,RADIUS Shared secret";
-			}
-		}
-		
-		do_input_validation($_POST, explode(" ", $reqdfields), explode(",", $reqdfieldsn), &$input_errors);
-		
-		if ($_POST['radiusip'] && !is_ipaddr($_POST['radiusip']))
-			$input_errors[] = "A valid RADIUS IP address must be specified.";
-		if ($_POST['radiusauthport'] && !is_port($_POST['radiusauthport']))
-			$input_errors[] = "A valid RADIUS authentication port number must be specified.";
-		if ($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))
-			$input_errors[] = "A valid RADIUS accounting port number must be specified.";
-	
-		if ($_POST['wpapsk'] && !(strlen($_POST['wpapsk']) >= 8 && strlen($_POST['wpapsk']) <= 63))
-			$input_errors[] = "The WPA PSK must be between 8 and 63 characters long.";
-	
-		if (!$input_errors) {
-			/* bridge check (hostap only!) */
-			if ($pconfig['bridge'] && ($pconfig['mode'] != "hostap"))
-				$input_errors[] = "Bridging a wireless interface is only possible in hostap mode.";
-				
-			/* if an 11a channel is selected, the mode must be 11a too, and vice versa */
-			$is_chan_11a = (strpos($wlchannels[$_POST['channel']]['mode'], "11a") !== false);
-			$is_std_11a = ($_POST['standard'] == "11a");
-			if ($is_chan_11a && !$is_std_11a)
-				$input_errors[] = "802.11a channels can only be selected if the standard is set to 802.11a too.";
-			else if (!$is_chan_11a && $is_std_11a)
-				$input_errors[] = "802.11a can only be selected if an 802.11a channel is selected too.";
-			
-			/* currently, WPA is only supported in AP (hostap) mode */
-			if ($_POST['wpamode'] != "none" && $pconfig['mode'] != "hostap")
-				$input_errors[] = "WPA is only supported in hostap mode.";
-		}
-	}
-
-	if (!$input_errors) {
-	
-		$optcfg['wireless']['standard'] = $_POST['standard'];
-		$optcfg['wireless']['mode'] = $_POST['mode'];
-		$optcfg['wireless']['ssid'] = $_POST['ssid'];
-		$optcfg['wireless']['channel'] = $_POST['channel'];
-		$optcfg['wireless']['wep']['enable'] = $_POST['wep_enable'] ? true : false;
-		$optcfg['wireless']['hidessid'] = $_POST['hidessid'] ? true : false;
-		
-		$optcfg['wireless']['wep']['key'] = array();
-		for ($i = 1; $i <= 4; $i++) {
-			if ($_POST['key' . $i]) {
-				$newkey = array();
-				$newkey['value'] = $_POST['key' . $i];
-				if ($_POST['txkey'] == $i)
-					$newkey['txkey'] = true;
-				$optcfg['wireless']['wep']['key'][] = $newkey;
-			}
-		}
-		
-		$optcfg['wireless']['wpa'] = array();
-		$optcfg['wireless']['wpa']['mode'] = $_POST['wpamode'];
-		$optcfg['wireless']['wpa']['version'] = $_POST['wpaversion'];
-		$optcfg['wireless']['wpa']['cipher'] = $_POST['wpacipher'];
-		$optcfg['wireless']['wpa']['psk'] = $_POST['wpapsk'];
-		$optcfg['wireless']['wpa']['radius'] = array();
-		$optcfg['wireless']['wpa']['radius']['server'] = $_POST['radiusip'];
-		$optcfg['wireless']['wpa']['radius']['authport'] = $_POST['radiusauthport'];
-		$optcfg['wireless']['wpa']['radius']['acctport'] = $_POST['radiusacctport'];
-		$optcfg['wireless']['wpa']['radius']['secret'] = $_POST['radiussecret'];
-	}
-	
-	return $input_errors;
-}
-
-function wireless_config_print() {
-	global $g, $optcfg, $pconfig, $wlchannels, $wlstandards;
 ?>
-                <tr> 
-                  <td colspan="2" valign="top" height="16"></td>
-				</tr>
-                <tr> 
-                  <td colspan="2" valign="top" class="listtopic">Wireless configuration</td>
-				</tr>
+<?php include("fbegin.inc"); ?>
+<script type="text/javascript">
+<!--
+function wlan_enable_change(enable_over) {
+	
+	// WPA only in hostap mode
+	var wpa_enable = (document.iform.mode.options[document.iform.mode.selectedIndex].value == "hostap") || enable_over;
+	var wpa_opt_enable = (document.iform.wpamode.options[document.iform.wpamode.selectedIndex].value != "none") || enable_over;
+	
+	// enter WPA PSK only in PSK mode
+	var wpa_psk_enable = (document.iform.wpamode.options[document.iform.wpamode.selectedIndex].value == "psk") || enable_over;
+	
+	// RADIUS server only in WPA Enterprise mode
+	var wpa_ent_enable = (document.iform.wpamode.options[document.iform.wpamode.selectedIndex].value == "enterprise") || enable_over;
+	
+	// WEP only if WPA is disabled
+	var wep_enable = (document.iform.wpamode.options[document.iform.wpamode.selectedIndex].value == "none") || enable_over;
+	
+	var wep_key_enable = document.iform.wep_enable.checked;
+	document.iform.wep_enable.disabled = !wep_enable;
+	document.iform.key1.disabled = !wep_key_enable;
+	document.iform.key2.disabled = !wep_key_enable;
+	document.iform.key3.disabled = !wep_key_enable;
+	document.iform.key4.disabled = !wep_key_enable;
+	
+	document.iform.wpaversion.disabled = !wpa_opt_enable;
+	document.iform.wpacipher.disabled = !wpa_opt_enable;
+	document.iform.wpapsk.disabled = !wpa_psk_enable;
+	document.iform.radiusip.disabled = !wpa_ent_enable;
+	document.iform.radiusauthport.disabled = !wpa_ent_enable;
+	document.iform.radiusacctport.disabled = !wpa_ent_enable;
+	document.iform.radiussecret.disabled = !wpa_ent_enable;
+}
+//-->
+</script>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
+            <form action="interfaces_wlan_edit.php" method="post" name="iform" id="iform">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
+				<tr>
+                  <td width="22%" valign="top" class="vncellreq">Parent interface</td>
+                  <td width="78%" class="vtable"> 
+                    <select name="if" class="formfld" onchange="document.iform.chgifonly.value='1'; document.iform.submit()">
+                      <?php
+					  foreach ($portlist as $ifn => $ifinfo): ?>
+                      <option value="<?=htmlspecialchars($ifn);?>" <?php if ($ifn == $pconfig['if']) echo "selected"; ?>> 
+					  <?php if ($ifinfo['drvname'])
+							echo htmlspecialchars($ifn . " (" . $ifinfo['drvname'] . ", " .  $ifinfo['mac'] . ")");
+						else
+							echo htmlspecialchars($ifn . " (" . $ifinfo['mac'] . ")");
+					  ?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select></td>
+                </tr>
+				<tr>
+                  <td width="22%" valign="top" class="vncell">Description</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
+                    <br> <span class="vexpl">You may enter a description here
+                    for your reference (not parsed).</span></td>
+                </tr>
                 <tr>
                   <td valign="top" class="vncellreq">Standard</td>
                   <td class="vtable"><select name="standard" class="formfld" id="standard">
@@ -226,25 +345,22 @@ function wireless_config_print() {
                   <td class="vtable"><select name="mode" class="formfld" id="mode" onChange="wlan_enable_change(false)">
                       <?php 
 						$opts = array();
-						if (preg_match($g['wireless_hostap_regex'], $optcfg['if']))
-							$opts[] = "hostap";
-						$opts[] = "BSS";
-						$opts[] = "IBSS";
-				foreach ($opts as $opt): ?>
-                      <option <?php if ($opt == $pconfig['mode']) echo "selected";?>> 
-                      <?=htmlspecialchars($opt);?>
+						if (preg_match($g['wireless_hostap_regex'], $pconfig['if']))
+							$opts['hostap'] = "AP";
+						$opts['bss'] = "BSS (Station)";
+						$opts['ibss'] = "IBSS (ad-hoc)";
+					  foreach ($opts as $optn => $optv): ?>
+                      <option value="<?=$optn?>" <?php if ($optn == $pconfig['mode']) echo "selected";?>> 
+                      <?=htmlspecialchars($optv);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <br>
-                    Note: To create an access-point, choose &quot;hostap&quot; mode.
-                    IBSS mode is sometimes also called &quot;ad-hoc&quot; 
-                    mode; BSS mode is also known as &quot;infrastructure&quot; mode.</td>
+                    </select></td>
 				</tr>
                 <tr> 
                   <td valign="top" class="vncellreq">SSID</td>
                   <td class="vtable"><?=$mandfldhtml;?><input name="ssid" type="text" class="formfld" id="ssid" size="20" value="<?=htmlspecialchars($pconfig['ssid']);?>">
                     <br><br><input type="checkbox" name="hidessid" id="hidessid" value="1" <?php if ($pconfig['hidessid']) echo "checked";?>><strong>Hide SSID</strong><br>
-                    If this option is selected, the SSID will not be broadcast in hostap mode, and only clients that
+                    If this option is selected, the SSID will not be broadcast in AP mode, and only clients that
                     know the exact SSID will be able to connect. Note that this option should never be used
                     as a substitute for proper security/encryption settings.
                   </td>
@@ -344,7 +460,7 @@ function wireless_config_print() {
                 </tr>
                 <tr> 
                   <td valign="top" class="vncell">WEP</td>
-                  <td class="vtable"> <input name="wep_enable" type="checkbox" id="wep_enable" value="yes" <?php if ($pconfig['wep_enable']) echo "checked"; ?>> 
+                  <td class="vtable"> <input name="wep_enable" type="checkbox" id="wep_enable" value="yes" <?php if ($pconfig['wep_enable']) echo "checked"; ?> onChange="wlan_enable_change(false)"> 
                     <strong>Enable WEP</strong>
                     <table border="0" cellspacing="0" cellpadding="0">
                       <tr> 
@@ -380,4 +496,16 @@ function wireless_config_print() {
                     104 (128) bit keys may be entered as 13 ASCII characters or 
                     26 hex digits preceded by '0x'.</td>
                 </tr>
-<?php } ?>
+                <tr>
+                  <td width="22%" valign="top">&nbsp;</td>
+                  <td width="78%"> 
+                    <input name="Submit" type="submit" class="formbtn" value="Save">
+                    <?php if (isset($id) && $a_wlans[$id]): ?>
+                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
+                    <?php endif; ?>
+					<input name="chgifonly" type="hidden" value="">
+                  </td>
+                </tr>
+              </table>
+</form>
+<?php include("fend.inc"); ?>

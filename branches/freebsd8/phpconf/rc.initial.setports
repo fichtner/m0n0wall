@@ -35,7 +35,7 @@
 	
 	$fp = fopen('php://stdin', 'r');
 	
-	$iflist = get_interface_list();
+	$iflist = get_interface_list(true, false);
 	
 	echo <<<EOD
 
@@ -50,6 +50,9 @@ EOD;
 	}
 	
 	echo <<<EOD
+
+Note that wireless LAN interfaces are not included in the list above;
+they can be set up through the webGUI later on.
 
 Do you want to set up VLANs first?
 If you're not going to use VLANs, or only for optional interfaces, you
@@ -233,7 +236,7 @@ EOD;
 	}
 	
 	function autodetect_interface($ifname, $fp) {
-		$iflist_prev = get_interface_list();
+		$iflist_prev = get_interface_list(true, false);
 		echo <<<EOD
 
 Connect the {$ifname} interface now and make sure that the link is up.
@@ -241,7 +244,7 @@ Then press ENTER to continue.
 
 EOD;
 		fgets($fp);
-		$iflist = get_interface_list();
+		$iflist = get_interface_list(true, false);
 		
 		foreach ($iflist_prev as $ifn => $ifa) {
 			if (!$ifa['up'] && $iflist[$ifn]['up']) {

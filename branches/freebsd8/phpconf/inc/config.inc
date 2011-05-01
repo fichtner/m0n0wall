@@ -166,7 +166,7 @@ if (!$noparseconfig) {
 						
 					echo "Detecting LAN interface.\n";
 				
-				    $iflist = get_interface_list();
+				    $iflist = get_interface_list(true, false);
 				
 				    foreach ($iflist as $iface => $ifa) {
 				    	if ($ifa['up']) {
@@ -244,27 +244,6 @@ function conf_mount_ro() {
 /* convert configuration, if necessary */
 function convert_config() {
 	global $config, $g;
-
-	/* Special solution for embedded: if interfaces in config use sisX, but
-	   we only have vrX, then change all (for migrating from WRAP to ALIX
-	   or Soekris 4xxx to 5xxx) */
-	if ($g['booting'] && ($g['platform'] == "embedded") &&
-		strpos($config['interfaces']['lan']['if'], "sis") === 0) {
-	
-		$iflist = get_interface_list();
-		if (!isset($iflist['sis0']) && isset($iflist['vr0'])) {
-		
-			echo "Changing sisX interface names to vrX...";
-			$config['interfaces']['lan']['if']  = str_replace("sis", "vr", $config['interfaces']['lan']['if']);
-			$config['interfaces']['wan']['if']  = str_replace("sis", "vr", $config['interfaces']['wan']['if']);
-			
-			for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-				$config['interfaces']['opt' . $i]['if'] = str_replace("sis", "vr", $config['interfaces']['opt' . $i]['if']);
-			
-			write_config();
-			echo "done\n";
-		}
-	}
 	
 	if ($config['version'] == $g['latest_config'] && !isset($config['system']['timeservers-randomize']))
 		return;		/* already at latest version */
@@ -636,6 +615,28 @@ function convert_config() {
 			$config['system']['timeservers-randomize'] = true;
 		
 		$config['version'] = "1.8";
+	}
+	
+	/* convert 1.8 -> 1.9 */
+	if ($config['version'] == "1.8") {
+		/* move WLAN configuration to separate section (FreeBSD 8 uses
+		   subinterfaces attached to the physical interface, a bit like VLAN) */
+		$config['wlans'] = array();
+		$config['wlans']['wlan'] = array();
+		
+		$i = 0;
+		foreach ($config['interfaces'] as $ifn => $if) {
+			if (isset($config['interfaces'][$ifn]['wireless'])) {
+				$wlan = $config['interfaces'][$ifn]['wireless'];
+				$wlan['if'] = $config['interfaces'][$ifn]['if'];
+				$config['wlans']['wlan'][] = $wlan;
+				unset($config['interfaces'][$ifn]['wireless']);
+				$config['interfaces'][$ifn]['if'] = "wlan" . $i;
+				$i++;
+			}
+		}
+		
+		$config['version'] = "1.9";
 	}
 
 	/* choose a random NTP server (first time startup)? */
