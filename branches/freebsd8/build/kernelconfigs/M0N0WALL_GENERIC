@@ -269,7 +269,10 @@ device		usb		# USB Bus (required)
 device		uhid		# "Human Interface Devices"
 device		ukbd		# Keyboard
 device		umass		# Disks/Mass storage - Requires scbus and da
-
+# USB Serial devices
+device		u3g		# USB-based 3G modems (Option, Huawei, Sierra)
+# USB tty support
+device		ucom		# Required by u3g
 # USB Ethernet, requires miibus
 device		aue		# ADMtek USB Ethernet
 device		axe		# ASIX Electronics USB Ethernet

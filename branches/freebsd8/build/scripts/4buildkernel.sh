@@ -20,6 +20,8 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/mlfk_ipl.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/pfil.c.orig.patch 
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/g_part_bsd.c.orig.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/usbdevs.orig.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/u3g.c.orig.patch
 
 
 # kernel compile
