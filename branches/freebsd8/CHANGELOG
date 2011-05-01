@@ -2,6 +2,18 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- introduce generic-pc-serial image
+
+- stop patching bootloader: it's kind of hopeless to try and reuse
+  the BIOS preset serial baudrate; some BIOSes don't even set it,
+  and on ALIX it doesn't work properly either. A fixed 9600 baud
+  is probably the lesser evil.
+
+- add regdomain.xml (required for proper WLAN support)
+
+- drop uath from kernel - requires firmware download program,
+  probably not worth the hassle since it can't do hostap anyway
+
 - add kernel support for 3g modems with u3g 
 
 - fixup go.sh for csh instead of bashisms

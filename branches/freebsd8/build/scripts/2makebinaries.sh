@@ -2,7 +2,7 @@
 
 set -e
 
-if [ ! -d $MW_BUILDPATH ]; then
+if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	echo "\$MW_BUILDPATH is not set"
 	exit 1
 fi
