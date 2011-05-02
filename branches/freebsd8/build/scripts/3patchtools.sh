@@ -11,7 +11,7 @@ fi
         cd /usr/src/usr.sbin/syslogd
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/syslogd.c.ipv6.patch
         cd /usr/src
-		patch < $MW_BUILDPATH/freebsd8/build/patches/user/syslogd.c.patch
+	patch < $MW_BUILDPATH/freebsd8/build/patches/user/syslogd.c.patch
         cd usr.sbin
         tar xfvz $MW_BUILDPATH/freebsd8/build/patches/user/clog-1.0.1.tar.gz
         cd syslogd
@@ -25,4 +25,5 @@ fi
         chmod a+rx $MW_BUILDPATH/m0n0fs/sbin/dhclient-script
 
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
-		find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null
+set +e
+	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null

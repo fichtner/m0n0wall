@@ -1,7 +1,5 @@
 #!/usr/local/bin/bash
 
-set -e
-
 /usr/local/bin/bash 1makebuildenv.sh
 /usr/local/bin/bash 2makebinaries.sh
 /usr/local/bin/bash 3patchtools.sh

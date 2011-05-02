@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fixup go.sh to find svn and  stage 3 to not exit on strip harmless errors
+
 - major overhaul of wireless LAN support: in FreeBSD 8, it is always
   necessary to create subinterfaces (wlanX) attached to the actual
   physical interfaces (e.g. athX). On some cards, it is now also

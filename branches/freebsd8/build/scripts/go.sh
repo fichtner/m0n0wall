@@ -13,7 +13,7 @@ if ( ! -x /usr/local/bin/svn ) then
 endif
 
 # figure out if we're already running from within a repository
-set svninfo=`svn info freebsd8 >& /dev/null`
+set svninfo=`/usr/local/bin/svn info freebsd8 >& /dev/null`
 if  ( $status != 1 ) then
 	echo "Found existing working copy"
 else
