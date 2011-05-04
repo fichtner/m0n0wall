@@ -4440,7 +4440,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_lookup.h sys/contrib/ipfilter/neti
  
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet/ip_nat.c
 --- sys.orig/contrib/ipfilter/netinet/ip_nat.c	2010-12-21 18:09:25.000000000 +0100
-+++ sys/contrib/ipfilter/netinet/ip_nat.c	2011-04-27 13:03:01.000000000 +0200
++++ sys/contrib/ipfilter/netinet/ip_nat.c	2011-05-04 10:42:10.000000000 +0200
 @@ -1,9 +1,9 @@
 -/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_nat.c,v 1.47.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
 -
@@ -5447,7 +5447,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  	}
  
  	return error;
-@@ -5257,12 +5259,14 @@
+@@ -5257,9 +5259,10 @@
  /* linked lists of NAT related information to go through: NAT rules, active */
  /* NAT mappings and the NAT fragment cache.                                 */
  /* ------------------------------------------------------------------------ */
@@ -5459,11 +5459,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  {
  	int error;
  
-+printf("nat_iterator\n");
- 	if (itp->igi_data == NULL)
- 		return EFAULT;
- 
-@@ -5273,7 +5277,7 @@
+@@ -5273,7 +5276,7 @@
  	case IPFGENITER_HOSTMAP :
  	case IPFGENITER_IPNAT :
  	case IPFGENITER_NAT :
@@ -5472,7 +5468,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  		break;
  
  	case IPFGENITER_NATFRAG :
-@@ -5394,11 +5398,11 @@
+@@ -5394,11 +5397,11 @@
  			removed++;
  		}
  		break;
@@ -5486,7 +5482,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  		/*
  		 * Take a large arbitrary number to mean the number of seconds
  		 * for which which consider to be the maximum value we'll allow
-@@ -5466,19 +5470,19 @@
+@@ -5466,19 +5469,19 @@
  	ipftable_t table;
  	int error;
  
@@ -5509,7 +5505,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  				ipf_nattable_sz * sizeof(u_long));
  		break;
  
-@@ -5491,3 +5495,56 @@
+@@ -5491,3 +5494,56 @@
  	}
  	return error;
  }

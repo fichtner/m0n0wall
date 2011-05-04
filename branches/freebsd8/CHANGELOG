@@ -2,6 +2,20 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- remove ipfw.ko dependency on libalias.ko
+
+- take port options out of .tgz for easier maintenance
+
+- remove stray "nat_iterator" printf from ipnat
+
+- remove ip_input/dummynet/mbuf patches; dummynet + bridging appears
+  to work fine now with 8.2
+
+- add ucd-snmp sysDescr patch back in
+
+- remove filtering bridge reminder on System: Advanced page - can't
+  keep this forever
+
 - fixup go.sh to find svn and  stage 3 to not exit on strip harmless errors
 
 - major overhaul of wireless LAN support: in FreeBSD 8, it is always

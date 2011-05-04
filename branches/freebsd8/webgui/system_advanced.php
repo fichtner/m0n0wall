@@ -171,23 +171,6 @@ if ($_POST) {
                   <td colspan="2" class="list" height="12"></td>
                 </tr>
 				<tr> 
-                  <td colspan="2" valign="top" class="listtopic">Filtering bridge</td>
-                </tr>
-                <tr> 
-                  <td width="22%" valign="top" class="vncell">&nbsp;</td>
-                  <td width="78%" class="vtable"> 
-                    <strong>Enable filtering bridge</strong><span class="vexpl"><br>
-                    This is no longer available because it is not applicable with
-                    if_bridge, the new way of bridging in FreeBSD. Filtering always
-                    occurs on the member interfaces of the bridge. It is retained
-                    here as a notice for those accustomed to using this option.
-                    </span></td>
-                </tr>
-                
-				<tr> 
-                  <td colspan="2" class="list" height="12"></td>
-                </tr>
-				<tr> 
                   <td colspan="2" valign="top" class="listtopic">Spoof Checking</td>
                 </tr>
                 <tr> 

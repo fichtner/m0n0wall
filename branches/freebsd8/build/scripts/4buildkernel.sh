@@ -14,7 +14,6 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/options.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_ftp_pxy.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_nat.c.orig.patch
-		# patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_input.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/fil.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_state.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/mlfk_ipl.c.orig.patch

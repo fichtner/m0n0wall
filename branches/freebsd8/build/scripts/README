@@ -10,8 +10,10 @@ http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html).
 At this point, you can either
 
 a) check out a repository (svn co http://svn.m0n0.ch/wall/branches/freebsd8),
-   make any desired local changes, then cd into build/scripts and
-   execute go.sh
+   make any desired local changes, then execute go.sh while outside
+   the working copy:
+
+	# freebsd8/build/scripts/go.sh
 
    Note that any new files must be 'svn add'ed in order to appear in
    the exported build directory (but no need to commit yet)

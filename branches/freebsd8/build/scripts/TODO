@@ -1,11 +1,9 @@
 critical areas
-	kernel patches for a few things
-		dummynet now in sys/netinet/ipfw/ip_dummynet.c  patch fails as dummynet is VERY different, ip_input.c patch is irrelevent until this is fixed if still required.
+
 
 areas to investigate impact
     lnc kernel driver is gone from 8.1 etc
-	
+
 	
 areas to improve
-	support for Serial as ALIX and WRAP will be nanoBSD based on GENERIC kernel
 	scripts to reverse the build scripts so you can do a clean build

@@ -8,8 +8,11 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 fi
 
 # set port options for ports that need user input
-		cd $MW_BUILDPATH/tmp
-		tar -zxvf $MW_BUILDPATH/freebsd8/build/files/portoptions.tgz -C /
+		for portoptf in $MW_BUILDPATH/freebsd8/build/files/portoptions/* ; do
+			port=${portoptf##*/}
+			mkdir -p /var/db/ports/$port
+			cp $portoptf /var/db/ports/$port/options
+		done
  
 # autconf
         rm /usr/local/bin/autoconf
@@ -141,6 +144,7 @@ fi
         '--with-out-transports=TCP Unix' \
         '--with-mib-modules=mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
 		--with-defaults
+		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ucd-snmp.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ucd-snmp.config.h.patch
 	    make
         install -s agent/snmpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
