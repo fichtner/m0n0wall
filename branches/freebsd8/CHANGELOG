@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix copy&paste bugs surrounding ipv6ramtu and make it optional
+
 - remove ipfw.ko dependency on libalias.ko
 
 - take port options out of .tgz for easier maintenance

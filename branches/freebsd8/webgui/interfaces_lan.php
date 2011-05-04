@@ -86,7 +86,7 @@ if ($_POST) {
 		if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['ipaddr6'])) {
 			$input_errors[] = "A valid IPv6 address must be specified.";
 		}
-		if ($_POST['ipv6ramtu'] < 56 || $_POST['ipv6ramtu'] >1500) {
+		if ($_POST['ipv6ramtu'] && ($_POST['ipv6ramtu'] < 56 || $_POST['ipv6ramtu'] > 1500)) {
 			$input_errors[] = "A valid RA MTU must be specified (56 - 1500).";
 		}
 	}
@@ -149,7 +149,7 @@ if ($_POST) {
 						  $pconfig['raflags'] != $_POST['raflags'] ||
 						  isset($oldipv6ra) != isset($_POST['ipv6ra']) ||
 						  isset($oldipv6ram) != isset($newipv6ram) ||
-						  isset($oldipv6ramtu) != isset($_POST['ipv6ramtu']));
+						  $oldipv6ramtu != $_POST['ipv6ramtu']);
 		}
 		
 		$dhcpd_disabled = false;

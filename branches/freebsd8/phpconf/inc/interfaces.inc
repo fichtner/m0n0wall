@@ -1073,7 +1073,7 @@ function interfaces_rtadvd_configure() {
 		} else {
 			$rtadvdconf .= $config['interfaces']['lan']['subnet6'];
 		}
-		if (isset($config['interfaces']['lan']['ipv6ramtu'])) {
+		if (isset($config['interfaces']['lan']['ipv6ramtu']) && $config['interfaces']['lan']['ipv6ramtu'] > 0) {
 			$rtadvdconf .= ":mtu#" . $config['interfaces']['lan']['ipv6ramtu'];
 		}
 		$rtadvdconf .= "\n";
@@ -1105,7 +1105,7 @@ function interfaces_rtadvd_configure() {
 			} else {
 				$rtadvdconf .= $config['interfaces']['opt' . $i]['subnet6'];
 			}
-			if (isset($config['interfaces']['opt' . $i]['ipv6ramtu'])) {
+			if (isset($config['interfaces']['opt' . $i]['ipv6ramtu']) && $config['interfaces']['opt' . $i]['ipv6ramtu'] > 0) {
 				$rtadvdconf .= ":mtu#" . $config['interfaces']['opt' . $i]['ipv6ramtu'];
 			}
 			$rtadvdconf .= "\n";

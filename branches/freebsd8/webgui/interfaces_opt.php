@@ -48,7 +48,7 @@ $pconfig['subnet'] = $optcfg['subnet'];
 $pconfig['enable'] = isset($optcfg['enable']);
 if (ipv6enabled()) {
 	$pconfig['ipv6ra'] = isset($optcfg['ipv6ra']);
-	$pconfig['ipv6ramtu'] = isset($optcfg['ipv6ramtu']);
+	$pconfig['ipv6ramtu'] = $optcfg['ipv6ramtu'];
 	
 	if (isset($optcfg['ipv6rao'])) {
 		$pconfig['raflags'] = "Other";
@@ -112,7 +112,7 @@ if ($_POST) {
 				if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['ipaddr6'])) {
 					$input_errors[] = "A valid IPv6 address must be specified.";
 				}
-				if ($_POST['ipv6ramtu'] < 56 || $_POST['ipv6ramtu'] >1500) {
+				if ($_POST['ipv6ramtu'] && ($_POST['ipv6ramtu'] < 56 || $_POST['ipv6ramtu'] > 1500)) {
 					$input_errors[] = "A valid RA MTU must be specified (56 - 1500).";
 				}
 			}
@@ -142,7 +142,7 @@ if ($_POST) {
 				unset($optcfg['subnet6']);
 				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
 				$optcfg['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
-				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'] ? true : false;
+				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'];
 				$optcfg['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else if ($_POST['ipv6mode'] == "DHCP-PD") {
 				$optcfg['ipaddr6'] = "DHCP-PD";
@@ -153,13 +153,13 @@ if ($_POST) {
 				$optcfg['slalen'] = 64 - $_POST['ispfix'];
 				$pconfig['slalen'] = 64 - $_POST['ispfix'];
 				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
-				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'] ;
+				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'];
 			} else if ($_POST['ipv6mode'] == "static") {
 				$optcfg['ipaddr6'] = $_POST['ipaddr6'];
 				$optcfg['subnet6'] = $_POST['subnet6'];
 				$optcfg['ipv6ra'] = $_POST['ipv6ra'] ? true : false;
 				$optcfg['ipv6ram'] = $_POST['ipv6ram'] ? true : false;
-				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'] ? true : false;
+				$optcfg['ipv6ramtu'] = $_POST['ipv6ramtu'];
 				$optcfg['ipv6rao'] = $_POST['ipv6rao'] ? true : false;
 			} else {
 				unset($optcfg['ipaddr6']);
