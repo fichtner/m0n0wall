@@ -21,8 +21,9 @@ a) check out a repository (svn co http://svn.m0n0.ch/wall/branches/freebsd8),
 b) Run the following commands to automatically get the latest version
    from the repository:
 
-   # wget http://svn.m0n0.ch/wall/branches/freebsd8/build/scripts/go.sh
-   # sh go.sh
+   # fetch http://svn.m0n0.ch/wall/branches/freebsd8/build/scripts/go.sh
+   # chmod +x go.sh
+   # ./go.sh
 
 This will give you a bash prompt where you should execute './doall.sh'  or execute each of the 5 shell scripts.
 

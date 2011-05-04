@@ -44,9 +44,8 @@ fi
 	ln -s /var/run/htpasswd usr/local/www/.htpasswd
  
 # configure build information
-	echo "generic-pc-cdrom" > etc/platform
 	date > etc/version.buildtime
-	echo "1.8.0b0" > etc/version
+	cp $MW_BUILDPATH/freebsd8/version etc/version
  
 # get and set current default configuration
 	cp $MW_BUILDPATH/freebsd8/phpconf/config.xml conf.default/config.xml

@@ -7,6 +7,8 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	exit 1
 fi
 
+VERSION=`cat $MW_BUILDPATH/freebsd8/version`
+
 makemfsroot() {
 	PLATFORM=$1
 	SPARESPACE=$2
@@ -70,7 +72,7 @@ makeimage() {
 	umount /mnt
 	mdconfig -d -u 30
 	gzip -9f image.bin
-	mv image.bin.gz $MW_BUILDPATH/images/$PLATFORM-1.8.0.img
+	mv image.bin.gz $MW_BUILDPATH/images/$PLATFORM-$VERSION.img
 	
 	echo " done"
 }
@@ -94,10 +96,10 @@ makeimage() {
 	cp $MW_BUILDPATH/freebsd8/build/boot/generic-pc/loader.rc $MW_BUILDPATH/tmp/cdroot/boot
 	cp kernel.gz $MW_BUILDPATH/tmp/cdroot/
 	cp mfsroot-generic-pc-cdrom.gz $MW_BUILDPATH/tmp/cdroot/
-	cp $MW_BUILDPATH/images/generic-pc-1.8.0.img $MW_BUILDPATH/tmp/cdroot/firmware.img
-	mkisofs -b "boot/cdboot" -no-emul-boot -A "m0n0wall 1.8.0 CD-ROM image" \
+	cp $MW_BUILDPATH/images/generic-pc-$VERSION.img $MW_BUILDPATH/tmp/cdroot/firmware.img
+	mkisofs -b "boot/cdboot" -no-emul-boot -A "m0n0wall $VERSION CD-ROM image" \
         -c "boot/boot.catalog" -d -r -publisher "m0n0.ch" \
         -p "m0n0.ch" -V "m0n0wall_cd" -o "m0n0wall.iso" \
         -quiet $MW_BUILDPATH/tmp/cdroot
-	mv m0n0wall.iso $MW_BUILDPATH/images/generic-pc-1.8.0.iso
+	mv m0n0wall.iso $MW_BUILDPATH/images/generic-pc-$VERSION.iso
 	echo " done"

@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- move system version number to file <repo>/version
+
 - fix DHCPv6 server wouldn't start
 
 - circumvent shaper and captive portal for IPv6 for the time being, since it
