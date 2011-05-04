@@ -3,7 +3,7 @@ critical areas
 
 areas to investigate impact
     lnc kernel driver is gone from 8.1 etc
-
+	DHCP relay cannot start when DHCP server is running (even on different interfaces)
 	
 areas to improve
 	scripts to reverse the build scripts so you can do a clean build

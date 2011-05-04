@@ -167,7 +167,7 @@ function services_dhcp6s_configure() {
 	/* DHCPv6 enabled on any interfaces? */
 	$dhcp6senable = false;
 	foreach ($dhcp6scfg as $dhcpif => $dhcpifconf) {
-		if (isset($dhcpifconf['v6enable']) && (($dhcpif == "lan") || (isset($config['interfaces'][$dhcpif]['v6enable']) && $config['interfaces'][$dhcpif]['if'] && (!$config['interfaces'][$dhcpif]['bridge']))))
+		if (isset($dhcpifconf['v6enable']) && (($dhcpif == "lan") || (isset($config['interfaces'][$dhcpif]['ipaddr6']) && $config['interfaces'][$dhcpif]['if'] && (!$config['interfaces'][$dhcpif]['bridge']))))
 			$dhcp6senable = true;
 	}
 	
@@ -787,19 +787,6 @@ function services_dnsupdate_process() {
 			if (substr($hostname, -1) != ".")
 				$hostname .= ".";
 			
-			/* write private key file
-			   this is dumb - public and private keys are the same for HMAC-MD5,
-			   but nsupdate insists on having both */
-			$fd = fopen("{$g['varetc_path']}/K{$keyname}+157+00000.private", "w");
-			$privkey .= <<<EOD
-Private-key-format: v1.2
-Algorithm: 157 (HMAC)
-Key: {$config['dnsupdate']['keydata']}
-
-EOD;
-			fwrite($fd, $privkey);
-			fclose($fd);
-			
 			/* write public key file */
 			if ($config['dnsupdate']['keytype'] == "host") {
 				$flags = 513;
@@ -812,24 +799,23 @@ EOD;
 				$proto = 3;
 			}
 			
-			$fd = fopen("{$g['varetc_path']}/K{$keyname}+157+00000.key", "w");
-			fwrite($fd, "{$keyname} IN KEY {$flags} {$proto} 157 {$config['dnsupdate']['keydata']}\n");
+			/* write private key file */
+			$fd = fopen("{$g['varetc_path']}/K{$keyname}+157+00000.private", "w");
+			$privkey .= <<<EOD
+Private-key-format: v1.2
+Algorithm: 157 (HMAC)
+Key: {$config['dnsupdate']['keydata']}
+
+EOD;
+			fwrite($fd, $privkey);
 			fclose($fd);
 			
-			/* generate update instructions */
-			$upinst =  "update delete {$hostname} A\n";
-			$upinst .= "update add {$hostname} {$config['dnsupdate']['ttl']} A {$wanip}\n";
-			$upinst .= "\n";	/* mind that trailing newline! */
-			
-			$fd = fopen("{$g['varetc_path']}/nsupdatecmds", "w");
-			fwrite($fd, $upinst);
-			fclose($fd);
-			
-			/* invoke nsupdate */
-			$cmd = "/usr/bin/nsupdate -k {$g['varetc_path']}/K{$keyname}+157+00000.private";
+			$cmd = "/usr/local/bin/dudders";
 			if (isset($config['dnsupdate']['usetcp']))
-				$cmd .= " -v";
-			$cmd .= " {$g['varetc_path']}/nsupdatecmds";
+				$cmd .= " -T";
+			$cmd .= " -k {$g['varetc_path']}/K{$keyname}+157+00000.private " .
+				escapeshellarg($hostname) . " " . escapeshellarg($config['dnsupdate']['ttl']) . " " . 
+				escapeshellarg($wanip);
 			
 			mwexec_bg($cmd);
 		}
