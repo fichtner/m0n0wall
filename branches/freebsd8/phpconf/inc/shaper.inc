@@ -163,6 +163,9 @@ function shaper_rules_generate() {
 	$shaperrules = "add $rulei set 4 pass all from $lanip to any\n"; $rulei++;
 	$shaperrules .= "add $rulei set 4 pass all from any to $lanip\n"; $rulei++;
 	
+	/* circumvent shaper for IPv6 traffic since dummynet is broken */
+	$shaperrules .= "add $rulei set 4 pass ipv6 from any to any\n"; $rulei++;
+	
 	/* generate rules */
 	if (isset($config['shaper']['rule']))	
 		foreach ($config['shaper']['rule'] as $rule) {

@@ -356,13 +356,17 @@ EOD;
 add 1000 set 1 skipto 50000 all from any to any not layer2 not via $cpif
 # pass all layer2 traffic on other interfaces
 add 1001 set 1 pass layer2 not via $cpif
+# pass IPv6 since the captive portal doesn't support it yet
+add 1002 set 1 skipto 50000 ipv6 from any to any not layer2
 
 # layer 2: pass ARP
 add 1100 set 1 pass layer2 mac-type arp
+# layer 2: pass IPv6
+add 1101 set 1 pass layer2 mac-type ipv6
 # layer 2: block anything else non-IP
-add 1101 set 1 deny layer2 not mac-type ip
+add 1102 set 1 deny layer2 not mac-type ip
 # layer 2: check if MAC addresses of authenticated clients are correct
-add 1102 set 1 skipto 20000 layer2
+add 1103 set 1 skipto 20000 layer2
 
 # allow access to our DHCP server (which needs to be able to ping clients as well)
 add 1200 set 1 pass udp from any 68 to 255.255.255.255 67 in

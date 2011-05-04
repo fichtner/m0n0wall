@@ -2,6 +2,12 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- circumvent shaper and captive portal for IPv6 for the time being, since it
+  doesn't work properly (dummynet IPv6 support is broken, and captive portal
+  has no explicit support for it). This gives CP users the option to either
+  simply not configure v6 on the CP interface, or to configure it and have
+  IPv6 traffic pass regardless of whether the client is authenticated.
+
 - fix copy&paste bugs surrounding ipv6ramtu and make it optional
 
 - remove ipfw.ko dependency on libalias.ko
