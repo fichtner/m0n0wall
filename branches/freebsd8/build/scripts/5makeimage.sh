@@ -95,7 +95,7 @@ makeimage() {
 	cp /boot/{cdboot,loader} $MW_BUILDPATH/tmp/cdroot/boot
 	cp $MW_BUILDPATH/freebsd8/build/boot/generic-pc/loader.rc $MW_BUILDPATH/tmp/cdroot/boot
 	cp kernel.gz $MW_BUILDPATH/tmp/cdroot/
-	cp mfsroot-generic-pc-cdrom.gz $MW_BUILDPATH/tmp/cdroot/
+	cp mfsroot-generic-pc-cdrom.gz $MW_BUILDPATH/tmp/cdroot/mfsroot.gz
 	cp $MW_BUILDPATH/images/generic-pc-$VERSION.img $MW_BUILDPATH/tmp/cdroot/firmware.img
 	mkisofs -b "boot/cdboot" -no-emul-boot -A "m0n0wall $VERSION CD-ROM image" \
         -c "boot/boot.catalog" -d -r -publisher "m0n0.ch" \

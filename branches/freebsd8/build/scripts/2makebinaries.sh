@@ -13,13 +13,14 @@ fi
 			mkdir -p /var/db/ports/$port
 			cp $portoptf /var/db/ports/$port/options
 		done
- 
+
 # autconf
         rm /usr/local/bin/autoconf
         rm /usr/local/bin/autoheader
         ln -s /usr/local/bin/autoconf-2.13 /usr/local/bin/autoconf
         ln -s /usr/local/bin/autoheader-2.13 /usr/local/bin/autoheader
 # php 4.4.9
+		cd $MW_BUILDPATH/tmp
         fetch http://dk.php.net/distributions/php-4.4.9.tar.bz2
         tar -zxf php-4.4.9.tar.bz2
         cd php-4.4.9/ext/
@@ -33,6 +34,7 @@ fi
         install -s sapi/cgi/php $MW_BUILDPATH/m0n0fs/usr/local/bin/
         cd ..
 # mini httpd
+		cd $MW_BUILDPATH/tmp
         fetch http://acme.com/software/mini_httpd/mini_httpd-1.19.tar.gz
         tar -zxf mini_httpd-1.19.tar.gz
         rm mini_httpd-1.19.tar.gz
