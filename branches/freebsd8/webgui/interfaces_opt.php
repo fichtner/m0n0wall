@@ -320,14 +320,14 @@ function enable_change(enable_over) {
                     <select name="ispfix" class="formfld" id="ispfix">
                       <?php for ($l = 64; $l > 0; --$l): ?>
                       <option value="<?=$l;?>" <?php
-                        if ($l == 64 - $pconfig['slalen'] || (!isset($pconfig['slalen']) && $l == 48)) echo "selected";
+                        if ($l == 64 - $pconfig['slalen'] || (!isset($pconfig['slalen']) && $l == 64)) echo "selected";
                       ?>>
                       <?=$l;?>
                       </option>
                       <?php endfor; ?>
                     </select><br>
 					   Select site-level aggregator ID and ISP prefix length (decimal notation).<br>
-					   If ID is 11 and the client is delegated an IPv6 prefix 2001:db8:ffff and prefix 48, this will result in
+					   If ID is 10 and the client is delegated an IPv6 prefix 2001:db8:ffff and prefix 64, this will result in
 					   a single IPv6 prefix, 2001:db8:ffff:A::/64 .</td>
                 </tr>
                <tr> 
