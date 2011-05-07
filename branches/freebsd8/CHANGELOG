@@ -2,6 +2,14 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fixup go.sh to find svn (yet again !)
+
+- amd64 builds;
+  now use wol from ports (amd64 fails to compile in previous method)
+  ipf path removed ref to i386, kernel build removed i386 from path 
+  patch kernel to make amd64 if uname -m is amd64
+  append amd64 to image names
+
 - change dhcp-pd to be /64 by default
 
 - fixup go.sh to find svn (again) and stage 2 to use tmp for php and minihttpd

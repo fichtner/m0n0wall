@@ -24,10 +24,13 @@ fi
 
 
 # kernel compile
-        cd /sys/i386/conf
-        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC* /sys/i386/conf/
+        cd /sys/$MW_ARCH/conf
+        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC* /sys/$MW_ARCH/conf/
+        if [ $MW_ARCH = "amd64" ]; then
+        	patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/amd64.kernel.orig.patch
+        fi
         config M0N0WALL_GENERIC
-        cd /sys/i386/compile/M0N0WALL_GENERIC/
+        cd /sys/$MW_ARCH/compile/M0N0WALL_GENERIC/
         make depend && make
         strip kernel
         strip --remove-section=.note --remove-section=.comment kernel
@@ -35,7 +38,10 @@ fi
         mv kernel.gz $MW_BUILDPATH/tmp/
         cd modules/usr/src/sys/modules
         cp if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
-		cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
+		if [ $MW_ARCH = "i386" ]; then
+                cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
+        fi
+
 
 # make libs
 		cd $MW_BUILDPATH/tmp

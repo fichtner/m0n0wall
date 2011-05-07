@@ -8,6 +8,9 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 fi
 
 VERSION=`cat $MW_BUILDPATH/freebsd8/version`
+if [ $MW_ARCH = "amd64" ]; then
+	VERSION=$VERSION.$MW_ARCH	
+fi
 
 makemfsroot() {
 	PLATFORM=$1
@@ -44,7 +47,9 @@ makeimage() {
 	cp $MW_BUILDPATH/tmp/kernel.gz $MW_BUILDPATH/tmp/firmwaretmp
 	cp $MW_BUILDPATH/tmp/mfsroot-$PLATFORM.gz $MW_BUILDPATH/tmp/firmwaretmp/mfsroot.gz
 	cp /boot/{loader,loader.rc} $MW_BUILDPATH/tmp/firmwaretmp
-	cp $MW_BUILDPATH/tmp/acpi.ko $MW_BUILDPATH/tmp/firmwaretmp
+	if [ $MW_ARCH = "i386" ]; then
+		cp $MW_BUILDPATH/tmp/acpi.ko $MW_BUILDPATH/tmp/firmwaretmp
+	fi
 	cp $MW_BUILDPATH/m0n0fs/conf.default/config.xml $MW_BUILDPATH/tmp/firmwaretmp
 
 	cd $MW_BUILDPATH/tmp
@@ -65,7 +70,9 @@ makeimage() {
 	if [ -r $MW_BUILDPATH/freebsd8/build/boot/$PLATFORM/boot.config ]; then
 		cp $MW_BUILDPATH/freebsd8/build/boot/$PLATFORM/boot.config /mnt
 	fi
-	cp $MW_BUILDPATH/tmp/acpi.ko /mnt/boot/kernel
+	if [ $MW_ARCH = "i386" ]; then
+		cp $MW_BUILDPATH/tmp/acpi.ko /mnt/boot/kernel
+	fi
 	mkdir /mnt/conf
 	cp $MW_BUILDPATH/m0n0fs/conf.default/config.xml /mnt/conf
 	cd $MW_BUILDPATH/tmp
@@ -91,7 +98,9 @@ makeimage() {
 	echo -n "Making ISO..."
 	cd $MW_BUILDPATH/tmp
 	mkdir -p $MW_BUILDPATH/tmp/cdroot/boot/kernel
-	cp $MW_BUILDPATH/tmp/acpi.ko $MW_BUILDPATH/tmp/cdroot/boot/kernel
+	if [ $MW_ARCH = "i386" ]; then
+		cp $MW_BUILDPATH/tmp/acpi.ko $MW_BUILDPATH/tmp/cdroot/boot/kernel
+	fi
 	cp /boot/{cdboot,loader} $MW_BUILDPATH/tmp/cdroot/boot
 	cp $MW_BUILDPATH/freebsd8/build/boot/generic-pc/loader.rc $MW_BUILDPATH/tmp/cdroot/boot
 	cp kernel.gz $MW_BUILDPATH/tmp/cdroot/

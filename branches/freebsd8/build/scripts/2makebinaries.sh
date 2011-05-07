@@ -44,13 +44,9 @@ fi
         install -s mini_httpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
         cd ..
 # wol
-        cd $MW_BUILDPATH/tmp
-        fetch "http://downloads.sourceforge.net/project/wake-on-lan/wol/0.7.1/wol-0.7.1.tar.gz"
-        tar -zxf wol-0.7.1.tar.gz
-        cd wol-0.7.1
-        ./configure --disable-nls
-        make
-        install -s src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
+		cd /usr/ports/net/wol
+		make WITHOUT_NLS=true
+        install -s work/wol-*/src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # ezipupdate
         cd $MW_BUILDPATH/tmp
         fetch http://dyn.pl/client/UNIX/ez-ipupdate/ez-ipupdate-3.0.11b8.tar.gz
@@ -67,7 +63,7 @@ fi
 		cd ip_fil4.1.34
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/ipfstat.c.patch
 		make freebsd8
-		install -s BSD/FreeBSD-8.?-RELEASE-i386/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
+		install -s BSD/FreeBSD-8.?-RELEASE-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
 # ISC dhcp-relay
         cd /usr/ports/net/isc-dhcp31-relay
         make

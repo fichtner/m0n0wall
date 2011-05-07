@@ -1,10 +1,12 @@
 critical areas
-
-
+	
 areas to investigate impact
     lnc kernel driver is gone from 8.1 etc
 	DHCP relay cannot start when DHCP server is running (even on different interfaces)
 	javascript around RA's is broken (when RA is not enabled, other options should be disabled)
 	default ipv6 route still not being configured for wan ipv6=dhcp
+	acpi for amd64 , not using acpi.ko
+	enable sysctl for hardware crypto for padlock and geode processor support that is now in m0n0wall kernel in vpn.inc
+	
 areas to improve
 	scripts to reverse the build scripts so you can do a clean build

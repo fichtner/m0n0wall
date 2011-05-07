@@ -3,6 +3,7 @@
 
 set MW_BUILDPATH=/usr/m0n0wall/build82
 setenv MW_BUILDPATH $MW_BUILDPATH
+setenv MW_ARCH `uname -m`
 
 # ensure prerequisite tools are installed
 if ( ! -x /usr/local/bin/bash ) then
@@ -27,7 +28,7 @@ echo "Creating build directory $MW_BUILDPATH."
 mkdir -p $MW_BUILDPATH
 
 echo "Exporting repository to $MW_BUILDPATH/freebsd8."
-svn export --force . $MW_BUILDPATH/freebsd8
+/usr/local/bin/svn export --force . $MW_BUILDPATH/freebsd8
 
 echo "Changing directory to $MW_BUILDPATH/freebsd8/build/scripts"
 cd $MW_BUILDPATH/freebsd8/build/scripts
