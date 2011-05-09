@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- make rc.newwanip6 have file lock and only reconfig ipv6 rules
+
 - update kernel for amd64, remove non amd64 devices and build in acpi
 
 - fixup go.sh to find svn (yet again !)

@@ -41,13 +41,17 @@
 		sleep(1);
 	}
 	
+	lock_file("{$g['varrun_path']}/newwanip6.lock");
+	
 	/* dhcp6c-exit-hooks passes a sleep timer, so that this doesn't run before
            ip address is assigned and therefore known to filter_configure() */
 	if ($argc) {
 		sleep($argv[1]);
 	}
 	
-	/* reload firewall/NAT rules (WAN IPv6 address may be referenced from
+	/* reload firewall rules ipv6 only (WAN IPv6 address may be referenced from
 	   user-defined firewall rules) */
-	filter_configure();	
+	filter_configure6();
+	
+	unlock_file("{$g['varrun_path']}/newwanip6.lock");	
 ?>

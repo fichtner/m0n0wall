@@ -90,6 +90,16 @@ function filter_configure() {
 	fwrite($fd, $ipfrules);
 	pclose($fd);
 	
+	filter_configure6()
+	
+	if ($g['booting'])
+		echo "done\n";
+	
+	return 0;
+}
+
+function filter_configure6() {
+
 	/* generate ipf rules for IPv6 */
 	$ipfrules_ipv6 = filter_rules_generate_ipv6();
 	$fd = popen("/sbin/ipf -6 -Fa -f - > /dev/null 2>&1", "w");
@@ -99,10 +109,7 @@ function filter_configure() {
 	}
 	fwrite($fd, $ipfrules_ipv6);
 	pclose($fd);
-	
-	if ($g['booting'])
-		echo "done\n";
-	
+
 	return 0;
 }
 
