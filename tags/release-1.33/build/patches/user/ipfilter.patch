@@ -1,0 +1,84 @@
+--- contrib/ipfilter/lib/printnat.c.orig	2007-11-18 12:03:22.000000000 +0100
++++ contrib/ipfilter/lib/printnat.c	2008-07-26 15:46:49.000000000 +0200
+@@ -217,6 +217,8 @@
+ 			putchar(' ');
+ 			printproto(pr, np->in_p, np);
+ 		}
++		if (np->in_flags & IPN_SEQUENTIAL)
++			printf(" sequential");
+ 		printf("\n");
+ 		if (opts & OPT_DEBUG) {
+ 			struct in_addr nip;
+--- contrib/ipfilter/tools/ipnat_y.y.orig	2007-11-18 12:03:27.000000000 +0100
++++ contrib/ipfilter/tools/ipnat_y.y	2008-07-26 17:21:32.000000000 +0200
+@@ -95,7 +95,7 @@
+ %token	IPNY_MAP IPNY_BIMAP IPNY_FROM IPNY_TO IPNY_MASK IPNY_PORTMAP IPNY_ANY
+ %token	IPNY_ROUNDROBIN IPNY_FRAG IPNY_AGE IPNY_ICMPIDMAP IPNY_PROXY
+ %token	IPNY_TCP IPNY_UDP IPNY_TCPUDP IPNY_STICKY IPNY_MSSCLAMP IPNY_TAG
+-%token	IPNY_TLATE
++%token	IPNY_TLATE IPNY_SEQUENTIAL
+ %type	<port> portspec
+ %type	<num> hexnumber compare range proto
+ %type	<ipa> hostname ipv4
+@@ -422,11 +422,11 @@
+ 	;
+ 
+ mapport:
+-	IPNY_PORTMAP tcpudp portspec ':' portspec
++	IPNY_PORTMAP tcpudp portspec ':' portspec randport
+ 			{ nat->in_pmin = htons($3);
+ 			  nat->in_pmax = htons($5);
+ 			}
+-	| IPNY_PORTMAP tcpudp IPNY_AUTO
++	| IPNY_PORTMAP tcpudp IPNY_AUTO randport
+ 			{ nat->in_flags |= IPN_AUTOPORTMAP;
+ 			  nat->in_pmin = htons(1024);
+ 			  nat->in_pmax = htons(65535);
+@@ -446,6 +446,10 @@
+ 			}
+ 	;
+ 
++randport:
++	| IPNY_SEQUENTIAL	{ nat->in_flags |= IPN_SEQUENTIAL; }
++	;
++
+ sobject:
+ 	saddr
+ 	| saddr port portstuff	{ nat->in_sport = $3.p1;
+@@ -519,6 +523,7 @@
+ nattag:	| IPNY_TAG YY_STR		{ strncpy(nat->in_tag.ipt_tag, $2,
+ 						  sizeof(nat->in_tag.ipt_tag));
+ 					}
++
+ rr:	| IPNY_ROUNDROBIN		{ nat->in_flags |= IPN_ROUNDR; }
+ 	;
+ 
+@@ -647,6 +652,7 @@
+ 	{ "range",	IPNY_RANGE },
+ 	{ "rdr",	IPNY_RDR },
+ 	{ "round-robin",IPNY_ROUNDROBIN },
++	{ "sequential",	IPNY_SEQUENTIAL },
+ 	{ "sticky",	IPNY_STICKY },
+ 	{ "tag",	IPNY_TAG },
+ 	{ "tcp",	IPNY_TCP },
+--- contrib/ipfilter/ip_fil.c.orig	2007-11-18 12:03:17.000000000 +0100
++++ contrib/ipfilter/ip_fil.c	2008-07-26 15:45:32.000000000 +0200
+@@ -801,3 +801,18 @@
+ {
+ 	return 0;
+ }
++
++
++u_32_t ipf_random()
++{
++	static int seeded = 0;
++
++	/*
++	 * Choose a non-random seed so that "randomness" can be "tested."
++	 */
++	if (seeded == 0) {
++		srand(0);
++		seeded = 1;
++	}
++	return rand();
++}
