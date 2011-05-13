@@ -9,6 +9,7 @@ fi
 
 # patch kernel / sources
 		cd /usr/src
+		patch -p0 < $MW_BUILDPATH/freebsd8/build/patches/kernel/stf_6rd_20100923-1.diff
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ipfilter_kernel_update_to_4.1.34.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/Makefile.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/options.orig.patch
@@ -25,10 +26,7 @@ fi
 
 # kernel compile
         cd /sys/$MW_ARCH/conf
-        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC* /sys/$MW_ARCH/conf/
-        if [ $MW_ARCH = "amd64" ]; then
-        	patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/amd64.kernel.orig.patch
-        fi
+        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.$MW_ARCH /sys/$MW_ARCH/conf/M0N0WALL_GENERIC
         config M0N0WALL_GENERIC
         cd /sys/$MW_ARCH/compile/M0N0WALL_GENERIC/
         make depend && make
@@ -37,7 +35,7 @@ fi
         gzip -9 kernel
         mv kernel.gz $MW_BUILDPATH/tmp/
         cd modules/usr/src/sys/modules
-        cp if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
+        cp aesni/aesni.ko glxsb/glxsb.ko padlock/padlock.ko if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
 		if [ $MW_ARCH = "i386" ]; then
                 cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
         fi

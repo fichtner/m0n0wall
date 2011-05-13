@@ -35,13 +35,9 @@ require("guiconfig.inc");
 
 /* find out whether there's hardware encryption (hifn) */
 unset($hwcrypto);
-$dmesg = system_get_dmesg_boot();
-if (preg_match("/^hifn.: (.*?),/m", $dmesg, $matches))
-	$hwcrypto = $matches[1];
-if (preg_match("/^padlock.: (.*?)/m", $dmesg, $matches))
-	$hwcrypto = "VIA Padlock";
-if (preg_match("/^glxsb.: (.*?)/m", $dmesg, $matches))
-	$hwcrypto = "AMD Geode LX Security Block";
+
+$hwcrypto = hwcrypto_descr();
+
 $specplatform = system_identify_specific_platform();
 if (preg_match("/^CPU.*/m", $dmesg, $matches) )
 	$cpudetail = " - " . $matches[0];

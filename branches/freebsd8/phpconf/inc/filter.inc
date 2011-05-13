@@ -44,12 +44,14 @@ function filter_ipmon_start() {
 	mwexec("/sbin/ipmon -sD");
 }
 
-function filter_configure() {
+function filter_configure($ipv4only = false) {
 	global $config, $g;
 	
 	if ($g['booting'])
 		echo "Configuring firewall... ";
-	
+		
+	lock_file("{$g['varrun_path']}/filter.lock");
+
 	/* set TCP timeouts */
 	if ($config['filter']['tcpidletimeout'] && $g['booting']) {
 		$tcpidletimeout = $config['filter']['tcpidletimeout']*2;
@@ -72,6 +74,7 @@ function filter_configure() {
 	$fd = popen("/sbin/ipnat -C -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipnat in filter_configure()\n");
+		unlock_file("{$g['varrun_path']}/filter.lock");	
 		return 1;
 	}
 		
@@ -84,32 +87,37 @@ function filter_configure() {
 	$fd = popen("/sbin/ipf -Fa -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
+		unlock_file("{$g['varrun_path']}/filter.lock");	
 		return 1;
 	}
 
 	fwrite($fd, $ipfrules);
 	pclose($fd);
-	
-	filter_configure6()
+	if (!$ipv4only)
+		filter_configure6();
 	
 	if ($g['booting'])
 		echo "done\n";
-	
+	unlock_file("{$g['varrun_path']}/filter.lock");	
 	return 0;
 }
 
 function filter_configure6() {
+
+	lock_file("{$g['varrun_path']}/filter6.lock");
 
 	/* generate ipf rules for IPv6 */
 	$ipfrules_ipv6 = filter_rules_generate_ipv6();
 	$fd = popen("/sbin/ipf -6 -Fa -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
+		unlock_file("{$g['varrun_path']}/filter6.lock");	
 		return 1;
 	}
 	fwrite($fd, $ipfrules_ipv6);
 	pclose($fd);
-
+	
+	unlock_file("{$g['varrun_path']}/filter6.lock");	
 	return 0;
 }
 

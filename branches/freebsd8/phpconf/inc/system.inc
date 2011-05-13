@@ -34,6 +34,19 @@
 /* include all configuration functions */
 require_once("functions.inc");
 	
+function hwcrypto_descr() {
+	$dmesg = system_get_dmesg_boot();
+	if (preg_match("/^hifn.: (.*?),/m", $dmesg, $matches))
+		$hwcrypto .= "Hifn ";
+	if (preg_match("/^padlock.: .*AES/m", $dmesg, $matches))
+		$hwcrypto .= "VIA Padlock ";
+	if (preg_match("/^glxsb.: .*AES/m", $dmesg, $matches))
+		$hwcrypto .= "AMD Geode LX Security Block ";
+	if (preg_match("/^aesni.: .*AES/m", $dmesg, $matches))
+		$hwcrypto .= "Intel AES-NI ";
+	return $hwcrypto;
+}
+
 function system_resolvconf_generate($dynupdate = false) {
 	global $config, $g;
 	
