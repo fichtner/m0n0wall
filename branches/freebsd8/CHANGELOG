@@ -2,6 +2,16 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add 6RD patch to stf from http://people.allbsd.org/~hrs/FreeBSD/stf_6rd_20100923-1.diff
+  no code yet to utilitse 6RD in m0n0wall
+
+- change locking for filter_reconfigure() ,and ipv4 only option
+
+- move amd64 kernel to a conf instead of patch (easier to maintain)
+
+- add aesni crypto device for Xeon Processor AES offload as kernel module 
+  and move glxsb padlock and aesni to modules. Fix crypto regex in index.php
+
 - make rc.newwanip6 have file lock and only reconfig ipv6 rules
 
 - update kernel for amd64, remove non amd64 devices and build in acpi
