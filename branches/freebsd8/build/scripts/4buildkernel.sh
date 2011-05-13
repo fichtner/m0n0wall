@@ -27,6 +27,7 @@ fi
 # kernel compile
         cd /sys/$MW_ARCH/conf
         cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.$MW_ARCH /sys/$MW_ARCH/conf/M0N0WALL_GENERIC
+		cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.hints /sys/$MW_ARCH/conf/
         config M0N0WALL_GENERIC
         cd /sys/$MW_ARCH/compile/M0N0WALL_GENERIC/
         make depend && make
