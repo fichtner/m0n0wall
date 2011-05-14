@@ -23,7 +23,13 @@ fi
 # dhclient-script
         cp $MW_BUILDPATH/freebsd8/build/tools/dhclient-script $MW_BUILDPATH/m0n0fs/sbin
         chmod a+rx $MW_BUILDPATH/m0n0fs/sbin/dhclient-script
-
+# setkey bin/147887 patch
+		cd /usr/src/lib/libipsec
+		patch < $MW_BUILDPATH/freebsd8/build/patches/user/pfkey.c.patch
+		make all install
+		cd /usr/src/sbin/setkey
+		make all
+		install -s setkey $MW_BUILDPATH/m0n0fs/usr/sbin/
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
-set +e
+	set +e
 	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null

@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- patch setkey for bin/147887 (gives 'invalid extension')
+
 - fix empty 6RD patch, and fixup stage 4 
 
 - add 6RD patch to stf from http://people.allbsd.org/~hrs/FreeBSD/stf_6rd_20100923-1.diff

@@ -42,7 +42,6 @@ sbin/ping
 sbin/ping6
 sbin/reboot
 sbin/route
-sbin/setkey
 sbin/shutdown
 sbin/sysctl
 sbin/umount
