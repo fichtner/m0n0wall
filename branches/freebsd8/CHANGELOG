@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fixup crypto display in index.php and setkey patch for whitespaces, add
+  syslinux image
+  
 - patch setkey for bin/147887 (gives 'invalid extension')
 
 - fix empty 6RD patch, and fixup stage 4 

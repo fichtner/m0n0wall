@@ -35,6 +35,29 @@ makemfsroot() {
 	echo " done"
 }
 
+makeminimfsroot() {
+	PLATFORM=$1
+	SPARESPACE=$2
+	
+	echo -n "Making Mini mfsroot for $PLATFORM..."
+	
+	echo $PLATFORM > $MW_BUILDPATH/m0n0fs/etc/platform
+	cd $MW_BUILDPATH/tmp
+	dd if=/dev/zero of=mfsroot-$PLATFORM bs=1k count=`du -I usr -d0 $MW_BUILDPATH/m0n0fs | cut -b1-5 | tr " " "+" | xargs -I {} echo "($SPARESPACE)+{}" | bc` > /dev/null 2>&1
+	mdconfig -a -t vnode -f mfsroot-$PLATFORM -u 20
+	disklabel -rw /dev/md20 auto
+	newfs -b 8192 -f 1024 -o space -m 0 /dev/md20 > /dev/null
+	mount /dev/md20 /mnt
+	cd /mnt
+	tar --exclude="usr/*" -cf - -C $MW_BUILDPATH/m0n0fs ./ | tar -xpf -
+	cd $MW_BUILDPATH/tmp
+	umount /mnt
+	mdconfig -d -u 20
+	gzip -9f mfsroot-$PLATFORM
+	
+	echo " done"
+}
+
 makeimage() {
 	PLATFORM=$1
 	SPARESPACE=$2
@@ -89,10 +112,28 @@ makeimage() {
 	makemfsroot generic-pc-cdrom 4096
 	makemfsroot generic-pc 4096
 	makemfsroot generic-pc-serial 4096
+	makeminimfsroot generic-pc-syslinux 4096
 	
 # Make firmware img with 2MB space 	
 	makeimage generic-pc 2048
 	makeimage generic-pc-serial 2048
+	makeimage generic-pc-syslinux 2048
+
+# Make syslinux tgz file 
+	mkdir $MW_BUILDPATH/tmp/syslinux
+	cd $MW_BUILDPATH/tmp/syslinux
+	
+	echo "default M0n0wall" > $MW_BUILDPATH/tmp/syslinux/syslinux.cfg
+	echo "label M0n0wall" >> $MW_BUILDPATH/tmp/syslinux/syslinux.cfg
+	echo "linux memdisk" >> $MW_BUILDPATH/tmp/syslinux/syslinux.cfg
+	echo "initrd generic-pc-syslinux-$VERSION.img" >> $MW_BUILDPATH/tmp/syslinux/syslinux.cfg
+	echo "append raw ro noedd" >> $MW_BUILDPATH/tmp/syslinux/syslinux.cfg
+	
+	cp -R $MW_BUILDPATH/m0n0fs/usr $MW_BUILDPATH/tmp/syslinux
+	mv $MW_BUILDPATH/images/generic-pc-syslinux-$VERSION.img $MW_BUILDPATH/tmp/syslinux
+	tar -zcf generic-pc-syslinux-$VERSION.tgz usr syslinux.cfg generic-pc-syslinux-$VERSION.img
+	mv generic-pc-syslinux-$VERSION.tgz $MW_BUILDPATH/images/
+	rm -rf $MW_BUILDPATH/tmp/syslinux
 	
 # Make ISO
 	echo -n "Making ISO..."

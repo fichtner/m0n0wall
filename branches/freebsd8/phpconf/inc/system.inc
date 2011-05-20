@@ -37,14 +37,44 @@ require_once("functions.inc");
 function hwcrypto_descr() {
 	$dmesg = system_get_dmesg_boot();
 	if (preg_match("/^hifn.: (.*?),/m", $dmesg, $matches))
-		$hwcrypto .= "Hifn ";
-	if (preg_match("/^padlock.: .*AES/m", $dmesg, $matches))
+		$hwcrypto = "Hifn (enabled) ";
+	if (preg_match("/^ *VIA Padlock Features=.*/m", $dmesg)) {
 		$hwcrypto .= "VIA Padlock ";
-	if (preg_match("/^glxsb.: .*AES/m", $dmesg, $matches))
+		if (mwexec("/sbin/sysctl dev.padlock.0.%desc") == 0 )
+			$hwcrypto .= "(enabled) ";
+	}
+	if (preg_match("/^CPU: Geode/m", $dmesg)) {
 		$hwcrypto .= "AMD Geode LX Security Block ";
-	if (preg_match("/^aesni.: .*AES/m", $dmesg, $matches))
+		if (mwexec("/sbin/sysctl dev.glxsb.0.%desc") == 0 )
+			$hwcrypto .= "(enabled) ";
+	}
+	if (preg_match("/^ *Features2=.*AESNI/m", $dmesg)) {
 		$hwcrypto .= "Intel AES-NI ";
+	}
 	return $hwcrypto;
+}
+
+function enable_cpuhwcrypto() {
+	disable_cpuhwcrypto();
+	$dmesg = system_get_dmesg_boot();
+	
+	if (preg_match("/^ *VIA Padlock Features=.*/m", $dmesg)) {
+		mwexec("/sbin/kldload padlock.ko");
+		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
+	}
+	if (preg_match("/^CPU: Geode/m", $dmesg)) {
+		mwexec("/sbin/kldload glxsb.ko");
+		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
+	}
+	if (preg_match("/^ *Features2=.*AESNI/m", $dmesg)) {
+		mwexec("/sbin/kldload aesni.ko");
+		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
+	}
+}
+
+function disable_cpuhwcrypto() {
+	mwexec("/sbin/kldunload padlock;/sbin/kldunload glxsb;/sbin/kldunload aesni");
+	mwexec("sysctl -w net.inet.ipsec.crypto_support=0");
 }
 
 function system_resolvconf_generate($dynupdate = false) {
