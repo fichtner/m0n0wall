@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fixup buildscripts and pfkey patch (whitespaces yet again)
+
 - fixup crypto display in index.php and setkey patch for whitespaces, add
   syslinux image
   

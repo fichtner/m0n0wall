@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 
-set +e
+set -e
 
 /usr/local/bin/bash 1makebuildenv.sh
 /usr/local/bin/bash 2makebinaries.sh

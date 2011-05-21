@@ -33,3 +33,4 @@ fi
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
 	set +e
 	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null
+	echo "Finished Stage 3"
