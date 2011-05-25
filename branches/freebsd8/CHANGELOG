@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- update todo
+
 - syslinux changes: microfs used for mfsroot, then chroot the FAT32 mount
   (experimental, symlinks won't work on FAT32 with freebsd needs fixing etc)
   
