@@ -11,6 +11,7 @@ bin/expr
 bin/hostname
 bin/kill
 bin/ls
+bin/ln
 bin/mkdir
 bin/mv
 bin/ps

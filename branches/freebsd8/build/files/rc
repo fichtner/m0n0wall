@@ -5,7 +5,13 @@
 #
 # Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
 # All rights reserved.
-/sbin/mount -o rw /dev/md0 /
+# 
+# Check if syslinx ran, it will have create md2
+
+if [ ! -e /dev/md2 ]; then
+	/sbin/mount -o rw /dev/md0 /
+fi
+
 
 stty status '^T'
 
@@ -21,6 +27,10 @@ trap "echo 'Reboot interrupted'; exit 1" 3
 
 # make some directories in /var
 mkdir /var/run /var/log /var/etc /var/db /var/empty
+
+if [ ! -e /dev/md2 ]; then
+	/bin/ln -s  /etc/resolv.conf /var/etc/resolv.conf
+fi
 
 # generate circular logfiles
 clog -i -s 262144 /var/log/system.log

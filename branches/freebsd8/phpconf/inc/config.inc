@@ -83,6 +83,30 @@ EOD;
 					mwexec("/sbin/umount -f {$g['cf_path']}");
 				}
 			}
+		} else if (strstr($g['platform'], "syslinux")) {
+			 /* we are on FAT so we are mounted on our RW source !  */
+			echo "Using Boot filesystem for configuration storage.\n";
+			/* probe kernel known disks until we find one with config.xml */
+			$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
+			foreach ($disks as $mountdisk) {
+				/* skip mfs mounted filesystems */
+				if (strstr($mountdisk, "md"))
+					continue;
+				if (mwexec("/sbin/mount -t msdos -r /dev/{$mountdisk}s1 {$g['cf_path']}") == 0) {
+					if (file_exists("{$g['cf_conf_path']}/config.xml")) {
+						/* found it */
+						$cfgdevice = $mountdisk;
+						$cfgpartition = $cfgdevice . "s1";
+						$cfgfstype = "msdos";
+						echo "Found configuration on $cfgdevice.\n";
+					}
+					
+					mwexec("/sbin/umount -f {$g['cf_path']}");
+					
+					if ($cfgdevice)
+						break;
+				}
+			}
 		} else {
 			/* probe kernel known disks until we find one with config.xml */
 			$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
