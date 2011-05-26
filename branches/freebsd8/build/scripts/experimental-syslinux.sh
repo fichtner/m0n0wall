@@ -19,8 +19,12 @@ mkdir -p lib libexec bin sbin etc dev usr/sbin mnt/m0n0wall
 perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl $MW_BUILDPATH/freebsd8/build/minibsd/micro.files /  $MW_BUILDPATH/microfs
 perl $MW_BUILDPATH/freebsd8/build/minibsd/mklibs.pl $MW_BUILDPATH/microfs > /tmp/m0n0wallmicro.libs
 perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl /tmp/m0n0wallmicro.libs / $MW_BUILDPATH/microfs
+
 cp  $MW_BUILDPATH/freebsd8/build/files/rc.microfs $MW_BUILDPATH/microfs/etc/rc
-find $MW_BUILDPATH/m0n0microfs/ | xargs strip -s 2> /dev/null
+cp $MW_BUILDPATH/freebsd8/build/files/ttys.microfs $MW_BUILDPATH/microfs/etc/ttys
+
+find $MW_BUILDPATH/microfs/ | xargs strip -s 2> /dev/null
+
 
 makeminimfsroot() {
 		PLATFORM=$1

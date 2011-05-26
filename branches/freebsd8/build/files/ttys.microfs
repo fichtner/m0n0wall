@@ -1,0 +1,4 @@
+#
+# name	getty				type	status		comments
+#
+console	"/usr/sbin/chroot /mnt/m0n0wall/m0n0fs /bin/sh /etc/rc.initial"	cons25	on secure
