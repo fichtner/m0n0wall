@@ -29,7 +29,7 @@ fi
 		make all install
 		cd /usr/src/sbin/setkey
 		make all
-		install -s setkey $MW_BUILDPATH/m0n0fs/usr/sbin/
+		install -s setkey $MW_BUILDPATH/m0n0fs/sbin/
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
 	set +e
 	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null

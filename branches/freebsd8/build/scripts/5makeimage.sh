@@ -111,3 +111,5 @@ makeimage() {
         -quiet $MW_BUILDPATH/tmp/cdroot
 	mv m0n0wall.iso $MW_BUILDPATH/images/generic-pc-$VERSION.iso
 	echo " done"
+
+echo "Finished Stage 5"

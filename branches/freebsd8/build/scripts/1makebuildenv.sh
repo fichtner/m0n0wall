@@ -66,4 +66,5 @@ fi
 	
 # create missing etc files
 	tar -xzf $MW_BUILDPATH/freebsd8/build/files/etcadditional.tgz -C $MW_BUILDPATH/m0n0fs/
-	cp $MW_BUILDPATH/freebsd8/build/files/rc $MW_BUILDPATH/m0n0fs/etc
+
+echo "Finished Stage 1"

@@ -2,6 +2,15 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix rc for syslinux symlinks, fix setkey to /sbin, remove rc script from build
+  directory, add some build script exit messages
+  
+- installing from cdrom will try from /dev/acd0 then /dev/cd0.  Install works
+  via remote ISO mapping on hp servers now.
+  
+- Add Manuel Kaspers ip6_input.c patch for ipsec6, add ipv6 support to ipsec tunnels
+  set sysctl for net.enc.in.ipsec_filter_mask in rc
+
 - fix syslinux not doing ttys in chroot properly (fixs console) , update todo
 
 - update todo

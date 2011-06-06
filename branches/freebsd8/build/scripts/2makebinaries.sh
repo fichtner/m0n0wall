@@ -146,3 +146,5 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ucd-snmp.config.h.patch
 	    make
         install -s agent/snmpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
+
+echo "Finished Stage 2"

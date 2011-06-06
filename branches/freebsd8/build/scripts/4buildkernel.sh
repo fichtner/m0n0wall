@@ -9,6 +9,7 @@ fi
 
 # patch kernel / sources
 		cd /usr/src
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip6_input.c.patch
 		patch -p0 < $MW_BUILDPATH/freebsd8/build/patches/kernel/stf_6rd_20100923-1.diff
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ipfilter_kernel_update_to_4.1.34.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/Makefile.orig.patch
@@ -46,3 +47,5 @@ fi
 		cd $MW_BUILDPATH/tmp
 		perl $MW_BUILDPATH/freebsd8/build/minibsd/mklibs.pl $MW_BUILDPATH/m0n0fs > m0n0wall.libs
 		perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl m0n0wall.libs / $MW_BUILDPATH/m0n0fs
+
+echo "Finished Stage 4"

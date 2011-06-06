@@ -56,7 +56,7 @@ $iflist = array("lan" => "LAN", "wan" => "WAN");
 if ($config['pptpd']['mode'] == "server" && !$ipv6rules)
 	$iflist['pptp'] = "PPTP VPN";
 
-if (isset($config['ipsec']['enable']) && !$ipv6rules)
+if (isset($config['ipsec']['enable']))
 	$iflist['ipsec'] = "IPsec VPN";
 
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {

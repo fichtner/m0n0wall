@@ -790,7 +790,7 @@ EOD;
 	}
 	
 	/* IPsec enabled? */
-	if (!$ipv6 && isset($config['ipsec']['enable']) && 
+	if ( isset($config['ipsec']['enable']) && 
 		((is_array($config['ipsec']['tunnel']) &&
 		count($config['ipsec']['tunnel'])) ||
 			isset($config['ipsec']['mobileclients']['enable']))) {
@@ -858,7 +858,7 @@ EOD;
 	
 	}
 	
-	if (!$ipv6 && isset($config['ipsec']['enable'])) {
+	if (isset($config['ipsec']['enable'])) {
 		$ipfrules .= <<<EOD
 
 # always pass outgoing IPsec encapsulated packets

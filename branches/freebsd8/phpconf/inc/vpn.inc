@@ -35,13 +35,16 @@ function vpn_ipsec_configure($ipchg = false) {
 	global $config, $g;
 	
 	$curwanip = get_current_wan_address();
-	
+	$curwanip6 = get_current_wan_address(true);
 	$syscfg = $config['system'];
 	$ipseccfg = $config['ipsec'];
 	$lancfg = $config['interfaces']['lan'];
 	$lanip = $lancfg['ipaddr'];
+	$lanip6 = $lancfg['ipaddr6'];
 	$lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
+	$lansa6 = gen_subnet6($lancfg['ipaddr6'], $lancfg['subnet6']);
 	$lansn = $lancfg['subnet'];
+	$lansn6 = $lancfg['subnet6'];
 	
 	if ($g['booting']) {
 		if (!isset($ipseccfg['enable']))
@@ -98,7 +101,10 @@ function vpn_ipsec_configure($ipchg = false) {
 				}
 					
 				$spdconf = "";
-				
+				if (ipv6enabled()) {
+					$spdconf .= "spdadd {$lansa6}/{$lansn6} {$lanip6}/128 any -P in none;\n";
+					$spdconf .= "spdadd {$lanip6}/128 {$lansa6}/{$lansn6} any -P out none;\n";
+				} 
 				$spdconf .= "spdadd {$lansa}/{$lansn} {$lanip}/32 any -P in none;\n";
 				$spdconf .= "spdadd {$lanip}/32 {$lansa}/{$lansn} any -P out none;\n";
 				
@@ -109,7 +115,7 @@ function vpn_ipsec_configure($ipchg = false) {
 				
 					/* see if this tunnel has a hostname for the remote-gateway, and if so,
 					   try to resolve it now and add it to the list for dnswatch */
-					if (!is_ipaddr($tunnel['remote-gateway'])) {
+					if (!is_ipaddr4or6($tunnel['remote-gateway'])) {
 						$dnswatch_list[] = $tunnel['remote-gateway'];
 						$rgip = resolve_retry($tunnel['remote-gateway']);
 						
@@ -120,21 +126,25 @@ function vpn_ipsec_configure($ipchg = false) {
 						$rgip = $tunnel['remote-gateway'];
 					}
 					$rgmap[$tunnel['remote-gateway']] = $rgip;
-				
-					$ep = vpn_endpoint_determine($tunnel, $curwanip);
+					if (ipv6enabled() && (is_ipaddr6($rgip))) {
+						$ep = vpn_endpoint_determine($tunnel, $curwanip6,$rgip);
+					} else {
+						$ep = vpn_endpoint_determine($tunnel, $curwanip,$rgip);
+					}
+					
 					if (!$ep)
 						continue;
 					
-					vpn_localnet_determine($tunnel['local-subnet'], $sa, $sn);
+					vpn_localnet_determine($tunnel['local-subnet'], $sa, $sn, $rgip);
 					
-					$spdconf .= "spdadd {$sa}/{$sn} " . 
-						"{$tunnel['remote-subnet']} any -P out ipsec " . 
-						"{$tunnel['p2']['protocol']}/tunnel/{$ep}-" .
-						"{$rgip}/unique;\n";
+					$spdconf .= "spdadd {$sa}/{$sn} " .
+					"{$tunnel['remote-subnet']} any -P out ipsec " . 
+					"{$tunnel['p2']['protocol']}/tunnel/{$ep}-" .
+					"{$rgip}/unique;\n";
 						
-					$spdconf .= "spdadd {$tunnel['remote-subnet']} " . 
-						"{$sa}/{$sn} any -P in ipsec " . 
-						"{$tunnel['p2']['protocol']}/tunnel/{$rgip}-" .
+					$spdconf .= "spdadd {$tunnel['remote-subnet']} " .
+					" {$sa}/{$sn} any -P in ipsec " .
+					"{$tunnel['p2']['protocol']}/tunnel/{$rgip}-" .
 						"{$ep}/unique;\n";
 				}
 				
@@ -201,11 +211,15 @@ function vpn_ipsec_configure($ipchg = false) {
 				if (!$rgip)
 					continue;
 				
-				$ep = vpn_endpoint_determine($tunnel, $curwanip);
+				if (ipv6enabled() && (is_ipaddr6($rgip))) {
+						$ep = vpn_endpoint_determine($tunnel, $curwanip6,$rgip);
+				} else {
+						$ep = vpn_endpoint_determine($tunnel, $curwanip,$rgip);
+				}
 				if (!$ep)
 					continue;
 			
-				vpn_localnet_determine($tunnel['local-subnet'], $sa, $sn);
+				vpn_localnet_determine($tunnel['local-subnet'], $sa, $sn, $rgip);
 			
 				if (isset($tunnel['p1']['myident']['myaddress'])) {
 					$myidentt = "address";
@@ -524,7 +538,11 @@ EOD;
 				foreach ($ipseccfg['tunnel'] as $tunnel) {
 					if (isset($tunnel['auto'])) {
 						$remotehost = substr($tunnel['remote-subnet'],0,strpos($tunnel['remote-subnet'],"/"));
-						$srchost = vpn_endpoint_determine($tunnel, $curwanip);
+						if (ipv6enabled() && (is_ipaddr6($rgip))) {
+							$srchost = vpn_endpoint_determine($tunnel, $curwanip6,$rgip);
+						} else {
+							$srchost = vpn_endpoint_determine($tunnel, $curwanip,$rgip);
+						}
 						if ($srchost)
 							mwexec_bg("/sbin/ping -c 1 -S {$srchost} {$remotehost}");
 					}
@@ -741,16 +759,22 @@ EOD;
 	return 0;
 }
 
-function vpn_localnet_determine($adr, &$sa, &$sn) {
+function vpn_localnet_determine($adr, &$sa, &$sn,$rgip) {
 	global $config, $g;
 
 	if (isset($adr)) {
 		if ($adr['network']) {			
 			switch ($adr['network']) {
 				case 'lan':
-					$sn = $config['interfaces']['lan']['subnet'];
-					$sa = gen_subnet($config['interfaces']['lan']['ipaddr'], $sn);
-					break;
+					if (ipv6enabled() && (is_ipaddr6($rgip))) {
+						$sn = $config['interfaces']['lan']['subnet6'];
+						$sa = gen_subnet6($config['interfaces']['lan']['ipaddr6'], $sn);
+						break;
+					} else {
+						$sn = $config['interfaces']['lan']['subnet'];
+						$sa = gen_subnet($config['interfaces']['lan']['ipaddr'], $sn);
+						break;
+					}
 			}
 		} else if ($adr['address']) {
 			list($sa,$sn) = explode("/", $adr['address']);
@@ -763,7 +787,7 @@ function vpn_localnet_determine($adr, &$sa, &$sn) {
 	}
 }
 
-function vpn_endpoint_determine($tunnel, $curwanip) {
+function vpn_endpoint_determine($tunnel, $curwanip,$rgip) {
 	
 	global $g, $config;
 	
@@ -773,12 +797,20 @@ function vpn_endpoint_determine($tunnel, $curwanip) {
 		else
 			return null;
 	} else if ($tunnel['interface'] == "lan") {
-		return $config['interfaces']['lan']['ipaddr'];
+		if (ipv6enabled() && (is_ipaddr6($rgip))) {
+				return $config['interfaces']['lan']['ipaddr6'];
+			} else {
+				return $config['interfaces']['lan']['ipaddr'];
+			}
 	} else {
 		$oc = $config['interfaces'][$tunnel['interface']];
 		
 		if (isset($oc['enable']) && $oc['if']) {
-			return $oc['ipaddr'];
+			if (ipv6enabled() && (is_ipaddr6($rgip))) {
+				return $oc['ipaddr'];
+			} else {
+				return $oc['ipaddr6'];
+			}
 		}
 	}
 	

@@ -80,7 +80,9 @@ EOD;
 		/* mount CD-ROM */
 		@mkdir("/cdrom");
 		if (mwexec("/sbin/mount -r -t cd9660 /dev/acd0 /cdrom") != 0) {
-			echo "failed! (cannot mount CD-ROM)";
+			if (mwexec("/sbin/mount -r -t cd9660 /dev/cd0 /cdrom") != 0) {
+				echo "failed! (cannot mount CD-ROM)";
+			}
 		} else if (!file_exists("/cdrom/firmware.img")) {
 			echo "failed! (firmware not found)\n";
 		} else {

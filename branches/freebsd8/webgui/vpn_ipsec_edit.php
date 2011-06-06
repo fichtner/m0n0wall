@@ -179,7 +179,7 @@ if ($_POST) {
 	}
 	
 	if (!is_specialnet($_POST['localnettype'])) {
-		if (($_POST['localnet'] && !is_ipaddr($_POST['localnet']))) {
+		if (($_POST['localnet'] && !is_ipaddr4or6($_POST['localnet']))) {
 			$input_errors[] = "A valid local network IP address must be specified.";
 		}
 		if (($_POST['localnetmask'] && !is_numeric($_POST['localnetmask']))) {
@@ -192,16 +192,22 @@ if ($_POST) {
 	if (($_POST['p2lifetime'] && !is_numeric($_POST['p2lifetime']))) {
 		$input_errors[] = "The P2 lifetime must be an integer.";
 	}
-	if ($_POST['remotebits'] && (!is_numeric($_POST['remotebits']) || ($_POST['remotebits'] < 0) || ($_POST['remotebits'] > 32))) {
+	if ($_POST['remotebits'] && (!is_numeric($_POST['remotebits']) || ($_POST['remotebits'] < 0) || ($_POST['remotebits'] > 128))) {
 		$input_errors[] = "The remote network bits are invalid.";
 	}
-	if (($_POST['remotenet'] && !is_ipaddr($_POST['remotenet']))) {
+	if (($_POST['remotenet'] && !is_ipaddr4or6($_POST['remotenet']))) {
 		$input_errors[] = "A valid remote network address must be specified.";
 	}
-	if (($_POST['remotegw'] && !is_ipaddr($_POST['remotegw']) && !is_domain($_POST['remotegw']))) {
+	if (($_POST['remotegw'] && !is_ipaddr4or6($_POST['remotegw']) && !is_domain($_POST['remotegw']))) {
 		$input_errors[] = "A valid remote gateway address or host name must be specified.";
 	}
-	if ((($_POST['p1myidentt'] == "address") && !is_ipaddr($_POST['p1myident']))) {
+	if (($_POST['remotenet'] && is_ipaddr6($_POST['remotenet'])) && ($_POST['remotegw'] && !is_ipaddr6($_POST['remotegw']))) {
+		$input_errors[] = "You can not set an ipv6 remote subnet to an ipv4 remote gateway";
+	}	
+	if (($_POST['remotenet'] && is_ipaddr($_POST['remotenet'])) && ($_POST['remotegw'] && is_ipaddr6($_POST['remotegw']))) {
+		$input_errors[] = "You can not set an ipv4 remote subnet to an ipv6 remote gateway";
+	}	
+	if ((($_POST['p1myidentt'] == "address") && !is_ipaddr4or6($_POST['p1myident']))) {
 		$input_errors[] = "A valid IP address for 'My identifier' must be specified.";
 	}
 	if ((($_POST['p1myidentt'] == "fqdn") && !is_domain($_POST['p1myident']))) {
@@ -389,7 +395,7 @@ function methodsel_change() {
                         <td><input name="localnet" type="text" class="formfld" id="localnet" size="20" value="<?php if (!is_specialnet($pconfig['localnet'])) echo htmlspecialchars($pconfig['localnet']);?>">
                           / 
                           <select name="localnetmask" class="formfld" id="localnetmask">
-                            <?php for ($i = 31; $i >= 0; $i--): ?>
+                            <?php for ($i = 127; $i >= 0; $i--): ?>
                             <option value="<?=$i;?>" <?php if ($i == $pconfig['localnetmask']) echo "selected"; ?>>
                             <?=$i;?>
                             </option>
@@ -401,10 +407,10 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Remote subnet</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="remotenet" type="text" class="formfld" id="remotenet" size="20" value="<?=htmlspecialchars($pconfig['remotenet']);?>">
+                    <?=$mandfldhtml;?><input name="remotenet" type="text" class="formfld" id="remotenet" size="20" value="<?=$pconfig['remotenet'];?>">
                     / 
                     <select name="remotebits" class="formfld" id="remotebits">
-                      <?php for ($i = 32; $i >= 0; $i--): ?>
+                      <?php for ($i = 128; $i >= 0; $i--): ?>
                       <option value="<?=$i;?>" <?php if ($i == $pconfig['remotebits']) echo "selected"; ?>> 
                       <?=$i;?>
                       </option>
@@ -414,9 +420,9 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Remote gateway</td>
                   <td width="78%" class="vtable"> 
-                    <?=$mandfldhtml;?><input name="remotegw" type="text" class="formfld" id="remotegw" size="20" value="<?=htmlspecialchars($pconfig['remotegw']);?>"> 
+                    <?=$mandfldhtml;?><input name="remotegw" type="text" class="formfld" id="remotegw" size="20" value="<?=$pconfig['remotegw'];?>"> 
                     <br>
-                    Enter the public IP address or host name of the remote gateway</td>
+                    Enter the public IP address or host name of the remote gateway. For ipv6, use an ipv6 IP address.</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Description</td>
@@ -453,7 +459,7 @@ function methodsel_change() {
                       <?=htmlspecialchars($modename);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=htmlspecialchars($pconfig['p1myident']);?>"> 
+                    </select> <input name="p1myident" type="text" class="formfld" id="p1myident" size="30" value="<?=$pconfig['p1myident'];?>"> 
                   </td>
                 </tr>
                 <tr> 
@@ -496,7 +502,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                   <td width="78%" class="vtable"> 
-                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=htmlspecialchars($pconfig['p1lifetime']);?>">
+                    <input name="p1lifetime" type="text" class="formfld" id="p1lifetime" size="20" value="<?=$pconfig['p1lifetime'];?>">
                     seconds</td>
                 </tr>
                 <tr> 
@@ -596,7 +602,7 @@ function methodsel_change() {
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
                   <td width="78%" class="vtable"> 
-                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=htmlspecialchars($pconfig['p2lifetime']);?>">
+                    <input name="p2lifetime" type="text" class="formfld" id="p2lifetime" size="20" value="<?=$pconfig['p2lifetime'];?>">
                     seconds</td>
                 </tr>
                 <tr> 
@@ -604,7 +610,7 @@ function methodsel_change() {
                   <td width="78%"> 
                     <input name="Submit" type="submit" class="formbtn" value="Save"> 
                     <?php if (isset($id) && $a_ipsec[$id]): ?>
-                    <input name="id" type="hidden" value="<?=htmlspecialchars($id);?>"> 
+                    <input name="id" type="hidden" value="<?=$id;?>"> 
                     <?php endif; ?>
                   </td>
                 </tr>
