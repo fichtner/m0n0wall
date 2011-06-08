@@ -68,6 +68,7 @@ usr/sbin/chown
 usr/sbin/chroot
 usr/sbin/diskinfo
 usr/sbin/hostapd
+usr/sbin/ndp
 usr/sbin/pwd_mkdb
 usr/sbin/rtadvd
 usr/sbin/sntp

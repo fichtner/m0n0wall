@@ -576,6 +576,27 @@ function arp_get_mac_by_ip($ip) {
 	return false;
 }
 
+/* obtain MAC address given an IP address by looking at the NDP table */
+function ndp_get_mac_by_ip($ip) {
+	exec("/usr/sbin/ndp -n {$ip}", $arpoutput);
+	
+	if ($ndpoutput[1]) {
+		$ndpi = explode(" ", eregi_replace(" +", " ",$ndpoutput[1]));
+		$macaddr = $ndpi[1];
+		if (is_macaddr($macaddr))
+			return $macaddr;
+		else
+			return false;
+	}
+	
+	return false;
+}
+
+function get_mac_by_ip($ip) {
+	if (is_ipaddr($ip)) return arp_get_mac_by_ip($ip);
+	if (is_ipaddr6($ip)) return ndp_get_mac_by_ip($ip);
+}
+
 function mac_format($clientmac) {
     $mac =explode(":", $clientmac);
 

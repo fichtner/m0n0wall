@@ -29,8 +29,14 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "ARP table");
 require("guiconfig.inc");
+
+if (ipv6enabled()){
+	$pgtitle = array("Diagnostics", "ARP/NDP table");
+} else {
+	$pgtitle = array("Diagnostics", "ARP table");
+}
+
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -162,7 +168,6 @@ if ($fp) {
 	unset($data);
 }
 
-exec("/usr/sbin/arp -an",$rawdata);
 
 $i = 0; 
 $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
@@ -176,6 +181,9 @@ foreach ($ifdescrs as $key =>$interface) {
 }
 
 $data = array();
+
+exec("/usr/sbin/arp -an",$rawdata);
+
 foreach ($rawdata as $line) {
 	$elements = explode(' ',$line);
 	
@@ -188,6 +196,27 @@ foreach ($rawdata as $line) {
 	}
 }
 
+if (ipv6enabled()){
+	
+	exec("/usr/sbin/ndp -an",$ndprawdata);
+	//remove headers from table
+	array_shift($ndprawdata);
+	
+	foreach ($ndprawdata as $line) {
+		$elements = explode(" ", eregi_replace(" +", " ",$line));
+		//check if linklocal and remove %if		
+		$ip6element = explode("%", $elements[0]);
+		
+		if ($elements[1] != "(incomplete)") {
+			$ndpent = array();
+			$ndpent['ip'] = trim($ip6element[0]);
+			$ndpent['mac'] = "0" . trim($elements[1]);
+			$ndpent['interface'] = trim($elements[2]);
+			$data[] = $ndpent;
+		}
+	}
+}
+
 function getHostName($mac,$ip)
 {
 	global $dhcpmac, $dhcpip, $resolve;
@@ -196,7 +225,7 @@ function getHostName($mac,$ip)
 		return $dhcpmac[$mac];
 	else if ($dhcpip[$ip])
 		return $dhcpip[$ip];
-	else if ($resolve) 
+	else if ($resolve && is_ipaddr4or6($ip)) 
 		return gethostbyaddr($ip);
 	else
 		return "&nbsp;";

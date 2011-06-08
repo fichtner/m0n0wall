@@ -31,7 +31,7 @@ mkdir /var/run /var/log /var/etc /var/db /var/empty
 
 if [ -e /dev/md2 ]; then
 	# If syslinux boot, we need new links as fat32 in freebsd doesn't support symlinks
-	rm /etc/resolv.conf /etc/hosts /usr/local/www/.htpasswd
+	rm /etc/resolv.conf /etc/hosts /usr/local/www/.htpasswd > /dev/null 2>&1
 	touch /etc/resolv.conf /etc/hosts /usr/local/www/.htpasswd
 	/bin/ln -s  /etc/resolv.conf /var/etc/resolv.conf
 	/bin/ln -s  /etc/hosts /var/etc/hosts

@@ -191,7 +191,11 @@ $menu['Diagnostics']['IPsec'] 			= array('diag_ipsec_sad.php',
 												'diag_ipsec_spd.php');
 $menu['Diagnostics']['Ping/Traceroute'] = array('diag_ping.php',
 												'diag_traceroute.php');
+if (ipv6enabled()){
+$menu['Diagnostics']['ARP/NDP Table'] 		= array('diag_arp.php');
+} else {
 $menu['Diagnostics']['ARP Table'] 		= array('diag_arp.php');
+}
 $menu['Diagnostics']['Firewall states'] = array('diag_ipfstat.php');
 $menu['Diagnostics']['Reset state'] 	= array('diag_resetstate.php');
 $menu['Diagnostics']['Backup/Restore'] 	= array('diag_backup.php');
