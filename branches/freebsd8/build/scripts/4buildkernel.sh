@@ -23,6 +23,7 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/g_part_bsd.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/usbdevs.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/u3g.c.orig.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/dummynet_v6.patch
 
 
 # kernel compile

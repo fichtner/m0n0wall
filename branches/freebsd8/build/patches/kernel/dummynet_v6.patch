@@ -1,0 +1,22 @@
+--- sys/netinet/ipfw/ip_dn_io.c.orig	2010-12-28 13:18:46.000000000 +0100
++++ sys/netinet/ipfw/ip_dn_io.c	2011-06-04 14:35:45.305439000 +0200
+@@ -610,7 +610,6 @@
+ 			break;
+ 
+ 		case DIR_OUT | PROTO_IPV6:
+-			SET_HOST_IPLEN(mtod(m, struct ip *));
+ 			ip6_output(m, NULL, NULL, IPV6_FORWARDING, NULL, NULL, NULL);
+ 			break;
+ #endif
+--- sys/netinet/ipfw/ip_fw_pfil.c.orig	2010-12-21 18:09:25.000000000 +0100
++++ sys/netinet/ipfw/ip_fw_pfil.c	2011-06-04 14:35:45.305439000 +0200
+@@ -127,7 +127,8 @@
+ 		args.rule = *((struct ipfw_rule_ref *)(tag+1));
+ 		m_tag_delete(*m0, tag);
+ 		if (args.rule.info & IPFW_ONEPASS) {
+-			SET_HOST_IPLEN(mtod(*m0, struct ip *));
++			if (mtod(*m0, struct ip *)->ip_v == 4)
++				SET_HOST_IPLEN(mtod(*m0, struct ip *));
+ 			return 0;
+ 		}
+ 	}
