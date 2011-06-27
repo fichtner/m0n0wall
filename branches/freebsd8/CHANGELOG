@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- ndp/arp page fixup
+
 - hide "ipfw*" and "bridge*" virtual interfaces from assign interfaces list
 
 - add kernel patch for dummynet on IPv6 packets
