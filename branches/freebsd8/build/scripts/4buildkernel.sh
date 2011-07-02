@@ -7,8 +7,14 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	exit 1
 fi
 
+# make our own copy of the kernel tree
+		rm -Rf $MW_BUILDPATH/tmp/sys
+		echo -n "Copying kernel sources..."
+		cp -Rp /usr/src/sys $MW_BUILDPATH/tmp
+		echo "done."
+
 # patch kernel / sources
-		cd /usr/src
+		cd $MW_BUILDPATH/tmp
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip6_input.c.patch
 		patch -p0 < $MW_BUILDPATH/freebsd8/build/patches/kernel/stf_6rd_20100923-1.diff
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ipfilter_kernel_update_to_4.1.34.patch
@@ -27,17 +33,17 @@ fi
 
 
 # kernel compile
-        cd /sys/$MW_ARCH/conf
-        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.$MW_ARCH /sys/$MW_ARCH/conf/M0N0WALL_GENERIC
-		cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.hints /sys/$MW_ARCH/conf/
+        cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf
+        cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.$MW_ARCH $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf/M0N0WALL_GENERIC
+		cp $MW_BUILDPATH/freebsd8/build/kernelconfigs/M0N0WALL_GENERIC.hints $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf/
         config M0N0WALL_GENERIC
-        cd /sys/$MW_ARCH/compile/M0N0WALL_GENERIC/
+        cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/compile/M0N0WALL_GENERIC/
         make depend && make
         strip kernel
         strip --remove-section=.note --remove-section=.comment kernel
         gzip -9 kernel
         mv kernel.gz $MW_BUILDPATH/tmp/
-        cd modules/usr/src/sys/modules
+        cd modules/$MW_BUILDPATH/tmp/sys/modules
         cp aesni/aesni.ko glxsb/glxsb.ko padlock/padlock.ko if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
 		if [ $MW_ARCH = "i386" ]; then
                 cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp

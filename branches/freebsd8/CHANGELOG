@@ -2,6 +2,24 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- modify build scripts as not to clobber the host system (as far as
+  possible - see TODO). Removing /usr/m0n0wall/build82 should now
+  leave things clean enough for another build. This is done mostly by
+  undoing patches to ports after they've been built, using a separate
+  working and DB directory for ports (-> env variable) and making a
+  copy of the kernel source tree before patching/compiling. Also,
+  autoconf has a handy wrapper that can be used to choose the version
+  without removing links.
+
+- automatically tag image version with subversion revision if '%'
+  character found in "version" file
+
+- add copies of various source code packages (PHP etc.) to repository,
+  as some of them are obsolete versions, and who knows when they're
+  gone from their official web locations.
+
+- unify syslogd.c patches
+
 - ndp/arp page fixup
 
 - hide "ipfw*" and "bridge*" virtual interfaces from assign interfaces list

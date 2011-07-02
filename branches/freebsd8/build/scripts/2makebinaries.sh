@@ -7,108 +7,118 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	exit 1
 fi
 
+# set working directory for ports compilation
+		rm -Rf $MW_BUILDPATH/tmp/ports/work
+		mkdir -p $MW_BUILDPATH/tmp/ports/work
+		export WRKDIRPREFIX=$MW_BUILDPATH/tmp/ports/work
+
 # set port options for ports that need user input
+		rm -Rf $MW_BUILDPATH/tmp/ports/db
+		mkdir -p $MW_BUILDPATH/tmp/ports/db
+		export PORT_DBDIR=$MW_BUILDPATH/tmp/ports/db
+		
 		for portoptf in $MW_BUILDPATH/freebsd8/build/files/portoptions/* ; do
 			port=${portoptf##*/}
-			mkdir -p /var/db/ports/$port
-			cp $portoptf /var/db/ports/$port/options
+			mkdir -p $PORT_DBDIR/$port
+			cp $portoptf $PORT_DBDIR/$port/options
 		done
 
-# autconf
-        rm /usr/local/bin/autoconf
-        rm /usr/local/bin/autoheader
-        ln -s /usr/local/bin/autoconf-2.13 /usr/local/bin/autoconf
-        ln -s /usr/local/bin/autoheader-2.13 /usr/local/bin/autoheader
+
+######## manually compiled packages ########
+
+# select Autoconf version 2.13
+		export AUTOCONF_VERSION=2.13
 # php 4.4.9
 		cd $MW_BUILDPATH/tmp
-        fetch http://dk.php.net/distributions/php-4.4.9.tar.bz2
-        tar -zxf php-4.4.9.tar.bz2
+		rm -Rf php-4.4.9
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/php-4.4.9.tar.bz2
         cd php-4.4.9/ext/
-        fetch http://pecl.php.net/get/radius-1.2.5.tgz
-        tar -zxf radius-1.2.5.tgz
+		tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/radius-1.2.5.tgz
         mv radius-1.2.5 radius
         cd ..
         ./buildconf --force
         ./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
         make
         install -s sapi/cgi/php $MW_BUILDPATH/m0n0fs/usr/local/bin/
-        cd ..
 # mini httpd
 		cd $MW_BUILDPATH/tmp
-        fetch http://acme.com/software/mini_httpd/mini_httpd-1.19.tar.gz
-        tar -zxf mini_httpd-1.19.tar.gz
-        rm mini_httpd-1.19.tar.gz
+		rm -Rf mini_httpd-1.19
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/mini_httpd-1.19.tar.gz
         cd mini_httpd-1.19/
         patch < $MW_BUILDPATH/freebsd8/build/patches/packages/mini_httpd.patch
         make
         install -s mini_httpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
-        cd ..
-# wol
-		cd /usr/ports/net/wol
-		make WITHOUT_NLS=true
-        install -s work/wol-*/src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # ezipupdate
         cd $MW_BUILDPATH/tmp
-        fetch http://dyn.pl/client/UNIX/ez-ipupdate/ez-ipupdate-3.0.11b8.tar.gz
-        tar -zxf ez-ipupdate-3.0.11b8.tar.gz
+		rm -Rf ez-ipupdate-3.0.11b8
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/ez-ipupdate-3.0.11b8.tar.gz
         cd ez-ipupdate-3.0.11b8
         patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ez-ipupdate.c.patch
         ./configure
         make
         install -s ez-ipupdate $MW_BUILDPATH/m0n0fs/usr/local/bin/
-        cd ..
 # ipfilter userland tools (newer version than included with FreeBSD)
 		cd $MW_BUILDPATH/tmp
-		tar -zxvf $MW_BUILDPATH/freebsd8/build/local-sources/ip_fil4.1.34.tar.gz
+		rm -Rf ip_fil4.1.34
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/ip_fil4.1.34.tar.gz
 		cd ip_fil4.1.34
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/ipfstat.c.patch
 		make freebsd8
 		install -s BSD/FreeBSD-8.?-RELEASE-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
+
+
+######## FreeBSD ports ########
+
 # ISC dhcp-relay
         cd /usr/ports/net/isc-dhcp31-relay
         make
-        install -s work/dhcp-*/work.freebsd/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-relay/work/dhcp-*/work.freebsd/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # ISC dhcp-server
         cd /usr/ports/net/isc-dhcp31-server
-		cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c /usr/ports/net/isc-dhcp31-server/files/
+		cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c files/
         make
-        install -s work/dhcp-*/work.freebsd/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-server/work/dhcp-*/work.freebsd/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+		rm files/patch-server.db.c
 # ISC dhcp-client
 		cd /usr/ports/net/isc-dhcp31-client
-		make
-		install -s work/dhcp-*/work.freebsd/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
+        make
+		install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-client/work/dhcp-*/work.freebsd/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
 # dnsmasq
         cd /usr/ports/dns/dnsmasq
-		make
-        install -s work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        make
+        install -s $WRKDIRPREFIX/usr/ports/dns/dnsmasq/work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # ipsec-tools
         cd /usr/ports/security/ipsec-tools
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ipsec-tools.Makefile.patch
         make
-        install -s work/ipsec-tools-*/src/racoon/.libs/racoon $MW_BUILDPATH/m0n0fs/usr/local/sbin
-        install -s work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MW_BUILDPATH/m0n0fs/usr/local/lib
+        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/racoon/.libs/racoon $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MW_BUILDPATH/m0n0fs/usr/local/lib
+		mv Makefile.orig Makefile
 # dhcp6
 		cd /usr/ports/net/dhcp6
-		make
-		install -s work/wide-dhc*/dhcp6c $MW_BUILDPATH/m0n0fs/usr/local/sbin
-		install -s work/wide-dhc*/dhcp6s $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        make
+		install -s $WRKDIRPREFIX/usr/ports/net/dhcp6/work/wide-dhc*/dhcp6c $MW_BUILDPATH/m0n0fs/usr/local/sbin
+		install -s $WRKDIRPREFIX/usr/ports/net/dhcp6/work/wide-dhc*/dhcp6s $MW_BUILDPATH/m0n0fs/usr/local/sbin
 # sixxs-aiccu		
-		cd /usr/ports/net/sixxs-aiccu/
+		cd /usr/ports/net/sixxs-aiccu
+		cp -p Makefile Makefile.orig
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/sixxs-aiccu.Makefile.patch
-		make
-		install -s work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
-# rtadvd		
-		cd /usr/src/usr.sbin/rtadvd
-		make
-		install -s rtadvd $MW_BUILDPATH/m0n0fs/usr/sbin/
-# mpd4
+        make
+		install -s $WRKDIRPREFIX/usr/ports/net/sixxs-aiccu/work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
+		mv Makefile.orig Makefile
+# mpd4 - XXX this will cause libpdel to be installed
 		cd /usr/ports/net/mpd4
-		make
-		install -s work/mpd-4.4.1/src/mpd4 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        make
+		install -s $WRKDIRPREFIX/usr/ports/net/mpd4/work/mpd-*/src/mpd4 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # mbmon
 		cd /usr/ports/sysutils/mbmon
-		make
-		install -s work/xmbmon205/mbmon $MW_BUILDPATH/m0n0fs/usr/local/bin/
+        make
+		install -s $WRKDIRPREFIX/usr/ports/sysutils/mbmon/work/xmbmon*/mbmon $MW_BUILDPATH/m0n0fs/usr/local/bin/
+# wol
+		cd /usr/ports/net/wol
+		make WITHOUT_NLS=true
+        install -s $WRKDIRPREFIX/usr/ports/net/wol/work/wol-*/src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
+
 
 # make m0n0wall tools and binaries
         cd $MW_BUILDPATH/tmp
@@ -127,14 +137,12 @@ fi
         install runsntp.sh $MW_BUILDPATH/m0n0fs/usr/local/bin
         install ppp-linkup vpn-linkdown vpn-linkup $MW_BUILDPATH/m0n0fs/usr/local/sbin
 
+# select Autoconf version 2.62
+		export AUTOCONF_VERSION=2.62
 # ucd-snmp
-        rm /usr/local/bin/autoconf
-        rm /usr/local/bin/autoheader
-        ln -s /usr/local/bin/autoconf-2.62 /usr/local/bin/autoconf
-        ln -s /usr/local/bin/autoheader-2.62 /usr/local/bin/autoheader
         cd $MW_BUILDPATH/tmp
-        fetch "http://downloads.sourceforge.net/project/net-snmp/ucd-snmp/4.2.7.1/ucd-snmp-4.2.7.1.tar.gz"
-        tar -zxf ucd-snmp-4.2.7.1.tar.gz
+		rm -Rf ucd-snmp-4.2.7.1
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/ucd-snmp-4.2.7.1.tar.gz
         cd ucd-snmp-4.2.7.1
         ./configure  --without-openssl --disable-debugging --enable-static \
         --enable-mini-agent --disable-privacy --disable-testing-code \

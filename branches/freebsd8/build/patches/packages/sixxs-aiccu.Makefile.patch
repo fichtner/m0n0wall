@@ -4,7 +4,7 @@
  MAINTAINER=	dinoex@FreeBSD.org
  COMMENT=	SixXS IPv6 TIC+ tunnel broker heartbeat client
  
--LIB_DEPENDS=	gnutls-openssl.40:${PORTSDIR}/security/gnutls
+-LIB_DEPENDS=	gnutls-openssl.27:${PORTSDIR}/security/gnutls
 -
  LICENSE=	BSD
  LICENSE_FILE=	${WRKSRC}/doc/LICENSE

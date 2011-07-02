@@ -29,6 +29,7 @@ mkdir -p $MW_BUILDPATH
 
 echo "Exporting repository to $MW_BUILDPATH/freebsd8."
 /usr/local/bin/svn export --force . $MW_BUILDPATH/freebsd8
+/usr/local/bin/svnversion -n . > $MW_BUILDPATH/freebsd8/svnrevision
 
 echo "Changing directory to $MW_BUILDPATH/freebsd8/build/scripts"
 cd $MW_BUILDPATH/freebsd8/build/scripts

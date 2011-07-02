@@ -45,7 +45,15 @@ fi
  
 # configure build information
 	date > etc/version.buildtime
-	cp $MW_BUILDPATH/freebsd8/version etc/version
+	VERSION=`cat $MW_BUILDPATH/freebsd8/version`
+
+	if [ -r $MW_BUILDPATH/freebsd8/svnrevision ]; then
+		# replace character '%' in version with repository revision
+		SVNREV=`cat $MW_BUILDPATH/freebsd8/svnrevision`
+		VERSION=${VERSION/\%/$SVNREV}
+	fi
+	
+	echo $VERSION > etc/version
  
 # get and set current default configuration
 	cp $MW_BUILDPATH/freebsd8/phpconf/config.xml conf.default/config.xml

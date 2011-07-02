@@ -12,4 +12,5 @@ areas to investigate impact
 	enable sysctl for hardware crypto for padlock and geode processor support that is now in m0n0wall kernel in vpn.inc
 	
 areas to improve
-	scripts to reverse the build scripts so you can do a clean build
+	avoid installing libpdel on host system while building mpd4 (or maybe simply uninstall it again afterwards?)
+	avoid clobbering host system's libipsec

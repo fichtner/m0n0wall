@@ -1,5 +1,5 @@
---- usr.sbin/syslogd/syslogd.c.orig	Sun Jan 15 18:50:37 2006
-+++ usr.sbin/syslogd/syslogd.c	Sat Nov 18 20:22:32 2006
+--- syslogd.c.orig	2010-12-21 18:09:25.000000000 +0100
++++ syslogd.c	2011-07-02 13:45:44.000000000 +0200
 @@ -66,6 +66,7 @@
   *   by Peter da Silva.
   * -u and -v by Harlan Stenn.
@@ -8,7 +8,7 @@
   */
  
  #define	MAXLINE		1024		/* maximum line length */
-@@ -86,6 +87,7 @@
+@@ -87,6 +88,7 @@
  #include <sys/time.h>
  #include <sys/resource.h>
  #include <sys/syslimits.h>
@@ -16,7 +16,7 @@
  #include <sys/types.h>
  
  #include <netinet/in.h>
-@@ -109,6 +111,7 @@
+@@ -110,6 +112,7 @@
  
  #include "pathnames.h"
  #include "ttymsg.h"
@@ -24,7 +24,7 @@
  
  #define SYSLOG_NAMES
  #include <sys/syslog.h>
-@@ -116,6 +119,7 @@
+@@ -117,6 +120,7 @@
  const char	*ConfFile = _PATH_LOGCONF;
  const char	*PidFile = _PATH_LOGPID;
  const char	ctty[] = _PATH_CONSOLE;
@@ -32,7 +32,7 @@
  
  #define	dprintf		if (Debug) printf
  
-@@ -181,6 +185,11 @@
+@@ -182,6 +186,11 @@
  			char	f_pname[MAXPATHLEN];
  			pid_t	f_pid;
  		} f_pipe;
@@ -44,7 +44,7 @@
  	} f_un;
  	char	f_prevline[MAXSVLINE];		/* last message logged */
  	char	f_lasttime[16];			/* time of last occurrence */
-@@ -259,10 +268,12 @@
+@@ -260,10 +269,12 @@
  #define F_USERS		5		/* list of users */
  #define F_WALL		6		/* everyone logged on */
  #define F_PIPE		7		/* pipe to program */
@@ -59,8 +59,8 @@
  };
  
  static struct filed *Files;	/* Log files that we write to */
-@@ -323,6 +334,8 @@
- static void	printline(const char *, char *);
+@@ -327,6 +338,8 @@
+ static void	printline(const char *, char *, int);
  static void	printsys(char *);
  static int	p_open(const char *, pid_t *);
 +static ssize_t	rbwrite(struct filed *, char *, size_t);
@@ -68,7 +68,7 @@
  static void	readklog(void);
  static void	reapchild(int);
  static void	usage(void);
-@@ -1233,6 +1246,21 @@
+@@ -1277,6 +1290,21 @@
  		}
  		break;
  
@@ -90,7 +90,7 @@
  	case F_PIPE:
  		dprintf(" %s\n", f->f_un.f_pipe.f_pname);
  		v->iov_base = lf;
-@@ -1545,6 +1573,10 @@
+@@ -1589,6 +1617,10 @@
  			}
  			f->f_un.f_pipe.f_pid = 0;
  			break;
@@ -101,8 +101,8 @@
  		}
  		next = f->f_next;
  		if (f->f_program) free(f->f_program);
-@@ -1667,6 +1699,10 @@
- 				printf("%s", f->f_un.f_forw.f_hname);
+@@ -1730,6 +1762,10 @@
+ 				}
  				break;
  
 +			case F_RING:
@@ -112,7 +112,7 @@
  			case F_PIPE:
  				printf("%s", f->f_un.f_pipe.f_pname);
  				break;
-@@ -1717,6 +1753,7 @@
+@@ -1780,6 +1816,7 @@
  	const char *p, *q;
  	char *bp;
  	char buf[MAXLINE], ebuf[100];
@@ -120,7 +120,25 @@
  
  	dprintf("cfline(\"%s\", f, \"%s\", \"%s\")\n", line, prog, host);
  
-@@ -1905,6 +1942,38 @@
+@@ -1942,9 +1979,16 @@
+ 			tp = f->f_un.f_forw.f_hname;
+ 			p++;
+ 
+-			while (*p && (*p != ':') && (i-- > 0)) {
++			while (*p && (*p != ':') && (*p != '[') && (i-- > 0)) {
+ 				*tp++ = *p++;
+ 			}
++			if (*p == '[') {
++				p++;
++				while (*p && (*p != ']') && (i-- > 0)) {
++					*tp++ = *p++;
++				}
++				p++;
++			}
+ 			*tp = '\0';
+ 		}
+ 		/* See if we copied a domain and have a port */
+@@ -1987,6 +2031,38 @@
  		}
  		break;
  
@@ -158,12 +176,11 @@
 +
  	case '|':
  		f->f_un.f_pipe.f_pid = 0;
- 		(void)strlcpy(f->f_un.f_fname, p + 1, sizeof(f->f_un.f_fname));
-@@ -2607,4 +2676,46 @@
- 		len *= 2;
+ 		(void)strlcpy(f->f_un.f_pipe.f_pname, p + 1,
+@@ -2697,3 +2773,45 @@
  		setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &len, slen);
  	}
-+}
+ }
 +
 +static ssize_t rbwritev(struct filed *f, struct iovec *iov, int iovcnt) {
 +	int i;
@@ -205,4 +222,4 @@
 +			
 +	f->f_un.f_ring.f_footer->cf_lock = 0;
 +	return out;
- }
++}

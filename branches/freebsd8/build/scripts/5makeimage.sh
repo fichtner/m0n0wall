@@ -7,7 +7,7 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	exit 1
 fi
 
-VERSION=`cat $MW_BUILDPATH/freebsd8/version`
+VERSION=`cat $MW_BUILDPATH/m0n0fs/etc/version`
 if [ $MW_ARCH = "amd64" ]; then
 	VERSION=$VERSION.$MW_ARCH	
 fi
