@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix interface status display (new netstat format)
+  Reported by: Stefan Buckmann <stefan@buckmann.ch>
+
 - modify build scripts as not to clobber the host system (as far as
   possible - see TODO). Removing /usr/m0n0wall/build82 should now
   leave things clean enough for another build. This is done mostly by

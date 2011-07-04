@@ -94,16 +94,17 @@ function get_interface_info($ifdescr) {
 		$ifinfo['macaddr'] = $linkinfo[3];
 		$ifinfo['inpkts'] = $linkinfo[4];
 		$ifinfo['inerrs'] = $linkinfo[5];
-		$ifinfo['inbytes'] = $linkinfo[6];
-		$ifinfo['outpkts'] = $linkinfo[7];
-		$ifinfo['outerrs'] = $linkinfo[8];
-		$ifinfo['outbytes'] = $linkinfo[9];
-		$ifinfo['collisions'] = $linkinfo[10];
+		$ifinfo['indrops'] = $linkinfo[6];
+		$ifinfo['inbytes'] = $linkinfo[7];
+		$ifinfo['outpkts'] = $linkinfo[8];
+		$ifinfo['outerrs'] = $linkinfo[9];
+		$ifinfo['outbytes'] = $linkinfo[10];
+		$ifinfo['collisions'] = $linkinfo[11];
 	} else {
 		$ifinfo['inpkts'] = $linkinfo[3];
-		$ifinfo['inbytes'] = $linkinfo[5];
-		$ifinfo['outpkts'] = $linkinfo[6];
-		$ifinfo['outbytes'] = $linkinfo[8];
+		$ifinfo['inbytes'] = $linkinfo[6];
+		$ifinfo['outpkts'] = $linkinfo[7];
+		$ifinfo['outbytes'] = $linkinfo[9];
 	}
 	
 	/* DHCP? -> see if dhclient is up */
