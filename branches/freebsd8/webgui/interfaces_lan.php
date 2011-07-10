@@ -277,7 +277,7 @@ function enable_change(enable_over) {
 					<input type="checkbox" name="ipv6ra" id="ipv6ra" onchange="enable_change(false)" value="1" <?php if ($pconfig['ipv6ra']) echo "checked";?> > <strong>Send IPv6 router advertisements</strong><br>
 					If this option is checked, other hosts on this interface will be able to automatically configure
 					their IPv6 address based on prefix and gateway information that the firewall provides to them.
-					This option should normally be enabled. <?php echo $pconfig['raflags']?> <br>
+					This option should normally be enabled.<br>
                     <strong>Flags</strong> <select name="raflags" class="formfld" id="raflags">
                       <?php $opts = array('None', 'Managed', 'Other');
 						foreach ($opts as $opt) {

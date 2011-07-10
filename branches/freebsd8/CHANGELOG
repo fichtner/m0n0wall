@@ -2,6 +2,12 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- remove stray raflags output in webGUI
+
+- re-enable traffic shaper for IPv6 packets. The webGUI still needs
+  to be modified to allow IPv6 address input etc.
+
 - fix interface status display (new netstat format)
   Reported by: Stefan Buckmann <stefan@buckmann.ch>
 
