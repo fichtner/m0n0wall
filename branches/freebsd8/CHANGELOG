@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add backport of r222728 with new sysctl added to allow default route to be
+  installed in route table even if ipv6 forwarding is enabled
 
 - remove stray raflags output in webGUI
 

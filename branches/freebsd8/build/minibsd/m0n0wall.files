@@ -26,7 +26,6 @@ sbin/adjkerntz
 sbin/atacontrol
 sbin/dmesg
 sbin/fastboot:sbin/fasthalt:sbin/halt:sbin/reboot
-sbin/ifconfig
 sbin/init
 sbin/ipfw
 sbin/kldload

@@ -38,6 +38,17 @@ fi
 		install -s /usr/obj/usr/src/sbin/setkey/setkey $MW_BUILDPATH/m0n0fs/sbin/
 		cd /usr/src/lib/libipsec
 		mv pfkey.c.orig pfkey.c
+# ifconfig for r222728
+		rm -Rf /usr/obj/usr/src/sbin/ifconfig
+		rm -Rf $MW_BUILDPATH/tmp/netinet6
+		cp -r /usr/src/sys/netinet6 $MW_BUILDPATH/tmp
+		cd $MW_BUILDPATH/tmp/netinet6
+		patch -p2 -t < $MW_BUILDPATH/freebsd8/build/patches/kernel/r222728_defroute.patch
+		cd /usr/src/sbin/ifconfig
+		patch < $MW_BUILDPATH/freebsd8/build/patches/user/ifconfig.r222728.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/user/ifconfig.Makefile.patch
+		make obj && make
+		install -s /usr/obj/usr/src/sbin/ifconfig/ifconfig $MW_BUILDPATH/m0n0fs/sbin/
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
 	set +e
 	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null

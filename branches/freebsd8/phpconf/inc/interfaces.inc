@@ -165,7 +165,7 @@ function interfaces_lan_configure6() {
 	
 	$lancfg = $config['interfaces']['lan'];
 	remove_all_ipv6_addresses($lancfg['if']);
-	mwexec('/sbin/ifconfig ' . $lancfg['if'] . ' inet6 -accept_rtadv');
+	mwexec('/sbin/ifconfig ' . $lancfg['if'] . ' inet6 -accept_rtadv no_radr');
 	if (ipv6enabled()) {
 		if ($lancfg['ipaddr6'] == "6to4") {
 			/* take second /64 from 6to4 prefix on WAN interface */
@@ -411,7 +411,7 @@ function interfaces_optional_configure_if6($opti) {
 	
 	if (isset($optcfg['enable'])) {
 		remove_all_ipv6_addresses($optcfg['if']);
-		mwexec('/sbin/ifconfig ' . $optcfg['if'] . ' inet6 -accept_rtadv');
+		mwexec('/sbin/ifconfig ' . $optcfg['if'] . ' inet6 -accept_rtadv no_radr');
 		if (ipv6enabled()) {
 			if ($optcfg['ipaddr6'] == "6to4") {
 				$v6addr = calc_6to4_address("opt" . $opti);
@@ -653,8 +653,9 @@ function interfaces_wan_configure6($newwanip = false) {
 	remove_all_ipv6_addresses("stf0");
 	remove_all_ipv6_addresses("gif0");
 	services_dhcp6c_stop();
-	mwexec('/sbin/ifconfig ' . $wanif . ' inet6 -accept_rtadv');	
-
+	mwexec('/sbin/ifconfig ' . $wanif . ' inet6 -accept_rtadv no_radr');	
+	mwexec("/sbin/sysctl net.inet6.ip6.rfc6204w3=0");
+	
 	/* kill any running aiccu */
 	killbypid("{$g['varrun_path']}/aiccu.pid");
 	
@@ -680,14 +681,14 @@ function interfaces_wan_configure6($newwanip = false) {
 			}
 		} else if ($wancfg['ipaddr6'] == "DHCP") {
 			services_dhcp6c_configure();
-			mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv');
-
+			mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv -no_radr');
+			mwexec("/sbin/sysctl net.inet6.ip6.rfc6204w3=1");
 		} else if ($wancfg['ipaddr6'] == "ppp") {
 			if ($newwanip) {
 				/* called from up-script -> add IPv6 default route */
 				mwexec('/sbin/route delete -inet6 default');
 				mwexec('/sbin/route add -inet6 default -iface ' . $g['pppoe_interface']);
-				mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv');
+				mwexec('/sbin/ifconfig ' . $wanif . ' inet6 accept_rtadv no_radr');
 			}
 			if ($config['interfaces']['lan']['ipaddr6'] == "DHCP-PD") {
 				services_dhcp6c_configure();
