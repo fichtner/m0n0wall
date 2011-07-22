@@ -14,3 +14,7 @@ areas to investigate impact
 areas to improve
 	avoid installing libpdel on host system while building mpd4 (or maybe simply uninstall it again afterwards?)
 	avoid clobbering host system's libipsec
+	make wireless LAN transmit power configurable
+	show "11b/g" instead of only "11g" in GUI
+	wireless LAN country code selection ("ifconfig xxx list countries")
+	revamp bridge support: use virtual interfaces, configured on Interfaces: Assign page (new tab)
