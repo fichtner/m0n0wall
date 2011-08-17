@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix inadvertent assignment that caused new IPv4 rules not to be applied
+  even though the apply button was clicked in the webGUI
+
 - add backport of r222728 with new sysctl added to allow default route to be
   installed in route table even if ipv6 forwarding is enabled
 

@@ -55,7 +55,7 @@ if ($_POST) {
 		$retval = 0;
 		if (!file_exists($d_sysrebootreqd_path)) {
 			$retval = system_routing_configure();
-			if ($configname = 'rule6') {
+			if ($configname == 'rule6') {
 				$retval |= filter_configure6();
 			} else {
 				$retval |= filter_configure(true);
