@@ -109,24 +109,38 @@ EOD;
 			}
 		} else {
 			/* probe kernel known disks until we find one with config.xml */
-			$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
-			foreach ($disks as $mountdisk) {
-				/* skip mfs mounted filesystems */
-				if (strstr($mountdisk, "md"))
-					continue;
-				if (mwexec("/sbin/mount -r /dev/{$mountdisk}a {$g['cf_path']}") == 0) {
-					if (file_exists("{$g['cf_conf_path']}/config.xml")) {
-						/* found it */
-						$cfgdevice = $mountdisk;
-						$cfgpartition = $cfgdevice . "a";
-						$cfgfstype = "ufs";
-						echo "Found configuration on $cfgdevice.\n";
+			
+			/* try up to three times, with 5 second delays in between, in case
+			   the kernel needs more time to discover USB devices etc. */
+			$maxtries = 3;
+			for ($ntries = 0; $ntries < $maxtries; $ntries++) {
+				$disks = explode(" ", trim(preg_replace("/kern.disks: /", "", exec("/sbin/sysctl kern.disks"))));
+				foreach ($disks as $mountdisk) {
+					/* skip mfs mounted filesystems */
+					if (strstr($mountdisk, "md"))
+						continue;
+					if (mwexec("/sbin/mount -r /dev/{$mountdisk}a {$g['cf_path']}") == 0) {
+						if (file_exists("{$g['cf_conf_path']}/config.xml")) {
+							/* found it */
+							$cfgdevice = $mountdisk;
+							$cfgpartition = $cfgdevice . "a";
+							$cfgfstype = "ufs";
+							echo "Found configuration on $cfgdevice.\n";
+						}
+					
+						mwexec("/sbin/umount -f {$g['cf_path']}");
+					
+						if ($cfgdevice)
+							break;
 					}
-					
-					mwexec("/sbin/umount -f {$g['cf_path']}");
-					
-					if ($cfgdevice)
-						break;
+				}
+				
+				if ($cfgdevice)
+					break;
+				
+				if ($ntries < ($maxtries-1)) {
+					echo "Configuration device not found; trying again in 5 seconds (" . ($maxtries - $ntries - 1) . " attempt(s) left)...\n";
+					sleep(5);
 				}
 			}
 		}
