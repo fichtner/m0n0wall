@@ -49,6 +49,9 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/user/ifconfig.Makefile.patch
 		make obj && make
 		install -s /usr/obj/usr/src/sbin/ifconfig/ifconfig $MW_BUILDPATH/m0n0fs/sbin/
+		mv Makefile.orig Makefile
+		mv af_inet6.c.orig af_inet6.c
+		mv af_nd6.c.orig af_nd6.c
 # lets strip out any missed symbols lazy way , lots of harmless errors to dev null
 	set +e
 	find $MW_BUILDPATH/m0n0fs/ | xargs strip -s 2> /dev/null
