@@ -549,7 +549,6 @@ function interfaces_wan_configure() {
 		
 		unlink_if_exists("{$g['varetc_path']}/dhclient.conf");
 		unlink_if_exists("{$g['varetc_path']}/mpd.conf");
-		unlink_if_exists("{$g['varetc_path']}/mpd.links");
 		unlink_if_exists("{$g['vardb_path']}/wanip");
 		unlink_if_exists("{$g['varetc_path']}/nameservers.inet.conf");
 		unlink_if_exists("{$g['varetc_path']}/nameservers.inet6.conf");
@@ -657,7 +656,17 @@ function interfaces_wan_configure6($newwanip = false) {
 	mwexec("/sbin/sysctl net.inet6.ip6.rfc6204w3=0");
 	
 	/* kill any running aiccu */
-	killbypid("{$g['varrun_path']}/aiccu.pid");
+	if (file_exists("{$g['varrun_path']}/aiccu.pid")) {
+		sigkillbypid("{$g['varrun_path']}/aiccu.pid", "TERM");
+		
+		/* AICCU doesn't exit immediately after receiving SIGTERM, as it only polls
+		   its "running" flag once per second. We give it 3 seconds to exit, and then send
+		   a SIGKILL if necessary */
+		for ($i = 0; $i < 30 && file_exists("{$g['varrun_path']}/aiccu.pid"); $i++)
+			usleep(100000);
+		if (file_exists("{$g['varrun_path']}/aiccu.pid"))
+			sigkillbypid("{$g['varrun_path']}/aiccu.pid", "KILL");
+	}
 	
 	if (ipv6enabled()) {
 		if ($wancfg['ipaddr6'] == "6to4") {
@@ -854,35 +863,21 @@ function interfaces_wan_pppoe_configure() {
 startup:
 
 pppoe:
-	new -i ng0 pppoe pppoe
+	create bundle static B1
+	set iface name ngwan0
 	set iface route default
-	set iface disable on-demand
-	set iface idle 0
 	set iface up-script /usr/local/sbin/ppp-linkup
 	set iface enable tcpmssfix
+	set ipcp yes vjcomp
+	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
 
 EOD;
+
 
 	/* IPv6 enabled on WAN interface? */
 	if ($wancfg['ipaddr6'] == "ppp") {
 		$mpdconf .= "	set bundle enable ipv6cp\n";
 	}
-	
-	$mpdconf .= <<<EOD
-	set bundle disable multilink
-	set bundle disable noretry
-	set auth authname "{$pppoecfg['username']}"
-	set auth password "{$pppoecfg['password']}"
-	set link keep-alive 10 60
-	set link max-redial 0
-	set link no acfcomp protocomp
-	set link disable pap chap
-	set link accept chap
-	set link mtu $mtu
-	set ipcp yes vjcomp
-	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
-
-EOD;
 
 	if (isset($config['system']['dnsallowoverride'])) {
 		$mpdconf .= <<<EOD
@@ -896,34 +891,30 @@ EOD;
 EOD;
 		}
 	}
-
-	$mpdconf .= "\topen\n";
-
-	fwrite($fd, $mpdconf);
-	fclose($fd);
 	
-	/* generate mpd.links */
-	$fd = fopen("{$g['varetc_path']}/mpd.links", "w");
-	if (!$fd) {
-		echo("Error: cannot open mpd.links in interfaces_wan_pppoe_configure().\n");
-		return 1;
-	}
-		
-	$mpdconf = <<<EOD
-pppoe:
-	set phys type pppoe
+	$mpdconf .= <<<EOD
+	
+	create link static L1 pppoe
+	set link action bundle B1
+	set auth authname "{$pppoecfg['username']}"
+	set auth password "{$pppoecfg['password']}"
+	set link keep-alive 10 60
+	set link max-redial 0
+	set link no acfcomp protocomp
+	set link disable pap chap
+	set link accept chap
+	set link mtu $mtu
 	set pppoe iface {$wancfg['if']}
 	set pppoe service "{$pppoecfg['provider']}"
-	set pppoe enable originate
-	set pppoe disable incoming
+	open
 
 EOD;
-
+	
 	fwrite($fd, $mpdconf);
 	fclose($fd);
 	
 	/* fire up mpd */
-	mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pppoe");
+	mwexec("/usr/local/sbin/mpd5 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pppoe");
 	
 	return 0;
 }
@@ -959,11 +950,12 @@ function interfaces_wan_pptp_configure() {
 startup:
 
 pptp:
-	new -i ng0 pptp pptp
+	create bundle static B1
+	set iface name ngwan0
 	set iface route default
-	set iface disable on-demand
-	set iface idle 0
 	set iface up-script /usr/local/sbin/ppp-linkup
+	set ipcp no vjcomp
+	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
 
 EOD;
 
@@ -971,21 +963,6 @@ EOD;
 	if ($wancfg['ipaddr6'] == "ppp") {
 		$mpdconf .= "	set bundle enable ipv6cp\n";
 	}
-	
-	$mpdconf .= <<<EOD
-	set bundle disable multilink
-	set bundle disable noretry
-	set auth authname "{$pptpcfg['username']}"
-	set auth password "{$pptpcfg['password']}"
-	set link keep-alive 10 60
-	set link max-redial 0
-	set link no acfcomp protocomp
-	set link disable pap chap
-	set link accept chap
-	set ipcp no vjcomp
-	set ipcp ranges 0.0.0.0/0 0.0.0.0/0
-
-EOD;
 	
 	if (isset($config['system']['dnsallowoverride'])) {
 		$mpdconf .= <<<EOD
@@ -995,25 +972,21 @@ EOD;
 EOD;
 	}
 	
-	$mpdconf .= "\topen\n";
-
-	fwrite($fd, $mpdconf);
-	fclose($fd);
+	$mpdconf .= <<<EOD
 	
-	/* generate mpd.links */
-	$fd = fopen("{$g['varetc_path']}/mpd.links", "w");
-	if (!$fd) {
-		echo("Error: cannot open mpd.links in interfaces_wan_pptp_configure().\n");
-		return 1;
-	}
-		
-	$mpdconf = <<<EOD
-pptp:
-	set phys type pptp
-	set pptp enable originate outcall
+	create link static L1 pptp
+	set auth authname "{$pptpcfg['username']}"
+	set auth password "{$pptpcfg['password']}"
+	set link keep-alive 10 60
+	set link max-redial 0
+	set link no acfcomp protocomp
+	set link disable pap chap
+	set link accept chap
+	set pptp enable outcall
 	set pptp disable windowing
 	set pptp self {$pptpcfg['local']}
 	set pptp peer {$pptpcfg['remote']}
+	open
 
 EOD;
 
@@ -1025,7 +998,7 @@ EOD;
 		escapeshellarg($pptpcfg['local'] . "/" . $pptpcfg['subnet']));
 	
 	/* fire up mpd */
-	mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
+	mwexec("/usr/local/sbin/mpd5 -b -d {$g['varetc_path']} -p {$g['varrun_path']}/mpd.pid pptp");
 	
 	return 0;
 }

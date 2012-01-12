@@ -12,7 +12,6 @@ areas to investigate impact
 	enable sysctl for hardware crypto for padlock and geode processor support that is now in m0n0wall kernel in vpn.inc
 	
 areas to improve
-	avoid installing libpdel on host system while building mpd4 (or maybe simply uninstall it again afterwards?)
 	avoid clobbering host system's libipsec
 	make wireless LAN transmit power configurable
 	show "11b/g" instead of only "11g" in GUI

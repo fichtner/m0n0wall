@@ -395,9 +395,9 @@ function get_interface_list($ethernet = true, $wireless = true) {
 
 /* convert friendly interface name (WAN, OPTx, etc.) to real interface (fxp0, ng0, etc.) */
 function convert_friendly_interface_to_real_interface_name($interface) {
-	global $config;
+	global $config, $g;
 	if($config['interfaces'][$interface]['ipaddr'] == "pppoe" or $config['interfaces'][$interface]['ipaddr'] == "pptp")
-		return "ng0";
+		return $g['pppoe_interface'];
 	$lc_interface = strtolower($interface);
 	if($lc_interface == "lan") return $config['interfaces']['lan']['if'];
 	if($lc_interface == "wan") return $config['interfaces']['wan']['if'];

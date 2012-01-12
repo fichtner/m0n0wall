@@ -43,7 +43,7 @@ function hwcrypto_descr() {
 		if (mwexec("/sbin/sysctl dev.padlock.0.%desc") == 0 )
 			$hwcrypto .= "(enabled) ";
 	}
-	if (preg_match("/^CPU: Geode/m", $dmesg)) {
+	if (preg_match("/^Geode LX:/m", $dmesg)) {
 		$hwcrypto .= "AMD Geode LX Security Block ";
 		if (mwexec("/sbin/sysctl dev.glxsb.0.%desc") == 0 )
 			$hwcrypto .= "(enabled) ";
@@ -686,7 +686,9 @@ function system_set_harddisk_standby() {
 		$standby = $config['system']['harddiskstandby'];
 		// Check for a numeric value
 		if (is_numeric($standby)) {
-			mwexec("/usr/local/sbin/ataidle -S $standby 0 0");
+			$device = trim(file_get_contents("{$g['varetc_path']}/cfdevice"));
+			mwexec("/sbin/atacontrol spindown $device " . ($standby*60));
+			mwexec("/bin/dd if=/dev/$device of=/dev/null count=1");
 			if ($g['booting']) {
 				echo "done\n";
 			}

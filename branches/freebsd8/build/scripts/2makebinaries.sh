@@ -70,19 +70,19 @@ fi
 ######## FreeBSD ports ########
 
 # ISC dhcp-relay
-        cd /usr/ports/net/isc-dhcp31-relay
+        cd /usr/ports/net/isc-dhcp41-relay
         make
-        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-relay/work/dhcp-*/work.freebsd/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-relay/work/dhcp-*/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # ISC dhcp-server
-        cd /usr/ports/net/isc-dhcp31-server
+        cd /usr/ports/net/isc-dhcp41-server
 		cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c files/
         make
-        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-server/work/dhcp-*/work.freebsd/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-server/work/dhcp-*/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 		rm files/patch-server.db.c
 # ISC dhcp-client
-		cd /usr/ports/net/isc-dhcp31-client
+		cd /usr/ports/net/isc-dhcp41-client
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp31-client/work/dhcp-*/work.freebsd/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
+		install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-client/work/dhcp-*/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
 # dnsmasq
         cd /usr/ports/dns/dnsmasq
         make
@@ -106,10 +106,10 @@ fi
         make
 		install -s $WRKDIRPREFIX/usr/ports/net/sixxs-aiccu/work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
 		mv Makefile.orig Makefile
-# mpd4 - XXX this will cause libpdel to be installed
-		cd /usr/ports/net/mpd4
+# mpd5
+		cd /usr/ports/net/mpd5
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/mpd4/work/mpd-*/src/mpd4 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+		install -s $WRKDIRPREFIX/usr/ports/net/mpd5/work/mpd-*/src/mpd5 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # mbmon
 		cd /usr/ports/sysutils/mbmon
         make
@@ -129,11 +129,13 @@ fi
         gcc -o choparp choparp.c
         gcc -o verifysig -lcrypto verifysig.c
         gcc -o dnswatch dnswatch.c
+        gcc -o voucher -lcrypto voucher.c
         install -s choparp $MW_BUILDPATH/m0n0fs/usr/local/sbin
         install -s stats.cgi $MW_BUILDPATH/m0n0fs/usr/local/www
         install -s minicron $MW_BUILDPATH/m0n0fs//usr/local/bin
         install -s verifysig $MW_BUILDPATH/m0n0fs/usr/local/bin
         install -s dnswatch $MW_BUILDPATH/m0n0fs/usr/local/bin
+        install -s voucher $MW_BUILDPATH/m0n0fs/usr/local/bin
         install runsntp.sh $MW_BUILDPATH/m0n0fs/usr/local/bin
         install ppp-linkup vpn-linkdown vpn-linkup $MW_BUILDPATH/m0n0fs/usr/local/sbin
 

@@ -2,6 +2,20 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- update MPD to version 5 (mpd4 is no longer in FreeBSD ports)
+  *** needs testing to ensure PPTP VPN and PPPoE/PPTP WAN can work concurrently
+      due to the need for renaming the WAN ng0 interface with MPD5 ***
+
+- add missing voucher binary (for captive portal voucher support)
+
+- update ISC-DHCP client/relay/server to 4.1 (3.1 is no longer in FreeBSD ports)
+
+- ensure AICCU is really killed before attempting to restart it again
+
+- start NTP client before dynamic DNS updater
+
+- fix hard disk standby feature by replacing ataidle with atacontrol **not tested**
+
 - fix inadvertent assignment that caused new IPv4 rules not to be applied
   even though the apply button was clicked in the webGUI
 

@@ -999,7 +999,7 @@ EOD;
 			$line .= "quick ";
 			
 			if ($ispptp)
-				$line .= "on ng" . ($iif+1) . " ";
+				$line .= "on ng$iif ";
 			else if ($isipsec)
 				$line .= "on enc0 ";
 			

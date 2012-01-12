@@ -582,7 +582,6 @@ function vpn_pptpd_configure() {
 		
 		/* remove mpd.conf, if it exists */
 		unlink_if_exists("{$g['varetc_path']}/mpd-vpn/mpd.conf");
-		unlink_if_exists("{$g['varetc_path']}/mpd-vpn/mpd.links");
 		unlink_if_exists("{$g['varetc_path']}/mpd-vpn/mpd.secret");
 	}
 		
@@ -605,60 +604,39 @@ function vpn_pptpd_configure() {
 			if (!$nunits)
 				$nunits = 16;
 			
+			$startip = $pptpdcfg['remoteip'];
+			$endip = long2ip(ip2long($pptpdcfg['remoteip']) + $nunits - 1);
+			
 			$mpdconf = <<<EOD
 startup:
 
 pptpd:
-
-EOD;
-
-			for ($i = 0; $i < $nunits; $i++) {
-				$mpdconf .= "	load pt{$i}\n";
-			}
-			
-			for ($i = 0; $i < $nunits; $i++) {
-			
-				$clientip = long2ip(ip2long($pptpdcfg['remoteip']) + $i);
-				$ngif = "ng" . ($i+1);
-			
-				$mpdconf .= <<<EOD
-
-pt{$i}:
-	new -i {$ngif} pt{$i} pt{$i}
-	set ipcp ranges {$pptpdcfg['localip']}/32 {$clientip}/32
-	load pts
-
-EOD;
-			}
-			
-			$mpdconf .= <<<EOD
-
-pts:
+	set ippool add pool1 $startip $endip
+	
+	create bundle template B
 	set iface disable on-demand
 	set iface enable proxy-arp
 	set iface enable tcpmssfix
 	set iface idle 1800
 	set iface up-script /usr/local/sbin/vpn-linkup
 	set iface down-script /usr/local/sbin/vpn-linkdown
-	set bundle enable multilink
+	
 	set bundle enable crypt-reqd
-	set link yes acfcomp protocomp
-	set link no pap chap
-	set link enable chap-msv2 eap
-	set link mtu 1460
-	set link keep-alive 10 60
-	set ipcp yes vjcomp
 	set bundle enable compression
+	
+	set ipcp yes vjcomp
+	set ipcp ranges {$pptpdcfg['localip']} ippool pool1
+	
 	set ccp yes mppc
-	set ccp yes mpp-e128
-	set ccp yes mpp-stateless
+	set mppc yes e128
+	set mppc yes stateless
 
 EOD;
 			
 			if (!isset($pptpdcfg['req128'])) {
 				$mpdconf .= <<<EOD
-	set ccp yes mpp-e40
-	set ccp yes mpp-e56
+	set mppc yes e40
+	set mppc yes e56
 
 EOD;
 			}
@@ -673,6 +651,23 @@ EOD;
 			} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
 				$mpdconf .= "	set ipcp dns " . join(" ", array_slice($syscfg['dnsserver'], 0, 2)) . "\n";
 			}
+			
+			$mpdconf .= <<<EOD
+
+	create link template L pptp
+	set link action bundle B
+	
+	set link enable multilink
+	set link yes acfcomp protocomp
+	set link no pap chap
+	set link enable chap-msv2 eap
+	set link mtu 1460
+	set link mru 1460
+	set link keep-alive 10 60
+	set link enable incoming
+
+EOD;
+			
 			
 			if (isset($pptpdcfg['radius']['enable'])) {
 				$mpdconf .= <<<EOD
@@ -696,30 +691,6 @@ EOD;
 			fwrite($fd, $mpdconf);
 			fclose($fd);
 			
-			/* write mpd.links */
-			$fd = fopen("{$g['varetc_path']}/mpd-vpn/mpd.links", "w");
-			if (!$fd) {
-				printf("Error: cannot open mpd.links in vpn_pptpd_configure().\n");
-				return 1;
-			}
-			
-			$mpdlinks = "";
-			
-			for ($i = 0; $i < $nunits; $i++) {
-				$mpdlinks .= <<<EOD
-
-pt{$i}:
-	set phys type pptp
-	set pptp enable incoming
-	set pptp disable originate
-	set pptp disable windowing
-
-EOD;
-			}
-
-			fwrite($fd, $mpdlinks);
-			fclose($fd);
-			
 			/* write mpd.secret */
 			$fd = fopen("{$g['varetc_path']}/mpd-vpn/mpd.secret", "w");
 			if (!$fd) {
@@ -739,7 +710,7 @@ EOD;
 			chmod("{$g['varetc_path']}/mpd-vpn/mpd.secret", 0600);
 			
 			/* fire up mpd */
-			mwexec("/usr/local/sbin/mpd4 -b -d {$g['varetc_path']}/mpd-vpn -p {$g['varrun_path']}/mpd-vpn.pid pptpd");
+			mwexec("/usr/local/sbin/mpd5 -b -d {$g['varetc_path']}/mpd-vpn -p {$g['varrun_path']}/mpd-vpn.pid pptpd");
 			
 			break;
 			

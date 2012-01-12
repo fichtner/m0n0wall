@@ -110,6 +110,9 @@
 	
 	/* start dnsmasq service */
 	services_dnsmasq_configure();
+
+	/* start the NTP client */
+	system_ntp_configure();
 	
 	/* start dyndns service */
 	services_dyndns_configure();
@@ -135,9 +138,6 @@
 	
 	/* start proxy ARP service */
 	services_proxyarp_configure();
-
-	/* start the NTP client */
-	system_ntp_configure();
 	
 	/* start pptpd */
 	vpn_pptpd_configure();
