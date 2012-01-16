@@ -2,9 +2,10 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- fix issue with PPPoE/PPTP assigned DNS servers on WAN (new mpd up-script argument formatting)
+
 - update MPD to version 5 (mpd4 is no longer in FreeBSD ports)
-  *** needs testing to ensure PPTP VPN and PPPoE/PPTP WAN can work concurrently
-      due to the need for renaming the WAN ng0 interface with MPD5 ***
 
 - add missing voucher binary (for captive portal voucher support)
 
@@ -14,7 +15,7 @@ $Id$
 
 - start NTP client before dynamic DNS updater
 
-- fix hard disk standby feature by replacing ataidle with atacontrol **not tested**
+- fix hard disk standby feature by replacing ataidle with atacontrol
 
 - fix inadvertent assignment that caused new IPv4 rules not to be applied
   even though the apply button was clicked in the webGUI
