@@ -31,6 +31,7 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/u3g.c.orig.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/dummynet_v6.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/r222728_defroute.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_fil_freebsd.c.patch
 		
 # kernel compile
         cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf

@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add ipfilter fix (from PR kern/106438) for pseudo header checksum handling on
+  NICs that support hardware checksumming, but not on the pseudo header
+  (e.g. Intel 82559)
+
 - fix issue with PPPoE/PPTP assigned DNS servers on WAN (new mpd up-script argument formatting)
 
 - update MPD to version 5 (mpd4 is no longer in FreeBSD ports)
