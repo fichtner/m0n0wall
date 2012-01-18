@@ -807,19 +807,6 @@ EOD;
 function system_identify_specific_platform() {
 	global $g;
 	
-	if ($g['platform'] == 'generic-pc')
-		return array('name' => 'generic-pc', 'descr' => "Generic PC");
-
-	if ($g['platform'] == 'generic-pc-serial')
-		return array('name' => 'generic-pc-serial', 'descr' => "Generic PC (serial console)");
-	
-	if ($g['platform'] == 'generic-pc-cdrom')
-		return array('name' => 'generic-pc-cdrom', 'descr' => "Generic PC (CD-ROM)");
-	
-	/* the rest of the code only deals with 'embedded' platforms */
-	if ($g['platform'] != 'embedded')
-		return array('name' => $g['platform'], 'descr' => $g['platform']);
-	
 	$dmesg = system_get_dmesg_boot();
 	
 	if (strpos($dmesg, "PC Engines WRAP") !== false)
@@ -837,8 +824,17 @@ function system_identify_specific_platform() {
 	if (preg_match("/Soekris net55../", $dmesg, $matches))
 		return array('name' => 'net55xx', 'descr' => $matches[0]);
 	
-	/* unknown embedded platform */
-	return array('name' => 'embedded', 'descr' => 'embedded (unknown)');
+	if ($g['platform'] == 'generic-pc')
+		return array('name' => 'generic-pc', 'descr' => "Generic PC");
+
+	if ($g['platform'] == 'generic-pc-serial')
+		return array('name' => 'generic-pc-serial', 'descr' => "Generic PC (serial console)");
+	
+	if ($g['platform'] == 'generic-pc-cdrom')
+		return array('name' => 'generic-pc-cdrom', 'descr' => "Generic PC (CD-ROM)");
+	
+	/* unknown platform */
+	return array('name' => $g['platform'], 'descr' => $g['platform']);
 }
 
 function system_get_dmesg_boot() {
