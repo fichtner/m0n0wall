@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- change aiccu syslog facility to daemon instead of local7
+
 - fix embedded platform display
 
 - port dummynet+ipnat double processing fix from 6.4

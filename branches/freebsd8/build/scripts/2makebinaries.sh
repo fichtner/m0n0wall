@@ -101,11 +101,13 @@ fi
 		install -s $WRKDIRPREFIX/usr/ports/net/dhcp6/work/wide-dhc*/dhcp6s $MW_BUILDPATH/m0n0fs/usr/local/sbin
 # sixxs-aiccu		
 		cd /usr/ports/net/sixxs-aiccu
+		cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-aiccu-common.c files/
 		cp -p Makefile Makefile.orig
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/sixxs-aiccu.Makefile.patch
         make
 		install -s $WRKDIRPREFIX/usr/ports/net/sixxs-aiccu/work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
 		mv Makefile.orig Makefile
+		rm files/patch-aiccu-common.c
 # mpd5
 		cd /usr/ports/net/mpd5
         make
