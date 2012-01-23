@@ -35,6 +35,9 @@
 
 	$version = chop(file_get_contents("{$g['etc_path']}/version"));
 	$buildtime = chop(file_get_contents("{$g['etc_path']}/version.buildtime"));
+	$wanip = get_current_wan_address();
+	if (!$wanip)
+	    $wanip = "(unknown)";
 	
 	echo <<<EOD
 
@@ -46,6 +49,7 @@
     
     
     LAN IP address: {$config['interfaces']['lan']['ipaddr']}
+    WAN IP address: $wanip
     
     Port configuration:
     
