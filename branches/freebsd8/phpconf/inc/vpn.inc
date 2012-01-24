@@ -647,7 +647,7 @@ EOD;
 				$dnsservers = array_filter($pptpdcfg['dnsserver'], "is_ipaddr");
 			} else if (isset($config['dnsmasq']['enable'])) {
 				$dnsservers[] = $config['interfaces']['lan']['ipaddr'];
-				if ($syscfg['dnsserver'][0])
+				if ($syscfg['dnsserver'][0] && is_ipaddr($syscfg['dnsserver'][0]))
 					$dnsservers[] =  $syscfg['dnsserver'][0];
 			} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
 				$dnsservers = array_slice(array_filter($syscfg['dnsserver'], "is_ipaddr"), 0, 2);
