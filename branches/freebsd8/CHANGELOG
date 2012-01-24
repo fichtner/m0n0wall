@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix captive portal input/output bytes accounting when traffic shaper is on
+
 - show current WAN IP on console
 
 - change aiccu syslog facility to daemon instead of local7

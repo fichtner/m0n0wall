@@ -9,7 +9,7 @@
   * For RELENG_{6,7} steal these flags for limited multiple routing table
   * support. In RELENG_8 and beyond, use just one flag and a tag.
 --- sys/netinet/ip_input.c.orig	2010-12-21 18:09:25.000000000 +0100
-+++ sys/netinet/ip_input.c	2012-01-18 11:33:16.000000000 +0100
++++ sys/netinet/ip_input.c	2012-01-23 20:03:04.000000000 +0100
 @@ -460,18 +460,22 @@
  		}
  	}
@@ -52,12 +52,12 @@
 +		   also through ipnat (reversed processing order in m0n0wall);
 +		   we skip the pfil hooks to avoid ipnat being called again on
 +		   this packet (this implicitly assumes that one_pass=1).
-+		   However, we need to remove the dummynet tag, otherwise the
++		   However, we need to remove the ipfw tag, otherwise the
 +		   packet will be treated improperly in ip_output. */
-+		struct m_tag *dn_tag;
-+		dn_tag = m_tag_find(m, PACKET_TAG_DUMMYNET, NULL);
-+		if (dn_tag != NULL)
-+			m_tag_delete(m, dn_tag);
++        struct m_tag *ipfw_tag;
++        ipfw_tag = m_tag_locate(m, MTAG_IPFW_RULE, 0, NULL);
++        if (ipfw_tag != NULL)
++            m_tag_delete(m, ipfw_tag);
 +		
 +		m->m_flags &= ~M_IPIN_SKIPPFIL;
 +		goto passin;
