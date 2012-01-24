@@ -92,7 +92,7 @@ function get_wireless_info($wlan, $i) {
 ?>
 <?php include("fbegin.inc"); ?>
 <?php 		
-	if (count($config['wlans']['wlan']) > 0): ?>
+	if (is_array($config['wlans']['wlan']) && count($config['wlans']['wlan']) > 0): ?>
             <table width="100%" border="0" cellspacing="0" cellpadding="0" summary="wi-fi info pane">
               <?php
 			      for ($i = 0; $i < count($config['wlans']['wlan']); $i++):
