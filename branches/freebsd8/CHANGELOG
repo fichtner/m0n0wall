@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix MPD error when PPTP VPN is enabled and IPv6 DNS servers are configured
+
 - fix captive portal input/output bytes accounting when traffic shaper is on
 
 - show current WAN IP on console

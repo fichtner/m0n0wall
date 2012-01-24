@@ -641,16 +641,20 @@ EOD;
 EOD;
 			}
 			
+			$dnsservers = array();
+			
 			if (is_array($pptpdcfg['dnsserver']) && ($pptpdcfg['dnsserver'][0])) {
-				$mpdconf .= "	set ipcp dns " . join(" ", $pptpdcfg['dnsserver']) . "\n";
+				$dnsservers = array_filter($pptpdcfg['dnsserver'], "is_ipaddr");
 			} else if (isset($config['dnsmasq']['enable'])) {
-				$mpdconf .= "	set ipcp dns " . $config['interfaces']['lan']['ipaddr'];
+				$dnsservers[] = $config['interfaces']['lan']['ipaddr'];
 				if ($syscfg['dnsserver'][0])
-					$mpdconf .= " " . $syscfg['dnsserver'][0];
-				$mpdconf .= "\n";
+					$dnsservers[] =  $syscfg['dnsserver'][0];
 			} else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0])) {
-				$mpdconf .= "	set ipcp dns " . join(" ", array_slice($syscfg['dnsserver'], 0, 2)) . "\n";
+				$dnsservers = array_slice(array_filter($syscfg['dnsserver'], "is_ipaddr"), 0, 2);
 			}
+			
+			if (!empty($dnsservers))
+				$mpdconf .= "	set ipcp dns " . join(" ", $dnsservers) . "\n";
 			
 			$mpdconf .= <<<EOD
 
