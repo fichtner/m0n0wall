@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- use UFS1 instead of UFS2 for image (UFS2 does not give an advantage here
+  and may give problems when upgrading directly from old versions)
+
 - fix MPD error when PPTP VPN is enabled and IPv6 DNS servers are configured
 
 - fix captive portal input/output bytes accounting when traffic shaper is on

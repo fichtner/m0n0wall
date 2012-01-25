@@ -59,7 +59,7 @@ makeimage() {
 	mdconfig -a -t vnode -f $MW_BUILDPATH/tmp/image.bin -u 30
 	disklabel  -wn  /dev/md30 auto 2>/dev/null |  awk '/unused/{if (M==""){sub("unused","4.2BSD");M=1}}{print}' > md.label
     bsdlabel -m  i386 -R -B -b /boot/boot /dev/md30 md.label
-    newfs -b 8192 -f 1024 -O2 -U -o space -m 0 /dev/md30a > /dev/null
+    newfs -b 8192 -f 1024 -O 1 -U -o space -m 0 /dev/md30a > /dev/null
 	mount /dev/md30a /mnt
 	
 	cp $MW_BUILDPATH/tmp/kernel.gz /mnt/
