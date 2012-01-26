@@ -45,6 +45,9 @@
 	/* convert configuration, if necessary */
 	convert_config();
 	
+	/* automatically reassign interfaces if necessary */
+	interfaces_autoreassign();
+	
 	/* execute the rc.early scripts of extensions */
 	system_do_extensions(1);
 	

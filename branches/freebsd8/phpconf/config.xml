@@ -101,6 +101,7 @@
 			<bridge>lan|wan|opt[n]</bridge>
 		</opt[n]>
 		-->
+		<!-- <noautoreassign/> -->
 	</interfaces>
 	<!--
 	<vlans>

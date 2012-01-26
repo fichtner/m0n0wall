@@ -1126,6 +1126,69 @@ function interfaces_rtadvd_configure() {
 	return 0;
 }
 
+function interfaces_autoreassign() {
+	global $config, $g;
+	
+	if (isset($config['interfaces']['noautoreassign']))
+		return;
+	
+	$iflist = get_interface_list(true, false);
+	
+	$logifs = array('lan', 'wan');
+	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+		$logifs[] = 'opt' . $i;
+	
+	/* Compare list of available interfaces with those in config to see whether
+	   at least one of them is available. Bail out on VLAN/WLAN configs too - we
+	   only intend to handle the normal case (one Ethernet interface per logical
+	   interface) */
+	foreach ($logifs as $logif) {
+		if (isset($iflist[$config['interfaces'][$logif]['if']]) || preg_match("/^(vlan|wlan)/", $config['interfaces'][$logif]['if']))
+			return;
+	}
+	
+	/* at this point, we have found that there are no VLANs/WLANs and none of the
+	   configured physical interfaces can be found. Reconfigure automatically */
+	echo <<<EOD
+
+
+*******************************************************************************
+* None of the assigned network interfaces could be found.                     *
+* This usually happens when installing on a new system, or when moving an     *
+* existing configuration to a different hardware. In that case, it does not   *
+* indicate a problem.                                                         *
+*                                                                             *
+* The logical interfaces (LAN/WAN/OPT) will be reconfigured automatically     *
+* using the available physical network interfaces. Please review the          *
+* assignments and change them if necessary.                                   *
+*******************************************************************************
+
+
+EOD;
+	
+	if (count($iflist) < 2) {
+		echo "ERROR: fewer than two network interfaces found. You need at least two interfaces (for LAN and WAN).\n\n";
+		return;
+	}
+	
+	/* sort list alphabetically to get some consistency */
+	$ifnames = array_keys($iflist);
+	sort($ifnames);
+	
+	/* assign first interface to LAN, second to WAN and any further interfaces to OPT */
+	$config['interfaces']['lan']['if'] = $ifnames[0];
+	$config['interfaces']['wan']['if'] = $ifnames[1];
+	
+	for ($i = 2; isset($ifnames[$i]); $i++) {
+		$opti = $i - 1;
+		if (isset($config['interfaces']['opt' . $opti])) {
+			$config['interfaces']['opt' . $opti]['if'] = $ifnames[$i];
+		}
+	}
+	
+	write_config();
+}
+
 function get_real_wan_interface($ipv6 = false) {
 	global $config, $g;
 	

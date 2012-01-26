@@ -117,7 +117,7 @@ if ($_POST) {
 		$config['ipsec']['dns-interval'] = $_POST['ipsecdnsinterval'];
 		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
-		$oldpolling = $config['system']['polling'];
+		$oldpolling = isset($config['system']['polling']);
 		$config['system']['polling'] = $_POST['polling_enable'] ? true : false;
 		if (!$_POST['ipfstatentries'])
 			unset($config['diag']['ipfstatentries']);
