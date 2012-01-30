@@ -148,6 +148,7 @@ $menu['Services']['Captive portal'] = array('services_captiveportal.php',
 			                  				'services_captiveportal_users.php',
 							  				'services_captiveportal_elementmanager.php');
 $menu['Services']['Wake on LAN']  	= array('services_wol.php');
+$menu['Services']['Scheduler']  	= array('services_croen.php');
 
 $menu['VPN']['IPsec']  				= array('vpn_ipsec.php',
 											'vpn_ipsec_mobile.php',

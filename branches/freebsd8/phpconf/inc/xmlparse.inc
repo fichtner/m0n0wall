@@ -34,7 +34,7 @@ $listtags = explode(" ", "rule rule6 user group key dnsserver winsserver pages "
 	"encryption-algorithm-option hash-algorithm-option hosts tunnel onetoone " .
 	"staticmap route route6 alias pipe queue shellcmd cacert earlyshellcmd mobilekey " .
 	"servernat proxyarpnet passthrumac allowedip wolentry vlan domainoverrides element " .
-	"roll active secondary wlan");
+	"roll active secondary wlan job");
 
 function startElement($parser, $name, $attrs) {
 	global $depth, $curpath, $config, $havedata, $listtags;

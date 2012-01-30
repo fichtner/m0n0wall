@@ -157,6 +157,9 @@
 	/* start Voucher support */
 	voucher_configure();
 	
+	/* start Scheduler */
+	services_croen_configure();
+	
 	/* set up termcap (for the firewall states page) */
 	system_set_termcap();
 	

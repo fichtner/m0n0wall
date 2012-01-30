@@ -824,4 +824,154 @@ EOD;
 	return 0;
 }
 
+function services_croen_configure() {
+	global $config, $g;
+
+	// kill any running croen daemons
+	$dircont = opendir($g['varrun_path']);
+	while ($file = readdir($dircont)) {
+		if (preg_match("/croen/", $file)) killbypid("{$g['varrun_path']}/$file");
+	}
+	closedir($dircont);
+	
+	if (isset($config['croen']['enable'])) {
+		if ($g['booting']) {
+			echo "Starting scheduler... ";
+		}
+
+		// start croen scheduler
+		croen_vars(&$croen);
+
+		// Interval
+		$croen_interval = (isset($config['croen']['interval']) ? (int)$config['croen']['interval'] : 60);
+
+		// Check for existing loop
+		if (!file_exists($g['varrun_path'].'/croen_loop.pid')) {
+			// Check for a (hopefully) valid time
+			if (time() > mktime(0, 0, 0, 1, 1, 2012)) {
+				foreach ($config['croen']['job'] AS $croen_id => $croen_job) {
+					switch ($croen_job['repeat']) {
+						// possible schedules: once
+						case 'once':
+							$croen_job_schedule[0] = strtotime($croen_job['date']." ".$croen_job['time']);
+							break;
+
+						// possible schedules: daily
+						case 'daily':
+							$croen_job_schedule[0] = strtotime("+0 day ".$croen_job['time']);
+							$croen_job_schedule[1] = strtotime("+1 day ".$croen_job['time']);
+							break;
+
+						// possible schedules: weekly
+						case 'weekly':
+							$croen_job_schedule[0] = strtotime("this ".$croen['date_weekly'][$croen_job['weekday']]." ".$croen_job['time']);
+							$croen_job_schedule[1] = strtotime("next ".$croen['date_weekly'][$croen_job['weekday']]." ".$croen_job['time']);
+							if ($croen_job_schedule[0] == $croen_job_schedule[1]) {
+								unset($croen_job_schedule[1]);
+							}
+							break;
+
+						// possible schedules: monthly
+						case 'monthly':
+							// is today the day of the month?
+							if ((int)date("d") == (int)$croen_job['day']) {
+								$croen_job_schedule[0] = strtotime("+0 day ".$croen_job['time']);
+							// is tomorrow the day of the month?
+							} elseif ((int)date("d", strtotime("+1 day")) == (int)$croen_job['day']) {
+								$croen_job_schedule[0] = strtotime("+1 day ".$croen_job['time']);
+							}
+							break;
+					}
+
+					// schedule if there is less than an hour (default) to do the job (+ 60 seconds tolerance) AND the job is not scheduled yet
+					if (isset($croen_job_schedule)) {
+						foreach ($croen_job_schedule AS $croen_v) {
+							$croen_t = $croen_v - time();
+							if ($croen_t > 0 && $croen_t <= ($croen_interval * 60 + 60) && !file_exists($g['varrun_path']."/croen_".$croen_id.".pid")) {
+								// determine job name
+								if (!isset($croen['descr'][$croen_job['name']][0])) { $croen['descr'][$croen_job['name']][0] = $croen_job['name']; }
+								// write syslog entry if required
+								if (isset($croen_job['syslog'])) {
+									croen_syslog("Job ".$croen['descr'][$croen_job['name']][0]." scheduled for ".date($croen['display_date'], $croen_v));
+								}
+								// start croen daemon with pid and id
+								if ($g['debug']) {
+									echo "debug: mwexec(\"".$croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob 0\")";
+									mwexec($croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob 0");
+								} else {
+									mwexec($croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob ".(isset($croen_job['syslog']) ? "0" : "1"));
+								}
+							}
+						}
+					}
+
+					// unset data for next loop
+					unset ($croen_job_schedule);
+				}
+				// schedule croen scheduler via croen daemon (silent) for +60 minutes (default) with pid
+				if ($g['debug']) {
+					echo "debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")\n";
+					croen_syslog("debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")");
+					echo "debug: Next croen scheduler call will be in 1 minute";
+					croen_syslog("debug: Next croen scheduler call will be in 1 minute");
+					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0");
+				} else {
+					mwexec($croen['daemon']." \"loop\" ".($croen_interval * 60)." ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 1");
+				}
+			} else {
+				// schedule croen scheduler via croen daemon (silent) for +1 minute with pid
+				if ($g['debug']) {
+					echo "debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")\n";
+					croen_syslog("debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")");
+					echo "debug: Next croen scheduler call will be in 1 minute";
+					croen_syslog("debug: Next croen scheduler call will be in 1 minute");
+					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0");
+				} else {
+					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 1");
+				}
+			}
+		}
+
+		if ($g['booting']) {
+			echo "done\n";
+		}
+	}
+	return 0;
+}
+
+function croen_vars($croen) {
+	global $g;
+	$croen = Array(
+		'date_once' => "M d Y, H:i",
+		'date_weekly' => Array(1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'),
+		'descr' => Array(
+			'reboot' => Array('Reboot', 'Reboots the system'),
+			'restart_wan' => Array('Reconnect', 'Restarts the WAN interface')),
+		'repeat' => Array(
+			'once' => 'Once',
+			'daily' => 'Daily',
+			'weekly' => 'Weekly',
+			'monthly' => 'Monthly'),
+		'scheduler' => 'scheduler',
+		'display_date' => "M d H:i:s",
+		'daemon' => '/usr/local/bin/croen',
+		'ext_dir' => $g['etc_path'] . '/croen_jobs/',
+	);
+	global $config;
+	if (!is_array($config['croen'])) {
+		$config['croen'] = array();
+	}
+	if (!is_array($config['croen']['job'])) {
+		$config['croen']['job'] = array();
+	}
+}
+
+function croen_syslog($m) {
+	define_syslog_variables();
+	$m = trim($m);
+	openlog("croen", FALSE, LOG_NOTICE);
+	syslog(LOG_NOTICE, $m);
+	closelog();
+}
+
 ?>

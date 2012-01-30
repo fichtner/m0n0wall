@@ -33,7 +33,7 @@ $pgtitle = array("License");
 require("guiconfig.inc"); 
 ?>
 <?php include("fbegin.inc"); ?>
-            <p><strong>m0n0wall&reg; is Copyright &copy; 2002-2011 by Manuel Kasper 
+            <p><strong>m0n0wall&reg; is Copyright &copy; 2002-2012 by Manuel Kasper 
               (<a href="mailto:mk@neon1.net">mk@neon1.net</a>).<br>
               All rights reserved.</strong></p>
             <p> Redistribution and use in source and binary forms, with or without<br>
@@ -179,6 +179,9 @@ require("guiconfig.inc");
 			  <br>
               St&eacute;phane Billiart (<a href="mailto:stephane.billiart@gmail.com">stephane.billiart@gmail.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal improvements (logout, status page, password change)</font></em><br>
+			  <br>
+              Lennart Grahl (<a href="mailto:masterkeule@gmail.com">masterkeule@gmail.com</a>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Scheduler</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 
               listed below.<br>

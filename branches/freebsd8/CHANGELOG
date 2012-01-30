@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- add scheduler ("Croen") service, contributed by Lennart Grahl
+  current possible actions: reboot, reconnect WAN interface
+
 - automatically reassign available physical network interfaces if none
   of the assigned interfaces in the configuration can be found on the system
   (i.e. for a new installation, or when moving an existing config to new

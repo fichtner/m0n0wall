@@ -594,4 +594,24 @@
 		</wolentry>
 		-->
 	</wol>
+	<croen>
+		<interval>60</interval>
+		<!--
+		<enable/>
+		<job>
+			<name>reboot|restart_wan</name>
+			<repeat>once|daily|weekly|monthly</repeat>
+			<syslog/>
+			*and*
+			<time>hh:mm</time>
+			<date>mm/dd/YYYY</date>
+			*or*
+			<time>hh:mm</time>
+			<weekday>number (1-7)</date>
+			*or*
+			<time>hh:mm</time>
+			<day>number (1-28)</date>
+		</job>
+		-->
+	</croen>
 </m0n0wall>
