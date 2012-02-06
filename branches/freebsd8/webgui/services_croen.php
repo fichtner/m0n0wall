@@ -175,7 +175,7 @@
 				<td valign="middle" nowrap class="list">
 					<a href="services_croen_edit.php?id='.$croen_job_id.'"><img src="e.gif" title="edit job" width="17" height="17" border="0" alt="edit job"></a>
 					<a href="services_croen.php?act=del&amp;id='.$croen_job_id.'" onclick="return confirm(\'Do you really want to delete this job?\')"><img src="x.gif" title="delete job" width="17" height="17" border="0" alt="delete job"></a>
-					'.(isset($croen['descr'][$croen_job['name']][2]) ? '<a href="services_croen.php?act=undo&amp;job='.$croen['descr'][$croen_job['name']][2].'">[undo]</a>' : '').'
+					'.(isset($croen['descr'][$croen_job['name']][2]) ? '<a href="services_croen.php?act=undo&amp;job='.$croen['descr'][$croen_job['name']][2].'"><img src="undo.gif" title="undo job" width="17" height="17" border="0" alt="undo job"></a>' : '').'
 				</td>
 			</tr>';
 		}
