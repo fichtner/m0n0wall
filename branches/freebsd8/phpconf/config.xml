@@ -599,7 +599,7 @@
 		<!--
 		<enable/>
 		<job>
-			<name>reboot|restart_wan</name>
+			<name>reboot|restart_wan|disable_wlan|enable_wlan</name>
 			<repeat>once|daily|weekly|monthly</repeat>
 			<syslog/>
 			*and*

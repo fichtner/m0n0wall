@@ -1,6 +1,6 @@
 /*
-	$Id: croen.c 1 2012-01-27 18:51:00Z masterkeule $
-	extension for m0n0wall (http://m0n0.ch/wall)
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net> and Lennart Grahl <masterkeule@gmail.com>.
 	All rights reserved.

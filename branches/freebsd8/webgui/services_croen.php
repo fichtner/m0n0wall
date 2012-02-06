@@ -1,8 +1,8 @@
 #!/usr/local/bin/php
 <?php
 /*
-	$Id: ext_croen_setup.php 1 2012-01-28 16:51:00Z masterkeule $
-	extension for m0n0wall (http://m0n0.ch/wall)
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
 	All rights reserved.
@@ -72,7 +72,7 @@
 	$pconfig['interval'] = (isset($config['croen']['interval']) ? $config['croen']['interval'] : 60);
 	$pconfig['job'] = &$config['croen']['job'];
 
-	// Delete Job
+	// Delete job
 	if ($_GET['act'] == 'del') {
 		if ($pconfig['job'][$_GET['id']]) {
 			unset($pconfig['job'][$_GET['id']]);
@@ -86,9 +86,18 @@
 			exit;
 		}
 	}
-
+	
 	// Include webinterface
 	include("fbegin.inc");
+
+	// Undo job
+	if ($_GET['act'] == 'undo' && $_GET['job'] != '' && isset($croen['descr'][$_GET['job']]) && file_exists($croen['ext_dir'].'/'.$_GET['job'].'.cjob')) {
+		croen_syslog("Job ".$croen['descr'][$_GET['job']][0]." executed via undo");
+		echo '<div style="display:none">';
+		include($croen['ext_dir'].'/'.$_GET['job'].'.cjob'); // I know, it's dirty but php hangs if it calls itself and that way it's even memory efficient. In addition this will never get touched at bootup.
+		echo '</div>';
+		$savemsg = 'Job '.$croen['descr'][$_GET['job']][0].' executed.';
+	}
 
 	// JavaScript to modify forms
 	echo '
@@ -166,6 +175,7 @@
 				<td valign="middle" nowrap class="list">
 					<a href="services_croen_edit.php?id='.$croen_job_id.'"><img src="e.gif" title="edit job" width="17" height="17" border="0" alt="edit job"></a>
 					<a href="services_croen.php?act=del&amp;id='.$croen_job_id.'" onclick="return confirm(\'Do you really want to delete this job?\')"><img src="x.gif" title="delete job" width="17" height="17" border="0" alt="delete job"></a>
+					'.(isset($croen['descr'][$croen_job['name']][2]) ? '<a href="services_croen.php?act=undo&amp;job='.$croen['descr'][$croen_job['name']][2].'">[undo]</a>' : '').'
 				</td>
 			</tr>';
 		}

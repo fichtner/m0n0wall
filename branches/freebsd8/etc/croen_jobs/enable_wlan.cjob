@@ -30,6 +30,35 @@
 */
 
 	require("functions.inc");
-	system_reboot();
+	global $config;
+
+	$upifs = Array();
+	// Get wireless interfaces
+	$wlan_interfaces = get_interface_list(false, true);
+	
+	// Go through wireless interfaces
+	foreach ($wlan_interfaces AS $ifname => $ifinfo) {
+		// Check for WLAN configuration(s)
+		if ($wlans = croen_check_wireless_associated($ifname)) {
+			foreach ($wlans AS $wlanid) {
+				// Retrieve config interface name (if assigned)
+				if ($configifname = croen_get_config_interface_name($wlanid)) {
+					// Check if interface is enabled (if OPT)
+					if ($ifname == 'lan' || $ifname == 'wan' || isset($config['interfaces'][$configifname]['enable'])) {
+						// Add to list
+						if (!in_array($ifname, $upifs)) {
+							$upifs[] = $ifname;
+						}
+						$upifs[] = $wlanid;
+					}
+				}
+			}
+		}
+	}
+	
+	// Down collected interfaces
+	foreach ($upifs AS $upif) {
+		mwexec("/sbin/ifconfig ".$upif." up");
+	}
 
 ?>

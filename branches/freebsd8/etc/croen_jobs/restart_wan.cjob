@@ -1,8 +1,8 @@
 #!/usr/local/bin/php -f
 <?php
 /*
-	$Id: restart_wan.cjob 1 2012-01-24 23:45:00Z masterkeule $
-	extension for m0n0wall (http://m0n0.ch/wall)
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
 	All rights reserved.
@@ -30,19 +30,70 @@
 */
 
 	require("functions.inc");
-	$wancfg = &$config['interfaces']['wan'];
+	global $config;
 
-	if ($wancfg['ipaddr'] == "dhcp") {
-		interfaces_wan_dhcp_down();
-		sleep(2);
+	// Determine WAN status
+	function croen_get_wan_status($ipaddr, $hwif = 'none') {
+		global $g;
+
+		// DHCP
+		if ($ipaddr == "dhcp") {
+			// run netstat to determine link info
+			unset($linkinfo);
+			exec("/usr/bin/netstat -I ".$hwif." -nWb -f link", $linkinfo);
+			$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+			if (!preg_match("/\*$/", $linkinfo[0]) && !preg_match("/^$/", $linkinfo[0]) && file_exists("{$g['varrun_path']}/dhclient.pid")) {
+				return 'up';
+			} else {
+				return 'down';
+			}
+
+		// PPPoE/PPTP
+		} elseif ($ipaddr == "pppoe" || $ipaddr == "pptp") {
+			$realif = get_real_wan_interface();
+			// Determine status
+			unset($linkinfo);
+			exec("/usr/bin/netstat -I ".$realif." -nWb -f link", $linkinfo);
+			$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+			if (preg_match("/\*$/", $linkinfo[0])) {
+				return 'down';
+			} else {
+				// Get PPPoE/PPTP link status for dial on demand
+				unset($ifconfiginfo);
+				exec("/sbin/ifconfig " . $realif, $ifconfiginfo);
+				$wanstatus = "up";
+				foreach ($ifconfiginfo as $ici) {
+					if (strpos($ici, 'LINK0') !== false) {
+						$wanstatus = "down";
+					}
+				}
+				return $wanstatus;
+			}
+		}
+	}
+
+	// DHCP
+	if ($config['interfaces']['wan']['ipaddr'] == "dhcp") {
+		if (croen_get_wan_status($config['interfaces']['wan']['ipaddr'], $config['interfaces']['wan']['if']) == 'up') {
+			interfaces_wan_dhcp_down();
+			sleep(2); // hope thats enough...
+		}
 		interfaces_wan_dhcp_up();
-	} elseif ($wancfg['ipaddr'] == "pppoe") {
-		interfaces_wan_pppoe_down();
-		sleep(2);
+
+	// PPPoE
+	} elseif ($config['interfaces']['wan']['ipaddr'] == "pppoe") {
+		if (croen_get_wan_status($config['interfaces']['wan']['ipaddr']) == 'up') {
+			interfaces_wan_pppoe_down();
+			sleep(2); // hope thats enough...
+		}
 		interfaces_wan_pppoe_up();
-	} elseif ($wancfg['ipaddr'] == "pptp") {
-		interfaces_wan_pptp_down();
-		sleep(2);
+
+	// PPTP
+	} elseif ($config['interfaces']['wan']['ipaddr'] == "pptp") {
+		if (croen_get_wan_status($config['interfaces']['wan']['ipaddr']) == 'up') {
+			interfaces_wan_pptp_down();
+			sleep(2); // hope thats enough...
+		}
 		interfaces_wan_pptp_up();
 	}
 

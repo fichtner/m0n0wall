@@ -1,8 +1,8 @@
 #!/usr/local/bin/php
 <?php
 /*
-	$Id: ext_croen_edit.php 1 2012-01-28 16:00:00Z masterkeule $
-	extension for m0n0wall (http://m0n0.ch/wall)
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
 	All rights reserved.
@@ -31,9 +31,9 @@
 
 	// Title
 	if (isset($_GET['id'])) {
-		$pgtitle = array("Services", "Scheduler", "Edit");
+		$pgtitle = array("Services", "Scheduler", "Edit job");
 	} else {
-		$pgtitle = array("Services", "Scheduler", "Add");
+		$pgtitle = array("Services", "Scheduler", "Add job");
 	}
 
 	// m0n0wall & shared functions

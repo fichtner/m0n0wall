@@ -946,7 +946,9 @@ function croen_vars($croen) {
 		'date_weekly' => Array(1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'),
 		'descr' => Array(
 			'reboot' => Array('Reboot', 'Reboots the system'),
-			'restart_wan' => Array('Reconnect', 'Restarts the WAN interface')),
+			'restart_wan' => Array('Reconnect', 'Restarts the WAN interface.'),
+			'disable_wlan' => Array('Disable WLAN', 'Disables all WLAN interfaces that have been assigned.', 'enable_wlan'),
+			'enable_wlan' => Array('Enable WLAN', 'Enables all WLAN interfaces that have been assigned.', 'disable_wlan')),
 		'repeat' => Array(
 			'once' => 'Once',
 			'daily' => 'Daily',
@@ -972,6 +974,29 @@ function croen_syslog($m) {
 	openlog("croen", FALSE, LOG_NOTICE);
 	syslog(LOG_NOTICE, $m);
 	closelog();
+}
+
+function croen_check_wireless_associated($realifname) {
+	global $config;
+	// Go through associated wireless interfaces
+	if (is_array($config['wlans']['wlan'])) {
+		foreach ($config['wlans']['wlan'] AS $wlanid => $wlaninfo) {
+			if ($wlaninfo['if'] == $realifname) {
+				$ret[] = 'wlan'.$wlanid;
+			}
+		}
+	}
+	return (isset($ret) ? $ret : FALSE);
+}
+
+function croen_get_config_interface_name($wlanid) {
+	global $config;
+	foreach ($config['interfaces'] as $ifname => $ifinfo) {
+		if ($ifinfo['if'] == $wlanid) {
+			return $ifname;
+		}
+	}
+	return FALSE;
 }
 
 ?>
