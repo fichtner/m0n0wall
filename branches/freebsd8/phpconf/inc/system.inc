@@ -55,26 +55,14 @@ function hwcrypto_descr() {
 }
 
 function enable_cpuhwcrypto() {
-	disable_cpuhwcrypto();
 	$dmesg = system_get_dmesg_boot();
 	
-	if (preg_match("/^ *VIA Padlock Features=.*/m", $dmesg)) {
+	if (preg_match("/^ *VIA Padlock Features=.*/m", $dmesg))
 		mwexec("/sbin/kldload padlock.ko");
-		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
-	}
-	if (preg_match("/^CPU: Geode/m", $dmesg)) {
+	if (preg_match("/^CPU: Geode/m", $dmesg))
 		mwexec("/sbin/kldload glxsb.ko");
-		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
-	}
-	if (preg_match("/^ *Features2=.*AESNI/m", $dmesg)) {
+	if (preg_match("/^ *Features2=.*AESNI/m", $dmesg))
 		mwexec("/sbin/kldload aesni.ko");
-		mwexec("sysctl -w net.inet.ipsec.crypto_support=1");
-	}
-}
-
-function disable_cpuhwcrypto() {
-	mwexec("/sbin/kldunload padlock;/sbin/kldunload glxsb;/sbin/kldunload aesni");
-	mwexec("sysctl -w net.inet.ipsec.crypto_support=0");
 }
 
 function system_resolvconf_generate($dynupdate = false) {

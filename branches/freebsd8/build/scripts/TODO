@@ -5,15 +5,10 @@ critical areas
 
 areas to investigate impact
 	syslinux build maybe reduced a fraction if not boot kmods are moved out of kernel into chroot for kldload after init/rc
-    lnc kernel driver is gone from 8.1 etc
 	DHCP relay cannot start when DHCP server is running (even on different interfaces)
-	javascript around RA's is broken (when RA is not enabled, other options should be disabled)
 	default ipv6 route still not being configured for wan ipv6=dhcp
-	enable sysctl for hardware crypto for padlock and geode processor support that is now in m0n0wall kernel in vpn.inc
 	
 areas to improve
-	avoid clobbering host system's libipsec
 	make wireless LAN transmit power configurable
-	show "11b/g" instead of only "11g" in GUI
 	wireless LAN country code selection ("ifconfig xxx list countries")
 	revamp bridge support: use virtual interfaces, configured on Interfaces: Assign page (new tab)

@@ -182,11 +182,12 @@ function enable_change(enable_over) {
 <?php if (ipv6enabled()): ?>
 	var en = (document.iform.ipv6mode.selectedIndex == 1 || enable_over);
 	var pd = (document.iform.ipv6mode.selectedIndex == 3 || enable_over);
+	var sendra = (document.iform.ipv6ra.checked);
 	document.iform.ipaddr6.disabled = !en;
 	document.iform.subnet6.disabled = !en;
 	document.iform.ipv6ra.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
-	document.iform.ipv6ramtu.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
-	document.iform.raflags.disabled = !(document.iform.ipv6mode.selectedIndex != 0 || enable_over);
+	document.iform.ipv6ramtu.disabled = !((document.iform.ipv6mode.selectedIndex != 0 && sendra) || enable_over);
+	document.iform.raflags.disabled = !((document.iform.ipv6mode.selectedIndex != 0 && sendra) || enable_over);
 	document.iform.ispfix.disabled = !pd;
 	document.iform.slaid.disabled = !pd;
 <?php endif; ?>

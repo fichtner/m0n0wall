@@ -3,6 +3,24 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- enable additional hash algorithms (SHA-256/384/512) and DH groups in
+  IPsec configuration
+
+- switch back to setkey binary that comes with ipsec-tools, as the stock
+  FreeBSD version still needs to be patched to cope with NAT-T (and the
+  patching causes libipsec troubles during the build process)
+
+- hack support for reading ISC leasefile back into Dnsmasq (to make
+  "Register DHCP leases in DNS forwarder" feature work again); better option would
+  be to switch to Dnsmasq for the DHCP server feature as well, but that is considered
+  too intrusive at this stage
+
+- enable CPU hardware crypto support by loading appropriate modules
+
+- fix IPv6 RA enable/disable JavaScript
+
+- fix aborted build when ntpd is running
+
 - fix reconnect behaviour of the scheduler to consider that interfaces could be already down
   add job enable/disable wlan to the scheduler
   add possibility to undo certain jobs of the scheduler that have already been executed

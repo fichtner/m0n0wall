@@ -45,6 +45,9 @@
 	/* convert configuration, if necessary */
 	convert_config();
 	
+	/* enable hardware crypto built into CPU, if available */
+	enable_cpuhwcrypto();
+	
 	/* automatically reassign interfaces if necessary */
 	interfaces_autoreassign();
 	

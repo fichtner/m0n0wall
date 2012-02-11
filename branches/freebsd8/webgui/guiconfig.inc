@@ -100,12 +100,15 @@ $my_identifier_list = array('myaddress' => 'My IP address',
 $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish', 
 					'cast128' => 'CAST128', 'aes' => 'AES');
 $p2_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
-					'cast128' => 'CAST128', 'rijndael' => 'Rijndael (AES)');
-$p1_halgos = array('sha1' => 'SHA1', 'md5' => 'MD5');
+					'cast128' => 'CAST128', 'rijndael' => 'AES');
+$p1_halgos = array('sha1' => 'SHA-1', 'sha256' => 'SHA-256', 'sha384' => 'SHA-384', 'sha512' => 'SHA-512', 'md5' => 'MD5');
 $p1_authentication_methods = array('pre_shared_key' => 'Pre-shared key', 'rsasig' => 'RSA signature');
-$p2_halgos = array('hmac_sha1' => 'SHA1', 'hmac_md5' => 'MD5');
+$p2_halgos = array('hmac_sha1' => 'SHA-1', 'hmac_md5' => 'MD5', 'hmac_sha256' => 'SHA-256', 'hmac_sha384' => 'SHA-384', 'hmac_sha512' => 'SHA-512');
 $p2_protos = array('esp' => 'ESP', 'ah' => 'AH');
-$p2_pfskeygroups = array('0' => 'off', '1' => '1', '2' => '2', '5' => '5');
+$p1_keygroups = array('1' => '1 (768 bit)', '2' => '2 (1024 bit)', '5' => '5 (1536 bit)', '14' => '14 (2048 bit)',
+	'15' => '15 (3072 bit)', '16' => '16 (4096 bit)', '17' => '17 (6144 bit)', '18' => '18 (8192 bit)');
+$p2_pfskeygroups = array('0' => 'off', '1' => '1 (768 bit)', '2' => '2 (1024 bit)', '5' => '5 (1536 bit)', '14' => '14 (2048 bit)',
+	'15' => '15 (3072 bit)', '16' => '16 (4096 bit)', '17' => '17 (6144 bit)', '18' => '18 (8192 bit)');
 
 $pptpd_subnet_sizes = array(16 => 28, 32 => 27, 64 => 26, 128 => 25, 256 => 24);
 

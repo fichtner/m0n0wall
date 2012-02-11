@@ -21,7 +21,7 @@ fi
 	cd $MW_BUILDPATH
 
 # ensure system time is correct
-	ntpdate pool.ntp.org
+	pgrep ntpd > /dev/null || ntpdate pool.ntp.org
 
 # make filesystem structure for image
 	mkdir  m0n0fs tmp images

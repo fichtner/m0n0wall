@@ -290,16 +290,15 @@ function methodsel_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">DH key group</td>
-                        <td width="78%" class="vtable">
+                  <td width="78%" class="vtable">
 					<select name="p1dhgroup" class="formfld">
-                      <?php $keygroups = explode(" ", "1 2 5"); foreach ($keygroups as $keygroup): ?>
+                      <?php foreach ($p1_keygroups as $keygroup => $keygroupname): ?>
                       <option value="<?=$keygroup;?>" <?php if ($keygroup == $pconfig['p1dhgroup']) echo "selected"; ?>> 
-                      <?=htmlspecialchars($keygroup);?>
+                      <?=htmlspecialchars($keygroupname);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <br> <span class="vexpl"><em>1 = 768 bit, 2 = 1024 
-                    bit, 5 = 1536 bit</em><br>
-                    Must match the setting chosen on the remote side. </span></td>
+                    </select> <br> <span class="vexpl">Must match the setting
+	                chosen on the remote side. </span></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>
@@ -377,15 +376,14 @@ function methodsel_change() {
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">PFS key group</td>
-                        <td width="78%" class="vtable">
+                  <td width="78%" class="vtable">
 					<select name="p2pfsgroup" class="formfld">
                       <?php foreach ($p2_pfskeygroups as $keygroup => $keygroupname): ?>
                       <option value="<?=$keygroup;?>" <?php if ($keygroup == $pconfig['p2pfsgroup']) echo "selected"; ?>> 
                       <?=htmlspecialchars($keygroupname);?>
                       </option>
                       <?php endforeach; ?>
-                    </select> <br> <span class="vexpl"><em>1 = 768 bit, 2 = 1024 
-                    bit, 5 = 1536 bit</em></span></td>
+                    </select></td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Lifetime</td>

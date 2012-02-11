@@ -64,8 +64,8 @@ function vpn_ipsec_configure($ipchg = false) {
 	}
 	
 	/* flush SPD and SAD */
-	mwexec("/sbin/setkey -FP");
-	mwexec("/sbin/setkey -F");
+	mwexec("/usr/local/sbin/setkey -FP");
+	mwexec("/usr/local/sbin/setkey -F");
 	
 	/* mark enc0 interface as up to enable filtering of decapsulated IPsec packets */
 	mwexec("/sbin/ifconfig enc0 up");
@@ -152,7 +152,7 @@ function vpn_ipsec_configure($ipchg = false) {
 				fclose($fd);
 			
 				/* load SPD */
-				mwexec("/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
+				mwexec("/usr/local/sbin/setkey -c < {$g['varetc_path']}/spd.conf");
 			}
 			
 			/* generate racoon.conf */

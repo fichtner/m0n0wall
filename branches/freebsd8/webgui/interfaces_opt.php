@@ -205,12 +205,13 @@ function enable_change(enable_over) {
 <?php if (ipv6enabled()): ?>
 	var ipv6_enable = (document.iform.ipv6mode.selectedIndex == 1);
 	var pd = (document.iform.ipv6mode.selectedIndex == 3 || enable_over);
+	var sendra = (document.iform.ipv6ra.checked);
 	document.iform.ipv6mode.disabled = !((all_enable && !bridge_enable) || enable_over);
 	document.iform.ipaddr6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.subnet6.disabled = !((all_enable && !bridge_enable && ipv6_enable) || enable_over);
 	document.iform.ipv6ra.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
-	document.iform.ipv6ramtu.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
-	document.iform.raflags.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0) || enable_over);
+	document.iform.ipv6ramtu.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0 && sendra) || enable_over);
+	document.iform.raflags.disabled = !((all_enable && !bridge_enable && document.iform.ipv6mode.selectedIndex != 0 && sendra) || enable_over);
 	document.iform.ispfix.disabled = !(pd  && !bridge_enable);
 	document.iform.slaid.disabled = !(pd  && !bridge_enable);
 <?php endif; ?>

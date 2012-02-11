@@ -85,13 +85,16 @@ fi
 		install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-client/work/dhcp-*/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
 # dnsmasq
         cd /usr/ports/dns/dnsmasq
+		cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-dnsmasq-iscreader.patch files/
         make
         install -s $WRKDIRPREFIX/usr/ports/dns/dnsmasq/work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        rm files/patch-dnsmasq-iscreader.patch
 # ipsec-tools
         cd /usr/ports/security/ipsec-tools
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ipsec-tools.Makefile.patch
         make
         install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/racoon/.libs/racoon $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/setkey/.libs/setkey $MW_BUILDPATH/m0n0fs/usr/local/sbin
         install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MW_BUILDPATH/m0n0fs/usr/local/lib
 		mv Makefile.orig Makefile
 # dhcp6

@@ -25,19 +25,6 @@ fi
 # dhclient-script
         cp $MW_BUILDPATH/freebsd8/build/tools/dhclient-script $MW_BUILDPATH/m0n0fs/sbin
         chmod a+rx $MW_BUILDPATH/m0n0fs/sbin/dhclient-script
-# setkey bin/147887 patch
-# XXX this modifies the host system's copy of libipsec, but this is
-# needed as we later copy all libraries from the base system
-		rm -Rf /usr/obj/usr/src/lib/libipsec
-		rm -Rf /usr/obj/usr/src/sbin/setkey
-		cd /usr/src/lib/libipsec
-		patch < $MW_BUILDPATH/freebsd8/build/patches/user/pfkey.c.patch
-		make obj && make && make install
-		cd /usr/src/sbin/setkey
-		make obj && make
-		install -s /usr/obj/usr/src/sbin/setkey/setkey $MW_BUILDPATH/m0n0fs/sbin/
-		cd /usr/src/lib/libipsec
-		mv pfkey.c.orig pfkey.c
 # ifconfig for r222728
 		rm -Rf /usr/obj/usr/src/sbin/ifconfig
 		rm -Rf $MW_BUILDPATH/tmp/netinet6
