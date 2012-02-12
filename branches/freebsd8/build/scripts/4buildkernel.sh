@@ -33,6 +33,7 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/r222728_defroute.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_fil_freebsd.c.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/dummynet_with_ipnat.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/vm_machdep.c.patch
 		
 # kernel compile
         cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf

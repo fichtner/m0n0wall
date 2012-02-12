@@ -3,6 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix bogus IPv6 DNS server addresses when using PPPoE/PPTP on WAN
+
+- change order of reset methods in vm_machdep.c to fix reboot on Nokia IP130 hardware
+
 - enable additional hash algorithms (SHA-256/384/512) and DH groups in
   IPsec configuration
 
