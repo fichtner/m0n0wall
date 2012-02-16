@@ -113,8 +113,10 @@ fi
 		rm files/patch-aiccu-common.c
 # mpd5
 		cd /usr/ports/net/mpd5
+		cp $MW_BUILDPATH/freebsd8/build/patches/packages/mpd5/patch-iface.c files/
         make
 		install -s $WRKDIRPREFIX/usr/ports/net/mpd5/work/mpd-*/src/mpd5 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+		rm files/patch-iface.c
 # mbmon
 		cd /usr/ports/sysutils/mbmon
         make

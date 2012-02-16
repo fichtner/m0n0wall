@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix IPv6 link-local address configuration error in MPD when IPV6CP comes up after IPCP
+  (error message "IFACE: Adding IPv6 address to ngwan0 failed: File exists" in log)
+
 - fix bogus IPv6 DNS server addresses when using PPPoE/PPTP on WAN
 
 - change order of reset methods in vm_machdep.c to fix reboot on Nokia IP130 hardware
