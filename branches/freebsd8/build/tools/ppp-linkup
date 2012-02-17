@@ -14,14 +14,10 @@ dns2pfx=${7% *}
 dns1=${6#dns1 }
 dns2=${7#dns2 }
 
-echo "dns1pfx: $dns1pfx" >> /tmp/ppplinkup.log
-echo "dns2pfx: $dns2pfx" >> /tmp/ppplinkup.log
-echo "------" >> /tmp/ppplinkup.log
-
-if [ "$dns1pfx" -eq "dns1" -a -n "$dns1" ]; then
+if [ "$dns1pfx" = "dns1" -a -n "$dns1" ]; then
 	echo $dns1 >> /var/etc/nameservers.$2.conf
 fi
-if [ "$dns2pfx" -eq "dns2" -a -n "$dns2" ]; then
+if [ "$dns2pfx" = "dns2" -a -n "$dns2" ]; then
 	echo $dns2 >> /var/etc/nameservers.$2.conf
 fi
 
@@ -29,4 +25,3 @@ fi
 # WAN IP address has changed
 
 /etc/rc.newwanip &
-
