@@ -3,6 +3,17 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix captive portal pass-thru MAC handling (could result in expired sessions not
+  being pruned if using captive portal without MAC filtering, i.e. behind a router,
+  when pass-thru MAC entries are also present or have been removed without restarting
+  the captive portal)
+
+- fix PHP build process to correctly build RADIUS module
+
+- disable "reading /var/db/dhcpd.leases" log messages
+
+- keep ngwan0 from appearing in interface assignment
+
 - fix IPv6 link-local address configuration error in MPD when IPV6CP comes up after IPCP
   (error message "IFACE: Adding IPv6 address to ngwan0 failed: File exists" in log)
 

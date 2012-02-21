@@ -695,7 +695,7 @@ function captiveportal_passthrumac_configure() {
     /* clear out passthru macs, if necessary */
     unlink_if_exists("{$g['vardb_path']}/captiveportal_mac.db");
 
-    if (is_array($config['captiveportal']['passthrumac'])) {
+    if (is_array($config['captiveportal']['passthrumac']) && count($config['captiveportal']['passthrumac']) > 0) {
 
         $fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db", "w");
         if (!$fd) {
@@ -1081,6 +1081,9 @@ function getNasIP()
 function portal_mac_fixed($clientmac) {
     global $g ;
 
+	if (empty($clientmac))
+		return false;
+
     /* open captive portal mac db */
     if (file_exists("{$g['vardb_path']}/captiveportal_mac.db")) {
         $fd = @fopen("{$g['vardb_path']}/captiveportal_mac.db","r") ;
@@ -1089,7 +1092,7 @@ function portal_mac_fixed($clientmac) {
         }
         while (!feof($fd)) {
             $mac = trim(fgets($fd)) ;
-            if(strcasecmp($clientmac, $mac) == 0) {
+            if (!empty($mac) && strcasecmp($clientmac, $mac) == 0) {
                 fclose($fd) ;
                 return TRUE ;
             }

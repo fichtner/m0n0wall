@@ -36,7 +36,8 @@ fi
 		tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/radius-1.2.5.tgz
         mv radius-1.2.5 radius
         cd ..
-        ./buildconf --force
+		rm configure
+        AUTOCONF_VERSION=2.13 ./buildconf --force
         ./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
         make
         install -s sapi/cgi/php $MW_BUILDPATH/m0n0fs/usr/local/bin/
