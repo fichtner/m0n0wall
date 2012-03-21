@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix incorrect handling of UDP packets with zero checksum when hardware checksumming
+  is enabled (corrects problems with Cisco VPN and potentially others)
+
 - fix captive portal pass-thru MAC handling (could result in expired sessions not
   being pruned if using captive portal without MAC filtering, i.e. behind a router,
   when pass-thru MAC entries are also present or have been removed without restarting
