@@ -1,0 +1,101 @@
+<?php
+/*
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
+	
+	Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+	if (isset($job) && isset($config['interfaces']['wan'])) {
+		require_once("functions.inc");
+		
+		if (!function_exists('croen_get_wan_status')) {
+			function croen_get_wan_status($ipaddr, $hwif = 'none') {
+				global $g;
+
+				// DHCP
+				if ($ipaddr == "dhcp") {
+					// run netstat to determine link info
+					unset($linkinfo);
+					exec("/usr/bin/netstat -I ".$hwif." -nWb -f link", $linkinfo);
+					$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+					if (!preg_match("/\*$/", $linkinfo[0]) && !preg_match("/^$/", $linkinfo[0]) && file_exists("{$g['varrun_path']}/dhclient.pid")) {
+						return 'up';
+					} else {
+						return 'down';
+					}
+
+				// PPPoE/PPTP
+				} elseif ($ipaddr == "pppoe" || $ipaddr == "pptp") {
+					$realif = get_real_wan_interface();
+					// Determine status
+					unset($linkinfo);
+					exec("/usr/bin/netstat -I ".$realif." -nWb -f link", $linkinfo);
+					$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+					if (preg_match("/\*$/", $linkinfo[0])) {
+						return 'down';
+					} else {
+						// Get PPPoE/PPTP link status for dial on demand
+						unset($ifconfiginfo);
+						exec("/sbin/ifconfig " . $realif, $ifconfiginfo);
+						$wanstatus = "up";
+						foreach ($ifconfiginfo as $ici) {
+							if (strpos($ici, 'LINK0') !== false) {
+								$wanstatus = "down";
+							}
+						}
+						return $wanstatus;
+					}
+				}
+			}
+		}
+
+		// DHCP
+		if ($config['interfaces']['wan']['ipaddr'] == "dhcp") {
+			if (croen_get_wan_status($config['interfaces']['wan']['ipaddr'], $config['interfaces']['wan']['if']) == 'up' || (isset($enable) && !$enable)) {
+				interfaces_wan_dhcp_down();
+				sleep(2); // hope thats enough...
+			}
+			if (!isset($enable) || $enable) interfaces_wan_dhcp_up();
+
+		// PPPoE
+		} elseif ($config['interfaces']['wan']['ipaddr'] == "pppoe") {
+			if (croen_get_wan_status($config['interfaces']['wan']['ipaddr']) == 'up' || (isset($enable) && !$enable)) {
+				interfaces_wan_pppoe_down();
+				sleep(2); // hope thats enough...
+			}
+			if (!isset($enable) || $enable) interfaces_wan_pppoe_up();
+
+		// PPTP
+		} elseif ($config['interfaces']['wan']['ipaddr'] == "pptp") {
+			if (croen_get_wan_status($config['interfaces']['wan']['ipaddr']) == 'up' || (isset($enable) && !$enable)) {
+				interfaces_wan_pptp_down();
+				sleep(2); // hope thats enough...
+			}
+			if (!isset($enable) || $enable) interfaces_wan_pptp_up();
+		}
+	}
+
+?>

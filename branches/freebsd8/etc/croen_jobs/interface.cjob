@@ -1,0 +1,110 @@
+<?php
+/*
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
+	
+	Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+	if (isset($job['name']) && isset($job['target'][0])) {
+		require_once("functions.inc");
+		
+		if (!function_exists('croen_get_interface_status') && !function_exists('croen_wireless_parent_interface')) {
+			function croen_get_interface_status($hwif) {
+				// Run netstat to determine link info
+				unset($linkinfo);
+				exec("/usr/bin/netstat -I ".$hwif." -nWb -f link", $linkinfo);
+				$linkinfo = preg_split("/\s+/", $linkinfo[1]);
+				return (!preg_match("/\*$/", $linkinfo[0]) && !preg_match("/^$/", $linkinfo[0]) ? TRUE : FALSE);
+			}
+			
+			function croen_wireless_parent_interface($enable, $if, $parent, &$deplist) {
+				// Up: up parent interface
+				if ($enable && !croen_get_interface_status($parent)) {
+					mwexec("/sbin/ifconfig ".$parent." up");
+				}
+
+				// Up/Down interface
+				mwexec("/sbin/ifconfig ".$if." ".($enable ? "up" : "down"));
+				// Update dependency list
+				if (is_array($deplist)) {
+					$i = array_search($if, $deplist);
+					if ($enable && $i === FALSE) {
+						$deplist[] = $if;
+					} elseif (!$enable && $i !== FALSE) {
+						unset($deplist[$i]);
+					}
+				}
+
+				// Down: check if parent interface can be downed
+				if (!$enable && is_array($deplist)) {
+					for ($i = 0; $i < count($deplist); $i++) {
+						if (!croen_get_interface_status($deplist[$i])) {
+							unset($deplist[$i]);
+						}
+					}
+					// Dependency list empty -> down parent interface
+					if (empty($deplist)) {
+						mwexec("/sbin/ifconfig ".$parent." down");
+					}
+				}
+			}
+		}
+		
+		// Enable/Disable interface
+		if ($job['name'] == 'interface-enable' || $job['name'] == 'interface-disable') {
+			$enable = ($job['name'] == 'interface-enable' ? TRUE : FALSE);
+			$iflist = croen_get_enabled_interfaces(1);
+			if (isset($iflist['interfaces'][$job['target'][0]]) && $ifinfo = &$iflist['interfaces'][$job['target'][0]]) {
+				if (isset($iflist['wireless_interface_dependencies'][$ifinfo['parent']])) {
+					$ifdep = &$iflist['wireless_interface_dependencies'][$ifinfo['parent']];
+				} else {
+					$ifdep = FALSE;
+				}
+				// WAN
+				if ($job['target'][0] == 'wan' && isset($jobs_dir) && isset($jobs_filename_ending) && file_exists($jobs_dir.'reconnect_wan'.$jobs_filename_ending)) {
+					// Up if enable
+					if ($enable && !croen_get_interface_status($ifinfo['if'])) {
+						mwexec("/sbin/ifconfig ".$ifinfo['if']." up");
+					}
+					require($jobs_dir.'reconnect_wan'.$jobs_filename_ending);
+					// Down if disable
+					if (!$enable && croen_get_interface_status($ifinfo['if'])) {
+						mwexec("/sbin/ifconfig ".$ifinfo['if']." down");
+					}
+				}
+				// LAN/OPT/VLAN/WLAN: change status of interface
+				elseif ($enable != croen_get_interface_status($ifinfo['if'])) {
+					if (preg_match("/^wlan/", $ifinfo['if']) && isset($ifinfo['parent'])) {
+						croen_wireless_parent_interface($enable, $ifinfo['if'], $ifinfo['parent'], &$ifdep);
+					} else {
+						mwexec("/sbin/ifconfig ".$ifinfo['if']." ".($enable ? "up" : "down"));
+					}
+				}
+			}
+		}
+	}
+
+?>

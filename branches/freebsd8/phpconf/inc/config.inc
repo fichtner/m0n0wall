@@ -676,6 +676,61 @@ function convert_config() {
 		
 		$config['version'] = "1.9";
 	}
+	
+	/* convert 1.9 -> 2.0 */
+	if ($config['version'] == "1.9") {
+		/* convert existing jobs of the scheduler to the new version & reset the scheduler interval */
+		croen_set_default_config();
+		$config['croen']['interval'] = (isset($config['croen']['interval']) && $config['croen']['interval'] > 0 && $config['croen']['interval'] < 60 ? $config['croen']['interval'] : 10);
+		
+		/* convert jobs */
+		if (isset($config['croen']['job']) && is_array($config['croen']['job'])) {
+			foreach ($config['croen']['job'] AS $job) {
+				$id = -1;
+				$k = ($job['repeat'] == 'once' ? 'date' : ($job['repeat'] == 'weekly' ? 'weekday' : ($job['repeat'] == 'monthly' ? 'day' : FALSE)));
+				/* rename */
+				if ($job['name'] == 'restart_wan') $job['name'] = 'reconnect_wan';
+				/* check if jobset with the same parameters exists */
+				foreach ($config['croen']['jobset'] AS $jobset_id => $jobset) {
+					if ($jobset['repeat'] == $job['repeat'] && $jobset['time'] == $job['time']) {
+						if (!$k || ($k && $jobset[$k] == $job[$k])) $id = $jobset_id;
+					}
+				}
+				/* enable/disable wlan conversion */
+				if ($job['name'] == 'enable_wlan' || $job['name'] == 'disable_wlan') {
+					foreach (croen_get_enabled_interfaces(2) AS $ifname => $ifinfo) {
+						if (preg_match("/^wlan/", $ifinfo['if'])) {
+							$job_data[] = Array('name' => ($job['name'] == 'enable_wlan' ? 'interface-enable' : 'interface-disable'), 'target' => $ifname);
+						}
+					}
+				} else {
+					$job_data[0]['name'] = $job['name'];
+				}
+				if (isset($job_data)) {
+					if ($id == -1) {
+						/* new jobset */
+						$jobset_data['repeat']		= $job['repeat'];
+						$jobset_data['time']		= $job['time'];
+						$jobset_data['syslog']		= isset($job['syslog']);
+						if ($k) $jobset_data[$k]	= $job[$k];
+						$jobset_data['job']			= $job_data;
+						$config['croen']['jobset'][] = $jobset_data;
+						unset($jobset_data);
+					} else {
+						/* add to existing jobset */
+						foreach ($job_data AS $j) {
+							$config['croen']['jobset'][$id]['job'][] = $j;
+						}
+					}
+					unset($job_data);
+				}
+			}
+		}
+		
+		unset($config['croen']['job']);
+		
+		$config['version'] = "2.0";
+	}
 
 	/* choose a random NTP server (first time startup)? */
 	if (isset($config['system']['timeservers-randomize'])) {

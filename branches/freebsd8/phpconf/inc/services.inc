@@ -827,145 +827,390 @@ EOD;
 function services_croen_configure() {
 	global $config, $g;
 
-	// kill any running croen daemons
-	$dircont = opendir($g['varrun_path']);
-	while ($file = readdir($dircont)) {
-		if (preg_match("/croen/", $file)) killbypid("{$g['varrun_path']}/$file");
+	// Default config
+	croen_set_default_config();
+	// Kill running croen daemon
+	killbypid("{$g['varrun_path']}/croen.pid");
+	// Kill running minicron daemon
+	killbypid("{$g['varrun_path']}/croen_wait.pid");
+	// Make sure there is no croen.tmp file present
+	if (file_exists($g['tmp_path'].'/croen.tmp')) {
+		unlink($g['tmp_path'].'/croen.tmp');
 	}
-	closedir($dircont);
 	
 	if (isset($config['croen']['enable'])) {
+		// Print start message if booting
 		if ($g['booting']) {
 			echo "Starting scheduler... ";
 		}
-
-		// start croen scheduler
-		croen_vars(&$croen);
-
-		// Interval
-		$croen_interval = (isset($config['croen']['interval']) ? (int)$config['croen']['interval'] : 60);
-
-		// Check for existing loop
-		if (!file_exists($g['varrun_path'].'/croen_loop.pid')) {
-			// Check for a (hopefully) valid time
-			if (time() > mktime(0, 0, 0, 1, 1, 2012)) {
-				foreach ($config['croen']['job'] AS $croen_id => $croen_job) {
-					switch ($croen_job['repeat']) {
-						// possible schedules: once
-						case 'once':
-							$croen_job_schedule[0] = strtotime($croen_job['date']." ".$croen_job['time']);
-							break;
-
-						// possible schedules: daily
-						case 'daily':
-							$croen_job_schedule[0] = strtotime("+0 day ".$croen_job['time']);
-							$croen_job_schedule[1] = strtotime("+1 day ".$croen_job['time']);
-							break;
-
-						// possible schedules: weekly
-						case 'weekly':
-							$croen_job_schedule[0] = strtotime("this ".$croen['date_weekly'][$croen_job['weekday']]." ".$croen_job['time']);
-							$croen_job_schedule[1] = strtotime("next ".$croen['date_weekly'][$croen_job['weekday']]." ".$croen_job['time']);
-							if ($croen_job_schedule[0] == $croen_job_schedule[1]) {
-								unset($croen_job_schedule[1]);
-							}
-							break;
-
-						// possible schedules: monthly
-						case 'monthly':
-							// is today the day of the month?
-							if ((int)date("d") == (int)$croen_job['day']) {
-								$croen_job_schedule[0] = strtotime("+0 day ".$croen_job['time']);
-							// is tomorrow the day of the month?
-							} elseif ((int)date("d", strtotime("+1 day")) == (int)$croen_job['day']) {
-								$croen_job_schedule[0] = strtotime("+1 day ".$croen_job['time']);
-							}
-							break;
-					}
-
-					// schedule if there is less than an hour (default) to do the job (+ 60 seconds tolerance) AND the job is not scheduled yet
-					if (isset($croen_job_schedule)) {
-						foreach ($croen_job_schedule AS $croen_v) {
-							$croen_t = $croen_v - time();
-							if ($croen_t > 0 && $croen_t <= ($croen_interval * 60 + 60) && !file_exists($g['varrun_path']."/croen_".$croen_id.".pid")) {
-								// determine job name
-								if (!isset($croen['descr'][$croen_job['name']][0])) { $croen['descr'][$croen_job['name']][0] = $croen_job['name']; }
-								// write syslog entry if required
-								if (isset($croen_job['syslog'])) {
-									croen_syslog("Job ".$croen['descr'][$croen_job['name']][0]." scheduled for ".date($croen['display_date'], $croen_v));
-								}
-								// start croen daemon with pid and id
-								if ($g['debug']) {
-									echo "debug: mwexec(\"".$croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob 0\")";
-									mwexec($croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob 0");
-								} else {
-									mwexec($croen['daemon']." \"".$croen['descr'][$croen_job['name']][0]."\" ".$croen_t." ".$g['varrun_path']."/croen_".$croen_id.".pid ".$croen['ext_dir'].$croen_job['name'].".cjob ".(isset($croen_job['syslog']) ? "0" : "1"));
-								}
-							}
-						}
-					}
-
-					// unset data for next loop
-					unset ($croen_job_schedule);
-				}
-				// schedule croen scheduler via croen daemon (silent) for +60 minutes (default) with pid
-				if ($g['debug']) {
-					echo "debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")\n";
-					croen_syslog("debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")");
-					echo "debug: Next croen scheduler call will be in 1 minute";
-					croen_syslog("debug: Next croen scheduler call will be in 1 minute");
-					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0");
-				} else {
-					mwexec($croen['daemon']." \"loop\" ".($croen_interval * 60)." ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 1");
-				}
-			} else {
-				// schedule croen scheduler via croen daemon (silent) for +1 minute with pid
-				if ($g['debug']) {
-					echo "debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")\n";
-					croen_syslog("debug: mwexec(\"".$croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0\")");
-					echo "debug: Next croen scheduler call will be in 1 minute";
-					croen_syslog("debug: Next croen scheduler call will be in 1 minute");
-					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 0");
-				} else {
-					mwexec($croen['daemon']." \"loop\" 60 ".$g['varrun_path']."/croen_loop.pid ".$croen['ext_dir'].$croen['scheduler']." 1");
-				}
+		
+		// Set croen config vars
+		$scheduler_path = '/etc/croen_jobs/scheduler';
+		$conf_vars = Array(
+			'pidfile' 		=> $g['varrun_path'].'/croen.pid',
+			'tmpfile' 		=> $g['tmp_path'].'/croen.tmp',
+			'call'			=> '/usr/local/bin/php '.$scheduler_path,
+			'interval'		=> (isset($config['croen']['interval']) ? $config['croen']['interval'] * 60 : 600));
+		
+		// Check for a (hopefully) valid time
+		if (time() > mktime(0, 0, 0, 1, 1, 2012)) {
+			// Open config file
+			$fd = fopen($g['varetc_path'].'/croen.conf', 'w');
+			// Write config settings
+			$conf_first = TRUE;
+			foreach ($conf_vars AS $conf_name => $conf_var) {
+				fwrite($fd, (!$conf_first ? "\n" : "").$conf_name." = ".$conf_var);
+				$conf_first = FALSE;
 			}
+			// Write jobs
+			foreach ($config['croen']['jobset'] AS $jobset_id => $jobset) {
+				fwrite($fd, "\njob = ".
+					$jobset_id." ".$jobset['repeat'].(isset($jobset['time']) ? " ".$jobset['time'] : "").
+					(isset($jobset['date']) ? " ".$jobset['date'] :
+					(isset($jobset['weekday']) ? " ".$jobset['weekday'] :
+					(isset($jobset['day']) ? " ".$jobset['day'] :
+					(isset($jobset['minute']) ? " ".$jobset['minute'] : ""))))
+				);
+			}
+			// Close config file
+			fclose($fd);
+			
+			// Start croen daemon
+			mwexec("/usr/local/bin/croen");
+		} else {
+			// If time is invalid sleep for 60 seconds and try again (minicron)
+			mwexec("/usr/local/bin/minicron 60 ".$g['varrun_path']."/croen_wait.pid ".$scheduler_path);
 		}
-
+		
+		// Print end message if booting
 		if ($g['booting']) {
 			echo "done\n";
 		}
 	}
+	
 	return 0;
 }
 
-function croen_vars($croen) {
-	global $g;
-	$croen = Array(
-		'date_once' => "M d Y, H:i",
-		'date_weekly' => Array(1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday'),
-		'descr' => Array(
-			'reboot' => Array('Reboot', 'Reboots the system'),
-			'restart_wan' => Array('Reconnect', 'Restarts the WAN interface.'),
-			'disable_wlan' => Array('Disable WLAN', 'Disables all WLAN interfaces that have been assigned.', 'enable_wlan'),
-			'enable_wlan' => Array('Enable WLAN', 'Enables all WLAN interfaces that have been assigned.', 'disable_wlan')),
-		'repeat' => Array(
-			'once' => 'Once',
-			'daily' => 'Daily',
-			'weekly' => 'Weekly',
-			'monthly' => 'Monthly'),
-		'scheduler' => 'scheduler',
-		'display_date' => "M d H:i:s",
-		'daemon' => '/usr/local/bin/croen',
-		'ext_dir' => $g['etc_path'] . '/croen_jobs/',
-	);
+function croen_set_default_config() {
 	global $config;
+
 	if (!is_array($config['croen'])) {
 		$config['croen'] = array();
 	}
-	if (!is_array($config['croen']['job'])) {
-		$config['croen']['job'] = array();
+	if (!is_array($config['croen']['jobset'])) {
+		$config['croen']['jobset'] = array();
 	}
+}
+
+function croen_parse_tmpfile($file = FALSE) {
+	global $config, $g;
+	if (!$file) {
+		$file = $g['tmp_path'].'/croen.tmp';
+	}
+	$arrow = ' -> ';
+	
+	// Get contents of temp file
+	$id = (file_exists($file) ? file_get_contents($file) : FALSE);
+	if ($id !== FALSE && ctype_digit(trim($id)) && isset($config['croen']['jobset'][trim($id)]['job']) && is_array($config['croen']['jobset'][trim($id)]['job'])) {
+		foreach ($config['croen']['jobset'][trim($id)]['job'] AS $i => $job) {
+			// Check for existance
+			$data = croen_job_exists($job['name'], Array('req', 'descr'), (isset($job['target']) ? Array('target' => $job['target']) : Array()));
+			if ($data && is_array($data)) {
+				// Validate job
+				if (!(($data['req']['target'] && !isset($job['target'])) || ($data['req']['target'] && !$data['descr']['target']) || ($data['req']['value'] && !isset($job['value'])))) {
+					$descr = '';
+					foreach ($data['descr']['job'] AS $k => $v) {
+						$descr .= $v.$arrow;
+					}
+					if (isset($job['target'])) {
+						$jobs[$i]['target'] = ($job['target'] == $data['descr']['target'] ? Array($job['target']) : Array($job['target'], $data['descr']['target']));
+						$descr .= $data['descr']['target'].$arrow;
+					}
+					if (isset($job['value'])) {
+						$jobs[$i]['value'] = $job['value'];
+						$descr .= $job['value'].$arrow;
+					}
+					$jobs[$i]['name'] = Array($job['name'], substr($descr, 0, (strlen($arrow))*-1));
+				}
+			}
+		}
+		if (isset($jobs)) {
+			return Array(
+				'id' 		=> $id,
+				'descr'		=> (isset($config['croen']['jobset'][trim($id)]['descr']) && !empty($config['croen']['jobset'][trim($id)]['descr']) ? $config['croen']['jobset'][trim($id)]['descr'] : FALSE),
+				'syslog'	=> isset($config['croen']['jobset'][trim($id)]['syslog']),
+				'jobs' 		=> $jobs
+			);
+		}
+	}
+	
+	return FALSE;
+}
+
+function croen_vars($which = Array()) {
+	// Date conversion to a specific format
+	if (in_array('date_once', $which)) {
+		$ret['date_once'] = "M d Y, H:i";
+	}
+	
+	// Weekday conversion (number to text)
+	if (in_array('date_weekly', $which)) {
+		$ret['date_weekly'] = Array(1 => 'Monday', 2 => 'Tuesday', 3 => 'Wednesday', 4 => 'Thursday', 5 => 'Friday', 6 => 'Saturday', 7 => 'Sunday');
+	}
+	
+	// Repeat types & descriptions
+	if (in_array('repeat', $which)) {
+		$ret['repeat'] = Array(
+			'once' => 'Once',
+			'daily' => 'Daily',
+			'weekly' => 'Weekly',
+			'monthly' => 'Monthly',
+			'x_minute' => 'Every x minute');
+	}
+
+	// Jobs
+	if (in_array('job', $which)) {
+		$ret['job'] = Array(
+			'type' 		=> 'select',
+			'name'		=> 'job',
+			'values'	=> Array(
+				// Reboot
+				'reboot' => FALSE,
+				// Reconnect WAN
+				'reconnect_wan' => FALSE,
+				// Interface
+				'interface' => Array(
+					'type' 		=> 'select',
+					'name'		=> 'interface',
+					'values'	=> Array(
+						'enable' => Array(
+							'type'		=> 'select',
+							'name'		=> 'enable',
+							'values'	=> 'enabled_interfaces',
+						),
+						'disable' => Array(
+							'type'		=> 'select',
+							'name'		=> 'disable',
+							'values'	=> 'enabled_interfaces',
+						),
+					),
+				),
+				// Traffic Shaper
+				'shaper' => Array(
+					'type' 		=> 'select',
+					'name'		=> 'shaper',
+					'values'	=> Array(
+						'enable' => FALSE,
+						'disable' => FALSE,
+						'enable_rule' => Array(
+							'type'		=> 'select',
+							'name'		=> 'enable_rule',
+							'values'	=> 'shaper_rule',
+						),
+						'disable_rule' => Array(
+							'type'		=> 'select',
+							'name'		=> 'disable_rule',
+							'values'	=> 'shaper_rule',
+						),
+						'set_pipe_bandwidth' => Array(
+							'type'		=> 'select',
+							'name'		=> 'set_pipe_bandwidth',
+							'values'	=> 'shaper_pipe',
+							'child'		=> Array(
+								'type'		=> 'digit',
+								'valid'		=> '0,*',
+								'name'		=> 'value',
+								'descr'		=> 'Kbit/s',
+							),
+						),
+						'set_queue_weight' => Array(
+							'type'		=> 'select',
+							'name'		=> 'set_queue_weight',
+							'values'	=> 'shaper_queue',
+							'child'		=> Array(
+								'type'		=> 'digit',
+								'valid'		=> '1,100',
+								'name'		=> 'value',
+							),
+						),
+					),
+				),
+				'exec_cmd' => Array(
+					'type'		=> 'text',
+					'valid'		=> FALSE,
+					'name'		=> 'exec_cmd',
+				),
+			),
+		);
+	}
+	
+	// Job targets
+	if (in_array('target', $which)) {
+		$ret['target'] = Array(
+			'enabled_interfaces'	=> croen_get_enabled_interfaces(0),
+			'shaper_rule'			=> croen_get_shaper('rule'),
+			'shaper_pipe'			=> croen_get_shaper('pipe'),
+			'shaper_queue'			=> croen_get_shaper('queue'),
+		);
+	}
+	
+	// Job descriptions
+	if (in_array('descr', $which)) {
+		$ret['descr'] = Array(
+			// Jobs
+			'reboot' 				=> 'Reboot system',
+			'reconnect_wan'			=> 'Reconnect WAN',
+			'interface'				=> 'Interface',
+			'shaper'				=> 'Traffic shaper',
+			'exec_cmd'				=> 'Execute command',
+			// Instructions
+			'enable'				=> 'Enable',
+			'disable'				=> 'Disable',
+			'enable_rule'			=> 'Enable rule',
+			'disable_rule'			=> 'Disable rule',
+			'set_pipe_bandwidth'	=> 'Set pipe bandwidth',
+			'set_queue_weight'		=> 'Set queue weight',
+		);
+	}
+
+	return $ret;
+}
+
+function croen_job_exists($name, $more = Array(), $var = Array()) {
+	// more: req, descr
+	// var: target (get description of target)
+
+	// Requirements
+	if (in_array('req', $more)) {
+		$req = Array('target' => FALSE, 'value' => FALSE);
+	}
+	// Description
+	if (in_array('descr', $more)) {
+		$d = croen_vars(Array('descr')); $d = $d['descr'];
+		$descr = Array();
+	}
+	// Job
+	$job = croen_vars(Array('job'));
+	$job = $job['job']['values'];
+	
+	$name = explode("-", $name);
+	// Check if job is existing by following the array tree
+	foreach ($name AS $v) {
+		if (isset($job[$v])) {
+			// Job description
+			if (isset($descr)) {
+				$descr['job'][$v] = (isset($d[$v]) ? $d[$v] : $v);
+			}
+			// Type: Select
+			if ($job[$v]['type'] == 'select' && isset($job[$v]['values']) && !is_array($job[$v]['values'])) {
+				if ($req) {
+					$req['target'] = TRUE;
+				}
+				// Target description
+				if (isset($descr) && isset($var['target'])) {
+					$t = croen_vars(Array('target'));
+					$descr['target'] = (isset($t['target'][$job[$v]['values']][$var['target']]) ? $t['target'][$job[$v]['values']][$var['target']] : $var['target']);
+				}
+				// Child type: Text || Digit
+				if (isset($job[$v]['child']) && ($job[$v]['child']['type'] == 'digit' || $job[$v]['child']['type'] == 'text')) {
+					if ($req) {
+						$req['value'] = TRUE;
+					}
+					// Input description
+					if (isset($descr) && isset($job[$v]['child']['descr'])) {
+						$descr['input'] = $job[$v]['child']['descr'];
+					}
+				}
+			}
+			// Type: Text || Digit
+			elseif ($job[$v]['type'] == 'digit' || $job[$v]['type'] == 'text') {
+				if ($req) {
+					$req['value'] = TRUE;
+				}
+				// Input description
+				if (isset($descr) && isset($job[$v]['child']['descr'])) {
+					$descr['input'] = $job[$v]['child']['descr'];
+				}
+			}
+			$job = (isset($job[$v]['values']) && is_array($job[$v]['values']) ? $job[$v]['values'] : FALSE);
+		} else {
+			return FALSE;
+		}
+	}
+
+	// Return
+	if (isset($req)) {
+		$ret['req'] = $req;
+	}
+	if (isset($descr)) {
+		$ret['descr'] = $descr;
+	}
+	return (isset($ret) ? $ret : TRUE);
+}
+
+function croen_get_shaper($what) {
+	global $config;
+	$list = Array();
+	
+	if (isset($config['shaper'][$what]) && is_array($config['shaper'][$what])) {
+		foreach ($config['shaper'][$what] AS $v) {
+			if (isset($v['descr']) && is_string($v['descr']) && $v['descr'] != '' && !in_array($v['descr'], $list)) {
+				$list[] = $v['descr'];
+			}
+		}
+	}
+	
+	return $list;
+}
+
+function croen_get_enabled_interfaces($mode = 0) {
+	// Mode 0: Return interface name => descr of interface
+	// Mode 1: Return verbose list with wireless parents
+	// Mode 2: Return verbose list without wireless parents
+
+	global $config;
+	$iflist = Array();
+	$ifdeplist = Array();
+	
+	// Get interfaces which are enabled
+	if (is_array($config['interfaces'])) {
+		foreach ($config['interfaces'] as $ifname => $ifinfo) {
+			if ($ifname == 'lan' || $ifname == 'wan' || isset($ifinfo['enable'])) {
+				// Mode 0
+				if ($mode == 0) {
+					$iflist[$ifname] = ($ifname == 'lan' ? 'LAN' :
+									   ($ifname == 'wan' ? 'WAN' :
+									   (isset($ifinfo['descr']) ? $ifinfo['descr'] : $ifname)));
+
+				// Mode 1/2
+				} else {
+					$iflist[$ifname] = Array('if' => $ifinfo['if'], 'descr' => (isset($ifinfo['descr']) ? $ifinfo['descr'] : strtoupper($ifname)));
+					// Add parent if wlan
+					if ($mode == 1 && preg_match("/^wlan/", $ifinfo['if']) && isset($config['wlans']['wlan'][substr($ifinfo['if'], 4)])) {
+						$iflist[$ifname]['parent'] = $config['wlans']['wlan'][substr($ifinfo['if'], 4)]['if'];
+						// Add dependency list
+						if (!isset($ifdeplist[$config['wlans']['wlan'][substr($ifinfo['if'], 4)]['if']])) {
+							$ifdeplist[$config['wlans']['wlan'][substr($ifinfo['if'], 4)]['if']] = croen_get_wireless_interface_dependencies($config['wlans']['wlan'][substr($ifinfo['if'], 4)]['if']);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return ($mode == 1 ? Array('interfaces' => $iflist, 'wireless_interface_dependencies' => $ifdeplist) : $iflist);
+}
+
+function croen_get_wireless_interface_dependencies($ifname) {
+	global $config;
+	if (is_array($config['wlans']['wlan'])) {
+		foreach ($config['wlans']['wlan'] AS $ifid => $ifinfo) {
+			if ($ifinfo['if'] == $ifname) {
+				$iflist[] = 'wlan'.$ifid;
+			}
+		}
+	}
+	return (isset($iflist) ? $iflist : Array());
 }
 
 function croen_syslog($m) {
@@ -974,29 +1219,6 @@ function croen_syslog($m) {
 	openlog("croen", FALSE, LOG_NOTICE);
 	syslog(LOG_NOTICE, $m);
 	closelog();
-}
-
-function croen_check_wireless_associated($realifname) {
-	global $config;
-	// Go through associated wireless interfaces
-	if (is_array($config['wlans']['wlan'])) {
-		foreach ($config['wlans']['wlan'] AS $wlanid => $wlaninfo) {
-			if ($wlaninfo['if'] == $realifname) {
-				$ret[] = 'wlan'.$wlanid;
-			}
-		}
-	}
-	return (isset($ret) ? $ret : FALSE);
-}
-
-function croen_get_config_interface_name($wlanid) {
-	global $config;
-	foreach ($config['interfaces'] as $ifname => $ifinfo) {
-		if ($ifinfo['if'] == $wlanid) {
-			return $ifname;
-		}
-	}
-	return FALSE;
 }
 
 ?>

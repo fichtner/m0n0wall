@@ -595,14 +595,12 @@
 		-->
 	</wol>
 	<croen>
-		<interval>60</interval>
+		<interval>10</interval>
 		<!--
 		<enable/>
-		<job>
-			<name>reboot|restart_wan|disable_wlan|enable_wlan</name>
-			<repeat>once|daily|weekly|monthly</repeat>
-			<syslog/>
-			*and*
+		<jobset>
+			<repeat>once|daily|weekly|monthly|x_minute</repeat>
+
 			<time>hh:mm</time>
 			<date>mm/dd/YYYY</date>
 			*or*
@@ -611,7 +609,16 @@
 			*or*
 			<time>hh:mm</time>
 			<day>number (1-28)</date>
-		</job>
+			*or*
+			<minute>number (1-1439)</minute>
+
+			<syslog/>
+			<job>
+				<name>set-something</name>
+				<target>target</target>
+				<value>value</value>
+			</job>
+		</jobset>
 		-->
 	</croen>
 </m0n0wall>

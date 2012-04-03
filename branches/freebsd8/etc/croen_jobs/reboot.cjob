@@ -1,4 +1,3 @@
-#!/usr/local/bin/php -f
 <?php
 /*
 	$Id$
@@ -29,7 +28,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-	require("functions.inc");
-	system_reboot();
+	if (isset($job)) {
+		require_once("functions.inc");
+		system_reboot();
+	}
 
 ?>

@@ -1,4 +1,3 @@
-#!/usr/local/bin/php -f
 <?php
 /*
 	$Id$
@@ -29,36 +28,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-	require("functions.inc");
-	global $config;
-
-	$downifs = Array();
-	// Get wireless interfaces
-	$wlan_interfaces = get_interface_list(false, true);
-	
-	// Go through wireless interfaces
-	foreach ($wlan_interfaces AS $ifname => $ifinfo) {
-		// Check for WLAN configuration(s)
-		if ($wlans = croen_check_wireless_associated($ifname)) {
-			foreach ($wlans AS $wlanid) {
-				// Retrieve config interface name (if assigned)
-				if ($configifname = croen_get_config_interface_name($wlanid)) {
-					// Check if interface is enabled (if OPT)
-					if ($ifname == 'lan' || $ifname == 'wan' || isset($config['interfaces'][$configifname]['enable'])) {
-						// Add to list
-						if (!in_array($ifname, $downifs)) {
-							$downifs[] = $ifname;
-						}
-						$downifs[] = $wlanid;
-					}
-				}
-			}
-		}
-	}
-	
-	// Down collected interfaces
-	foreach ($downifs AS $downif) {
-		mwexec("/sbin/ifconfig ".$downif." down");
+	if (isset($job['value'])) {
+		require_once("functions.inc");
+		exec($job['value']);
 	}
 
 ?>

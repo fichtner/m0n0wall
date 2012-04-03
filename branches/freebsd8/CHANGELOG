@@ -3,6 +3,20 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- rewrite croen daemon (scheduler) from scratch to handle more than one job at a time
+  and do considerably less php calls
+- delete obsolete job Enable/Disable WLAN
+- disable undo feature for jobs
+- add custom description for jobs
+- add job Interface: Enable/Disable
+  if all wlan child interfaces of a parent interface have been disabled the parent
+  interface will also be brought down to save power
+- add job Traffic Shaper: Enable/Disable
+- add job Traffic Shaper: Enable/Disable rule
+- add job Traffic Shaper: Set pipe bandwidth of a pipe
+- add job Traffic Shaper: Set queue weight of a queue
+- add job Execute command
+
 - fix incorrect handling of UDP packets with zero checksum when hardware checksumming
   is enabled (corrects problems with Cisco VPN and potentially others)
 
