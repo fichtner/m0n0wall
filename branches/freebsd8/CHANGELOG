@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- fix version of config.xml
+- minor tweaks of croen daemon
+
 - rewrite croen daemon (scheduler) from scratch to handle more than one job at a time
   and do considerably less php calls
 - delete obsolete job Enable/Disable WLAN

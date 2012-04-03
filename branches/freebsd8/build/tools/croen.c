@@ -102,8 +102,10 @@ void ParseConfigLine(char *confline, struct conf_t *conf);
 struct jobExec_t *GetJobsOfThisLoop(unsigned short *jobExecC, const struct job_t *job, unsigned short jobC, unsigned short interval, const time_t *targetTime);
 int CmpJobBySleepTimeASC(const void *pA, const void *pB);
 void WriteTmpFile(const char *filename, unsigned short id);
-long GetSleepTime(time_t sleep, unsigned long id, unsigned short loopMode);
-#if (DEBUG_MESSAGES == 1)
+#if (DEBUG_MESSAGES != 1)
+	long GetSleepTime(time_t sleep);
+#else
+	long GetSleepTime(time_t sleep, unsigned long id, unsigned short loopMode);
 	void DebugPrintGatheredData(const struct conf_t *conf, const struct job_t *job, const unsigned short *jobC);
 	void DebugSetTime(time_t time);
 #endif
@@ -205,7 +207,11 @@ int main() {
 				for (i = 0; i < jobExecC; i++) {
 					/* Calculate sleep time & sleep */
 					while (1) {
-						long sleepTime = GetSleepTime(jobExec[i].sleep, (long)job[jobExec[i].arrayId].id, 0);
+						#if (DEBUG_MESSAGES == 1)
+							long sleepTime = GetSleepTime(jobExec[i].sleep, (unsigned long)job[jobExec[i].arrayId].id, 0);
+						#else
+							long sleepTime = GetSleepTime(jobExec[i].sleep);
+						#endif
 						if (sleepTime == 0) {
 							break;
 						} else if (sleepTime < 0) {
@@ -245,7 +251,7 @@ int main() {
 					#if (DEBUG_MESSAGES == 1)
 						long sleepTime = GetSleepTime(targetTime, debugLoopCount, 1);
 					#else
-						long sleepTime = GetSleepTime(targetTime, 0, 1);
+						long sleepTime = GetSleepTime(targetTime);
 					#endif
 					if (sleepTime == 0) {
 						break;
@@ -342,12 +348,14 @@ int main() {
 #endif
 
 /* Get sleep time of a job. Return values: <0 = end loop immediately, 0 = don't sleep anymore, >0 = sleep for x seconds */
-long GetSleepTime(time_t sleep, unsigned long id, unsigned short loopMode) {
-	#if (DEBUG_MESSAGES == 1)
-		char debugTmpJob[DEFAULT_CHAR_LENGTH];
-		if (loopMode != 1) snprintf(debugTmpJob, DEFAULT_CHAR_LENGTH, "Job(%hu)", id);
-		else snprintf(debugTmpJob, DEFAULT_CHAR_LENGTH, "Loop(%hu)", id);
-	#endif
+#if (DEBUG_MESSAGES == 1)
+	long GetSleepTime(time_t sleep, unsigned long id, unsigned short loopMode) {
+			char debugTmpJob[DEFAULT_CHAR_LENGTH];
+			if (loopMode != 1) snprintf(debugTmpJob, DEFAULT_CHAR_LENGTH, "Job(%hu)", id);
+			else snprintf(debugTmpJob, DEFAULT_CHAR_LENGTH, "Loop(%hu)", id);
+#else
+	long GetSleepTime(time_t sleep) {
+#endif
 
 	while (1) {
 		long sleepTime = (long)difftime(sleep, time(NULL));
@@ -459,9 +467,9 @@ struct jobExec_t *GetJobsOfThisLoop(unsigned short *jobExecC, const struct job_t
 
 		} else if (REPEAT_X_MINUTE == job[i].repeat) {
 			/* Every x minute */
-			execTime = (int)((mktime(&execDate) / (job[i].minute * 60)) + 1) * job[i].minute * 60;
+			execTime = (time_t)((mktime(&execDate) / (job[i].minute * 60)) + 1) * job[i].minute * 60;
 			/* Amount of jobs within the loop interval */
-			x = ((int)(interval / (job[i].minute * 60)) > 0 ? (int)(interval / (job[i].minute * 60)) : 1);
+			x = ((short)(interval / (job[i].minute * 60)) > 0 ? (short)(interval / (job[i].minute * 60)) : 1);
 
 		} else ExitMessage("Unknown repeat type");
 
