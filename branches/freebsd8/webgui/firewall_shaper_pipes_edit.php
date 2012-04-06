@@ -85,14 +85,15 @@ if ($_POST) {
 			$pipe['mask'] = $_POST['mask'];
 		$pipe['descr'] = $_POST['descr'];
 		
-		if (isset($id) && $a_pipes[$id])
+		if (isset($id) && $a_pipes[$id]) {
+			// Scheduler: update matching jobs
+			croen_update_job('shaper-set_pipe_bandwidth', $a_pipes[$id]['descr'], ($pipe['descr'] != '' ? $pipe['descr'] : FALSE));
 			$a_pipes[$id] = $pipe;
-		else
+		} else
 			$a_pipes[] = $pipe;
 		
 		write_config();
 		touch($d_shaperconfdirty_path);
-		
 		header("Location: firewall_shaper_pipes.php");
 		exit;
 	}

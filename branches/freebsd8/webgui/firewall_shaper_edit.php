@@ -331,9 +331,11 @@ if ($_POST) {
 		list($targettype,$target) = explode(":", $_POST['target']);
 		$shaperent[$targettype] = $target;
 		
-		if (isset($id) && $a_shaper[$id])
+		if (isset($id) && $a_shaper[$id]) {
+			// Scheduler: update matching jobs
+			croen_update_job(Array('shaper-enable_rule', 'shaper-disable_rule'), $a_shaper[$id]['descr'], ($shaperent['descr'] != '' ? $shaperent['descr'] : FALSE));
 			$a_shaper[$id] = $shaperent;
-		else {
+		} else {
 			if (is_numeric($after))
 				array_splice($a_shaper, $after+1, 0, array($shaperent));
 			else
@@ -342,7 +344,6 @@ if ($_POST) {
 		
 		write_config();
 		touch($d_shaperconfdirty_path);
-		
 		header("Location: firewall_shaper.php");
 		exit;
 	}

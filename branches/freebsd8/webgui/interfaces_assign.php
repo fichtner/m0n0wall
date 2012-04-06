@@ -147,6 +147,9 @@ if ($_GET['act'] == "del") {
 		$i++;
 	}
 
+	// Scheduler: delete matching jobs
+	croen_update_job(Array('interface-enable', 'interface-disable'), $_GET['id']);
+
 	write_config();
 	touch($d_sysrebootreqd_path);
 	header("Location: interfaces_assign.php");

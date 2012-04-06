@@ -42,6 +42,8 @@ function wipe_magic () {
   foreach ($types as $type) {
     foreach (array_keys($config['shaper'][$type]) as $num) {
     if (substr($config['shaper'][$type][$num]['descr'],0,2) == "m_") {
+	  // Scheduler: delete matching jobs
+	  croen_update_job(($type == 'rule' ? Array('shaper-enable_rule', 'shaper-disable_rule') : ($type == 'pipe' ? 'shaper-set_pipe_bandwidth' : 'shaper-set_queue_weight')), $config['shaper'][$type][$num]['descr']);
       unset($config['shaper'][$type][$num]);
     }
     }
@@ -312,6 +314,8 @@ if ($_POST) {
         }
         if (!$input_errors) {
           if ($_POST['install']) {
+		     // Scheduler: delete matching jobs
+		     croen_update_job(Array('shaper-enable_rule', 'shaper-disable_rule', 'shaper-set_pipe_bandwidth', 'shaper-set_queue_weight'));
 	     	 unset ($config['shaper']);
              create_magic($_POST['maxup'],$_POST['maxdown'],$_POST['p2plow']?TRUE:FALSE,$_POST['maskq']?TRUE:FALSE);
              touch($d_shaperconfdirty_path);

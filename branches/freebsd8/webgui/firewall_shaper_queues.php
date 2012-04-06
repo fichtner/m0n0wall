@@ -54,6 +54,8 @@ if ($_GET['act'] == "del") {
 		}
 		
 		if (!$input_errors) {
+			// Scheduler: delete matching jobs
+			croen_update_job('shaper-set_queue_weight', $a_queues[$_GET['id']]['descr']);
 			unset($a_queues[$_GET['id']]);
 			
 			/* renumber all rules */

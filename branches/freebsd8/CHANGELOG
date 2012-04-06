@@ -3,6 +3,9 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- move scheduler functions in services.inc to new include scheduler.inc
+- scheduler jobs will now be updated if their targets have been modified
+
 - fix version of config.xml
 - minor tweaks of croen daemon
 

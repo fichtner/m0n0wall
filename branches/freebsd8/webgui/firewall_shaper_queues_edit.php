@@ -70,14 +70,15 @@ if ($_POST) {
 			$queue['mask'] = $_POST['mask'];
 		$queue['descr'] = $_POST['descr'];
 		
-		if (isset($id) && $a_queues[$id])
+		if (isset($id) && $a_queues[$id]) {
+			// Scheduler: update matching jobs
+			croen_update_job('shaper-set_queue_weight', $a_queues[$id]['descr'], ($queue['descr'] != '' ? $queue['descr'] : FALSE));
 			$a_queues[$id] = $queue;
-		else
+		} else
 			$a_queues[] = $queue;
 		
 		write_config();
 		touch($d_shaperconfdirty_path);
-		
 		header("Location: firewall_shaper_queues.php");
 		exit;
 	}

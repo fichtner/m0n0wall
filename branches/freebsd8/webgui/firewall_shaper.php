@@ -72,6 +72,8 @@ if ($_POST) {
 
 if ($_GET['act'] == "del") {
 	if ($a_shaper[$_GET['id']]) {
+		// Scheduler: delete matching jobs
+		croen_update_job(Array('shaper-enable_rule', 'shaper-disable_rule'), $a_shaper[$_GET['id']]['descr']);
 		unset($a_shaper[$_GET['id']]);
 		write_config();
 		touch($d_shaperconfdirty_path);

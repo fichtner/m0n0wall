@@ -117,6 +117,9 @@ if ($_POST) {
 				}
 			}
 		}
+	} else {
+		// Scheduler: delete matching jobs
+		croen_update_job(Array('interface-enable', 'interface-disable'), 'opt'.$index);
 	}
 	
 	if (!$input_errors) {
