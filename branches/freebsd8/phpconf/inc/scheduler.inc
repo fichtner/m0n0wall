@@ -362,20 +362,25 @@
 		global $config;
 
 		foreach ($config['croen']['jobset'] AS $jobset_id => $jobset) {
-			foreach ($jobset['job'] AS $job_id => $job) {
-				if ((!is_array($jobName) && $job['name'] == $jobName) || (is_array($jobName) && in_array($job['name'], $jobName))) {
-					if ($oldTarget !== FALSE && $newTarget !== FALSE && isset($job['target']) && $job['target'] == $oldTarget) {
-						// Set target to new target
-						$config['croen']['jobset'][$jobset_id]['job'][$job_id]['target'] = $newTarget;
-					} elseif ($oldTarget === FALSE || ($oldTarget !== FALSE && isset($job['target']) && $job['target'] == $oldTarget)) {
-						// Unset job
-						unset($config['croen']['jobset'][$jobset_id]['job'][$job_id]);
-						if (empty($config['croen']['jobset'][$jobset_id]['job'])) {
-							// Unset jobset if no jobs exist
-							unset($config['croen']['jobset'][$jobset_id]);
+			if (isset($jobset['job']) && is_array($jobset['job'])) {
+				foreach ($jobset['job'] AS $job_id => $job) {
+					if ((!is_array($jobName) && $job['name'] == $jobName) || (is_array($jobName) && in_array($job['name'], $jobName))) {
+						if ($oldTarget !== FALSE && $newTarget !== FALSE && isset($job['target']) && $job['target'] == $oldTarget) {
+							// Set target to new target
+							$config['croen']['jobset'][$jobset_id]['job'][$job_id]['target'] = $newTarget;
+						} elseif ($oldTarget === FALSE || ($oldTarget !== FALSE && isset($job['target']) && $job['target'] == $oldTarget)) {
+							// Unset job
+							unset($config['croen']['jobset'][$jobset_id]['job'][$job_id]);
+							if (empty($config['croen']['jobset'][$jobset_id]['job'])) {
+								// Unset jobset if no jobs exist
+								unset($config['croen']['jobset'][$jobset_id]);
+							}
 						}
 					}
 				}
+			} else {
+				// Unset jobset if no jobs exist
+				unset($config['croen']['jobset'][$jobset_id]);
 			}
 		}
 	}
