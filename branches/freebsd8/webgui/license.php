@@ -180,7 +180,7 @@ require("guiconfig.inc");
               St&eacute;phane Billiart (<a href="mailto:stephane.billiart@gmail.com">stephane.billiart@gmail.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Captive portal improvements (logout, status page, password change)</font></em><br>
 			  <br>
-              Lennart Grahl (<a href="mailto:masterkeule@gmail.com">masterkeule@gmail.com</a>)<br>
+              Lennart Grahl (<a href="mailto:lennart.grahl@gmail.com">lennart.grahl@gmail.com</a>)<br>
               &nbsp;&nbsp;&nbsp;&nbsp;<em><font color="#666666">Scheduler</font></em><br>
             <hr size="1">
             <p>m0n0wall is based upon/includes various free software packages, 

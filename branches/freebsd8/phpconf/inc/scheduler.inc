@@ -3,7 +3,7 @@
 	$Id$
     part of m0n0wall (http://m0n0.ch/wall)
     
-    Copyright (C) 2012 Lennart Grahl <masterkeule@gmail.com>.
+    Copyright (C) 2012 Lennart Grahl <lennart.grahl@gmail.com>.
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -378,9 +378,6 @@
 						}
 					}
 				}
-			} else {
-				// Unset jobset if no jobs exist
-				unset($config['croen']['jobset'][$jobset_id]);
 			}
 		}
 	}
