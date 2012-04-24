@@ -1315,6 +1315,10 @@ EOD;
 		$config .= "wpa_pairwise=CCMP\n";
 	else
 		$config .= "wpa_pairwise=TKIP CCMP\n";
+		
+	if (isset($wlcfg['wpa']['grouprekey'])) {
+		$config .= "wpa_group_rekey=".$wlcfg['wpa']['grouprekey']."\n";
+	}
 	
 	return $config;
 }
