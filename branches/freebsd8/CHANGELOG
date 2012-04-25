@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- update ISC patch for dnsmasq 2.60
+
 - add possibility to modify wpa_group_rekey value
   (via config only: wlans -> wlan -> wpa -> grouprekey = interval in seconds)
 
