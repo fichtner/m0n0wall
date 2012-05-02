@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- use csup instead of cvsup
+
+- use cvsup to make sure port tree is compatible with patches
 
 - update ISC patch for dnsmasq 2.60
 

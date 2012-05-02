@@ -12,9 +12,6 @@ endif
 if ( ! -x /usr/local/bin/svn ) then
 	pkg_add -r subversion
 endif
-if ( ! -x /usr/local/bin/cvsup ) then
-	pkg_add -r cvsup-without-gui
-endif
 
 # figure out if we're already running from within a repository
 set svninfo=`/usr/local/bin/svn info freebsd8 >& /dev/null`
@@ -39,7 +36,7 @@ cd $MW_BUILDPATH/freebsd8/build/scripts
 chmod +x *.sh
 
 echo "Updating ports to correct versions: ` grep release $MW_BUILDPATH/freebsd8/build/files/m0n0wall.1.8.supfile | grep date | cut -f3 -d'='`"
-/usr/local/bin/cvsup $MW_BUILDPATH/freebsd8/build/files/m0n0wall.1.8.supfile
+/usr/bin/csup $MW_BUILDPATH/freebsd8/build/files/m0n0wall.1.8.supfile
 
 echo 
 echo "----- Build environment prepared -----"
