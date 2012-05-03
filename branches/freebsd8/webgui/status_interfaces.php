@@ -201,7 +201,7 @@ function get_interface_info($ifdescr) {
 					if (preg_match("/^0x/", $matches[1]))
 						$ifaddr4s[] = $ifinfo['ipaddr'] . "/" . long2ip(hexdec($matches[1]));
 				}
-				if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+				if (ipv6enabled() && preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
 					$ifaddr6s[] = $matches[1] . "/" . $matches[2];
 				}
 			}
@@ -233,7 +233,7 @@ function get_interface_info($ifdescr) {
 						exec("/sbin/ifconfig stf0", $ifconfiginfo);
 
 						foreach ($ifconfiginfo as $ici) {
-							if (preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
+							if (ipv6enabled() && preg_match("/inet6 (\S+) prefixlen (\d+)/", $ici, $matches)) {
 								$ifaddr6s[] = $matches[1] . "/" . $matches[2];
 							}
 						}
