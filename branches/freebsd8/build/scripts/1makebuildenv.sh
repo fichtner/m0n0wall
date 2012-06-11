@@ -45,6 +45,7 @@ fi
  
 # configure build information
 	date > etc/version.buildtime
+	date +%s > etc/version.buildtime.unix
 	VERSION=`cat $MW_BUILDPATH/freebsd8/version`
 
 	if [ -r $MW_BUILDPATH/freebsd8/svnrevision ]; then
