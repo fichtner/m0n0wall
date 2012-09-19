@@ -1,0 +1,13 @@
+--- sys/dev/e1000/if_em.c.orig	2012-06-11 21:35:05.000000000 +0000
++++ sys/dev/e1000/if_em.c	2012-06-11 21:36:42.000000000 +0000
+@@ -626,9 +626,8 @@
+ 	}
+ 
+ 	if (!em_is_valid_ether_addr(adapter->hw.mac.addr)) {
+-		device_printf(dev, "Invalid MAC address\n");
++		device_printf(dev, "** M0n0wall Patch - ignoring Invalid MAC address - forcing driver to load anyway **\n");
+ 		error = EIO;
+-		goto err_late;
+ 	}
+ 
+ 	/*

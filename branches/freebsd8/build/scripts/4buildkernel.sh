@@ -34,6 +34,8 @@ fi
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/ip_fil_freebsd.c.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/dummynet_with_ipnat.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/vm_machdep.c.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/if_em.c.patch
+		patch < $MW_BUILDPATH/freebsd8/build/patches/kernel/if_fxp.c.patch
 		
 # kernel compile
         cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf
