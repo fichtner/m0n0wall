@@ -39,7 +39,7 @@ require("guiconfig.inc");
 */
 
 /* get list without VLAN/WLAN virtual interfaces */
-$portlist = get_interface_list(true, false);
+$portlist = get_interface_list(true, false, true);
 
 /* add VLAN interfaces */
 if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {

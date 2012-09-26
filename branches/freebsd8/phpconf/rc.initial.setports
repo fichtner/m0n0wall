@@ -35,7 +35,7 @@
 	
 	$fp = fopen('php://stdin', 'r');
 	
-	$iflist = get_interface_list(true, false);
+	$iflist = get_interface_list(true, false, false);
 	
 	echo <<<EOD
 
@@ -236,7 +236,7 @@ EOD;
 	}
 	
 	function autodetect_interface($ifname, $fp) {
-		$iflist_prev = get_interface_list(true, false);
+		$iflist_prev = get_interface_list(true, false, false);
 		echo <<<EOD
 
 Connect the {$ifname} interface now and make sure that the link is up.
@@ -244,7 +244,7 @@ Then press ENTER to continue.
 
 EOD;
 		fgets($fp);
-		$iflist = get_interface_list(true, false);
+		$iflist = get_interface_list(true, false, false);
 		
 		foreach ($iflist_prev as $ifn => $ifa) {
 			if (!$ifa['up'] && $iflist[$ifn]['up']) {

@@ -329,7 +329,7 @@ function is_port($port) {
 
 /* returns a list of interfaces with MAC addresses
    (skips VLAN and other virtual interfaces) */
-function get_interface_list($ethernet = true, $wireless = true) {
+function get_interface_list($ethernet = true, $wireless = true, $serial = true) {
 	
 	global $g;
 	
@@ -389,14 +389,24 @@ function get_interface_list($ethernet = true, $wireless = true) {
 			$iflist[$ifname]['drvname'] = $drvname;
 		}
 	}
-	
+	if ($serial) {
+		exec("/bin/ls /dev/cuaU*", $modemports);
+		array_shift($modemports);
+		
+		foreach ($modemports as $uport) {
+			if (preg_match("!/dev/cuaU(\d+).(\d+)$!", $uport)) {
+				$iflist[$uport]['mac'] = 'N/A';
+				$iflist[$uport]['up'] = false;
+			}		
+		}
+	}
 	return $iflist;
 }
 
 /* convert friendly interface name (WAN, OPTx, etc.) to real interface (fxp0, ng0, etc.) */
 function convert_friendly_interface_to_real_interface_name($interface) {
 	global $config, $g;
-	if($config['interfaces'][$interface]['ipaddr'] == "pppoe" or $config['interfaces'][$interface]['ipaddr'] == "pptp")
+	if($config['interfaces'][$interface]['ipaddr'] == "pppoe" or $config['interfaces'][$interface]['ipaddr'] == "pptp" or $config['interfaces'][$interface]['ipaddr'] == "modem")
 		return $g['pppoe_interface'];
 	$lc_interface = strtolower($interface);
 	if($lc_interface == "lan") return $config['interfaces']['lan']['if'];

@@ -66,7 +66,13 @@ fi
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/ipfstat.c.patch
 		make freebsd8
 		install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
-
+# modem-stats
+		cd $MW_BUILDPATH/tmp
+		rm -Rf modem-stats-1.0.1
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/modem-stats-1.0.1.src.elf.tar.gz
+		cd modem-stats-1.0.1
+		make
+		install -s modem-stats $MW_BUILDPATH/m0n0fs/sbin
 
 ######## FreeBSD ports ########
 

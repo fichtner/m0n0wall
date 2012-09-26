@@ -37,7 +37,7 @@ if (!is_array($config['wlans']['wlan']))
 
 $a_wlans = &$config['wlans']['wlan'];
 
-$portlist = get_interface_list(false, true);
+$portlist = get_interface_list(false, true, false);
 
 /* if there's only one interface, we can "pre-select" it */
 if (count($portlist) == 1) {

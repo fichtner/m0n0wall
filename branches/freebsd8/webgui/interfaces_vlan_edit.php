@@ -37,7 +37,7 @@ if (!is_array($config['vlans']['vlan']))
 
 $a_vlans = &$config['vlans']['vlan'];
 
-$portlist = get_interface_list(true, false);
+$portlist = get_interface_list(true, false, false);
 
 $id = $_GET['id'];
 if (isset($_POST['id']))

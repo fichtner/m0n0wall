@@ -544,6 +544,9 @@ function interfaces_wan_configure() {
 		/* kill PPPoE client (mpd) */
 		killbypid("{$g['varrun_path']}/mpd.pid");
 		
+		/* kill Modem client (mpd) */
+		killbypid("{$g['varrun_path']}/mpd-modem.pid");
+		
 		/* wait for processes to die */
 		sleep(2);
 		
@@ -591,6 +594,10 @@ function interfaces_wan_configure() {
 			
 		case 'pptp':
 			interfaces_wan_pptp_configure();
+			break;
+			
+		case 'modem':
+			interfaces_wan_modem_configure();
 			break;
 			
 		default:
@@ -1017,6 +1024,102 @@ function interfaces_wan_pptp_up() {
 	sleep(3);
 }
 
+function interfaces_wan_modem_configure() {
+	global $config, $g;
+	
+	$wancfg = $config['interfaces']['wan'];
+	$modemcfg = $config['modem'];
+	
+	/* generate mpd.conf */
+	if (!file_exists("{$g['varetc_path']}/mpd-modem"))
+		mkdir("{$g['varetc_path']}/mpd-modem");
+	$fd = fopen("{$g['varetc_path']}/mpd-modem/mpd.conf", "w");
+	if (!$fd) {
+		echo("Error: cannot open mpd.conf in interfaces_wan_modem_configure().\n");
+		return 1;
+	}
+		
+	$mpdconf = <<<EOD
+startup:
+
+modem:
+	create bundle static B1
+	set iface name ngwan0
+	set iface route default
+	set iface up-script /usr/local/sbin/ppp-linkup
+	set ipcp no vjcomp
+	set ipcp ranges 0.0.0.0/0 10.10.10.0/0
+	set iface disable on-demand
+	set iface idle 0
+	set iface enable tcpmssfix
+	
+EOD;
+
+	/* IPv6 enabled on WAN interface? */
+	if ($wancfg['ipaddr6'] == "ppp") {
+		$mpdconf .= "	set bundle enable ipv6cp\n";
+	}
+	
+	if (isset($config['system']['dnsallowoverride'])) {
+		$mpdconf .= <<<EOD
+	set ipcp enable req-pri-dns
+	set ipcp enable req-sec-dns
+
+EOD;
+	}
+	
+	$mpdconf .= <<<EOD
+	
+	create link static L1 modem
+	set auth authname "{$modemcfg['username']}"
+	set auth password "{$modemcfg['password']}"
+	set link keep-alive 10 60
+	set link max-redial 0
+	set link disable pap chap
+	set link accept chap pap eap
+	set link action bundle B1
+	set link disable multilink
+	set link disable incoming
+	set link mtu 1492
+	set modem device "{$wancfg['if']}"
+	set modem script DialPeer
+	set modem idle-script Ringback
+	set modem watch -cd
+	set modem var \$DialPrefix "DT"
+	set modem var \$Telephone "*99***1#"
+	set modem var \$APNstring "{$modemcfg['apn']}"
+	open
+
+
+EOD;
+
+	fwrite($fd, $mpdconf);
+	fclose($fd);
+	
+	if ($g['booting']) {
+		echo 'Waiting for USB modems to settle... ';
+		sleep(5);
+	}
+	/* fire up mpd */
+	mwexec("/usr/local/sbin/mpd5 -b -d {$g['etc_path']}/mpd-modem -f {$g['varetc_path']}/mpd-modem/mpd.conf -p {$g['varrun_path']}/mpd-modem.pid modem");
+	
+	return 0;
+}
+
+function interfaces_wan_modem_down() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd-modem.pid", "SIGUSR2");
+
+	sleep(3);
+}
+
+function interfaces_wan_modem_up() {
+	global $g;
+	sigkillbypid("{$g['varrun_path']}/mpd-modem.pid", "SIGUSR1");
+
+	sleep(3);
+}
+
 function interfaces_rtadvd_configure() {
 	global $config, $g;
 
@@ -1132,7 +1235,7 @@ function interfaces_autoreassign() {
 	if (isset($config['interfaces']['noautoreassign']))
 		return;
 	
-	$iflist = get_interface_list(true, false);
+	$iflist = get_interface_list(true, false, false);
 	
 	$logifs = array('lan', 'wan');
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
@@ -1208,7 +1311,7 @@ function get_real_wan_interface($ipv6 = false) {
 		else if ($wancfg['ipaddr6'] == "ppp")
 			$wanif = $g['pppoe_interface'];
 	} else {
-		if (($wancfg['ipaddr'] == "pppoe") || ($wancfg['ipaddr'] == "pptp")) {
+		if (($wancfg['ipaddr'] == "pppoe") || ($wancfg['ipaddr'] == "pptp") || ($wancfg['ipaddr'] == "modem")) {
 			$wanif = $g['pppoe_interface'];
 		}
 	}
@@ -1221,7 +1324,7 @@ function get_current_wan_address($ipv6 = false) {
 	
 	$wancfg = $config['interfaces']['wan'];
 	
-	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp')) || ($ipv6 && $wancfg['ipaddr6'] == "aiccu")) {
+	if (in_array($wancfg['ipaddr'], array('pppoe','dhcp','pptp','modem')) || ($ipv6 && $wancfg['ipaddr6'] == "aiccu")) {
 		/* dynamic WAN IP address, find out which one */
 		$wanif = get_real_wan_interface($ipv6);
 		

@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix Checkin (include files :)
+
 - Initial support for USB modems
 
 - Patch fxp driver to disable checksumming for 82559 chipsets and em driver for nokia firewalls (force load)

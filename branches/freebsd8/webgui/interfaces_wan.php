@@ -46,6 +46,10 @@ $pconfig['pptp_local'] = $config['pptp']['local'];
 $pconfig['pptp_subnet'] = $config['pptp']['subnet'];
 $pconfig['pptp_remote'] = $config['pptp']['remote'];
 
+$pconfig['modem_username'] = $config['modem']['username'];
+$pconfig['modem_password'] = $config['modem']['password'];
+$pconfig['modem_apn'] = $config['modem']['apn'];
+
 $pconfig['dhcphostname'] = $wancfg['dhcphostname'];
 
 if ($wancfg['ipaddr'] == "dhcp") {
@@ -54,6 +58,8 @@ if ($wancfg['ipaddr'] == "dhcp") {
 	$pconfig['type'] = "PPPoE";
 } else if ($wancfg['ipaddr'] == "pptp") {
 	$pconfig['type'] = "PPTP";
+} else if ($wancfg['ipaddr'] == "modem") {
+	$pconfig['type'] = "Modem";
 } else {
 	$pconfig['type'] = "Static";
 	$pconfig['ipaddr'] = $wancfg['ipaddr'];
@@ -114,6 +120,10 @@ if ($_POST) {
 		$reqdfields = explode(" ", "pptp_username pptp_password pptp_local pptp_subnet pptp_remote");
 		$reqdfieldsn = explode(",", "PPTP username,PPTP password,PPTP local IP address,PPTP subnet,PPTP remote IP address");
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	} else if ($_POST['type'] == "Modem") {
+		$reqdfields = explode(" ", "modem_username modem_password modem_apn");
+		$reqdfieldsn = explode(",", "Modem username,Modem password,Modem APN");
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	}
 	
 	$_POST['spoofmac'] = str_replace("-", ":", $_POST['spoofmac']);
@@ -156,8 +166,8 @@ if ($_POST) {
 		if ($_POST['ipv6mode'] == "static" && !is_ipaddr6($_POST['gateway6'])) {
 			$input_errors[] = 'A valid IPv6 gateway must be specified.';
 		}
-		if ($_POST['ipv6mode'] == "ppp" && $_POST['type'] != "PPPoE" && $_POST['type'] != "PPTP") {
-			$input_errors[] = 'IPv6 PPP mode can only be used in conjunction with PPPoE or PPTP.';
+		if ($_POST['ipv6mode'] == "ppp" && $_POST['type'] != "PPPoE" && $_POST['type'] != "PPTP" && $_POST['type'] != "Modem") {
+			$input_errors[] = 'IPv6 PPP mode can only be used in conjunction with PPPoE, PPTP or Modem.';
 		}
 		if ($_POST['ipv6mode'] == "tunnel" && !is_ipaddr($_POST['tunnel6'])) {
 			$input_errors[] = 'An IPv6 tunnel endpoint address must be specified.';
@@ -197,6 +207,9 @@ if ($_POST) {
 		unset($config['aiccu']['password']);
 		unset($config['aiccu']['tunnelid']);
 		unset($config['aiccu']['aiccu_ayiya']);
+		unset($config['modem']['username']);
+		unset($config['modem']['password']);
+		unset($config['modem']['apn']);
 		
 		if ($_POST['type'] == "Static") {
 			$wancfg['ipaddr'] = $_POST['ipaddr'];
@@ -220,6 +233,11 @@ if ($_POST) {
 			$config['pptp']['local'] = $_POST['pptp_local'];
 			$config['pptp']['subnet'] = $_POST['pptp_subnet'];
 			$config['pptp']['remote'] = $_POST['pptp_remote'];
+		} else if ($_POST['type'] == "Modem") {
+			$wancfg['ipaddr'] = "modem";
+			$config['modem']['username'] = $_POST['modem_username'];
+			$config['modem']['password'] = $_POST['modem_password'];
+			$config['modem']['apn'] = $_POST['modem_apn'];
 		}
 		
 		$wancfg['blockpriv'] = $_POST['blockpriv'] ? true : false;
@@ -297,6 +315,9 @@ function type_change() {
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
 			document.iform.dhcphostname.disabled = 1;
+			document.iform.modem_username.disabled = 1;
+			document.iform.modem_password.disabled = 1;
+			document.iform.modem_apn.disabled = 1;
 			break;
 		case 1:
 			document.iform.username.disabled = 1;
@@ -312,6 +333,9 @@ function type_change() {
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
 			document.iform.dhcphostname.disabled = 0;
+			document.iform.modem_username.disabled = 1;
+			document.iform.modem_password.disabled = 1;
+			document.iform.modem_apn.disabled = 1;
 			break;
 		case 2:
 			document.iform.username.disabled = 0;
@@ -327,6 +351,9 @@ function type_change() {
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
 			document.iform.dhcphostname.disabled = 1;
+			document.iform.modem_username.disabled = 1;
+			document.iform.modem_password.disabled = 1;
+			document.iform.modem_apn.disabled = 1;
 			break;
 		case 3:
 			document.iform.username.disabled = 1;
@@ -342,6 +369,9 @@ function type_change() {
 			document.iform.pptp_subnet.disabled = 0;
 			document.iform.pptp_remote.disabled = 0;
 			document.iform.dhcphostname.disabled = 1;
+			document.iform.modem_username.disabled = 1;
+			document.iform.modem_password.disabled = 1;
+			document.iform.modem_apn.disabled = 1;
 			break;
 		case 4:
 			document.iform.username.disabled = 1;
@@ -357,6 +387,9 @@ function type_change() {
 			document.iform.pptp_subnet.disabled = 1;
 			document.iform.pptp_remote.disabled = 1;
 			document.iform.dhcphostname.disabled = 1;
+			document.iform.modem_username.disabled = 0;
+			document.iform.modem_password.disabled = 0;
+			document.iform.modem_apn.disabled = 0;
 			break;
 	}
 }
@@ -369,7 +402,7 @@ function type_change() {
                 <tr> 
                   <td valign="middle"><strong>Type</strong></td>
                   <td><select name="type" class="formfld" id="type" onchange="type_change()">
-                      <?php $opts = split(" ", "Static DHCP PPPoE PPTP");
+                      <?php $opts = split(" ", "Static DHCP PPPoE PPTP Modem");
 				foreach ($opts as $opt): ?>
                       <option <?php if ($opt == $pconfig['type']) echo "selected";?>> 
                       <?=htmlspecialchars($opt);?>
@@ -586,6 +619,27 @@ function type_change() {
                   <td width="100" valign="top" class="vncellreq">Remote IP address</td>
                   <td class="vtable"><?=$mandfldhtml;?><input name="pptp_remote" type="text" class="formfld" id="pptp_remote" size="20" value="<?=htmlspecialchars($pconfig['pptp_remote']);?>"> 
                   </td>
+                </tr>
+                               <tr> 
+                  <td colspan="2" valign="top" height="16"></td>
+                </tr>
+                <tr> 
+                  <td colspan="2" valign="top" class="listtopic">Modem configuration</td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">Username</td>
+                  <td class="vtable"><?=$mandfldhtml;?><input name="modem_username" type="text" class="formfld" id="modem_username" size="20" value="<?=htmlspecialchars($pconfig['modem_username']);?>"> 
+                  </td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncellreq">Password</td>
+                  <td class="vtable"><?=$mandfldhtml;?><input name="modem_password" type="password" class="formfld" id="modem_password" size="20" value="<?=htmlspecialchars($pconfig['modem_password']);?>"> 
+                  </td>
+                </tr>
+                <tr> 
+                  <td valign="top" class="vncell">APN</td>
+                  <td class="vtable"><input name="modem_apn" type="text" class="formfld" id="modem_apn" size="20" value="<?=htmlspecialchars($pconfig['modem_apn']);?>"> 
+                    </td>
                 </tr>
                 <tr> 
                   <td height="16" colspan="2" valign="top"></td>

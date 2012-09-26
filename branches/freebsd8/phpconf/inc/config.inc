@@ -204,7 +204,7 @@ if (!$noparseconfig) {
 						
 					echo "Detecting LAN interface.\n";
 				
-				    $iflist = get_interface_list(true, false);
+				    $iflist = get_interface_list(true, false, false);
 				
 				    foreach ($iflist as $iface => $ifa) {
 				    	if ($ifa['up']) {

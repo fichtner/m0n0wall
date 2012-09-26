@@ -27,7 +27,7 @@ set -T
 trap "echo 'Reboot interrupted'; exit 1" 3
 
 # make some directories in /var
-mkdir /var/run /var/log /var/etc /var/db /var/empty
+mkdir -p /var/run /var/log /var/etc /var/db /var/empty /var/spool/lock
 
 if [ -e /dev/md2 ]; then
 	# If syslinux boot, we need new links as fat32 in freebsd doesn't support symlinks
