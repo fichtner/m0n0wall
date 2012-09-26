@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Initial support for USB modems
+
 - Patch fxp driver to disable checksumming for 82559 chipsets and em driver for nokia firewalls (force load)
 
 - hide IPv6 addresses on interface status page when IPv6 is disabled
