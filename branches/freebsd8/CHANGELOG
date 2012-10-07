@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Add support in snmpd for hrSystemUptime
+
 - Fix Checkin (include files :)
 
 - Initial support for USB modems
