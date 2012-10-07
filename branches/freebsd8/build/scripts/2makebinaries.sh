@@ -166,7 +166,7 @@ fi
         --enable-mini-agent --disable-privacy --disable-testing-code \
         --disable-shared-version --disable-shared \
         '--with-out-transports=TCP Unix' \
-        '--with-mib-modules=mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
+        '--with-mib-modules=host/hr_system mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
 		--with-defaults
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ucd-snmp.patch
 		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ucd-snmp.config.h.patch
