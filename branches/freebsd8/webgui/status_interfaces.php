@@ -220,11 +220,7 @@ function get_interface_info($ifdescr) {
 		if ($ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down" && $ifinfo['modemlink'] != "down") {
 			/* try to determine IP address and netmask with ifconfig */
 			unset($ifconfiginfo);
-			if ($ifinfo['modemlink']) {
-				exec("/sbin/ifconfig " . $ifinfo['hwif'], $ifconfiginfo);
-			} else {
-				exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
-			}
+			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
 			
 			foreach ($ifconfiginfo as $ici) {
 				if (preg_match("/inet (\S+)/", $ici, $matches)) {

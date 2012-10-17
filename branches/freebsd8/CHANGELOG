@@ -2,6 +2,7 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix ip address for modem on status page.
 
 - Update build scripts and patches for FreeBSD 8.3 and bump version to 1.8.1
   to reflect this relatively major change.
