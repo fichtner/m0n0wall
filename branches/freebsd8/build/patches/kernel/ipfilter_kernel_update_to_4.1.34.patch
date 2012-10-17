@@ -26,20 +26,7 @@ diff -ur sys.orig/conf/options sys/conf/options
 diff -ur sys.orig/contrib/ipfilter/netinet/fil.c sys/contrib/ipfilter/netinet/fil.c
 --- sys.orig/contrib/ipfilter/netinet/fil.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/fil.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/fil.c,v 1.57.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-- * Copyright (C) 1993-2003 by Darren Reed.
-+ * Copyright (C) 1993-2010 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
-@@ -151,12 +151,9 @@
+@@ -151,7 +151,5 @@
  #include "netinet/ipl.h"
  /* END OF INCLUDES */
  
@@ -47,12 +34,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/fil.c sys/contrib/ipfilter/netinet/fi
 -
  #if !defined(lint)
  static const char sccsid[] = "@(#)fil.c	1.36 6/5/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$FreeBSD: src/sys/contrib/ipfilter/netinet/fil.c,v 1.57.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $";
--/* static const char rcsid[] = "@(#)$Id: fil.c,v 2.243.2.125 2007/10/10 09:27:20 darrenr Exp $"; */
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #ifndef	_KERNEL
 @@ -235,6 +232,7 @@
  static	ipfunc_t	fr_findfunc __P((ipfunc_t));
  static	frentry_t	*fr_firewall __P((fr_info_t *, u_32_t *));
@@ -590,15 +571,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/fil.c sys/contrib/ipfilter/netinet/fi
  /*
   * Copyright (c) 1982, 1986, 1988, 1991, 1993
   *	The Regents of the University of California.  All rights reserved.
-@@ -3207,7 +3197,7 @@
-  * SUCH DAMAGE.
-  *
-  *	@(#)uipc_mbuf.c	8.2 (Berkeley) 1/4/94
-- * $Id: fil.c,v 2.243.2.125 2007/10/10 09:27:20 darrenr Exp $
-+ * $Id$
-  */
- /*
-  * Copy data from an mbuf chain starting "off" bytes from the beginning,
 @@ -3450,7 +3440,7 @@
  	fg = fr_findgroup(group, unit, fr_active, NULL);
  	if (fg == NULL)
@@ -1690,18 +1662,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/fil.c sys/contrib/ipfilter/netinet/fi
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_auth.c sys/contrib/ipfilter/netinet/ip_auth.c
 --- sys.orig/contrib/ipfilter/netinet/ip_auth.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_auth.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_auth.c,v 1.48.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1998-2003 by Darren Reed & Guido van Rooij.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
 @@ -52,7 +52,7 @@
  # include <sys/stream.h>
  # include <sys/kmem.h>
@@ -1719,16 +1679,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_auth.c sys/contrib/ipfilter/netine
  #include <netinet/in.h>
  #include <netinet/in_systm.h>
  #include <netinet/ip.h>
-@@ -120,8 +119,7 @@
- /* END OF INCLUDES */
- 
- #if !defined(lint)
--static const char rcsid[] = "@(#)$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_auth.c,v 1.48.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $";
--/* static const char rcsid[] = "@(#)$Id: ip_auth.c,v 2.73.2.24 2007/09/09 11:32:04 darrenr Exp $"; */
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- 
 @@ -135,6 +133,7 @@
  
  int	fr_authsize = FR_NUMAUTH;
@@ -2146,20 +2096,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_auth.c sys/contrib/ipfilter/netine
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_auth.h sys/contrib/ipfilter/netinet/ip_auth.h
 --- sys.orig/contrib/ipfilter/netinet/ip_auth.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_auth.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,12 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_auth.h,v 1.16.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1997-2001 by Darren Reed & Guido Van Rooij.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_auth.h,v 1.16.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_auth.h,v 2.16.2.2 2006/03/16 06:45:49 darrenr Exp $
-+ * $Id$
-  *
-  */
- #ifndef	__IP_AUTH_H__
 @@ -21,6 +18,7 @@
  	u_32_t	fra_pass;
  	fr_info_t	fra_info;
@@ -2171,16 +2107,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_auth.h sys/contrib/ipfilter/netine
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_compat.h sys/contrib/ipfilter/netinet/ip_compat.h
 --- sys.orig/contrib/ipfilter/netinet/ip_compat.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_compat.h	2011-04-27 13:03:01.000000000 +0200
-@@ -4,8 +4,7 @@
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_compat.h	1.8 1/14/96
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_compat.h,v 1.38.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_compat.h,v 2.142.2.57 2007/10/10 09:51:42 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef	__IP_COMPAT_H__
 @@ -47,6 +46,9 @@
  #if defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 105000000) && \
      !defined(_KERNEL) && !defined(USE_INET6)
@@ -2722,16 +2648,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_compat.h sys/contrib/ipfilter/neti
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_fil.h sys/contrib/ipfilter/netinet/ip_fil.h
 --- sys.orig/contrib/ipfilter/netinet/ip_fil.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_fil.h	2011-04-27 14:01:51.000000000 +0200
-@@ -4,8 +4,7 @@
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_fil.h	1.35 6/5/96
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_fil.h,v 1.37.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_fil.h,v 2.170.2.51 2007/10/10 09:48:03 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef	__IP_FIL_H__
 @@ -209,7 +208,7 @@
  		  } \
  		}
@@ -2916,21 +2832,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_fil.h sys/contrib/ipfilter/netinet
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_fil_freebsd.c sys/contrib/ipfilter/netinet/ip_fil_freebsd.c
 --- sys.orig/contrib/ipfilter/netinet/ip_fil_freebsd.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_fil_freebsd.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_fil_freebsd.c,v 1.20.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1993-2003 by Darren Reed.
-  *
-@@ -7,7 +5,7 @@
-  */
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_fil.c	2.41 6/5/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$Id: ip_fil_freebsd.c,v 2.53.2.50 2007/09/20 12:51:50 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #if defined(KERNEL) || defined(_KERNEL)
 @@ -62,12 +60,6 @@
  #else
  # include <sys/select.h>
@@ -3312,18 +3213,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_fil_freebsd.c sys/contrib/ipfilter
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_frag.c sys/contrib/ipfilter/netinet/ip_frag.c
 --- sys.orig/contrib/ipfilter/netinet/ip_frag.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_frag.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_frag.c,v 1.33.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1993-2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
 @@ -62,7 +62,6 @@
  #ifdef sun
  # include <net/af.h>
@@ -3332,16 +3221,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_frag.c sys/contrib/ipfilter/netine
  #include <netinet/in.h>
  #include <netinet/in_systm.h>
  #include <netinet/ip.h>
-@@ -102,8 +101,7 @@
- 
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_frag.c	1.11 3/24/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_frag.c,v 1.33.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $";
--/* static const char rcsid[] = "@(#)$Id: ip_frag.c,v 2.77.2.12 2007/09/20 12:51:51 darrenr Exp $"; */
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- 
 @@ -130,6 +128,7 @@
  u_long	fr_ticks = 0;
  
@@ -3658,21 +3537,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_frag.c sys/contrib/ipfilter/netine
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_frag.h sys/contrib/ipfilter/netinet/ip_frag.h
 --- sys.orig/contrib/ipfilter/netinet/ip_frag.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_frag.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,13 +1,10 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_frag.h,v 1.19.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1993-2001 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_frag.h	1.5 3/24/96
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_frag.h,v 1.19.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_frag.h,v 2.23.2.1 2004/03/29 16:21:56 darrenr Exp
-+ * $Id$
-  */
- 
- #ifndef	__IP_FRAG_H__
 @@ -30,14 +27,14 @@
  	 * therefore important for this set to remain together.
  	 */
@@ -3707,22 +3571,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_frag.h sys/contrib/ipfilter/netine
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_ftp_pxy.c sys/contrib/ipfilter/netinet/ip_ftp_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_ftp_pxy.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_ftp_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_ftp_pxy.c,v 1.28.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1997-2003 by Darren Reed
-  *
-@@ -8,8 +6,7 @@
-  * Simple FTP transparent proxy for in-kernel use.  For use with the NAT
-  * code.
-  *
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_ftp_pxy.c,v 1.28.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_ftp_pxy.c,v 2.88.2.19 2006/04/01 10:14:53 darrenr Exp $
-+ * $Id$
-  */
- 
- #define	IPF_FTP_PROXY
 @@ -38,6 +35,11 @@
  #define	FTPXY_PASS_2	14
  #define	FTPXY_PAOK_2	15
@@ -4015,27 +3863,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_ftp_pxy.c sys/contrib/ipfilter/net
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_htable.c sys/contrib/ipfilter/netinet/ip_htable.c
 --- sys.orig/contrib/ipfilter/netinet/ip_htable.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_htable.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_htable.c,v 1.5.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1993-2001, 2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
-@@ -53,7 +53,7 @@
- /* END OF INCLUDES */
- 
- #if !defined(lint)
--static const char rcsid[] = "@(#)$Id: ip_htable.c,v 2.34.2.11 2007/09/20 12:51:51 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #ifdef	IPFILTER_LOOKUP
 @@ -529,6 +529,12 @@
  
  	READ_ENTER(&ip_poolrw);
@@ -4115,15 +3942,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_htable.c sys/contrib/ipfilter/neti
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_ipsec_pxy.c sys/contrib/ipfilter/netinet/ip_ipsec_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_ipsec_pxy.c	2007-06-04 04:49:45.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_ipsec_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -6,7 +6,7 @@
-  * Simple ISAKMP transparent proxy for in-kernel use.  For use with the NAT
-  * code.
-  *
-- * $Id: ip_ipsec_pxy.c,v 2.20.2.8 2006/07/14 06:12:14 darrenr Exp $
-+ * $Id$
-  *
-  */
- #define	IPF_IPSEC_PROXY
 @@ -143,8 +143,6 @@
  	ipn->in_p = IPPROTO_ESP;
  
@@ -4198,15 +4016,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_ipsec_pxy.c sys/contrib/ipfilter/n
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_irc_pxy.c sys/contrib/ipfilter/netinet/ip_irc_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_irc_pxy.c	2007-06-04 04:49:45.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_irc_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -3,7 +3,7 @@
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $Id: ip_irc_pxy.c,v 2.39.2.6 2006/07/14 06:12:14 darrenr Exp $
-+ * $Id$
-  */
- 
- #define	IPF_IRC_PROXY
 @@ -397,8 +397,6 @@
  		tcp2->th_win = htons(8192);
  		tcp2->th_sport = sp;
@@ -4240,20 +4049,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_irc_pxy.c sys/contrib/ipfilter/net
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_log.c sys/contrib/ipfilter/netinet/ip_log.c
 --- sys.orig/contrib/ipfilter/netinet/ip_log.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_log.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,12 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_log.c,v 1.35.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1997-2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_log.c,v 1.35.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_log.c,v 2.75.2.19 2007/09/09 11:32:06 darrenr Exp $
-+ * $Id$
-  */
- #include <sys/param.h>
- #if defined(KERNEL) || defined(_KERNEL)
 @@ -104,7 +101,6 @@
  #if __FreeBSD_version >= 300000
  # include <net/if_var.h>
@@ -4389,15 +4184,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_log.c sys/contrib/ipfilter/netinet
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_lookup.c sys/contrib/ipfilter/netinet/ip_lookup.c
 --- sys.orig/contrib/ipfilter/netinet/ip_lookup.c	2007-10-18 23:42:34.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_lookup.c	2011-04-27 13:03:01.000000000 +0200
-@@ -58,7 +58,7 @@
- /* END OF INCLUDES */
- 
- #if !defined(lint)
--static const char rcsid[] = "@(#)$Id: ip_lookup.c,v 2.35.2.19 2007/10/11 09:05:51 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #ifdef	IPFILTER_LOOKUP
 @@ -583,7 +583,7 @@
  	int err;
  	SPL_INT(s);
@@ -4441,18 +4227,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_lookup.h sys/contrib/ipfilter/neti
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet/ip_nat.c
 --- sys.orig/contrib/ipfilter/netinet/ip_nat.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_nat.c	2011-05-04 10:42:10.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_nat.c,v 1.47.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1995-2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
 @@ -80,7 +80,6 @@
  #ifdef sun
  # include <net/af.h>
@@ -4469,16 +4243,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
  #ifdef	IPFILTER_SYNC
  #include "netinet/ip_sync.h"
  #endif
-@@ -117,8 +117,7 @@
- 
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_nat.c	1.11 6/5/96 (C) 1995 Darren Reed";
--static const char rcsid[] = "@(#)$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_nat.c,v 1.47.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $";
--/* static const char rcsid[] = "@(#)$Id: ip_nat.c,v 2.195.2.102 2007/10/16 10:08:10 darrenr Exp $"; */
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- 
 @@ -210,8 +209,8 @@
  static	nat_t	*fr_natclone __P((fr_info_t *, nat_t *));
  static	void	nat_mssclamp __P((tcphdr_t *, u_32_t, fr_info_t *, u_short *));
@@ -5565,21 +5329,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.c sys/contrib/ipfilter/netinet
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.h sys/contrib/ipfilter/netinet/ip_nat.h
 --- sys.orig/contrib/ipfilter/netinet/ip_nat.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_nat.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,13 +1,10 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_nat.h,v 1.28.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1995-2001, 2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_nat.h	1.5 2/4/96
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_nat.h,v 1.28.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_nat.h,v 2.90.2.20 2007/09/25 08:27:32 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef	__IP_NAT_H__
 @@ -367,6 +364,7 @@
  	u_long	*ns_bucketlen[2];
  	u_long	ns_ticks;
@@ -5605,39 +5354,9 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_nat.h sys/contrib/ipfilter/netinet
  extern	void	fr_setnatqueue __P((nat_t *, int));
  extern	void	fr_hostmapdel __P((hostmap_t **));
  
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_netbios_pxy.c sys/contrib/ipfilter/netinet/ip_netbios_pxy.c
---- sys.orig/contrib/ipfilter/netinet/ip_netbios_pxy.c	2005-12-30 12:22:09.000000000 +0100
-+++ sys/contrib/ipfilter/netinet/ip_netbios_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,7 +1,7 @@
- /*
-  * Simple netbios-dgm transparent proxy for in-kernel use.
-  * For use with the NAT code.
-- * $Id: ip_netbios_pxy.c,v 2.8.2.1 2005/08/20 13:48:23 darrenr Exp $
-+ * $Id$
-  */
- 
- /*-
-@@ -29,7 +29,7 @@
-  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-  * SUCH DAMAGE.
-  *
-- * $Id: ip_netbios_pxy.c,v 2.8.2.1 2005/08/20 13:48:23 darrenr Exp $
-+ * $Id$
-  */
- 
- #define	IPF_NETBIOS_PROXY
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_pool.c sys/contrib/ipfilter/netinet/ip_pool.c
 --- sys.orig/contrib/ipfilter/netinet/ip_pool.c	2007-10-18 23:42:38.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_pool.c	2011-04-27 13:03:01.000000000 +0200
-@@ -2,6 +2,8 @@
-  * Copyright (C) 1993-2001, 2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
 @@ -33,15 +35,10 @@
  # endif
  #endif
@@ -5663,15 +5382,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_pool.c sys/contrib/ipfilter/netine
  #include <net/if.h>
  #include <netinet/in.h>
  
-@@ -78,7 +76,7 @@
- 
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_fil.c	2.41 6/5/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$Id: ip_pool.c,v 2.55.2.24 2007/10/10 09:45:37 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #ifdef IPFILTER_LOOKUP
 @@ -97,23 +95,6 @@
  ip_pool_stat_t ipoolstat;
  ipfrwlock_t ip_poolrw;
@@ -5827,30 +5537,9 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_pool.c sys/contrib/ipfilter/netine
  	RADIX_NODE_HEAD_UNLOCK(rnh);
  
  	Free(rnh);
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_pool.h sys/contrib/ipfilter/netinet/ip_pool.h
---- sys.orig/contrib/ipfilter/netinet/ip_pool.h	2007-10-18 23:42:28.000000000 +0200
-+++ sys/contrib/ipfilter/netinet/ip_pool.h	2011-04-27 13:03:01.000000000 +0200
-@@ -3,7 +3,7 @@
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $Id: ip_pool.h,v 2.26.2.6 2007/10/10 09:51:43 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef	__IP_POOL_H__
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_pptp_pxy.c sys/contrib/ipfilter/netinet/ip_pptp_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_pptp_pxy.c	2007-06-04 04:49:55.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_pptp_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -4,7 +4,7 @@
-  * Simple PPTP transparent proxy for in-kernel use.  For use with the NAT
-  * code.
-  *
-- * $Id: ip_pptp_pxy.c,v 2.10.2.15 2006/10/31 12:11:23 darrenr Exp $
-+ * $Id$
-  *
-  */
- #define	IPF_PPTP_PROXY
 @@ -165,8 +165,6 @@
  	if ((nat2 == NULL) || (pptp->pptp_state == NULL)) {
  		bcopy((char *)fin, (char *)&fi, sizeof(fi));
@@ -5890,12 +5579,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_pptp_pxy.c sys/contrib/ipfilter/ne
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_proxy.c sys/contrib/ipfilter/netinet/ip_proxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_proxy.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_proxy.c	2011-04-27 14:12:12.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_proxy.c,v 1.30.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1997-2003 by Darren Reed.
-  *
 @@ -70,7 +68,6 @@
  #ifdef sun
  # include <net/af.h>
@@ -5913,35 +5596,9 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_proxy.c sys/contrib/ipfilter/netin
  #include "netinet/ip_ftp_pxy.c"
  #include "netinet/ip_rcmd_pxy.c"
  # include "netinet/ip_pptp_pxy.c"
-@@ -101,10 +100,8 @@
- #include "netinet/ip_ipsec_pxy.c"
- #include "netinet/ip_rpcb_pxy.c"
- 
--/* END OF INCLUDES */
--
- #if !defined(lint)
--static const char rcsid[] = "@(#)$Id: ip_proxy.c,v 2.62.2.21 2007/06/02 21:22:28 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- static int appr_fixseqack __P((fr_info_t *, ip_t *, ap_session_t *, int ));
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_proxy.h sys/contrib/ipfilter/netinet/ip_proxy.h
 --- sys.orig/contrib/ipfilter/netinet/ip_proxy.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_proxy.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,12 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_proxy.h,v 1.17.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1997-2001 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_proxy.h,v 1.17.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_proxy.h,v 2.31.2.2 2005/03/12 19:33:48 darrenr Exp
-+ * $Id$
-  */
- 
- #ifndef	__IP_PROXY_H__
 @@ -143,7 +140,7 @@
   * This is the scratch buffer size used to hold strings from the TCP stream
   * that we may want to parse.  It's an arbitrary size, really, but it must
@@ -5954,20 +5611,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_proxy.h sys/contrib/ipfilter/netin
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_raudio_pxy.c sys/contrib/ipfilter/netinet/ip_raudio_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_raudio_pxy.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_raudio_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,12 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_raudio_pxy.c,v 1.13.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_raudio_pxy.c,v 1.13.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-  * Copyright (C) 1998-2003 by Darren Reed
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $Id: ip_raudio_pxy.c,v 1.40.2.4 2006/07/14 06:12:17 darrenr Exp $
-+ * $Id$
-  */
- 
- #define	IPF_RAUDIO_PROXY
 @@ -278,8 +275,6 @@
  	bcopy((char *)fin, (char *)&fi, sizeof(fi));
  	bzero((char *)tcp2, sizeof(*tcp2));
@@ -6024,23 +5667,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_raudio_pxy.c sys/contrib/ipfilter/
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_rcmd_pxy.c sys/contrib/ipfilter/netinet/ip_rcmd_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_rcmd_pxy.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_rcmd_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,15 +1,12 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_rcmd_pxy.c,v 1.15.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1998-2003 by Darren Reed
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-- * $Id: ip_rcmd_pxy.c,v 1.41.2.7 2006/07/14 06:12:18 darrenr Exp $
-+ * $Id$
-  *
-  * Simple RCMD transparent proxy for in-kernel use.  For use with the NAT
-  * code.
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_rcmd_pxy.c,v 1.15.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-  */
- 
- #define	IPF_RCMD_PROXY
 @@ -154,8 +151,6 @@
  	 * other way.
  	 */
@@ -6078,15 +5704,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_rcmd_pxy.c sys/contrib/ipfilter/ne
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_rpcb_pxy.c sys/contrib/ipfilter/netinet/ip_rpcb_pxy.c
 --- sys.orig/contrib/ipfilter/netinet/ip_rpcb_pxy.c	2007-10-18 23:42:37.000000000 +0200
 +++ sys/contrib/ipfilter/netinet/ip_rpcb_pxy.c	2011-04-27 13:03:01.000000000 +0200
-@@ -37,7 +37,7 @@
-  *   o The enclosed hack of STREAMS support is pretty sick and most likely
-  *     broken.
-  *
-- *	$Id: ip_rpcb_pxy.c,v 2.25.2.7 2007/06/04 09:16:31 darrenr Exp $
-+ *	$Id$
-  */
- 
- #define	IPF_RPCB_PROXY
 @@ -916,14 +916,14 @@
  		/* There must be only one 4 byte argument. */
  		if (!RPCB_BUF_EQ(rm, p, 4))
@@ -6173,12 +5790,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_rpcb_pxy.c sys/contrib/ipfilter/ne
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_rules.c sys/contrib/ipfilter/netinet/ip_rules.c
 --- sys.orig/contrib/ipfilter/netinet/ip_rules.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_rules.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_rules.c,v 1.1.1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
- * Copyright (C) 1993-2000 by Darren Reed.
- *
 @@ -8,11 +6,22 @@
  * to the original author and the contributors.
  */
@@ -6229,54 +5840,9 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_rules.c sys/contrib/ipfilter/netin
  frentry_t *ipfrule_match_out_(fin, passp)
  fr_info_t *fin;
  u_32_t *passp;
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_rules.h sys/contrib/ipfilter/netinet/ip_rules.h
---- sys.orig/contrib/ipfilter/netinet/ip_rules.h	2010-12-21 18:09:25.000000000 +0100
-+++ sys/contrib/ipfilter/netinet/ip_rules.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_rules.h,v 1.1.1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- extern int ipfrule_add __P((void));
- extern int ipfrule_remove __P((void));
- 
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_scan.c sys/contrib/ipfilter/netinet/ip_scan.c
---- sys.orig/contrib/ipfilter/netinet/ip_scan.c	2007-10-18 23:42:35.000000000 +0200
-+++ sys/contrib/ipfilter/netinet/ip_scan.c	2011-04-27 13:03:01.000000000 +0200
-@@ -58,7 +58,7 @@
- 
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_state.c	1.8 6/5/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$Id: ip_scan.c,v 2.40.2.10 2007/06/02 21:22:28 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #ifdef	IPFILTER_SCAN	/* endif at bottom of file */
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_scan.h sys/contrib/ipfilter/netinet/ip_scan.h
---- sys.orig/contrib/ipfilter/netinet/ip_scan.h	2007-06-04 04:50:20.000000000 +0200
-+++ sys/contrib/ipfilter/netinet/ip_scan.h	2011-04-27 13:03:01.000000000 +0200
-@@ -4,7 +4,7 @@
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_fil.h	1.35 6/5/96
-- * $Id: ip_scan.h,v 2.9.2.2 2006/07/14 06:12:19 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef __IP_SCAN_H__
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_state.c sys/contrib/ipfilter/netinet/ip_state.c
 --- sys.orig/contrib/ipfilter/netinet/ip_state.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_state.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,9 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_state.c,v 1.42.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1995-2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-+ *
-+ * Copyright 2008 Sun Microsystems, Inc.
-  */
- #if defined(KERNEL) || defined(_KERNEL)
- # undef KERNEL
 @@ -72,7 +72,6 @@
  #ifdef sun
  # include <net/af.h>
@@ -6285,15 +5851,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_state.c sys/contrib/ipfilter/netin
  #include <netinet/in.h>
  #include <netinet/in_systm.h>
  #include <netinet/ip.h>
-@@ -113,7 +112,7 @@
- 
- #if !defined(lint)
- static const char sccsid[] = "@(#)ip_state.c	1.8 6/5/96 (C) 1993-2000 Darren Reed";
--static const char rcsid[] = "@(#)$Id: ip_state.c,v 2.186.2.80 2007/10/16 09:33:23 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- static	ipstate_t **ips_table = NULL;
 @@ -128,11 +127,16 @@
  static ipstate_t *fr_matchsrcdst __P((fr_info_t *, ipstate_t *, i6addr_t *,
  				      i6addr_t *, tcphdr_t *, u_32_t));
@@ -7005,21 +6562,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_state.c sys/contrib/ipfilter/netin
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_state.h sys/contrib/ipfilter/netinet/ip_state.h
 --- sys.orig/contrib/ipfilter/netinet/ip_state.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_state.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,13 +1,10 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_state.h,v 1.20.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1995-2001 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_state.h	1.3 1/12/96 (C) 1995 Darren Reed
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ip_state.h,v 1.20.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ip_state.h,v 2.68.2.10 2007/10/16 09:33:24 darrenr Exp $
-+ * $Id$
-  */
- #ifndef	__IP_STATE_H__
- #define	__IP_STATE_H__
 @@ -223,6 +220,7 @@
  extern	u_long	fr_tcplastack;
  extern	u_long	fr_tcptimeout;
@@ -7038,12 +6580,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_state.h sys/contrib/ipfilter/netin
 diff -ur sys.orig/contrib/ipfilter/netinet/ip_sync.c sys/contrib/ipfilter/netinet/ip_sync.c
 --- sys.orig/contrib/ipfilter/netinet/ip_sync.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ip_sync.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,5 +1,3 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ip_sync.c,v 1.6.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1995-1998 by Darren Reed.
-  *
 @@ -32,6 +30,10 @@
  # if !defined(__SVR4) && !defined(__svr4__)
  #  include <sys/mbuf.h>
@@ -7063,15 +6599,7 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_sync.c sys/contrib/ipfilter/netine
  #include <netinet/in.h>
  #include <netinet/in_systm.h>
  #include <netinet/ip.h>
-@@ -98,13 +99,17 @@
- /* END OF INCLUDES */
- 
- #if !defined(lint)
--static const char rcsid[] = "@(#)$Id: ip_sync.c,v 2.40.2.9 2007/06/02 21:22:28 darrenr Exp $";
-+static const char rcsid[] = "@(#)$Id$";
- #endif
- 
- #define	SYNC_STATETABSZ	256
+@@ -106,6 +107,10 @@
  #define	SYNC_NATTABSZ	256
  
  #ifdef	IPFILTER_SYNC
@@ -7273,35 +6801,10 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ip_sync.c sys/contrib/ipfilter/netine
  #  endif
  # endif
  }
-diff -ur sys.orig/contrib/ipfilter/netinet/ip_sync.h sys/contrib/ipfilter/netinet/ip_sync.h
---- sys.orig/contrib/ipfilter/netinet/ip_sync.h	2007-06-04 04:49:57.000000000 +0200
-+++ sys/contrib/ipfilter/netinet/ip_sync.h	2011-04-27 13:03:01.000000000 +0200
-@@ -4,7 +4,7 @@
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ip_fil.h	1.35 6/5/96
-- * $Id: ip_sync.h,v 2.11.2.4 2006/07/14 06:12:20 darrenr Exp $
-+ * $Id$
-  */
- 
- #ifndef __IP_SYNC_H__
 diff -ur sys.orig/contrib/ipfilter/netinet/ipl.h sys/contrib/ipfilter/netinet/ipl.h
 --- sys.orig/contrib/ipfilter/netinet/ipl.h	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/ipl.h	2011-04-27 13:03:01.000000000 +0200
-@@ -1,20 +1,17 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/ipl.h,v 1.27.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 1993-2001, 2003 by Darren Reed.
-  *
-  * See the IPFILTER.LICENCE file for details on licencing.
-  *
-  * @(#)ipl.h	1.21 6/5/96
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/ipl.h,v 1.27.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-- * Id: ipl.h,v 2.52.2.30 2007/10/16 09:41:00 darrenr Exp $
-+ * $Id$
-  */
- 
+@@ -14,8 +14,8 @@
  #ifndef	__IPL_H__
  #define	__IPL_H__
  
@@ -7315,16 +6818,6 @@ diff -ur sys.orig/contrib/ipfilter/netinet/ipl.h sys/contrib/ipfilter/netinet/ip
 diff -ur sys.orig/contrib/ipfilter/netinet/mlfk_ipl.c sys/contrib/ipfilter/netinet/mlfk_ipl.c
 --- sys.orig/contrib/ipfilter/netinet/mlfk_ipl.c	2010-12-21 18:09:25.000000000 +0100
 +++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	2011-04-27 13:03:01.000000000 +0200
-@@ -1,9 +1,6 @@
--/*	$FreeBSD: src/sys/contrib/ipfilter/netinet/mlfk_ipl.c,v 1.22.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $	*/
--
- /*
-  * Copyright (C) 2000 by Darren Reed.
-  *
-- * $FreeBSD: src/sys/contrib/ipfilter/netinet/mlfk_ipl.c,v 1.22.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
-  * See the IPFILTER.LICENCE file for details on licencing.
-  */
- 
 @@ -18,7 +15,7 @@
  #include <sys/select.h>
  #if __FreeBSD_version >= 500000

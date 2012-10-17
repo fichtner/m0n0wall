@@ -186,10 +186,10 @@ function get_interface_info($ifdescr) {
 	if ($ifinfo['status'] == "up") {
 		/* try to determine media with ifconfig */
 		unset($ifconfiginfo);
-		if (($ifdescr != "wan" && $config['interfaces']['wan']['ipaddr'] != "modem")) {
-			exec("/sbin/ifconfig " . $ifinfo['hwif'], $ifconfiginfo);
-		} else {
+		if ($ifdescr == "wan" && $config['interfaces']['wan']['ipaddr'] == "modem") {
 			exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
+		} else {
+			exec("/sbin/ifconfig " . $ifinfo['hwif'], $ifconfiginfo);
 		}
 		
 		foreach ($ifconfiginfo as $ici) {
@@ -220,10 +220,10 @@ function get_interface_info($ifdescr) {
 		if ($ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down" && $ifinfo['modemlink'] != "down") {
 			/* try to determine IP address and netmask with ifconfig */
 			unset($ifconfiginfo);
-			if ($ifinfo['modemlink'] != "down" ) {
-				exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
-			} else {
+			if ($ifinfo['modemlink']) {
 				exec("/sbin/ifconfig " . $ifinfo['hwif'], $ifconfiginfo);
+			} else {
+				exec("/sbin/ifconfig " . $ifinfo['if'], $ifconfiginfo);
 			}
 			
 			foreach ($ifconfiginfo as $ici) {
@@ -241,8 +241,8 @@ function get_interface_info($ifdescr) {
 			
 			if ($ifdescr == "wan") {
 				/* run netstat to determine the default gateway */
-				if ($ifinfo['modemlink'] != "down" ) {
-						$ifinfo['gateway'] = "Modem";
+				if ($ifinfo['modemlink']) {
+					$ifinfo['gateway'] = "Modem";
 				} else {
 					unset($netstatrninfo);
 					exec("/usr/bin/netstat -rnf inet", $netstatrninfo);
@@ -256,7 +256,7 @@ function get_interface_info($ifdescr) {
 				if (ipv6enabled()) {
 					unset($netstatrninfo);
 					exec("/usr/bin/netstat -rnf inet6", $netstatrninfo);
-					if ($ifinfo['modemlink'] != "down" ) {
+					if ($ifinfo['modemlink']) {
 						$ifinfo['gateway6'] = "Modem";
 					} else { 
 						foreach ($netstatrninfo as $nsr) {

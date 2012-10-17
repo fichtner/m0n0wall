@@ -349,7 +349,7 @@ function get_interface_list($ethernet = true, $wireless = true, $serial = true) 
 		if (substr($ifname, -1) == "*")
 			$ifname = substr($ifname, 0, strlen($ifname) - 1);
 		
-		if (preg_match("/^(ppp|sl|gif|faith|lo|ng|ngwan|vlan|wlan|tun|enc|ipfw|bridge)\d/", $ifname))
+		if (preg_match("/^(ppp|sl|gif|faith|lo|ng|ngwan|vlan|wlan|tun|enc|ipfw|bridge|usbus)\d/", $ifname))
 			continue;
 		
 		if (preg_match($g['wireless_regex'], $ifname)) {

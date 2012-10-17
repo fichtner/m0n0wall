@@ -1,9 +1,9 @@
-Build m0n0wall on FreeBSD 8.2
+Build m0n0wall on FreeBSD 8.3
 
-Install freebsd 8.2 with developer features and login, su to root then.
+Install freebsd 8.3 with developer features and login, su to root then.
 
 Consider using cvsup to update the source tree to the latest
-RELENG_8_2, and the ports collection to the latest version before
+RELENG_8_3, and the ports collection to the latest version before
 proceeding (see
 http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/cvsup.html).
 
@@ -27,9 +27,9 @@ b) Run the following commands to automatically get the latest version
 
 This will give you a bash prompt where you should execute './doall.sh'  or execute each of the 5 shell scripts.
 
-if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build82/images/
+if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build83/images/
 
-To start from scratch again, it should be sufficient to delete /usr/m0n0wall/build82 and repeat the steps above.
+To start from scratch again, it should be sufficient to delete /usr/m0n0wall/build83 and repeat the steps above.
 
 For the syslinux image, make a fat32 disk/usb and run syslinux to create the MBR and place syslinux.sys on the disk, 
 then copy memdisk from the syslinux files onto the root of the disk.  Now extract the m0n0wall tgz syslinux image onto the 

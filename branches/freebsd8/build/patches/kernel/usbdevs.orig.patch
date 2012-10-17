@@ -1,10 +1,10 @@
---- sys/dev/usb/usbdevs.orig	2011-05-01 00:16:51.000000000 +0000
-+++ sys/dev/usb/usbdevs	2011-05-01 00:17:33.000000000 +0000
-@@ -1865,6 +1865,7 @@
+--- sys/dev/usb/usbdevs.orig	2012-03-03 07:15:13.000000000 +0100
++++ sys/dev/usb/usbdevs	2012-10-17 17:06:54.000000000 +0200
+@@ -1875,6 +1875,7 @@
+ product HUAWEI E143E		0x143e	3G modem
+ product HUAWEI E143F		0x143f	3G modem
+ product HUAWEI E1752		0x1446	3G modem
++product HUAWEI K4505		0x1464	3G modem
  product HUAWEI K3765		0x1465	3G modem
  product HUAWEI E1820		0x14ac	E1820 HSPA+ USB Slider
  product HUAWEI K3765_INIT	0x1520	K3765 Initial
-+product HUAWEI K4505		0x1464	3G modem
- 
- /* HUAWEI 3com products */
- product HUAWEI3COM WUB320G	0x0009	Aolynk WUB320g

@@ -2,6 +2,12 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- Update build scripts and patches for FreeBSD 8.3 and bump version to 1.8.1
+  to reflect this relatively major change.
+
+- Fix "Modem" appearing as gateway for Ethernet interfaces on status page.
+
 - Add support in snmpd for hrSystemUptime
 
 - Fix Checkin (include files :)

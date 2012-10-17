@@ -1,14 +1,5 @@
 --- sys/modules/ipfw/Makefile.orig	2006-09-19 17:45:21.000000000 +0200
 +++ sys/modules/ipfw/Makefile	2008-02-23 19:43:06.000000000 +0100
-@@ -6,7 +6,7 @@
- 
- KMOD=	ipfw
- SRCS=	ip_fw2.c ip_fw_pfil.c
--SRCS+=	ip_fw_dynamic.c ip_fw_log.c ip_fw_nat.c
-+SRCS+=	ip_fw_dynamic.c ip_fw_log.c
- SRCS+=	ip_fw_sockopt.c ip_fw_table.c
- SRCS+=	opt_inet6.h opt_ipsec.h
- 
 @@ -18,8 +18,8 @@
  #CFLAGS+= -DIPFIREWALL_VERBOSE_LIMIT=100
  #

@@ -1,7 +1,7 @@
 #!/bin/csh 
 
 
-set MW_BUILDPATH=/usr/m0n0wall/build82
+set MW_BUILDPATH=/usr/m0n0wall/build83
 setenv MW_BUILDPATH $MW_BUILDPATH
 setenv MW_ARCH `uname -m`
 

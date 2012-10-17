@@ -1,7 +1,7 @@
 *default host=cvsup.ie.FreeBSD.org
 *default base=/var/db
 *default prefix=/usr
-*default release=cvs date=2012.04.29.00.00.00
+*default release=cvs date=2012.10.17.00.00.00
 *default delete use-rel-suffix
 *default compress
 

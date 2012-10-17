@@ -26,7 +26,7 @@
  MAN=	ifconfig.8
  
 -CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
-+CFLAGS+= -I/usr/m0n0wall/build82/tmp/ -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
++CFLAGS+= -I${MW_BUILDPATH}/tmp/ -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
  WARNS?=	0
  
  .include <bsd.prog.mk>

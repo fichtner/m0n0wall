@@ -1,11 +1,11 @@
---- server/db.c.orig	2008-01-22 18:28:24.000000000 +0100
-+++ server/db.c	2010-02-24 22:46:06.000000000 +0100
-@@ -718,7 +718,7 @@
- 	/* If we haven't rewritten the lease database in over an
- 	   hour, rewrite it now.  (The length of time should probably
- 	   be configurable. */
--	if (count && cur_time - write_time > 3600) {
-+	if (count && cur_time - write_time > 300) {
- 		count = 0;
- 		write_time = cur_time;
- 		new_lease_file ();
+--- server/db.c.orig	2012-08-23 20:23:54.000000000 +0200
++++ server/db.c	2012-10-17 16:24:04.000000000 +0200
+@@ -36,7 +36,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ 
+-#define LEASE_REWRITE_PERIOD 3600
++#define LEASE_REWRITE_PERIOD 300
+ 
+ static isc_result_t write_binding_scope(FILE *db_file, struct binding *bnd,
+ 					char *prepend);
