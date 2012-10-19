@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -48,11 +48,14 @@ require("guiconfig.inc");
     <td class="tabcont">
 <?php
 
-/* delete any SP? */
-if ($_GET['act'] == "del") {
+/* delete any SPs? */
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
 	$fd = @popen("/usr/local/sbin/setkey -c > /dev/null 2>&1", "w");
 	if ($fd) {
-		fwrite($fd, "spddelete {$_GET['src']} {$_GET['dst']} any -P {$_GET['dir']} ;\n");
+		foreach ($_POST['entries'] as $entry) {
+			list ($src,$dst,$dir) = split(";", $entry);
+			fwrite($fd, "spddelete $src $dst any -P $dir ;\n");
+		}
 		pclose($fd);
 		sleep(1);
 	}
@@ -97,8 +100,10 @@ if ($fd) {
 }
 if (count($spd)):
 ?>
+<form action="diag_ipsec_spd.php" method="post">
             <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="inner content pane">
   <tr>
+    			<td class="list">&nbsp;</td>
                 <td nowrap class="listhdrr">Source</td>
                 <td nowrap class="listhdrr">Destination</td>
                 <td nowrap class="listhdrr">Direction</td>
@@ -109,6 +114,10 @@ if (count($spd)):
 <?php
 foreach ($spd as $sp): ?>
 	<tr>
+		<?php
+			$args = htmlspecialchars($sp['src'] . ";" . $sp['dst'] . ";" . $sp['dir']);
+		?>
+		<td class="listt"><input type="checkbox" name="entries[]" value="<?=$args;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
 		<td class="listlr" valign="top"><?=htmlspecialchars($sp['src']);?></td>
 		<td class="listr" valign="top"><?=htmlspecialchars($sp['dst']);?></td>
 		<td class="listr" valign="top"><img src="<?=$sp['dir'];?>.gif" width="11" height="11" style="margin-top: 2px"></td>
@@ -116,16 +125,17 @@ foreach ($spd as $sp): ?>
 		<td class="listr" valign="top"><?=htmlspecialchars($sp['ep_src']);?> - <br>
 			<?=htmlspecialchars($sp['ep_dst']);?></td>
 		<td class="list" nowrap>
-		<?php
-			$args = "src=" . rawurlencode($sp['src']);
-			$args .= "&amp;dst=" . rawurlencode($sp['dst']);
-			$args .= "&amp;dir=" . rawurlencode($sp['dir']);
-		?>
-		  <a href="diag_ipsec_spd.php?act=del&amp;<?=$args;?>" onclick="return confirm('Do you really want to delete this security policy?')"><img src="x.gif" title="delete SP" width="17" height="17" border="0" alt="delete SP"></a>
 		</td>
 				
 	</tr>
 <?php endforeach; ?>
+	 <tr> 
+	   <td></td>
+	 </tr> 
+	 <tr> 
+	   <td class="list" colspan="6"></td>
+	   <td class="list"><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected SPs" alt="delete selected SPs" onclick="return confirm('Do you really want to delete the selected security policies?')"></td>
+	 </tr>
 </table>
 <br>
 <table border="0" cellspacing="0" cellpadding="0" summary="inout content pane">
@@ -141,6 +151,7 @@ foreach ($spd as $sp): ?>
 	<td>outgoing (as seen by firewall)</td>
   </tr>
 </table>
+</form>
 <?php else: ?>
 <p><strong>No IPsec security policies.</strong></p>
 <?php endif; ?>

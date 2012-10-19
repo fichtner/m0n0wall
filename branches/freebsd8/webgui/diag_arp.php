@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2005 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2005-2012 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,27 +37,20 @@ if (ipv6enabled()){
 	$pgtitle = array("Diagnostics", "ARP table");
 }
 
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-        $id = $_POST['id'];
-
-if ($_GET['act'] == "del") {
-	if (isset($id)) {
-		/* remove arp entry from arp table */
-		mwexec("/usr/sbin/arp -d " . escapeshellarg($id));
-
-		/* redirect to avoid reposting form data on refresh */
-		header("Location: diag_arp.php");
-		exit;
+if (isset($_POST['del_x'])) {
+	if (is_array($_POST['entries']) && count($_POST['entries']) > 0) {
+		foreach ($_POST['entries'] as $entry) {
+			/* remove arp entry from arp table */
+			mwexec("/usr/sbin/arp -d " . escapeshellarg($entry));
+		}
 	} else {
 		/* remove all entries from arp table */
 		mwexec("/usr/sbin/arp -d -a");
-
-		/* redirect to avoid reposting form data on refresh */
-		header("Location: diag_arp.php");
-		exit;
 	}
+	
+	/* redirect to avoid reposting form data on refresh */
+	header("Location: diag_arp.php");
+	exit;
 }
 
 $resolve = isset($config['syslog']['resolve']);
@@ -233,8 +226,10 @@ function getHostName($mac,$ip)
 
 ?>
 
+<form action="diag_arp.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="inner content pane">
   <tr>
+    <td class="list">&nbsp;</td>
     <td class="listhdrr">IP address</td>
     <td class="listhdrr">MAC address</td>
     <td class="listhdrr">Hostname</td>
@@ -243,19 +238,19 @@ function getHostName($mac,$ip)
   </tr>
 <?php $i = 0; foreach ($data as $entry): ?>
   <tr>
+	<td class="listt"><input type="checkbox" name="entries[]" value="<?=$entry['ip'];?>" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
     <td class="listlr"><?=$entry['ip'];?></td>
     <td class="listr"><?=$entry['mac'];?></td>
     <td class="listr"><?=getHostName($entry['mac'], $entry['ip']);?></td>
     <td class="listr"><?=$hwif[$entry['interface']];?></td>
-    <td valign="middle" nowrap class="list"><a href="diag_arp.php?act=del&amp;id=<?=$entry['ip'];?>"><img src="x.gif" title="delete arp entry" width="17" height="17" border="0" alt="delete arp entry"></a></td>
   </tr>
 <?php $i++; endforeach; ?>
   <tr> 
     <td></td>
   </tr> 
   <tr> 
-    <td class="list" colspan="4"></td>
-    <td class="list"><a href="diag_arp.php?act=del"><img src="x.gif" title="remove all entries from arp table" width="17" height="17" border="0" alt="remove all entries from arp table"></a></td>
+    <td class="list" colspan="5"></td>
+    <td class="list"><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected ARP entries (or all if none selected)" alt="delete selected ARP entries (or all if none selected)"></td>
   </tr>
   <tr>
     <td colspan="4">
@@ -267,5 +262,6 @@ function getHostName($mac,$ip)
     </td>
   </tr>
 </table>
+</form>
 
 <?php include("fend.inc"); ?>

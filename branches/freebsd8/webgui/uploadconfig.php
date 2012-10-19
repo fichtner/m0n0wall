@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -33,23 +33,27 @@ require("guiconfig.inc");
 
 header("Content-Type: text/plain");
 
-/* get config.xml in POST variable "config" */
-if ($_POST['config']) {
-	$fd = @fopen("{$g['tmp_path']}/config.xml", "w");
-	if (!$fd) {
-		echo "ERR Could not save configuration.\n";
-		exit(0);
-	}
-	fwrite($fd, $_POST['config']);
-	fclose($fd);
-	if (config_install("{$g['tmp_path']}/config.xml") == 0) {
-		echo "OK\n";
-		system_reboot();
+if ($_POST) {
+	/* get config.xml in POST variable "config" */
+	if ($_POST['config']) {
+		$fd = @fopen("{$g['tmp_path']}/config.xml", "w");
+		if (!$fd) {
+			echo "ERR Could not save configuration.\n";
+			exit(0);
+		}
+		fwrite($fd, $_POST['config']);
+		fclose($fd);
+		if (config_install("{$g['tmp_path']}/config.xml") == 0) {
+			echo "OK\n";
+			system_reboot();
+		} else {
+			echo "ERR Could not install configuration.\n";
+		}
 	} else {
-		echo "ERR Could not install configuration.\n";
+		echo "ERR Invalid configuration received.\n";
 	}
 } else {
-	echo "ERR Invalid configuration received.\n";
+	echo csrf_get_tokens();
 }
 
 exit(0);

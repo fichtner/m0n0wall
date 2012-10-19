@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2003-2006 Bob Zoller (bob@kludgebox.com) and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Bob Zoller (bob@kludgebox.com) and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ if ($_POST) {
 	$reqdfieldsn = explode(",", "Host,Count");
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
-	if (($_POST['count'] < 1) || ($_POST['count'] > MAX_COUNT)) {
+	if (!is_numericint($_POST['count']) || ($_POST['count'] < 1) || ($_POST['count'] > MAX_COUNT)) {
 		$input_errors[] = "Count must be between 1 and {MAX_COUNT}";
 	}
 

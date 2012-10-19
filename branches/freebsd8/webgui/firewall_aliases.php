@@ -39,9 +39,7 @@ aliases_sort();
 $a_aliases = &$config['aliases']['alias'];
 
 if ($_POST) {
-
-	$pconfig = $_POST;
-
+	
 	if ($_POST['apply']) {
 		$retval = 0;
 		if (!file_exists($d_sysrebootreqd_path)) {
@@ -59,14 +57,16 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_aliases[$_GET['id']]) {
-		unset($a_aliases[$_GET['id']]);
-		write_config();
-		touch($d_aliasesdirty_path);
-		header("Location: firewall_aliases.php");
-		exit;
-	}
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
+	foreach ($_POST['entries'] as $entry) {
+		if ($a_aliases[$entry])
+			unset($a_aliases[$entry]);
+	}	
+	
+	write_config();
+	touch($d_aliasesdirty_path);
+	header("Location: firewall_aliases.php");
+	exit;
 }
 ?>
 <?php include("fbegin.inc"); ?>
@@ -78,13 +78,15 @@ if ($_GET['act'] == "del") {
 <?php endif; ?>
               <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr>
+    			  <td width="5%" class="list">&nbsp;</td>
                   <td width="25%" class="listhdrr">Name</td>
-                  <td width="30%" class="listhdrr">Address</td>
+                  <td width="25%" class="listhdrr">Address</td>
                   <td width="35%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_aliases as $alias): ?>
                 <tr>
+				  <td class="listt"><input type="checkbox" name="entries[]" value="<?=$i;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
                   <td class="listlr">
                     <?=htmlspecialchars($alias['name']);?>
                   </td>
@@ -94,13 +96,14 @@ if ($_GET['act'] == "del") {
                   <td class="listbg">
                     <?=htmlspecialchars($alias['descr']);?>&nbsp;
                   </td>
-                  <td valign="middle" nowrap class="list"> <a href="firewall_aliases_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit alias" width="17" height="17" border="0" alt="edit alias"></a>
-                     &nbsp;<a href="firewall_aliases.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this alias? All elements that still use it will become invalid (e.g. filter rules)!')"><img src="x.gif" title="delete alias" width="17" height="17" border="0" alt="delete alias"></a></td>
+                  <td valign="middle" nowrap class="list"> <a href="firewall_aliases_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit alias" width="17" height="17" border="0" alt="edit alias"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="3"></td>
-                  <td class="list"> <a href="firewall_aliases_edit.php"><img src="plus.gif" title="add alias" width="17" height="17" border="0" alt="add alias"></a></td>
+                  <td class="list" colspan="4"></td>
+                  <td class="list">
+					<input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected aliases" alt="delete selected aliases" onclick="return confirm('Do you really want to delete the selected aliases? All elements that still use them will become invalid (e.g. filter rules)!')">
+					<a href="firewall_aliases_edit.php"><img src="plus.gif" title="add alias" width="17" height="17" border="0" alt="add alias"></a></td>
 				</tr>
               </table>
             </form>
