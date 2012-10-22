@@ -69,18 +69,22 @@ if ($_POST) {
 			if (file_exists($d_ipsecconfdirty_path))
 				unlink($d_ipsecconfdirty_path);
 		}
+	} else {
+		foreach ($_POST as $pn => $pv) {
+			if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+				$id = $matches[1];
+				if ($a_ipsec[$id]) {
+					unset($a_ipsec[$id]);
+					write_config();
+					touch($d_ipsecconfdirty_path);
+					header("Location: vpn_ipsec.php");
+					exit;
+				}
+			}
+		}
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_ipsec[$_GET['id']]) {
-		unset($a_ipsec[$_GET['id']]);
-		write_config();
-		touch($d_ipsecconfdirty_path);
-		header("Location: vpn_ipsec.php");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="vpn_ipsec.php" method="post">
@@ -169,7 +173,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($ipsecent['descr']);?>&nbsp;
                   <?=$spane;?></td>
                   <td valign="middle" nowrap class="list"> <a href="vpn_ipsec_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit tunnel" width="17" height="17" border="0" alt="edit tunnel"></a> 
-                    &nbsp;<a href="vpn_ipsec.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this tunnel?')"><img src="x.gif" title="delete tunnel" width="17" height="17" border="0" alt="delete tunnel"></a></td>
+                    &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete tunnel" alt="delete tunnel" onclick="return confirm('Do you really want to delete this tunnel?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

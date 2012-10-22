@@ -82,13 +82,16 @@ if ($_POST) {
 			exit;
 		}
     }
-} else {
-	if (($_GET['act'] == "del") && $a_element[$_GET['id']]) {
-		unset($a_element[$_GET['id']]);
-		write_config();
-		captiveportal_write_elements();
-		header("Location: services_captiveportal_filemanager.php");
-		exit;
+
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			unset($a_element[$id]);
+			write_config();
+			captiveportal_write_elements();
+			header("Location: services_captiveportal_filemanager.php");
+			exit;
+		}
 	}
 }
 
@@ -123,7 +126,7 @@ if ($_POST) {
 		<td class="listlr"><?=htmlspecialchars($element['name']);?></td>
 		<td class="listr" align="right"><?=format_bytes($element['size']);?></td>
 		<td valign="middle" nowrap class="list">
-		<a href="services_captiveportal_filemanager.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this file?')"><img src="x.gif" title="delete file" width="17" height="17" border="0" alt="delete file"></a>
+		<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete file" alt="delete file" onclick="return confirm('Do you really want to delete this file?')">
 		</td>
 	  </tr>
   <?php $i++; endforeach; ?>

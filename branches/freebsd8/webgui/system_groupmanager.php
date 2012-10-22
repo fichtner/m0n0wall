@@ -112,75 +112,81 @@ $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 	
-if ($_GET['act'] == "del") {
-	if ($a_group[$_GET['id']]) {
-	    $ok_to_delete = true;
-	    if (isset($config['system']['user'])) {
-    	    foreach ($config['system']['user'] as $userent) {
-    	    	if ($userent['groupname'] == $a_group[$_GET['id']]['name']) {
-    				$ok_to_delete = false;
-    				$input_errors[] = "users still exist who are members of this group!";
-    				break;	    
-    	    	}
-    	    }
-	    }
-        if ($ok_to_delete) {
-    		unset($a_group[$_GET['id']]);
-	       	write_config();
-		    header("Location: system_groupmanager.php");
-		    exit;
-	    }
-	}
-}	
-	
 if ($_POST) {
 
 	unset($input_errors);
-	$pconfig = $_POST;
-
-	/* input validation */
-	$reqdfields = explode(" ", "groupname");
-	$reqdfieldsn = explode(",", "Group Name");
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-	
-	if (preg_match("/[^a-zA-Z0-9\.\-_ ]/", $_POST['groupname']))
-		$input_errors[] = "The group name contains invalid characters.";
-		
-	if (!$input_errors && !(isset($id) && $a_group[$id])) {
-		/* make sure there are no dupes */
-		foreach ($a_group as $group) {
-			if ($group['name'] == $_POST['groupname']) {
-				$input_errors[] = "Another entry with the same group name already exists.";
-				break;
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_group[$id]) {
+			    $ok_to_delete = true;
+			    if (isset($config['system']['user'])) {
+		    	    foreach ($config['system']['user'] as $userent) {
+		    	    	if ($userent['groupname'] == $a_group[$id]['name']) {
+		    				$ok_to_delete = false;
+		    				$input_errors[] = "users still exist who are members of this group!";
+		    				break;	    
+		    	    	}
+		    	    }
+			    }
+		        if ($ok_to_delete) {
+		    		unset($a_group[$id]);
+			       	write_config();
+				    header("Location: system_groupmanager.php");
+				    exit;
+			    }
 			}
 		}
 	}
-	
+
 	if (!$input_errors) {
+		$pconfig = $_POST;
+
+		/* input validation */
+		$reqdfields = explode(" ", "groupname");
+		$reqdfieldsn = explode(",", "Group Name");
 	
-		if (isset($id) && $a_group[$id])
-			$group = $a_group[$id];
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	
+		if (preg_match("/[^a-zA-Z0-9\.\-_ ]/", $_POST['groupname']))
+			$input_errors[] = "The group name contains invalid characters.";
 		
-		$group['name'] = $_POST['groupname'];
-		$group['description'] = $_POST['description'];
-		unset($group['pages']);
-		foreach ($pages as $fname => $title) {
-			$identifier = str_replace('.php','',$fname);
-			if ($_POST[$identifier] == 'yes') {
-				$group['pages'][] = $fname;
-			}			
-		}		
+		if (!$input_errors && !(isset($id) && $a_group[$id])) {
+			/* make sure there are no dupes */
+			foreach ($a_group as $group) {
+				if ($group['name'] == $_POST['groupname']) {
+					$input_errors[] = "Another entry with the same group name already exists.";
+					break;
+				}
+			}
+		}
+	
+		if (!$input_errors) {
+	
+			if (isset($id) && $a_group[$id])
+				$group = $a_group[$id];
 		
-		if (isset($id) && $a_group[$id])
-			$a_group[$id] = $group;
-		else
-			$a_group[] = $group;
+			$group['name'] = $_POST['groupname'];
+			$group['description'] = $_POST['description'];
+			unset($group['pages']);
+			foreach ($pages as $fname => $title) {
+				$identifier = str_replace('.php','',$fname);
+				if ($_POST[$identifier] == 'yes') {
+					$group['pages'][] = $fname;
+				}			
+			}		
 		
-		write_config();
+			if (isset($id) && $a_group[$id])
+				$a_group[$id] = $group;
+			else
+				$a_group[] = $group;
 		
-		header("Location: system_groupmanager.php");
-		exit;
+			write_config();
+		
+			header("Location: system_groupmanager.php");
+			exit;
+		}
 	}
 }
 
@@ -188,6 +194,7 @@ if ($_POST) {
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="system_groupmanager.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
@@ -210,7 +217,6 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
         }
 	}
 ?>
-<form action="system_groupmanager.php" method="post" name="iform" id="iform">
           <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="group management pane">
             <tr> 
               <td width="22%" valign="top" class="vncellreq">Group name</td>
@@ -263,7 +269,6 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
               </td>
             </tr>
           </table>
- </form>
 <?php
 } else {
 ?>
@@ -286,7 +291,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
                     <?=count($group['pages']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="system_groupmanager.php?act=edit&amp;id=<?=$i; ?>"><img src="e.gif" title="edit group" width="17" height="17" border="0" alt="edit group"></a>
-                     &nbsp;<a href="system_groupmanager.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this group?')"><img src="x.gif" title="delete group" width="17" height="17" border="0" alt="delete group"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete group" alt="delete group" onclick="return confirm('Do you really want to delete this group?')"></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 	    <tr> 
@@ -304,4 +309,5 @@ if($_GET['act']=="new" || $_GET['act']=="edit"){
   </td>
   </tr>
   </table>
+ </form>
 <?php include("fend.inc"); ?>

@@ -87,6 +87,19 @@ $a_maps = &$config['dhcpd'][$if]['staticmap'];
 
 if ($_POST) {
 
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_maps[$id]) {
+				unset($a_maps[$id]);
+				write_config();
+				touch($d_staticmapsdirty_path);
+				header("Location: services_dhcp.php?if={$if}");
+				exit;
+			}
+		}
+	}
+
 	unset($input_errors);
 	$pconfig = $_POST;
 
@@ -197,15 +210,6 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_maps[$_GET['id']]) {
-		unset($a_maps[$_GET['id']]);
-		write_config();
-		touch($d_staticmapsdirty_path);
-		header("Location: services_dhcp.php?if={$if}");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <script type="text/javascript">
@@ -431,7 +435,7 @@ function enable_change(enable_over) {
                     <?=htmlspecialchars($mapent['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_dhcp_edit.php?if=<?=urlencode($if);?>&amp;id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a>
-                     &nbsp;<a href="services_dhcp.php?if=<?=urlencode($if);?>&amp;act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this mapping?')"><img src="x.gif" title="delete mapping" width="17" height="17" border="0" alt="delete mapping"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete mapping" alt="delete mapping" onclick="return confirm('Do you really want to delete this mapping?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

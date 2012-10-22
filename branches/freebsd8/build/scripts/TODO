@@ -9,6 +9,5 @@ areas to investigate impact
 	default ipv6 route still not being configured for wan ipv6=dhcp
 	
 areas to improve
-	make wireless LAN transmit power configurable
 	wireless LAN country code selection ("ifconfig xxx list countries")
 	revamp bridge support: use virtual interfaces, configured on Interfaces: Assign page (new tab)

@@ -35,8 +35,13 @@ require("guiconfig.inc");
 <?php include("fbegin.inc"); ?>
 <?php
 
-if ($_GET['act'] == "del") {
-    captiveportal_disconnect_client($_GET['id'],6);
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(.+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+	    	captiveportal_disconnect_client($id, 6);
+		}
+	}
 }
 
 flush();
@@ -130,7 +135,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
     <?php endif; ?>
     <td class="listr"><?=$cpent[4];?>&nbsp;</td>
     <td valign="middle" class="list" nowrap>
-    <a href="?order=<?=htmlspecialchars($_GET['order']);?>&amp;showact=<?=htmlspecialchars($_GET['showact']);?>&amp;act=del&amp;id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" title="disconnect client" width="17" height="17" border="0" alt="disconnect client"></a></td>
+	<input name="del_<?=$cpent[1];?>" type="image" src="x.gif" width="17" height="17" title="disconnect client" alt="disconnect client" onclick="return confirm('Do you really want to disconnect this client?')">
   </tr>
 <?php endforeach; ?>
 </table>

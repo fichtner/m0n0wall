@@ -49,6 +49,19 @@ $a_routes = &$config['staticroutes'][$configname];
 
 if ($_POST) {
 
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_routes[$id]) {
+				unset($a_routes[$id]);
+				write_config();
+				touch($d_staticroutesdirty_path);
+				header("Location: system_routes.php?{$typelink}");
+				exit;
+			}
+		}
+	}
+
 	$pconfig = $_POST;
 
 	if ($_POST['apply']) {
@@ -72,15 +85,6 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_routes[$_GET['id']]) {
-		unset($a_routes[$_GET['id']]);
-		write_config();
-		touch($d_staticroutesdirty_path);
-		header("Location: system_routes.php?{$typelink}");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="system_routes.php?<?=$typelink?>" method="post">
@@ -118,7 +122,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($route['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="system_routes_edit.php?id=<?=$i;?><?=$typelink?>"><img src="e.gif" title="edit route" width="17" height="17" border="0" alt="edit route"></a>
-                     &nbsp;<a href="system_routes.php?act=del&amp;id=<?=$i;?><?=$typelink?>" onclick="return confirm('Do you really want to delete this route?')"><img src="x.gif" title="delete route" width="17" height="17" border="0" alt="delete route"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete route" alt="delete route" onclick="return confirm('Do you really want to delete this route?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

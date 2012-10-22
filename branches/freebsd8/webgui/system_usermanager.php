@@ -51,89 +51,98 @@ if ($_SERVER['REMOTE_USER'] === $config['system']['username']) {
     }
     admin_users_sort();
     $a_user = &$config['system']['user'];
-    
-    if ($_GET['act'] == "del") {
-    	if ($a_user[$_GET['id']]) {
-    	    $userdeleted = $a_user[$_GET['id']]['name'];
-    		unset($a_user[$_GET['id']]);
-    		write_config();
-			$retval = system_password_configure();
-			$savemsg = get_std_save_message($retval);
-			$savemsg = "User ".$userdeleted." successfully deleted<br>";    		
-    	}
-    }
-	
+  	
     if ($_POST) {
-    	
-    	unset($input_errors);
-    	$pconfig = $_POST;
-    
-    	/* input validation */
-    	if (isset($id) && ($a_user[$id])) {
-    		$reqdfields = explode(" ", "username");
-    		$reqdfieldsn = explode(",", "Username");
-    	} else {
-    		$reqdfields = explode(" ", "username password");
-    		$reqdfieldsn = explode(",", "Username,Password");
-    	}
-    	
-    	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-    	
-    	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['username']))
-    		$input_errors[] = "The username contains invalid characters.";
 
-		if($_POST['username']==$config['system']['username']) {
-			$input_errors[] = "username can not match the administrator username!";
-		}   		
-    		
-    	if (($_POST['password']) && ($_POST['password'] != $_POST['password2']))
-    		$input_errors[] = "The passwords do not match.";
-		if ($_POST['password'] && strpos($_POST['password'], ":") !== false)
-			$input_errors[] = "The password may not contain colons (:).";
-
-       	if (!$input_errors && !(isset($id) && $a_user[$id])) {
-    		/* make sure there are no dupes */
-    		foreach ($a_user as $userent) {
-    			if ($userent['name'] == $_POST['username']) {
-    				$input_errors[] = "Another entry with the same username already exists.";
-    				break;
-    			}
-    		}
-    	}
-
-		if(!isset($groupindex[$_POST['groupname']])) {
-			$input_errors[] = "group does not exist, please define the group before assigning users.";
+		$deldone = false;
+		foreach ($_POST as $pn => $pv) {
+			if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+				$id = $matches[1];
+				if ($a_user[$id]) {
+		    	    $userdeleted = $a_user[$id]['name'];
+		    		unset($a_user[$id]);
+		    		write_config();
+					$retval = system_password_configure();
+					$savemsg = get_std_save_message($retval);
+					$savemsg = "User ".$userdeleted." successfully deleted<br>";
+		    	}	
+				$deldone = true;
+				break;
+			}
 		}
+
+		if (!$deldone) {
+	    	unset($input_errors);
+	    	$pconfig = $_POST;
+    
+	    	/* input validation */
+	    	if (isset($id) && ($a_user[$id])) {
+	    		$reqdfields = explode(" ", "username");
+	    		$reqdfieldsn = explode(",", "Username");
+	    	} else {
+	    		$reqdfields = explode(" ", "username password");
+	    		$reqdfieldsn = explode(",", "Username,Password");
+	    	}
     	
-    	if (!$input_errors) {
+	    	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
     	
-    		if (isset($id) && $a_user[$id])
-    			$userent = $a_user[$id];
+	    	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['username']))
+	    		$input_errors[] = "The username contains invalid characters.";
+
+			if($_POST['username']==$config['system']['username']) {
+				$input_errors[] = "Username can not match the administrator username!";
+			}   		
     		
-    		$userent['name'] = $_POST['username'];
-    		$userent['fullname'] = $_POST['fullname'];
-    		$userent['groupname'] = $_POST['groupname'];
+	    	if (($_POST['password']) && ($_POST['password'] != $_POST['password2']))
+	    		$input_errors[] = "The passwords do not match.";
+			if ($_POST['password'] && strpos($_POST['password'], ":") !== false)
+				$input_errors[] = "The password may not contain colons (:).";
+
+	       	if (!$input_errors && !(isset($id) && $a_user[$id])) {
+	    		/* make sure there are no dupes */
+	    		foreach ($a_user as $userent) {
+	    			if ($userent['name'] == $_POST['username']) {
+	    				$input_errors[] = "Another entry with the same username already exists.";
+	    				break;
+	    			}
+	    		}
+	    	}
+
+			if(!isset($groupindex[$_POST['groupname']])) {
+				$input_errors[] = "Group does not exist, please define the group before assigning users.";
+			}
+    	
+	    	if (!$input_errors) {
+    	
+	    		if (isset($id) && $a_user[$id])
+	    			$userent = $a_user[$id];
     		
-    		if ($_POST['password'])
-    			$userent['password'] = crypt($_POST['password']);
+	    		$userent['name'] = $_POST['username'];
+	    		$userent['fullname'] = $_POST['fullname'];
+	    		$userent['groupname'] = $_POST['groupname'];
     		
-    		if (isset($id) && $a_user[$id])
-    			$a_user[$id] = $userent;
-    		else
-    			$a_user[] = $userent;
+	    		if ($_POST['password'])
+	    			$userent['password'] = crypt($_POST['password']);
     		
-    		write_config();
-			$retval = system_password_configure();
-			$savemsg = get_std_save_message($retval);
+	    		if (isset($id) && $a_user[$id])
+	    			$a_user[$id] = $userent;
+	    		else
+	    			$a_user[] = $userent;
+    		
+	    		write_config();
+				$retval = system_password_configure();
+				$savemsg = get_std_save_message($retval);
 			
-			header("Location: system_usermanager.php");
-    	}
+				header("Location: system_usermanager.php");
+	    	}
+		}
     }
 
 ?>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="system_usermanager.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
@@ -156,7 +165,6 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
         }
 	}	
 ?>
-	<form action="system_usermanager.php" method="post" name="iform" id="iform">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
                   <td width="22%" valign="top" class="vncellreq">Username</td>
@@ -203,7 +211,6 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
                   </td>
                 </tr>
               </table>
-     </form>
 <?php
 } else {
 ?>
@@ -226,7 +233,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
                     <?=htmlspecialchars($userent['groupname']); ?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="system_usermanager.php?act=edit&amp;id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
-                     &nbsp;<a href="system_usermanager.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this User?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete user" alt="delete user" onclick="return confirm('Do you really want to delete this user?')"></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 	    <tr> 
@@ -244,6 +251,7 @@ if($_GET['act']=="new" || $_GET['act']=="edit" || $input_errors){
   </td>
   </tr>
   </table>
+</form>
 <?php 
 } else { // end of admin user code, start of normal user code
 	if (isset($_POST['save'])) {

@@ -56,17 +56,21 @@ if ($_POST) {
 			}
 		}
 	}
-}
-
-if ($_GET['act'] == "del") {
-	if ($a_passthrumacs[$_GET['id']]) {
-		unset($a_passthrumacs[$_GET['id']]);
-		write_config();
-		touch($d_passthrumacsdirty_path);
-		header("Location: services_captiveportal_mac.php");
-		exit;
+	
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_passthrumacs[$id]) {
+				unset($a_passthrumacs[$id]);
+				write_config();
+				touch($d_passthrumacsdirty_path);
+				header("Location: services_captiveportal_mac.php");
+				exit;
+			}
+		}
 	}
 }
+
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="services_captiveportal_mac.php" method="post">
@@ -106,7 +110,7 @@ if ($_GET['act'] == "del") {
 		<?=htmlspecialchars($mac['descr']);?>&nbsp;
 	  </td>
 	  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_mac_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0" alt="edit host"></a>
-		 &nbsp;<a href="services_captiveportal_mac.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0" alt="delete host"></a></td>
+		 &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete host" alt="delete host" onclick="return confirm('Do you really want to delete this host?')"></td>
 	</tr>
   <?php $i++; endforeach; ?>
 	<tr> 

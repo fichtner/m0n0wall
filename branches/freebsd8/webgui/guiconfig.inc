@@ -52,7 +52,7 @@ function csrf_startup() {
 function my_csrf_callback() {
 	echo "Bad request token. Please make sure cookies are enabled and try again.";
 }
-require_once("csrf-magic.php");
+require_once("csrf-magic.inc");
 
 $d_natconfdirty_path = $g['varrun_path'] . "/nat.conf.dirty";
 $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
@@ -97,7 +97,10 @@ for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 $medias = array("auto" => "autoselect", "100full" => "100BASE-TX full-duplex",
 	"100half" => "100BASE-TX half-duplex", "10full" => "10BASE-T full-duplex",
 	"10half" => "10BASE-T half-duplex", "1000full" => "1000BASE-TX full-duplex");
-	
+
+$wlan_txpowers = array('0' => '0 dBm (1 mW)', '3' => '3 dBm (2 mW)', '7' => '7 dBm (5 mW)', '10' => '10 dBm (10 mW)',
+	'14' => '14 dBm (25 mW)', '17' => '17 dBm (50 mW)', '20' => '20 dBm (100 mW)', '23' => '23 dBm (200 mW)', '26' => '26 dBm (400 mW)');
+
 /* platforms that support firmware updating */
 $fwupplatforms = array('generic-pc', 'embedded', 'generic-pc-serial');
 

@@ -59,6 +59,7 @@ if (isset($id) && $a_wlans[$id]) {
 	$pconfig['mode'] = $a_wlans[$id]['mode'];
 	$pconfig['ssid'] = $a_wlans[$id]['ssid'];
 	$pconfig['channel'] = $a_wlans[$id]['channel'];
+	$pconfig['txpower'] = $a_wlans[$id]['txpower'];
 	$pconfig['wep_enable'] = isset($a_wlans[$id]['wep']['enable']);
 	$pconfig['hidessid'] = isset($a_wlans[$id]['hidessid']);
 	
@@ -91,8 +92,8 @@ if ($_POST) {
 
 	if (!$_POST['chgifonly']) {
 		/* input validation */
-		$reqdfields = "if mode ssid channel";
-		$reqdfieldsn = "Parent interface,Mode,SSID,Channel";
+		$reqdfields = "if mode ssid channel txpower";
+		$reqdfieldsn = "Parent interface,Mode,SSID,Channel,Transmit power";
 	
 		if ($_POST['wpamode'] != "none") {
 			$reqdfields .= " wpaversion wpacipher";
@@ -144,6 +145,7 @@ if ($_POST) {
 			$wlan['mode'] = $_POST['mode'];
 			$wlan['ssid'] = $_POST['ssid'];
 			$wlan['channel'] = $_POST['channel'];
+			$wlan['txpower'] = $_POST['txpower'];
 			$wlan['wep']['enable'] = $_POST['wep_enable'] ? true : false;
 			$wlan['hidessid'] = $_POST['hidessid'] ? true : false;
 		
@@ -191,6 +193,9 @@ if ($pconfig['if']) {
 	$wlstandards = array();
 	$wlchannels = array();
 }
+
+if (!isset($pconfig['txpower']) || strlen($pconfig['txpower']) == 0)
+	$pconfig['txpower'] = 17;	/* pick a reasonable default */
 
 function wireless_get_standards($if) {
 	$standards = array();
@@ -385,6 +390,18 @@ function wlan_enable_change(enable_over) {
                     </select></td>
                 </tr>
                 <tr> 
+                  <td valign="top" class="vncellreq">Transmit power</td>
+                  <td class="vtable"><select name="txpower" class="formfld" id="txpower">
+                      <?php foreach ($wlan_txpowers as $txpower => $txpowerinfo): ?>
+                      <option <?php if ($txpower == $pconfig['txpower']) echo "selected";?> value="<?=$txpower;?>">
+                      <?=$txpowerinfo;?>
+                      </option>
+                      <?php endforeach; ?>
+                    </select><br>
+					Not all transmit power settings listed above may actually be supported by the adapter; in that case the closest
+					possible setting will be used. You must ensure that the setting you choose complies with local regulations.</td>
+                </tr>
+                <tr> 
                   <td valign="top" class="vncell">WPA</td>
                   <td class="vtable">
                     <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -508,4 +525,9 @@ function wlan_enable_change(enable_over) {
                 </tr>
               </table>
 </form>
+<script type="text/javascript">
+<!--
+wlan_enable_change(false);
+//-->
+</script>
 <?php include("fend.inc"); ?>

@@ -40,12 +40,17 @@ if (!is_array($config['captiveportal']['user'])) {
 captiveportal_users_sort();
 $a_user = &$config['captiveportal']['user'];
 
-if ($_GET['act'] == "del") {
-	if ($a_user[$_GET['id']]) {
-		unset($a_user[$_GET['id']]);
-		write_config();
-		header("Location: services_captiveportal_users.php");
-		exit;
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_user[$id]) {
+				unset($a_user[$id]);
+				write_config();
+				header("Location: services_captiveportal_users.php");
+				exit;
+			}
+		}
 	}
 }
 
@@ -65,6 +70,7 @@ if ($changed) {
 
 ?>
 <?php include("fbegin.inc"); ?>
+<form action="services_captiveportal_users.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td>
   <ul id="tabnav">
@@ -100,7 +106,7 @@ if ($changed) {
                     <?=$userent['expirationdate']; ?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_captiveportal_users_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
-                     &nbsp;<a href="services_captiveportal_users.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete user" alt="delete user" onclick="return confirm('Do you really want to delete this user?')"></td>
 		</tr>
 	<?php $i++; endforeach; ?>
 		<tr> 
@@ -111,4 +117,5 @@ if ($changed) {
 </td>
 </tr>
 </table>
+</form>
 <?php include("fend.inc"); ?>

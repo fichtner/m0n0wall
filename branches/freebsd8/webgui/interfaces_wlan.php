@@ -64,23 +64,28 @@ function renumber_wlan($if, $delwlan) {
 		return $if;
 }
 
-if ($_GET['act'] == "del") {
-	/* check if still in use */
-	if (wlan_inuse($_GET['id'])) {
-		$input_errors[] = "This WLAN cannot be deleted because it is still being used as an interface.";
-	} else {
-		unset($a_wlans[$_GET['id']]);
-		
-		/* renumber all interfaces that use WLANs */
-		$config['interfaces']['lan']['if'] = renumber_wlan($config['interfaces']['lan']['if'], $_GET['id']);
-		$config['interfaces']['wan']['if'] = renumber_wlan($config['interfaces']['wan']['if'], $_GET['id']);
-		for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-			$config['interfaces']['opt' . $i]['if'] = renumber_wlan($config['interfaces']['opt' . $i]['if'], $_GET['id']);
-		
-		write_config();
-		touch($d_sysrebootreqd_path);
-		header("Location: interfaces_wlan.php");
-		exit;
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			/* check if still in use */
+			if (wlan_inuse($id)) {
+				$input_errors[] = "This WLAN cannot be deleted because it is still being used as an interface.";
+			} else {
+				unset($a_wlans[$id]);
+
+				/* renumber all interfaces that use WLANs */
+				$config['interfaces']['lan']['if'] = renumber_wlan($config['interfaces']['lan']['if'], $id);
+				$config['interfaces']['wan']['if'] = renumber_wlan($config['interfaces']['wan']['if'], $id);
+				for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+					$config['interfaces']['opt' . $i]['if'] = renumber_wlan($config['interfaces']['opt' . $i]['if'], $id);
+
+				write_config();
+				touch($d_sysrebootreqd_path);
+				header("Location: interfaces_wlan.php");
+				exit;
+			}
+		}
 	}
 }
 
@@ -88,6 +93,7 @@ if ($_GET['act'] == "del") {
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
+<form action="interfaces_wlan.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
@@ -117,7 +123,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($wlan['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="interfaces_wlan_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit WLAN" width="17" height="17" border="0" alt="edit WLAN"></a>
-                     &nbsp;<a href="interfaces_wlan.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this WLAN?')"><img src="x.gif" title="delete WLAN" width="17" height="17" border="0" alt="delete WLAN"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete WLAN" alt="delete WLAN" onclick="return confirm('Do you really want to delete this WLAN?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
@@ -128,4 +134,5 @@ if ($_GET['act'] == "del") {
 			  </td>
 	</tr>
 </table>
+</form>
 <?php include("fend.inc"); ?>

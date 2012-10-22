@@ -118,75 +118,60 @@ if ($_POST) {
 							$config['interfaces'][$ifname]['descr'] = strtoupper($ifname);
 					}
 				}
+			} else if (preg_match("/^del_(.+)_x$/", $ifname, $matches)) {
+				$del_ifname = $matches[1];
+				unset($config['interfaces'][$del_ifname]);	/* delete the specified OPTn */
+
+				/* shift down other OPTn interfaces to get rid of holes */
+				$i = substr($del_ifname, 3); /* the number of the OPTn port being deleted */
+				$i++;
+
+				/* look at the following OPTn ports */
+				while (is_array($config['interfaces']['opt' . $i])) {
+					$config['interfaces']['opt' . ($i - 1)] =
+						$config['interfaces']['opt' . $i];
+
+					if ($config['interfaces']['opt' . ($i - 1)]['descr'] == "OPT" . $i)
+						$config['interfaces']['opt' . ($i - 1)]['descr'] = "OPT" . ($i - 1);
+
+					unset($config['interfaces']['opt' . $i]);
+					$i++;
+				}
+
+				// Scheduler: delete matching jobs
+				croen_update_job(Array('interface-enable', 'interface-disable'), $del_ifname);
+			} else if ($ifname == "add_x") {
+				/* find next free optional interface number */
+				$i = 1;
+				while (is_array($config['interfaces']['opt' . $i]))
+					$i++;
+
+				$newifname = 'opt' . $i;
+				$config['interfaces'][$newifname] = array();
+				$config['interfaces'][$newifname]['descr'] = "OPT" . $i;
+
+				/* Find an unused port for this interface */
+				foreach ($portlist as $portname => $portinfo) {
+					$portused = false;
+					foreach ($config['interfaces'] as $ifname => $ifdata) {
+						if ($ifdata['if'] == $portname) {
+							$portused = true;
+							break;
+						}
+					}
+					if (!$portused) {
+						$config['interfaces'][$newifname]['if'] = $portname;
+						if (preg_match($g['wireless_regex'], $portname))
+							$config['interfaces'][$newifname]['wireless'] = array();
+						break;
+					}
+				}
 			}
 		}
 	
 		write_config();
 		touch($d_sysrebootreqd_path);
 	}
-}
-
-if ($_GET['act'] == "del") {
-	$id = $_GET['id'];
-	
-	unset($config['interfaces'][$id]);	/* delete the specified OPTn */
-
-	/* shift down other OPTn interfaces to get rid of holes */
-	$i = substr($id, 3); /* the number of the OPTn port being deleted */
-	$i++;
-	
-	/* look at the following OPTn ports */
-	while (is_array($config['interfaces']['opt' . $i])) {
-		$config['interfaces']['opt' . ($i - 1)] =
-			$config['interfaces']['opt' . $i];
-		
-		if ($config['interfaces']['opt' . ($i - 1)]['descr'] == "OPT" . $i)
-			$config['interfaces']['opt' . ($i - 1)]['descr'] = "OPT" . ($i - 1);
-		
-		unset($config['interfaces']['opt' . $i]);
-		$i++;
-	}
-
-	// Scheduler: delete matching jobs
-	croen_update_job(Array('interface-enable', 'interface-disable'), $_GET['id']);
-
-	write_config();
-	touch($d_sysrebootreqd_path);
-	header("Location: interfaces_assign.php");
-	exit;
-}
-
-if ($_GET['act'] == "add") {
-	/* find next free optional interface number */
-	$i = 1;
-	while (is_array($config['interfaces']['opt' . $i]))
-		$i++;
-	
-	$newifname = 'opt' . $i;
-	$config['interfaces'][$newifname] = array();
-	$config['interfaces'][$newifname]['descr'] = "OPT" . $i;
-	
-	/* Find an unused port for this interface */
-	foreach ($portlist as $portname => $portinfo) {
-		$portused = false;
-		foreach ($config['interfaces'] as $ifname => $ifdata) {
-			if ($ifdata['if'] == $portname) {
-				$portused = true;
-				break;
-			}
-		}
-		if (!$portused) {
-			$config['interfaces'][$newifname]['if'] = $portname;
-			if (preg_match($g['wireless_regex'], $portname))
-				$config['interfaces'][$newifname]['wireless'] = array();
-			break;
-		}
-	}
-	
-	write_config();
-	touch($d_sysrebootreqd_path);
-	header("Location: interfaces_assign.php");
-	exit;
 }
 
 ?>
@@ -245,7 +230,7 @@ if ($_GET['act'] == "add") {
 		</td>
 		<td valign="middle" class="list"> 
 		  <?php if (($ifname != 'lan') && ($ifname != 'wan')): ?>
-		  <a href="interfaces_assign.php?act=del&amp;id=<?=$ifname;?>"><img src="x.gif" title="delete interface" width="17" height="17" border="0" alt="delete interface"></a> 
+		  <input name="del_<?=$ifname;?>" type="image" src="x.gif" width="17" height="17" title="delete interface" alt="delete interface" onclick="return confirm('Do you really want to delete this interface?')">
 		  <?php endif; ?>
 		</td>
   </tr>
@@ -254,7 +239,7 @@ if ($_GET['act'] == "add") {
   <tr>
 	<td class="list" colspan="2"></td>
 	<td class="list" nowrap>
-	<a href="interfaces_assign.php?act=add"><img src="plus.gif" title="add interface" width="17" height="17" border="0" alt="add interface"></a>
+	<input name="add" type="image" src="plus.gif" width="17" height="17" title="add interface" alt="add interface">
 	</td>
   </tr>
   <?php else: ?>

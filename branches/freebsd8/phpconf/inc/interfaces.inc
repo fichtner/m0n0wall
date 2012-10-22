@@ -467,6 +467,11 @@ function interfaces_wlan_configure() {
 			$ifcargs .= " up";
 
 			mwexec("/sbin/ifconfig " . $ifcargs);
+			
+			if (isset($wlan['txpower']) && strlen($wlan['txpower']) > 0) {
+				/* must issue separate ifconfig call for txpower */
+				mwexec("/sbin/ifconfig wlan$i txpower " . escapeshellarg($wlan['txpower']));
+			}
 
 			/* configure encryption (if needed) */
 			interfaces_wlan_configure_encryption("wlan$i", $wlan);

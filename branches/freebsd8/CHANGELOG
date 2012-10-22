@@ -3,7 +3,10 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
-- Eliminate modifying GETs from webGUI pages that start with a-g.
+- Add WLAN TX power setting (static list, since querying the supported
+  power settings doesn't appear to be reliable).
+
+- Eliminate modifying GETs from webGUI pages (except for services_croen*.php)
   
   Note: the API pages exec_raw.php and uploadconfig.php now require
   different parameters than before. exec_raw.php now requires the cmd to
