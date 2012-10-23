@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Disable usbus interfaces (to avoid SNMP ifindex shift).
+
 - Add WLAN TX power setting (static list, since querying the supported
   power settings doesn't appear to be reliable).
 

@@ -1,5 +1,6 @@
 set hw.ata.atapi_dma="0"
 set hw.ata.ata_dma="0"
+set hw.usb.no_pf="1"
 set kern.ipc.maxpipekva=10485760
 load /kernel
 load -t mfs_root /mfsroot
