@@ -5,6 +5,9 @@
 *default delete use-rel-suffix
 *default compress
 
+#Mk for newer ports
+ports-base
+
 # isc-dhcpserver
 # isc-dhcprelay
 # isc-dhcpclient
