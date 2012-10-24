@@ -92,32 +92,22 @@
 	$pconfig['jobset'] = &$config['croen']['jobset'];
 
 	// Delete job
-	if ($_GET['act'] == 'del' && isset($pconfig['jobset'][$_GET['id']])) {
-		unset($pconfig['jobset'][$_GET['id']]);
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			unset($pconfig['jobset'][$matches[1]]);
 
-		// Write config, set dirty & reroute...
-		if ($pconfig['enable']) {
-			touch($d_croendirty_path);
+			// Write config, set dirty & reroute...
+			if ($pconfig['enable']) {
+				touch($d_croendirty_path);
+			}
+			write_config();
+			header("Location: services_croen.php");
+			exit;
 		}
-		write_config();
-		header("Location: services_croen.php");
-		exit;
 	}
 	
 	// Include webinterface
 	include("fbegin.inc");
-
-	// Undo job
-	/*if ($_GET['act'] == 'undo' && isset($pconfig['jobset'][$_GET['id']])) {
-		croen_syslog("Undone Job(".$_GET['id'].") ".$data['descr'][$pconfig['jobset'][$_GET['id']]['name']][0]);
-		echo '<div style="display:none">';
-		$job_id = $_GET['id'];
-		global $g;
-		include($g['etc_path'].'/croen_jobs/'.$pconfig['jobset'][$_GET['id']]['name'].'.cjob'); // I know, it's dirty but php hangs if it calls itself and that way it's even memory efficient. In addition this will never get touched at bootup.
-		unset($job_id);
-		echo '</div>';
-		$savemsg = 'Undone Job('.$_GET['id'].') '.$data['descr'][$pconfig['jobset'][$_GET['id']]['name']][0];
-	}*/ // disabled
 
 	// JavaScript to modify forms
 	echo '
@@ -175,41 +165,42 @@
 						<input name="save" type="submit" class="formbtn" value="Save" onClick="enable_change(true)"> 
 					</td>
 				</tr>
-			</table>
-		</form><br>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
-			<tr><td class="tabcont">
-				<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
-					<tr>
-						<td width="4%" class="list">&nbsp;</td>
-						<td width="21%" class="listhdrr">Repeat</td>
-						<td width="53%" class="listhdrr">Job(s)</td>
-						<td width="17%" class="listhdr">Description</td>
-						<td width="5%" class="list">&nbsp;</td>
-					</tr>';
+			</table><br>
+		</form>
+		<form action="services_croen.php" method="post" name="iform2" id="iform2">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
+				<tr><td class="tabcont">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
+						<tr>
+							<td width="4%" class="list">&nbsp;</td>
+							<td width="21%" class="listhdrr">Repeat</td>
+							<td width="53%" class="listhdrr">Job(s)</td>
+							<td width="17%" class="listhdr">Description</td>
+							<td width="5%" class="list">&nbsp;</td>
+						</tr>';
 		
 	// Jobs
 	$arrow = ' <img src="in.gif" width="8" height="8" border="0"> ';
 	foreach ($pconfig['jobset'] AS $job_id => $jobset) {
 		echo '
-					<tr>
-						<td>'.(isset($jobset['syslog']) ? '<img src="log.gif" width="11" height="11" border="0">' : '&nbsp;').'</td>
-						<td class="listlr">'.
-							($jobset['repeat'] == 'x_minute' ? str_replace("x minute", ($jobset['minute'] > 1 ? $jobset['minute']." minutes" : "minute"), $data['repeat'][$jobset['repeat']]) : $data['repeat'][$jobset['repeat']].',<br>').
-							($jobset['repeat'] == 'once' ? date($data['date_once'], strtotime(htmlspecialchars($jobset['date']).' '.htmlspecialchars($jobset['time']))) : 
-							($jobset['repeat'] == 'daily' ? htmlspecialchars($jobset['time']) : 
-							($jobset['repeat'] == 'weekly' ? $data['date_weekly'][htmlspecialchars($jobset['weekday'])].', '.htmlspecialchars($jobset['time']) : 
-							($jobset['repeat'] == 'monthly' ? htmlspecialchars($jobset['day']).
-								((int)$jobset['day'] == 1 || (int)$jobset['day'] == 21 ? 'st' : ((int)$jobset['day'] == 2 || (int)$jobset['day'] == 22 ? 'nd' : ((int)$jobset['day'] == 3 || (int)$jobset['day'] == 23 ? 'rd' : 'th')))
-							.', '.htmlspecialchars($jobset['time']) : ''))))
-						.'</td>
-						<td class="listr" style="padding:0;">';
+						<tr>
+							<td>'.(isset($jobset['syslog']) ? '<img src="log.gif" width="11" height="11" border="0">' : '&nbsp;').'</td>
+							<td class="listlr">'.
+								($jobset['repeat'] == 'x_minute' ? str_replace("x minute", ($jobset['minute'] > 1 ? $jobset['minute']." minutes" : "minute"), $data['repeat'][$jobset['repeat']]) : $data['repeat'][$jobset['repeat']].',<br>').
+								($jobset['repeat'] == 'once' ? date($data['date_once'], strtotime(htmlspecialchars($jobset['date']).' '.htmlspecialchars($jobset['time']))) : 
+								($jobset['repeat'] == 'daily' ? htmlspecialchars($jobset['time']) : 
+								($jobset['repeat'] == 'weekly' ? $data['date_weekly'][htmlspecialchars($jobset['weekday'])].', '.htmlspecialchars($jobset['time']) : 
+								($jobset['repeat'] == 'monthly' ? htmlspecialchars($jobset['day']).
+									((int)$jobset['day'] == 1 || (int)$jobset['day'] == 21 ? 'st' : ((int)$jobset['day'] == 2 || (int)$jobset['day'] == 22 ? 'nd' : ((int)$jobset['day'] == 3 || (int)$jobset['day'] == 23 ? 'rd' : 'th')))
+								.', '.htmlspecialchars($jobset['time']) : ''))))
+							.'</td>
+							<td class="listr" style="padding:0;">';
 
 		// Jobs
 		$first = TRUE;
 		foreach ($jobset['job'] AS $job) {
 			echo '
-							<div style="padding: 4px 6px;'.(!$first ? ' border-top: 1px solid #999999;' : '').'">';
+								<div style="padding: 4px 6px;'.(!$first ? ' border-top: 1px solid #999999;' : '').'">';
 			$first = FALSE;
 
 			$j = croen_job_exists($job['name'], Array('descr'), (isset($job['target']) ? Array('target' => $job['target']) : Array()));
@@ -226,27 +217,26 @@
 		}
 
 		echo '
-						</td>
-						<td class="listbg">'.(isset($jobset['descr']) && !empty($jobset['descr']) ? $jobset['descr'] : '&nbsp;').'</td>
-						<td nowrap class="list">
-							<a href="services_croen_edit.php?id='.$job_id.'"><img src="e.gif" title="edit job" width="17" height="17" border="0" alt="edit job"></a>
-							<a href="services_croen.php?act=del&amp;id='.$job_id.'" onclick="return confirm(\'Do you really want to delete this job?\')"><img src="x.gif" title="delete job" width="17" height="17" border="0" alt="delete job"></a>';
-							//'.($data['descr'][$jobset['name']][2] ? '<a href="services_croen.php?act=undo&amp;id='.$job_id.'"><img src="undo.gif" title="undo job" width="17" height="17" border="0" alt="undo job"></a>' : '').' // disabled
-		echo '
-						</td>
-					</tr>';
+							</td>
+							<td class="listbg">'.(isset($jobset['descr']) && !empty($jobset['descr']) ? $jobset['descr'] : '&nbsp;').'</td>
+							<td nowrap class="list">
+								<a href="services_croen_edit.php?id='.$job_id.'"><img src="e.gif" title="edit job" width="17" height="17" border="0" alt="edit job"></a>
+								<input name="del_'.$job_id.'" type="image" src="x.gif" width="17" height="17" title="delete job" alt="delete job" onclick="return confirm(\'Do you really want to delete this job?\')">
+							</td>
+						</tr>';
 	}
 
 	echo '
-					<tr> 
-						<td class="list" colspan="4"></td>
-						<td class="list">
-							<a href="services_croen_edit.php"><img src="plus.gif" title="add job" width="17" height="17" border="0" alt="add job"></a>
-						</td>
-					</tr>
-				</table>
-			</td></tr>
-		</table>
+						<tr> 
+							<td class="list" colspan="4"></td>
+							<td class="list">
+								<a href="services_croen_edit.php"><img src="plus.gif" title="add job" width="17" height="17" border="0" alt="add job"></a>
+							</td>
+						</tr>
+					</table>
+				</td></tr>
+			</table>
+		</form>
 
 		<script type="text/javascript">
 			<!--

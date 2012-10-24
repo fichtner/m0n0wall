@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Eliminate modifying GETs from services_croen.php
+
 - Update supfile to include ports-base to update Mk or new ports won't build
 
 - Disable usbus interfaces (to avoid SNMP ifindex shift).
