@@ -92,8 +92,9 @@ if ($fp) {
 captiveportal_unlock();
 ?>
 
-<?php if (isset($config['voucher']['enable'])): ?>
 <form action="status_captiveportal.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php if (isset($config['voucher']['enable'])): ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
 <tr><td class="tabnavtbl">
 <ul id="tabnav">
@@ -144,8 +145,8 @@ $tabs = array('Users' => 'status_captiveportal.php',
 </td>
 </tr>
 </table>
-</form>
 <?php endif; ?>
+</form>
 
 <p><!-- TODO: paragraph is not valid here -->
 <form action="status_captiveportal.php" method="GET">

@@ -328,7 +328,7 @@ function csrf_start() {
 function csrf_get_secret() {
     if ($GLOBALS['csrf']['secret']) return $GLOBALS['csrf']['secret'];
     $dir = dirname(__FILE__);
-    $file = $dir . '/csrf-secret.php';
+    $file = $dir . '/csrf-secret.inc';
     $secret = '';
     if (file_exists($file)) {
         include $file;
