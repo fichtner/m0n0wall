@@ -33,9 +33,9 @@ require("guiconfig.inc");
 
 unset($index);
 if ($_GET['index'])
-	$index = $_GET['index'];
+	$index = (int)$_GET['index'];
 else if ($_POST['index'])
-	$index = $_POST['index'];
+	$index = (int)$_POST['index'];
 	
 if (!$index)
 	exit;
@@ -347,8 +347,8 @@ wlan_enable_change(false);
 <?php endif; ?>
 //-->
 </script>
+</table>
 <?php else: ?>
 <strong>Optional <?=htmlspecialchars($index);?> has been disabled because there is no OPT<?=htmlspecialchars($index);?> interface.</strong>
 <?php endif; ?>
-</table>
 <?php include("fend.inc"); ?>

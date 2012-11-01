@@ -89,6 +89,12 @@ if ($_POST) {
                 </td>
               </tr><?php endif; ?>
               <tr> 
+                <td width="25%" class="vncellt">System Date</td>
+                <td width="75%" class="listr"> 
+                   <?=exec("/bin/date");?>
+                </td>
+              </tr>
+              <tr> 
                 <td width="25%" class="vncellt">Uptime</td>
                 <td width="75%" class="listr"> 
                   <?php
@@ -114,13 +120,15 @@ if ($_POST) {
 					echo htmlspecialchars($uptimestr);
 				  ?>
                 </td>
-              </tr><?php if ($config['lastchange']): ?>
+              </tr>
+			  <?php if ($config['lastchange']): ?>
               <tr> 
                 <td width="25%" class="vncellt">Last config change</td>
                 <td width="75%" class="listr"> 
                   <?=htmlspecialchars(date("D M j G:i:s T Y", $config['lastchange']));?>
                 </td>
-              </tr><?php endif; ?>
+              </tr>
+			  <?php endif; ?>
 			  <tr> 
                 <td width="25%" class="vncellt">CPU usage</td>
                 <td width="75%" class="listr">

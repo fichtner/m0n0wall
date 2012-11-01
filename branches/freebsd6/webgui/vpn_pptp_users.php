@@ -54,18 +54,22 @@ if ($_POST) {
 			if (file_exists($d_pptpuserdirty_path))
 				unlink($d_pptpuserdirty_path);
 		}
+	} else {
+		foreach ($_POST as $pn => $pv) {
+			if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+				$id = $matches[1];
+				if ($a_secret[$id]) {
+					unset($a_secret[$id]);
+					write_config();
+					touch($d_pptpuserdirty_path);
+					header("Location: vpn_pptp_users.php");
+					exit;
+				}
+			}
+		}
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_secret[$_GET['id']]) {
-		unset($a_secret[$_GET['id']]);
-		write_config();
-		touch($d_pptpuserdirty_path);
-		header("Location: vpn_pptp_users.php");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="vpn_pptp_users.php" method="post">
@@ -103,7 +107,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($secretent['ip']);?>&nbsp;
                   </td>
                   <td class="list" nowrap> <a href="vpn_pptp_users_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit user" width="17" height="17" border="0" alt="edit user"></a>
-                     &nbsp;<a href="vpn_pptp_users.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this user?')"><img src="x.gif" title="delete user" width="17" height="17" border="0" alt="delete user"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete user" alt="delete user" onclick="return confirm('Do you really want to delete this user?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

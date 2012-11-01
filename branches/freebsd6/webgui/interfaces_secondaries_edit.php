@@ -96,7 +96,7 @@ if ($_POST) {
 		
 		write_config();		
 		touch($d_sysrebootreqd_path);
-		header("Location: interfaces_secondaries.php?if=$if&ifname=" . urlencode($ifname));
+		header("Location: interfaces_secondaries.php?if=" . urlencode($if) . "&ifname=" . urlencode($ifname));
 		exit;
 	}
 }

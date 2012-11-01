@@ -77,18 +77,22 @@ if (!isset($config['voucher']['msgexpired'])) {
 
 $a_roll = &$config['voucher']['roll'];
 
-if ($_GET['act'] == "del") {
-    $id = $_GET['id'];
-    if ($a_roll[$id]) {
-        $roll = $a_roll[$id]['number']; 
-        voucher_lock();
-        unset($a_roll[$id]);
-        voucher_unlink_db($roll);
-        voucher_unlock();
-        write_config();
-        header("Location: services_captiveportal_vouchers.php");
-        exit;
-    }
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_roll[$id]) {
+		        $roll = $a_roll[$id]['number']; 
+		        voucher_lock();
+		        unset($a_roll[$id]);
+		        voucher_unlink_db($roll);
+		        voucher_unlock();
+		        write_config();
+		        header("Location: services_captiveportal_vouchers.php");
+		        exit;
+		    }
+		}
+	}
 }
 
 /* print all vouchers of the selected roll */
@@ -271,7 +275,7 @@ function enable_change(enable_change) {
                   <td valign="middle" nowrap class="list"> 
                   <?php if ($pconfig['enable']): ?> 
                     <a href="services_captiveportal_vouchers_edit.php?id=<?=$i; ?>"><img src="e.gif" title="edit voucher" width="17" height="17" border="0" alt="edit voucher"></a>
-                    <a href="services_captiveportal_vouchers.php?act=del&amp;id=<?=$i; ?>" onclick="return confirm('Do you really want to delete this voucher? This makes all vouchers from this roll invalid')"><img src="x.gif" title="delete vouchers" width="17" height="17" border="0" alt="delete vouchers"></a>
+                    <input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete voucher roll" alt="delete voucher roll" onclick="return confirm('Do you really want to delete this voucher roll and render all vouchers from this roll invalid?')">
                     <a href="services_captiveportal_vouchers.php?act=csv&amp;id=<?=$i; ?>"><img src="log_s.gif" title="generate vouchers for this roll to CSV file" width="11" height="15" border="0" alt="generate vouchers for this roll to CSV file"></a>
                     <?php endif;?>
                   </td>

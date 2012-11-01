@@ -56,17 +56,21 @@ if ($_POST) {
 			}
 		}
 	}
-}
-
-if ($_GET['act'] == "del") {
-	if ($a_allowedips[$_GET['id']]) {
-		unset($a_allowedips[$_GET['id']]);
-		write_config();
-		touch($d_allowedipsdirty_path);
-		header("Location: services_captiveportal_ip.php");
-		exit;
+	
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_allowedips[$id]) {
+				unset($a_allowedips[$id]);
+				write_config();
+				touch($d_allowedipsdirty_path);
+				header("Location: services_captiveportal_ip.php");
+				exit;
+			}
+		}
 	}
 }
+
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="services_captiveportal_ip.php" method="post">
@@ -112,7 +116,7 @@ if ($_GET['act'] == "del") {
 		<?=htmlspecialchars($ip['descr']);?>&nbsp;
 	  </td>
 	  <td valign="middle" nowrap class="list"> <a href="services_captiveportal_ip_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit address" width="17" height="17" border="0" alt="edit address"></a>
-		 &nbsp;<a href="services_captiveportal_ip.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this address?')"><img src="x.gif" title="delete address" width="17" height="17" border="0" alt="delete address"></a></td>
+		 &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete address" alt="delete address" onclick="return confirm('Do you really want to delete this address?')"></td>
 	</tr>
   <?php $i++; endforeach; ?>
 	<tr> 

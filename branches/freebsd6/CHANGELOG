@@ -2,6 +2,41 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+
+- Increase key size of auto-generated webGUI certificates to 2048 bits.
+
+- Update default webGUI certificate/key.
+
+- Backported from beta branch:
+
+  - Eliminate modifying GETs from webGUI pages.
+  
+    Note: the API pages exec_raw.php and uploadconfig.php now require
+    different parameters than before. exec_raw.php now requires the cmd to
+    be given in a POST, and both pages need a valid CSRF magic token,
+    which can be obtained by issuing a GET first without any parameters
+    (see example in exec_raw.php comment).
+
+  - Make rule moving and deletion on shaper rules page work like for
+    firewall rules.
+
+  - Add csrf-magic for CSRF protection in webGUI.
+
+  - Fix potential XSS in diag_ping.php and diag_traceroute.php.
+
+- Bump copyright year.
+
+- Remove domain name handling from dhclient-script; it's not used and
+  looks suspicious in light of CVE-2011-0997.
+
+- Change ARP command not to use sed (not available in m0n0wall).
+
+- Change virtualHW version to 7 for VMWare image to avoid errors in ESX 4
+
+
+1.33
+----
+
 - Add MTU option for ipv6 RA 
   ipv6 RA uses configured subnet length instead of default /64
   

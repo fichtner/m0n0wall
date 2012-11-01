@@ -36,15 +36,20 @@ if (!is_array($config['ipsec']['cacert'])) {
 	$config['ipsec']['cacert'] = array();
 }
 ipsec_ca_sort();
-$a_secret = &$config['ipsec']['cacert'];
+$a_cacert = &$config['ipsec']['cacert'];
 
-if ($_GET['act'] == "del") {
-	if ($a_secret[$_GET['id']]) {
-		unset($a_secret[$_GET['id']]);
-		write_config();
-		touch($d_ipsecconfdirty_path);
-		header("Location: vpn_ipsec_ca.php");
-		exit;
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_cacert[$id]) {
+				unset($a_cacert[$id]);
+				write_config();
+				touch($d_ipsecconfdirty_path);
+				header("Location: vpn_ipsec_ca.php");
+				exit;
+			}
+		}
 	}
 }
 
@@ -56,6 +61,8 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The IPsec tunnel configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
+</form>
+<form action="vpn_ipsec_ca.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td>
   <ul id="tabnav">
@@ -75,13 +82,13 @@ if ($_GET['act'] == "del") {
                   <td class="listhdrr">Identifier</td>
                   <td class="list"></td>
 				</tr>
-			  <?php $i = 0; foreach ($a_secret as $secretent): ?>
+			  <?php $i = 0; foreach ($a_cacert as $cacertent): ?>
                 <tr> 
                   <td class="listlr">
-                    <?=htmlspecialchars($secretent['ident']);?>
+                    <?=htmlspecialchars($cacertent['ident']);?>
                   </td>
                   <td class="list" nowrap> <a href="vpn_ipsec_ca_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit certificate" width="17" height="17" border="0" alt="certificate"></a>
-                     &nbsp;<a href="vpn_ipsec_ca.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this certificate?')"><img src="x.gif" title="delete certificate" width="17" height="17" border="0" alt="delete certificate"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete certificate" alt="delete certificate" onclick="return confirm('Do you really want to delete this certificate?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

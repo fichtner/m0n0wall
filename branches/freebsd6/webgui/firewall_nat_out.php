@@ -43,6 +43,14 @@ if ($_POST) {
     $pconfig = $_POST;
 
     $config['nat']['advancedoutbound']['enable'] = ($_POST['enable']) ? true : false;
+
+	if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
+		foreach ($_POST['entries'] as $entry) {
+			if ($a_out[$entry])
+				unset($a_out[$entry]);
+		}
+	}
+	
     write_config();
     
     $retval = 0;
@@ -62,15 +70,6 @@ if ($_POST) {
     }
 }
 
-if ($_GET['act'] == "del") {
-    if ($a_out[$_GET['id']]) {
-        unset($a_out[$_GET['id']]);
-        write_config();
-        touch($d_natconfdirty_path);
-        header("Location: firewall_nat_out.php");
-        exit;
-    }
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="firewall_nat_out.php" method="post">
@@ -120,15 +119,17 @@ if ($_GET['act'] == "del") {
               </table>
               <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr> 
+    			  <td width="5%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">Interface</td>
-                  <td width="20%" class="listhdrr">Source</td>
-                  <td width="20%" class="listhdrr">Destination</td>
-                  <td width="20%" class="listhdrr">Target</td>
-                  <td width="25%" class="listhdr">Description</td>
-                  <td width="5%" class="list"></td>
+                  <td width="18%" class="listhdrr">Source</td>
+                  <td width="19%" class="listhdrr">Destination</td>
+                  <td width="18%" class="listhdrr">Target</td>
+                  <td width="20%" class="listhdr">Description</td>
+                  <td width="10%" class="list"></td>
                 </tr>
               <?php $i = 0; foreach ($a_out as $natent): ?>
                 <tr valign="top"> 
+				  <td class="listt"><input type="checkbox" name="entries[]" value="<?=$i;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
                   <td class="listlr">
                     <?php
 					if (!$natent['interface'] || ($natent['interface'] == "wan"))
@@ -165,13 +166,14 @@ if ($_GET['act'] == "del") {
                   <td class="listbg"> 
                     <?=htmlspecialchars($natent['descr']);?>&nbsp;
                   </td>
-                  <td class="list" nowrap> <a href="firewall_nat_out_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a>
-                     &nbsp;<a href="firewall_nat_out.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this mapping?')"><img src="x.gif" title="delete mapping" width="17" height="17" border="0" alt="delete mapping"></a></td>
+                  <td class="list" nowrap> <a href="firewall_nat_out_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a></td>
                 </tr>
               <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="5"></td>
-                  <td class="list"> <a href="firewall_nat_out_edit.php"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
+                  <td class="list" colspan="6"></td>
+                  <td class="list">
+					<input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected mappings" alt="delete selected mappings" onclick="return confirm('Do you really want to delete the selected mappings?')">
+					<a href="firewall_nat_out_edit.php"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
                 </tr>
               </table>
 </td>

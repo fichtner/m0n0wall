@@ -3,7 +3,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,16 @@ require_once("functions.inc");
 
 /* ensure the user is authorized to view the current page */
 require_once("auth.inc");
+
+/* include csrf-magic for CSRF protection */
+function csrf_startup() {
+	csrf_conf('callback', 'my_csrf_callback');
+	csrf_conf('xhtml', false);
+}
+function my_csrf_callback() {
+	echo "Bad request token. Please make sure cookies are enabled and try again.";
+}
+require_once("csrf-magic.inc");
 
 $d_natconfdirty_path = $g['varrun_path'] . "/nat.conf.dirty";
 $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";

@@ -630,7 +630,7 @@ function convert_to_6to4_nibbles($ipaddr) {
 	return sprintf('%02x%02x:%02x%02x',	$octets[0], $octets[1], $octets[2], $octets[3]);
 }
 
-/* generate a self-signed SSL cert/key (1024-bit, valid for 2 years) and return it in PEM format */
+/* generate a self-signed SSL cert/key (2048-bit, valid for 3 years) and return it in PEM format */
 function generate_self_signed_cert($orgname, $cn) {
 	global $g;
 	
@@ -647,12 +647,12 @@ function generate_self_signed_cert($orgname, $cn) {
 
 	$config = array(
 		"digest_alg" => "sha1",
-		"private_key_bits" => 1024
+		"private_key_bits" => 2048
 	);
 
 	$privkey = openssl_pkey_new($config);
 	$csr = openssl_csr_new($dn, $privkey, $config);
-	$sscert = openssl_csr_sign($csr, null, $privkey, 730, $config, time());
+	$sscert = openssl_csr_sign($csr, null, $privkey, 3*365, $config, time());
 
 	openssl_x509_export($sscert, $certout);
 	openssl_pkey_export($privkey, $pkeyout);

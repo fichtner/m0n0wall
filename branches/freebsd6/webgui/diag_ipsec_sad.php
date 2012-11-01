@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -48,11 +48,14 @@ require("guiconfig.inc");
     <td class="tabcont">
 <?php
 
-/* delete any SA? */
-if ($_GET['act'] == "del") {
+/* delete any SAs? */
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
 	$fd = @popen("/usr/local/sbin/setkey -c > /dev/null 2>&1", "w");
 	if ($fd) {
-		fwrite($fd, "delete {$_GET['src']} {$_GET['dst']} {$_GET['proto']} {$_GET['spi']} ;\n");
+		foreach ($_POST['entries'] as $entry) {
+			list ($src,$dst,$proto,$spi) = split(";", $entry);
+			fwrite($fd, "delete $src $dst $proto $spi ;\n");
+		}
 		pclose($fd);
 		sleep(1);
 	}
@@ -93,8 +96,10 @@ if ($fd) {
 }
 if (count($sad)):
 ?>
+<form action="diag_ipsec_sad.php" method="post">
             <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="inner content pane">
   <tr>
+    			<td class="list">&nbsp;</td>
                 <td nowrap class="listhdrr">Source</td>
                 <td nowrap class="listhdrr">Destination</td>
                 <td nowrap class="listhdrr">Protocol</td>
@@ -106,25 +111,27 @@ if (count($sad)):
 <?php
 foreach ($sad as $sa): ?>
 	<tr>
+		<?php
+			$args = htmlspecialchars($sa['src'] . ";" . $sa['dst'] . ";" . $sa['proto'] . ";0x" . $sa['spi']);
+		?>
+		<td class="listt"><input type="checkbox" name="entries[]" value="<?=$args;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
 		<td class="listlr"><?=htmlspecialchars($sa['src']);?></td>
 		<td class="listr"><?=htmlspecialchars($sa['dst']);?></td>
 		<td class="listr"><?=htmlspecialchars(strtoupper($sa['proto']));?></td>
 		<td class="listr"><?=htmlspecialchars($sa['spi']);?></td>
 		<td class="listr"><?=htmlspecialchars($sa['ealgo']);?></td>
 		<td class="listr"><?=htmlspecialchars($sa['aalgo']);?></td>
-		<td class="list" nowrap>
-		<?php
-			$args = "src=" . rawurlencode($sa['src']);
-			$args .= "&amp;dst=" . rawurlencode($sa['dst']);
-			$args .= "&amp;proto=" . rawurlencode($sa['proto']);
-			$args .= "&amp;spi=" . rawurlencode("0x" . $sa['spi']);
-		?>
-		  <a href="diag_ipsec_sad.php?act=del&amp;<?=$args;?>" onclick="return confirm('Do you really want to delete this security association?')"><img src="x.gif" title="delete SA" width="17" height="17" border="0" alt="delete SA"></a>
-		</td>
-				
 	</tr>
 <?php endforeach; ?>
+	 <tr> 
+	   <td></td>
+	 </tr> 
+	 <tr> 
+	   <td class="list" colspan="7"></td>
+	   <td class="list"><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected SAs" alt="delete selected SAs" onclick="return confirm('Do you really want to delete the selected security associations?')"></td>
+	 </tr>
 </table>
+</form>
 <?php else: ?>
 <p><strong>No IPsec security associations.</strong></p>
 <?php endif; ?>

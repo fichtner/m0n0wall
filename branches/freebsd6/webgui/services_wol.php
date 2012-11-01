@@ -39,6 +39,19 @@ wol_sort();
 $a_wol = &$config['wol']['wolentry'];
 
 if ($_POST || $_GET['mac']) {
+	
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_wol[$id]) {
+				unset($a_wol[$id]);
+				write_config();
+				header("Location: services_wol.php");
+				exit;
+			}
+		}
+	}
+	
 	unset($input_errors);
 	
 	if ($_GET['mac']) {
@@ -67,14 +80,6 @@ if ($_POST || $_GET['mac']) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_wol[$_GET['id']]) {
-		unset($a_wol[$_GET['id']]);
-		write_config();
-		header("Location: services_wol.php");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -141,7 +146,7 @@ Click the MAC address to wake up a computer. <br>
                     <?=htmlspecialchars($wolent['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_wol_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0" alt="edit entry"></a>
-                     &nbsp;<a href="services_wol.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0" alt="delete entry"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete entry" alt="delete entry" onclick="return confirm('Do you really want to delete this entry?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

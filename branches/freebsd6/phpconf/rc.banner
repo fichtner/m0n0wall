@@ -41,7 +41,7 @@
 
 *** This is m0n0wall, version {$version}
     built on {$buildtime} for {$g['fullplatform']}
-    Copyright (C) 2002-2011 by Manuel Kasper. All rights reserved.
+    Copyright (C) 2002-2012 by Manuel Kasper. All rights reserved.
     Visit http://m0n0.ch/wall for updates.
     
     

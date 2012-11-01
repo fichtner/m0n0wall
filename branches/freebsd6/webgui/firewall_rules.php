@@ -98,21 +98,17 @@ if (isset($_POST['del_x'])) {
 		header("Location: firewall_rules.php?if={$if}{$typelink}");
 		exit;
 	}
-} else if ($_GET['act'] == "toggle") {
-	if ($a_filter[$_GET['id']]) {
-		$a_filter[$_GET['id']]['disabled'] = !isset($a_filter[$_GET['id']]['disabled']);
-		write_config();
-		touch($d_filterconfdirty_path);
-		header("Location: firewall_rules.php?if={$if}{$typelink}");
-		exit;
-	}
 } else {
 	/* yuck - IE won't send value attributes for image buttons, while Mozilla does - 
-	   so we use .x/.y to fine move button clicks instead... */
+	   so we use .x/.y to find move and toggle button clicks instead... */
 	unset($movebtn);
+	unset($togglebtn);
 	foreach ($_POST as $pn => $pd) {
 		if (preg_match("/move_(\d+)_x/", $pn, $matches)) {
 			$movebtn = $matches[1];
+			break;
+		} else if (preg_match("/toggle_(\d+)_x/", $pn, $matches)) {
+			$togglebtn = $matches[1];
 			break;
 		}
 	}
@@ -149,6 +145,16 @@ if (isset($_POST['del_x'])) {
 		touch($d_filterconfdirty_path);
 		header("Location: firewall_rules.php?if={$if}{$typelink}");
 		exit;
+	}
+	
+	if (isset($togglebtn)) {
+		if ($a_filter[$togglebtn]) {
+			$a_filter[$togglebtn]['disabled'] = !isset($a_filter[$togglebtn]['disabled']);
+			write_config();
+			touch($d_filterconfdirty_path);
+			header("Location: firewall_rules.php?if={$if}{$typelink}");
+			exit;
+		}
 	}
 }
 
@@ -300,7 +306,7 @@ function fr_insline(id, on) {
 							$textss = $textse = "";
 						}
 				  ?>
-				  <a href="?if=<?=htmlspecialchars($if);?>&act=toggle&id=<?=$i;?><?=$typelink;?>"><img src="<?=$iconfn;?>.gif" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
+				  <input name="toggle_<?=$i;?>" type="image" src="<?=$iconfn;?>.gif" width="11" height="11" title="click to toggle enabled/disabled status">
 				  <?php if (isset($filterent['log'])):
 							$iconfn = "log_s";
 						if (isset($filterent['disabled']))

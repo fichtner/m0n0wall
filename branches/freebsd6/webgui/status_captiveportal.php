@@ -35,8 +35,13 @@ require("guiconfig.inc");
 <?php include("fbegin.inc"); ?>
 <?php
 
-if ($_GET['act'] == "del") {
-    captiveportal_disconnect_client($_GET['id'],6);
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(.+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+	    	captiveportal_disconnect_client($id, 6);
+		}
+	}
 }
 
 flush();
@@ -87,8 +92,9 @@ if ($fp) {
 captiveportal_unlock();
 ?>
 
-<?php if (isset($config['voucher']['enable'])): ?>
 <form action="status_captiveportal.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php if (isset($config['voucher']['enable'])): ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
 <tr><td class="tabnavtbl">
 <ul id="tabnav">
@@ -130,7 +136,7 @@ $tabs = array('Users' => 'status_captiveportal.php',
     <?php endif; ?>
     <td class="listr"><?=$cpent[4];?>&nbsp;</td>
     <td valign="middle" class="list" nowrap>
-    <a href="?order=<?=htmlspecialchars($_GET['order']);?>&amp;showact=<?=htmlspecialchars($_GET['showact']);?>&amp;act=del&amp;id=<?=$cpent[1];?>" onclick="return confirm('Do you really want to disconnect this client?')"><img src="x.gif" title="disconnect client" width="17" height="17" border="0" alt="disconnect client"></a></td>
+    <input name="del_<?=$cpent[1];?>" type="image" src="x.gif" width="17" height="17" title="disconnect client" alt="disconnect client" onclick="return confirm('Do you really want to disconnect this client?')">
   </tr>
 <?php endforeach; ?>
 </table>
@@ -139,8 +145,8 @@ $tabs = array('Users' => 'status_captiveportal.php',
 </td>
 </tr>
 </table>
-</form>
 <?php endif; ?>
+</form>
 
 <p><!-- TODO: paragraph is not valid here -->
 <form action="status_captiveportal.php" method="GET">

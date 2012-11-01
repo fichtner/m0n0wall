@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -63,14 +63,16 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_1to1[$_GET['id']]) {
-		unset($a_1to1[$_GET['id']]);
-		write_config();
-		touch($d_natconfdirty_path);
-		header("Location: firewall_nat_1to1.php");
-		exit;
-	}
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
+	foreach ($_POST['entries'] as $entry) {
+		if ($a_1to1[$entry])
+			unset($a_1to1[$entry]);
+	}	
+	
+	write_config();
+	touch($d_natconfdirty_path);
+	header("Location: firewall_nat_1to1.php");
+	exit;
 }
 ?>
 <?php include("fbegin.inc"); ?>
@@ -96,14 +98,16 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr> 
+    			  <td width="5%" class="list">&nbsp;</td>
 				  <td width="10%" class="listhdrr">Interface</td>
                   <td width="20%" class="listhdrr">External IP</td>
                   <td width="20%" class="listhdrr">Internal IP</td>
-                  <td width="40%" class="listhdr">Description</td>
+                  <td width="35%" class="listhdr">Description</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_1to1 as $natent): ?>
                 <tr> 
+				  <td class="listt"><input type="checkbox" name="entries[]" value="<?=$i;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
 				  <td class="listlr">
                   <?php
 					if (!$natent['interface'] || ($natent['interface'] == "wan"))
@@ -123,13 +127,14 @@ if ($_GET['act'] == "del") {
                   <td class="listbg"> 
                     <?=htmlspecialchars($natent['descr']);?>&nbsp;
                   </td>
-                  <td class="list" nowrap> <a href="firewall_nat_1to1_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a>
-                     &nbsp;<a href="firewall_nat_1to1.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this mapping?')"><img src="x.gif" title="delete mapping" width="17" height="17" border="0" alt="delete mapping"></a></td>
+                  <td class="list" nowrap> <a href="firewall_nat_1to1_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit mapping" width="17" height="17" border="0" alt="edit mapping"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="4"></td>
-                  <td class="list"> <a href="firewall_nat_1to1_edit.php"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
+                  <td class="list" colspan="5"></td>
+                  <td class="list">
+					<input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected mappings" alt="delete selected mappings" onclick="return confirm('Do you really want to delete the selected mappings?')">
+					<a href="firewall_nat_1to1_edit.php"><img src="plus.gif" title="add mapping" width="17" height="17" border="0" alt="add mapping"></a></td>
 				</tr>
               </table><br>
 			  	<span class="vexpl"><span class="red"><strong>Note:<br>

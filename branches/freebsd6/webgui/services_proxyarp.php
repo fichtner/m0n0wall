@@ -39,6 +39,20 @@ proxyarp_sort();
 $a_proxyarp = &$config['proxyarp']['proxyarpnet'];
 
 if ($_POST) {
+	
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			if ($a_proxyarp[$id]) {
+				unset($a_proxyarp[$id]);
+				write_config();
+				touch($d_proxyarpdirty_path);
+				header("Location: services_proxyarp.php");
+				exit;
+			}
+		}
+	}
+	
 	$pconfig = $_POST;
 	
 	$retval = 0;
@@ -55,15 +69,6 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_proxyarp[$_GET['id']]) {
-		unset($a_proxyarp[$_GET['id']]);
-		write_config();
-		touch($d_proxyarpdirty_path);
-		header("Location: services_proxyarp.php");
-		exit;
-	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="services_proxyarp.php" method="post">
@@ -108,7 +113,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($arpent['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_proxyarp_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit network" width="17" height="17" border="0" alt="edit network"></a>
-                     &nbsp;<a href="services_proxyarp.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this network?')"><img src="x.gif" title="delete network" width="17" height="17" border="0" alt="delete network"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete network" alt="delete network" onclick="return confirm('Do you really want to delete this network?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

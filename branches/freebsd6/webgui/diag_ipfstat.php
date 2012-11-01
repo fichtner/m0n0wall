@@ -432,12 +432,12 @@ if ($_GET['ip'] == '6') {
 </form>
 </p>
 
-<?php
+<?php endif;
 if (ipv6enabled()) {
 ?>
+	</td>
 	</tr>
 	</table>
 <?php
-}
- endif; ?>
+}?>
 <?php include("fend.inc"); ?>

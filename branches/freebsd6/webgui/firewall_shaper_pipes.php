@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -40,54 +40,59 @@ if (!is_array($config['shaper']['queue'])) {
 }
 $a_pipes = &$config['shaper']['pipe'];
 
-if ($_GET['act'] == "del") {
-	if ($a_pipes[$_GET['id']]) {
-		/* check that no rule references this pipe */
-		if (is_array($config['shaper']['rule'])) {
-			foreach ($config['shaper']['rule'] as $rule) {
-				if (isset($rule['targetpipe']) && ($rule['targetpipe'] == $_GET['id'])) {
-					$input_errors[] = "This pipe cannot be deleted because it is still referenced by a rule.";
-					break;
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
+	foreach ($_POST['entries'] as $entry) {
+		if ($a_pipes[$entry]) {
+			/* check that no rule references this pipe */
+			if (is_array($config['shaper']['rule'])) {
+				foreach ($config['shaper']['rule'] as $rule) {
+					if (isset($rule['targetpipe']) && ($rule['targetpipe'] == $entry)) {
+						$input_errors[] = "This pipe cannot be deleted because it is still referenced by a rule.";
+						break;
+					}
+				}
+			}
+
+			/* check that no queue references this pipe */
+			if (is_array($config['shaper']['queue'])) {
+				foreach ($config['shaper']['queue'] as $queue) {
+					if ($queue['targetpipe'] == $entry) {
+						$input_errors[] = "This pipe cannot be deleted because it is still referenced by a queue.";
+						break;
+					}
 				}
 			}
 		}
-		
-		/* check that no queue references this pipe */
-		if (is_array($config['shaper']['queue'])) {
-			foreach ($config['shaper']['queue'] as $queue) {
-				if ($queue['targetpipe'] == $_GET['id']) {
-					$input_errors[] = "This pipe cannot be deleted because it is still referenced by a queue.";
-					break;
-				}
-			}
-		}
-		
-		if (!$input_errors) {
-			unset($a_pipes[$_GET['id']]);
-			
+	}
+	
+	if (!$input_errors) {
+		foreach ($_POST['entries'] as $entry) {
+			unset($a_pipes[$entry]);
+
 			/* renumber all rules and queues */
 			if (is_array($config['shaper']['rule'])) {
 				for ($i = 0; isset($config['shaper']['rule'][$i]); $i++) {
 					$currule = &$config['shaper']['rule'][$i];
-					if (isset($currule['targetpipe']) && ($currule['targetpipe'] > $_GET['id']))
+					if (isset($currule['targetpipe']) && ($currule['targetpipe'] > $entry))
 						$currule['targetpipe']--;
 				}
 			}
 			if (is_array($config['shaper']['queue'])) {
 				for ($i = 0; isset($config['shaper']['queue'][$i]); $i++) {
 					$curqueue = &$config['shaper']['queue'][$i];
-					if ($curqueue['targetpipe'] > $_GET['id'])
+					if ($curqueue['targetpipe'] > $entry)
 						$curqueue['targetpipe']--;
 				}
 			}
-			
-			write_config();
-			touch($d_shaperconfdirty_path);
-			header("Location: firewall_shaper_pipes.php");
-			exit;
 		}
+
+		write_config();
+		touch($d_shaperconfdirty_path);
+		header("Location: firewall_shaper_pipes.php");
+		exit;
 	}
 }
+
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="firewall_shaper.php" method="post">
@@ -97,6 +102,8 @@ if ($_GET['act'] == "del") {
 <?php print_info_box_np("The traffic shaper configuration has been changed.<br>You must apply the changes in order for them to take effect.");?><br>
 <input name="apply" type="submit" class="formbtn" id="apply" value="Apply changes"></p>
 <?php endif; ?>
+</form>
+<form action="firewall_shaper_pipes.php" method="post">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
@@ -113,17 +120,19 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
               <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                       <tr> 
+    			  		<td width="5%" class="list">&nbsp;</td>
                         <td width="10%" class="listhdrr">No.</td>
                         <td width="15%" class="listhdrr">Bandwidth</td>
                         <td width="10%" class="listhdrr">Delay</td>
                         <td width="10%" class="listhdrr">PLR</td>
                         <td width="10%" class="listhdrr">Queue</td>
-                        <td width="15%" class="listhdrr">Mask</td>
+                        <td width="10%" class="listhdrr">Mask</td>
                         <td width="20%" class="listhdr">Description</td>
                         <td width="10%" class="list"></td>
                       </tr>
                       <?php $i = 0; foreach ($a_pipes as $pipe): ?>
                       <tr valign="top">
+				  		<td class="listt"><input type="checkbox" name="entries[]" value="<?=$i;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
                         <td class="listlr"> 
                           <?=($i+1);?></td>
                         <td class="listr"> 
@@ -153,13 +162,14 @@ if ($_GET['act'] == "del") {
                         <td class="listbg"> 
                           <?=htmlspecialchars($pipe['descr']);?>
                           &nbsp; </td>
-                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_pipes_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit pipe" width="17" height="17" border="0"></a> 
-                          &nbsp;<a href="firewall_shaper_pipes.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this pipe?')"><img src="x.gif" title="delete pipe" width="17" height="17" border="0" alt=""></a></td>
+                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_pipes_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit pipe" width="17" height="17" border="0"></a></td>
                       </tr>
                       <?php $i++; endforeach; ?>
                       <tr> 
-                        <td class="list" colspan="7"></td>
-                        <td class="list"> <a href="firewall_shaper_pipes_edit.php"><img src="plus.gif" title="add pipe" width="17" height="17" border="0" alt=""></a></td>
+                        <td class="list" colspan="8"></td>
+                        <td class="list">
+							<input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected pipes" alt="delete selected pipes" onclick="return confirm('Do you really want to delete the selected pipes?')">
+							<a href="firewall_shaper_pipes_edit.php"><img src="plus.gif" title="add pipe" width="17" height="17" border="0" alt=""></a></td>
                       </tr>
                     </table><br>
                     <strong><span class="red">Note:</span></strong> a pipe can 

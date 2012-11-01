@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2005-2006 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2005-2012 Paul Taylor (paultaylor@winndixie.com) and Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ if ($_POST) {
 	$reqdfieldsn = explode(",", "Host,ttl");
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
-	if (($_POST['ttl'] < 1) || ($_POST['ttl'] > MAX_TTL)) {
+	if (!is_numericint($_POST['ttl']) || ($_POST['ttl'] < 1) || ($_POST['ttl'] > MAX_TTL)) {
 		$input_errors[] = "Maximum number of hops must be between 1 and {MAX_TTL}";
 	}
 

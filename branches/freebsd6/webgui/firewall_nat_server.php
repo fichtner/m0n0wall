@@ -60,27 +60,31 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_snat[$_GET['id']]) {
-		/* make sure no inbound NAT mappings reference this entry */
-		if (is_array($config['nat']['rule'])) {
-			foreach ($config['nat']['rule'] as $rule) {
-				if ($rule['external-address'] == $a_snat[$_GET['id']]['ipaddr']) {
-					$input_errors[] = "This entry cannot be deleted because it is still referenced by at least one inbound NAT mapping.";
-					break;
+if (isset($_POST['del_x']) && is_array($_POST['entries'])) {
+	foreach ($_POST['entries'] as $entry) {
+		if ($a_snat[$entry]) {
+			/* make sure no inbound NAT mappings reference this entry */
+			if (is_array($config['nat']['rule'])) {
+				foreach ($config['nat']['rule'] as $rule) {
+					if ($rule['external-address'] == $a_snat[$entry]['ipaddr']) {
+						$input_errors[] = "The entry for " . htmlspecialchars($a_snat[$entry]['ipaddr']) . " cannot be deleted because it is still referenced by at least one inbound NAT mapping.";
+						break;
+					}
 				}
 			}
 		}
-		
-		if (!$input_errors) {
-			unset($a_snat[$_GET['id']]);
-			write_config();
-			touch($d_natconfdirty_path);
-			header("Location: firewall_nat_server.php");
-			exit;
-		}
+	}
+	
+	if (!$input_errors) {
+		foreach ($_POST['entries'] as $entry)
+			unset($a_snat[$entry]);
+		write_config();
+		touch($d_natconfdirty_path);
+		header("Location: firewall_nat_server.php");
+		exit;
 	}
 }
+
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="firewall_nat_server.php" method="post">
@@ -106,25 +110,28 @@ if ($_GET['act'] == "del") {
     <td class="tabcont">
               <table width="80%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
                 <tr> 
-                  <td width="40%" class="listhdrr">External IP address</td>
-                  <td width="50%" class="listhdr">Description</td>
-                  <td width="10%" class="list"></td>
+    			  <td width="5%" class="list">&nbsp;</td>
+                  <td width="35%" class="listhdrr">External IP address</td>
+                  <td width="40%" class="listhdr">Description</td>
+                  <td width="20%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_snat as $natent): ?>
                 <tr> 
+				  <td class="listt"><input type="checkbox" name="entries[]" value="<?=$i;?>" style="margin: 0 5px 0 0; padding: 0; width: 15px; height: 15px;"></td>
                   <td class="listlr"> 
                     <?=$natent['ipaddr'];?>
                   </td>
                   <td class="listbg"> 
                     <?=htmlspecialchars($natent['descr']);?>&nbsp;
                   </td>
-                  <td class="list" nowrap> <a href="firewall_nat_server_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0" alt="edit entry"></a>
-                     &nbsp;<a href="firewall_nat_server.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="x.gif" title="delete entry" width="17" height="17" border="0" alt="delete entry"></a></td>
+                  <td class="list" nowrap> <a href="firewall_nat_server_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit entry" width="17" height="17" border="0" alt="edit entry"></a></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
-                  <td class="list" colspan="2"></td>
-                  <td class="list"> <a href="firewall_nat_server_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0" alt="add entry"></a></td>
+                  <td class="list" colspan="3"></td>
+                  <td class="list">
+					<input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected entries" alt="delete selected entries" onclick="return confirm('Do you really want to delete the selected entries?')">
+					<a href="firewall_nat_server_edit.php"><img src="plus.gif" title="add entry" width="17" height="17" border="0" alt="add entry"></a></td>
 				</tr>
               </table><br>
 			        <span class="vexpl"><span class="red"><strong>Note:<br>

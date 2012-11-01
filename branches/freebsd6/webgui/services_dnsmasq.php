@@ -51,6 +51,30 @@ $a_domainOverrides = &$config['dnsmasq']['domainoverrides'];
 
 if ($_POST) {
 
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(.+)_x$/", $pn, $matches)) {
+			list($type,$id) = explode(":", $matches[1]);
+			if ($type == 'host') {
+				if ($a_hosts[$id]) {
+					unset($a_hosts[$id]);
+					write_config();
+					touch($d_dnsmasqdirty_path);
+					header("Location: services_dnsmasq.php");
+					exit;
+				}
+			}
+			elseif ($type == 'doverride') {
+				if ($a_domainOverrides[$id]) {
+					unset($a_domainOverrides[$id]);
+					write_config();
+					touch($d_dnsmasqdirty_path);
+					header("Location: services_dnsmasq.php");
+					exit;
+				}
+		 	}
+		}
+	}
+
 	$pconfig = $_POST;
 
 	$config['dnsmasq']['enable'] = ($_POST['enable']) ? true : false;
@@ -75,26 +99,6 @@ if ($_POST) {
 	}
 }
 
-if ($_GET['act'] == "del") {
-	if ($_GET['type'] == 'host') {
-		if ($a_hosts[$_GET['id']]) {
-			unset($a_hosts[$_GET['id']]);
-			write_config();
-			touch($d_dnsmasqdirty_path);
-			header("Location: services_dnsmasq.php");
-			exit;
-		}
-	}
-	elseif ($_GET['type'] == 'doverride') {
-		if ($a_domainOverrides[$_GET['id']]) {
-			unset($a_domainOverrides[$_GET['id']]);
-			write_config();
-			touch($d_dnsmasqdirty_path);
-			header("Location: services_dnsmasq.php");
-			exit;
-		}
- 	}
-}
 ?>
 <?php include("fbegin.inc"); ?>
 <form action="services_dnsmasq.php" method="post">
@@ -188,7 +192,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($hostent['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit host" width="17" height="17" border="0" alt="edit host"></a>
-                     &nbsp;<a href="services_dnsmasq.php?act=del&amp;type=host&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this host?')"><img src="x.gif" title="delete host" width="17" height="17" border="0" alt="delete host"></a></td>
+                     &nbsp;<input name="del_host:<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete host" alt="delete host" onclick="return confirm('Do you really want to delete this host?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 
@@ -221,7 +225,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($doment['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="services_dnsmasq_domainoverride_edit.php?id=<?=$i;?>"><img src="e.gif" width="17" height="17" border="0" alt=""></a>
-                     &nbsp;<a href="services_dnsmasq.php?act=del&amp;type=doverride&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this domain override?')"><img src="x.gif" width="17" height="17" border="0" alt=""></a></td>
+                     &nbsp;<input name="del_doverride:<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete domain override" alt="delete domain override" onclick="return confirm('Do you really want to delete this domain override?')"></td>
 				</tr>
 			  <?php $i++; endforeach; ?>
                 <tr> 

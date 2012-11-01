@@ -4,7 +4,7 @@
 	$Id$
 	part of m0n0wall (http://m0n0.ch/wall)
 	
-	Copyright (C) 2003-2007 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2003-2012 Manuel Kasper <mk@neon1.net>.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
@@ -68,47 +68,131 @@ if ($_POST) {
 				unlink($d_shaperconfdirty_path);
 		}
 	}
-}
+	
+	if (isset($_POST['del_x'])) {
+		/* delete selected rules */
+		if (is_array($_POST['rule']) && count($_POST['rule'])) {
+			foreach ($_POST['rule'] as $rulei) {
+				unset($a_shaper[$rulei]);
+			}
+			write_config();
+			touch($d_shaperconfdirty_path);
+			header("Location: firewall_shaper.php");
+			exit;
+		}
+	} else {
+		/* yuck - IE won't send value attributes for image buttons, while Mozilla does - 
+		   so we use .x/.y to find move and toggle button clicks instead... */
+		unset($movebtn);
+		unset($togglebtn);
+		foreach ($_POST as $pn => $pd) {
+			if (preg_match("/move_(\d+)_x/", $pn, $matches)) {
+				$movebtn = $matches[1];
+				break;
+			} else if (preg_match("/toggle_(\d+)_x/", $pn, $matches)) {
+				$togglebtn = $matches[1];
+				break;
+			}
+		}
+		/* move selected rules before this rule */
+		if (isset($movebtn) && is_array($_POST['rule']) && count($_POST['rule'])) {
+			$a_shaper_new = array();
 
-if ($_GET['act'] == "del") {
-	if ($a_shaper[$_GET['id']]) {
-		unset($a_shaper[$_GET['id']]);
-		write_config();
-		touch($d_shaperconfdirty_path);
-		header("Location: firewall_shaper.php");
-		exit;
-	}
-} else if ($_GET['act'] == "down") {
-	if ($a_shaper[$_GET['id']] && $a_shaper[$_GET['id']+1]) {
-		$tmp = $a_shaper[$_GET['id']+1];
-		$a_shaper[$_GET['id']+1] = $a_shaper[$_GET['id']];
-		$a_shaper[$_GET['id']] = $tmp;
-		write_config();
-		touch($d_shaperconfdirty_path);
-		header("Location: firewall_shaper.php");
-		exit;
-	}
-} else if ($_GET['act'] == "up") {
-	if (($_GET['id'] > 0) && $a_shaper[$_GET['id']]) {
-		$tmp = $a_shaper[$_GET['id']-1];
-		$a_shaper[$_GET['id']-1] = $a_shaper[$_GET['id']];
-		$a_shaper[$_GET['id']] = $tmp;
-		write_config();
-		touch($d_shaperconfdirty_path);
-		header("Location: firewall_shaper.php");
-		exit;
-	}
-} else if ($_GET['act'] == "toggle") {
-	if ($a_shaper[$_GET['id']]) {
-		$a_shaper[$_GET['id']]['disabled'] = !isset($a_shaper[$_GET['id']]['disabled']);
-		write_config();
-		touch($d_shaperconfdirty_path);
-		header("Location: firewall_shaper.php");
-		exit;
+			/* copy all rules < $movebtn and not selected */
+			for ($i = 0; $i < $movebtn; $i++) {
+				if (!in_array($i, $_POST['rule']))
+					$a_shaper_new[] = $a_shaper[$i];
+			}
+
+			/* copy all selected rules */
+			for ($i = 0; $i < count($a_shaper); $i++) {
+				if ($i == $movebtn)
+					continue;
+				if (in_array($i, $_POST['rule']))
+					$a_shaper_new[] = $a_shaper[$i];
+			}
+
+			/* copy $movebtn rule */
+			if ($movebtn < count($a_shaper))
+				$a_shaper_new[] = $a_shaper[$movebtn];
+
+			/* copy all rules > $movebtn and not selected */
+			for ($i = $movebtn+1; $i < count($a_shaper); $i++) {
+				if (!in_array($i, $_POST['rule']))
+					$a_shaper_new[] = $a_shaper[$i];
+			}
+
+			$a_shaper = $a_shaper_new;
+			write_config();
+			touch($d_shaperconfdirty_path);
+			header("Location: firewall_shaper.php");
+			exit;
+		}
+
+		if (isset($togglebtn)) {
+			if ($a_shaper[$togglebtn]) {
+				$a_shaper[$togglebtn]['disabled'] = !isset($a_shaper[$togglebtn]['disabled']);
+				write_config();
+				touch($d_shaperconfdirty_path);
+				header("Location: firewall_shaper.php");
+				exit;
+			}
+		}
 	}
 }
 ?>
 <?php include("fbegin.inc"); ?>
+<script type="text/javascript">
+<!--
+function fr_toggle(id) {
+	var checkbox = document.getElementById('frc' + id);
+	checkbox.checked = !checkbox.checked;
+	fr_bgcolor(id);
+}
+function fr_bgcolor(id) {
+	var row = document.getElementById('fr' + id);
+	var checkbox = document.getElementById('frc' + id);
+	var cells = row.getElementsByTagName("td");
+	
+	for (i = 1; i <= 5; i++) {
+		cells[i].style.backgroundColor = checkbox.checked ? "#FFFFBB" : "#FFFFFF";
+	}
+	cells[6].style.backgroundColor = checkbox.checked ? "#FFFFBB" : "#D9DEE8";
+}
+function fr_insline(id, on) {
+	var row = document.getElementById('fr' + id);
+	var prevrow;
+	if (id != 0) {
+		prevrow = document.getElementById('fr' + (id-1));
+	} else {
+		prevrow = document.getElementById('frheader');
+	}
+	
+	var cells = row.getElementsByTagName("td");
+	var prevcells = prevrow.getElementsByTagName("td");
+	
+	for (i = 1; i <= 6; i++) {
+		if (on) {
+			prevcells[i].style.borderBottom = "3px solid #999999";
+			prevcells[i].style.paddingBottom = (id != 0) ? 2 : 3;
+		} else {
+			prevcells[i].style.borderBottomWidth = "1px";
+			prevcells[i].style.paddingBottom = (id != 0) ? 4 : 5;
+		}
+	}
+	
+	for (i = 1; i <= 6; i++) {
+		if (on) {
+			cells[i].style.borderTop = "2px solid #999999";
+			cells[i].style.paddingTop = 2;
+		} else {
+			cells[i].style.borderTopWidth = 0;
+			cells[i].style.paddingTop = 4;
+		}
+	}
+}
+// -->
+</script>
 <form action="firewall_shaper.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_shaperconfdirty_path)): ?><p>
@@ -142,18 +226,20 @@ if ($_GET['act'] == "del") {
               </table>
               &nbsp;<br>
               <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
-                      <tr> 
+                      <tr id="frheader"> 
+                  		<td width="5%" class="list">&nbsp;</td>
                         <td width="5%" class="listhdrrns">If</td>
                         <td width="5%" class="listhdrrns">Proto</td>
-                        <td width="20%" class="listhdrr">Source</td>
-                        <td width="20%" class="listhdrr">Destination</td>
-                        <td width="15%" class="listhdrrns">Target</td>
+                        <td width="18%" class="listhdrr">Source</td>
+                        <td width="18%" class="listhdrr">Destination</td>
+                        <td width="14%" class="listhdrrns">Target</td>
                         <td width="25%" class="listhdr">Description</td>
                         <td width="10%" class="list"></td>
                       </tr>
                       <?php $i = 0; foreach ($a_shaper as $shaperent): ?>
-                      <tr valign="top"> 
-                        <td class="listlr"> 
+                      <tr valign="top" id="fr<?=$i;?>"> 
+                  		<td class="listt"><input type="checkbox" id="frc<?=$i;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$i;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
+                        <td class="listlr" onClick="fr_toggle(<?=$i;?>)"> 
                           <?php
 				  $dis = "";
 				  if (isset($shaperent['disabled'])) {
@@ -168,28 +254,28 @@ if ($_GET['act'] == "del") {
 				  	$iflabels['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 				  echo $textss . htmlspecialchars($iflabels[$shaperent['interface']]);
 				  echo "<br>";
-				  echo "<a href=\"?act=toggle&id={$i}\">";
 				  if ($shaperent['direction'] != "in")
-				  	echo "<img src=\"out{$dis}.gif\" width=\"11\" height=\"11\" border=\"0\" style=\"margin-top: 5px\" title=\"click to toggle enabled/disabled status\">";
-				  if ($shaperent['direction'] != "out")
-				  	echo "<img src=\"in{$dis}.gif\" width=\"11\" height=\"11\" border=\"0\" style=\"margin-top: 5px\" title=\"click to toggle enabled/disabled status\">";
-				  echo "</a>" . $textse;;
+					$iconfn = "out{$dis}.gif";
+				  else
+				    $iconfn = "in{$dis}.gif";
+				  echo "<input name=\"toggle_$i\" type=\"image\" src=\"$iconfn\" width=\"11\" height=\"11\" style=\"margin-top: 5px\" title=\"click to toggle enabled/disabled status\">";
+				  echo $textse;
 				  ?>
                         </td>
-                        <td class="listr"> 
+                        <td class="listr" onClick="fr_toggle(<?=$i;?>)">
                           <?=$textss;?><?php if (isset($shaperent['protocol'])) echo strtoupper($shaperent['protocol']); else echo "*"; ?><?=$textse;?>
                         </td>
-                        <td class="listr"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['source'])); ?>
+                        <td class="listr" onClick="fr_toggle(<?=$i;?>)"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['source'])); ?>
 						<?php if ($shaperent['source']['port']): ?><br>
 						Port: <?=htmlspecialchars(pprint_port($shaperent['source']['port'])); ?> 
 						<?php endif; ?><?=$textse;?>
                         </td>
-                        <td class="listr"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['destination'])); ?>
+                        <td class="listr" onClick="fr_toggle(<?=$i;?>)"><?=$textss;?><?php echo htmlspecialchars(pprint_address($shaperent['destination'])); ?>
 						<?php if ($shaperent['destination']['port']): ?><br>
 						Port: <?=htmlspecialchars(pprint_port($shaperent['destination']['port'])); ?>
 						<?php endif; ?><?=$textse;?>
                         </td>
-                        <td class="listr"><?=$textss;?>
+                        <td class="listr" onClick="fr_toggle(<?=$i;?>)"><?=$textss;?>
                           <?php 
 							if (isset($shaperent['targetpipe'])) {
 								if ($a_pipe[$shaperent['targetpipe']]['descr'])
@@ -206,28 +292,28 @@ if ($_GET['act'] == "del") {
 							}
 						  ?><?=$textse;?>
                         </td>
-                        <td class="listbg"> 
+                        <td class="listbg" onClick="fr_toggle(<?=$i;?>)">
                           <?=$textss;?><?=htmlspecialchars($shaperent['descr']);?><?=$textse;?>
                           &nbsp; </td>
-                        <td valign="middle" nowrap class="list"> <a href="firewall_shaper_edit.php?id=<?=$i;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a> 
-                          <?php if ($i > 0): ?>
-                          <a href="firewall_shaper.php?act=up&amp;id=<?=$i;?>"><img src="up.gif" title="move up" width="17" height="17" border="0" alt="move up"></a> 
-                          <?php else: ?>
-                          <img src="up_d.gif" width="17" height="17" border="0" alt""> 
-                          <?php endif; ?><br>
-						  <a href="firewall_shaper.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this rule?')"><img src="x.gif" title="delete rule" width="17" height="17" border="0" alt="delete rule"></a> 
-                          <?php if (isset($a_shaper[$i+1])): ?>
-                          <a href="firewall_shaper.php?act=down&amp;id=<?=$i;?>"><img src="down.gif" title="move down" width="17" height="17" border="0" alt="move down"></a> 
-                          <?php else: ?>
-                          <img src="down_d.gif" width="17" height="17" border="0" alt=""> 
-                          <?php endif; ?>
-                          <a href="firewall_shaper_edit.php?dup=<?=$i;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a> 
+                        <td valign="middle" nowrap class="list">
+						    <table border="0" cellspacing="0" cellpadding="1" summary="button pane">
+							<tr>
+							  <td><input name="move_<?=$i;?>" type="image" src="left.gif" width="17" height="17" title="move selected rules before this rule" onMouseOver="fr_insline(<?=$i;?>, true)" onMouseOut="fr_insline(<?=$i;?>, false)"></td>
+							  <td><a href="firewall_shaper_edit.php?id=<?=$i;?><?=$typelink;?>"><img src="e.gif" title="edit rule" width="17" height="17" border="0" alt="edit rule"></a></td>
+							</tr>
+							<tr>
+							  <td align="center" valign="middle"></td>
+							  <td><a href="firewall_shaper_edit.php?dup=<?=$i;?><?=$typelink;?>"><img src="plus.gif" title="add a new rule based on this one" width="17" height="17" border="0" alt="add a new rule based on this one"></a></td>
+							</tr>
+							</table>
                         </td>
                       </tr>
                       <?php $i++; endforeach; ?>
                       <tr> 
-                        <td class="list" colspan="6"></td>
-                        <td class="list"> <a href="firewall_shaper_edit.php"><img src="plus.gif" title="add rule" width="17" height="17" border="0" alt="add rule"></a></td>
+                        <td class="list" colspan="7"></td>
+                        <td class="list">
+							<?php if ($i == 0): ?><img src="x_d.gif" width="17" height="17" title="delete selected rules" border="0" alt="delete selected rules"><?php else: ?><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected rules" alt="delete selected rules" onclick="return confirm('Do you really want to delete the selected rules?')"><?php endif; ?>
+							<a href="firewall_shaper_edit.php"><img src="plus.gif" title="add rule" width="17" height="17" border="0" alt="add rule"></a></td>
                       </tr>
                     </table>
 					  

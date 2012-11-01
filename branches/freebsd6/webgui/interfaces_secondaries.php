@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Interfaces", $_GET['ifname'], "Add secondary IP address");
+$pgtitle = array("Interfaces", htmlspecialchars($_GET['ifname']), "Add secondary IP address");
 require("guiconfig.inc");
 
 if (!is_array($config['secondaries']['secondary']))
@@ -37,18 +37,24 @@ if (!is_array($config['secondaries']['secondary']))
 
 $a_secondaries = &$config['secondaries']['secondary'] ;
 
-if ($_GET['act'] == "del") {
-	unset($a_secondaries[$_GET['id']]);
-	write_config();
-	touch($d_sysrebootreqd_path);
-	header("Location: interfaces_secondaries.php?if=" . $_GET['if'] ."&ifname=" . urlencode($_GET['ifname']));
-	exit;
+if ($_POST) {
+	foreach ($_POST as $pn => $pv) {
+		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
+			$id = $matches[1];
+			unset($a_secondaries[$id]);
+			write_config();
+			touch($d_sysrebootreqd_path);
+			header("Location: interfaces_secondaries.php?if=" . urlencode($_GET['if']) ."&ifname=" . urlencode($_GET['ifname']));
+			exit;
+		}
+	}
 }
 
 ?>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if (file_exists($d_sysrebootreqd_path)) print_info_box(get_std_save_message(0)); ?>
+<form action="interfaces_secondaries.php?if=<?=urlencode($_GET['if'])?>&amp;ifname=<?=urlencode($_GET['ifname'])?>" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="tab pane">
   <tr><td class="tabnavtbl">
   <ul id="tabnav">
@@ -79,7 +85,7 @@ if ($_GET['act'] == "del") {
                     <?=htmlspecialchars($secondary['descr']);?>&nbsp;
                   </td>
                   <td valign="middle" nowrap class="list"> <a href="interfaces_secondaries_edit.php?id=<?=$i;?>&amp;if=<?=urlencode($_GET['if'])?>&amp;ifname=<?=urlencode($_GET['ifname'])?>"><img src="e.gif" title="edit IP Address" width="17" height="17" border="0" alt="edit IP Address"></a>
-                     &nbsp;<a href="interfaces_secondaries.php?act=del&amp;id=<?=$i;?>&amp;if=<?=urlencode($_GET['if'])?>&amp;ifname=<?=urlencode($_GET['ifname'])?>" onclick="return confirm('Do you really want to delete this IP Address?')"><img src="x.gif" title="delete IP Address" width="17" height="17" border="0" alt="delete IP Address"></a></td>
+                     &nbsp;<input name="del_<?=$i;?>" type="image" src="x.gif" width="17" height="17" title="delete address" alt="delete address" onclick="return confirm('Do you really want to delete this IP address?')"></td>
 				</tr>
 				
 			  <?php } ; $i++; endforeach; ?>
@@ -99,4 +105,5 @@ if ($_GET['act'] == "del") {
 			  </td>
 	</tr>
 </table>
+</form>
 <?php include("fend.inc"); ?>
