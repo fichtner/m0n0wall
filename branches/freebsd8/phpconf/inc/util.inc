@@ -689,12 +689,12 @@ function generate_self_signed_cert($orgname, $cn) {
 
 	$config = array(
 		"digest_alg" => "sha1",
-		"private_key_bits" => 1024
+		"private_key_bits" => 2048
 	);
 
 	$privkey = openssl_pkey_new($config);
 	$csr = openssl_csr_new($dn, $privkey, $config);
-	$sscert = openssl_csr_sign($csr, null, $privkey, 730, $config, time());
+	$sscert = openssl_csr_sign($csr, null, $privkey, 3*365, $config, time());
 
 	openssl_x509_export($sscert, $certout);
 	openssl_pkey_export($privkey, $pkeyout);
