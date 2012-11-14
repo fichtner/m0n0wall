@@ -115,7 +115,7 @@ if ($_POST) {
 		$config['filter']['tcpidletimeout'] = $_POST['tcpidletimeout'];
 		$oldipsecdnsinterval = $config['ipsec']['dns-interval'];
 		$config['ipsec']['dns-interval'] = $_POST['ipsecdnsinterval'];
-		$oldpreferoldsa = $config['ipsec']['preferoldsa'];
+		$oldpreferoldsa = isset($config['ipsec']['preferoldsa']);
 		$config['ipsec']['preferoldsa'] = $_POST['preferoldsa_enable'] ? true : false;
 		$oldpolling = isset($config['system']['polling']);
 		$config['system']['polling'] = $_POST['polling_enable'] ? true : false;
@@ -127,11 +127,11 @@ if ($_POST) {
 		$config['nat']['portrange-high'] = $_POST['portrangehigh'];
 		
 		write_config();
-		
+
 		if (($config['system']['webgui']['certificate'] != $oldcert)
 				|| ($config['system']['webgui']['private-key'] != $oldkey)
 				|| ($config['filter']['tcpidletimeout'] != $oldtcpidletimeout)
-				|| ($config['system']['polling'] != $oldpolling)) {
+				|| (isset($config['system']['polling']) != $oldpolling)) {
 			touch($d_sysrebootreqd_path);
 		}
 		if (($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
@@ -150,14 +150,16 @@ if ($_POST) {
 			config_lock();
 			$retval = filter_configure();
 			$retval |= interfaces_optional_configure();
-			if ($config['ipsec']['preferoldsa'] != $oldpreferoldsa || $config['ipsec']['dns-interval'] != $oldipsecdnsinterval)
+			if (isset($config['ipsec']['preferoldsa']) != $oldpreferoldsa || $config['ipsec']['dns-interval'] != $oldipsecdnsinterval) {
 				$retval |= vpn_ipsec_configure();
+			}
 			$retval |= system_set_termcap();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval) . $savemsgadd;
 	}
 }
+
 ?>
 <?php include("fbegin.inc"); ?>
             <?php if ($input_errors) print_input_errors($input_errors); ?>

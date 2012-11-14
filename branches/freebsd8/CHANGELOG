@@ -3,6 +3,16 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Fix changes to the 'Use device polling' state now fire up a 'reboot required' event as expected.
+  Fix changes to the 'Prefer old IPsec SAs' state now trigger an ipsec function call as expected.
+
+- Fix disconnecting sessions on captive portal status page.
+  Keep csrf-secret.php from appearing on group manager.
+
+- Generate 2048-bit SSL certificates by default and make them valid for 3 instead of 2 years.
+
+- Replace expired default certificate/key by new one.
+
 - Eliminate modifying GETs from services_croen.php
 
 - Update supfile to include ports-base to update Mk or new ports won't build
