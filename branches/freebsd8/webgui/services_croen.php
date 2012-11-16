@@ -91,19 +91,31 @@
 	$pconfig['interval'] = (isset($config['croen']['interval']) ? $config['croen']['interval'] : 10);
 	$pconfig['jobset'] = &$config['croen']['jobset'];
 
-	// Delete job
+	// Actions
+	$config_changed = FALSE;
 	foreach ($_POST as $pn => $pv) {
+		// Delete job
 		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
 			unset($pconfig['jobset'][$matches[1]]);
-
-			// Write config, set dirty & reroute...
-			if ($pconfig['enable']) {
-				touch($d_croendirty_path);
+			$config_changed = TRUE;
+			
+		// Toggle job
+		} elseif (preg_match("/^toggle_(\d+)_x$/", $pn, $matches)) {
+			if (isset($pconfig['jobset'][$matches[1]])) {
+				$pconfig['jobset'][$matches[1]]['disabled'] = !isset($pconfig['jobset'][$matches[1]]['disabled']);
 			}
-			write_config();
-			header("Location: services_croen.php");
-			exit;
+			$config_changed = TRUE;
 		}
+	}
+	
+	// Changed someting: Write config, set dirty & reroute
+	if ($config_changed) {
+		if ($pconfig['enable']) {
+			touch($d_croendirty_path);
+		}
+		write_config();
+		header("Location: services_croen.php");
+		exit;
 	}
 	
 	// Include webinterface
@@ -172,9 +184,9 @@
 				<tr><td class="tabcont">
 					<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane">
 						<tr>
-							<td width="4%" class="list">&nbsp;</td>
+							<td width="7%" class="list">&nbsp;</td>
 							<td width="21%" class="listhdrr">Repeat</td>
-							<td width="53%" class="listhdrr">Job(s)</td>
+							<td width="50%" class="listhdrr">Job(s)</td>
 							<td width="17%" class="listhdr">Description</td>
 							<td width="5%" class="list">&nbsp;</td>
 						</tr>';
@@ -184,7 +196,7 @@
 	foreach ($pconfig['jobset'] AS $job_id => $jobset) {
 		echo '
 						<tr>
-							<td>'.(isset($jobset['syslog']) ? '<img src="log.gif" width="11" height="11" border="0">' : '&nbsp;').'</td>
+							<td><input name="toggle_'.$job_id.'" type="image" src="enable'.(isset($jobset['disabled']) ? '_d' : '').'.gif" width="11" height="11" title="click to toggle enabled/disabled status">&nbsp;&nbsp;'.(isset($jobset['syslog']) ? '<img src="log'.(isset($jobset['disabled']) ? '_d' : '').'.gif" width="11" height="11" border="0">' : '&nbsp;').'</td>
 							<td class="listlr">'.
 								($jobset['repeat'] == 'x_minute' ? str_replace("x minute", ($jobset['minute'] > 1 ? $jobset['minute']." minutes" : "minute"), $data['repeat'][$jobset['repeat']]) : $data['repeat'][$jobset['repeat']].',<br>').
 								($jobset['repeat'] == 'once' ? date($data['date_once'], strtotime(htmlspecialchars($jobset['date']).' '.htmlspecialchars($jobset['time']))) : 
@@ -232,6 +244,25 @@
 							<td class="list">
 								<a href="services_croen_edit.php"><img src="plus.gif" title="add job" width="17" height="17" border="0" alt="add job"></a>
 							</td>
+						</tr>
+					</table>
+					<table border="0" cellspacing="0" cellpadding="0" summary="info pane">
+						<tr> 
+							<td width="16"><img src="enable.gif" width="11" height="11" alt=""></td>
+							<td>enabled</td>
+							<td width="14"></td>
+							<td width="16"><img src="log.gif" width="11" height="11" alt=""></td>
+							<td>log</td>
+						</tr>
+						<tr>
+							<td colspan="5" height="4"></td>
+						</tr>
+						<tr>
+							<td><img src="enable_d.gif" width="11" height="11" alt=""></td>
+							<td>disabled</td>
+							<td></td>
+							<td><img src="log_d.gif" width="11" height="11" alt=""></td>
+							<td>log (disabled)</td>
 						</tr>
 					</table>
 				</td></tr>

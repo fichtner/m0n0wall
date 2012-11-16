@@ -864,13 +864,16 @@ function services_croen_configure() {
 			}
 			// Write jobs
 			foreach ($config['croen']['jobset'] AS $jobset_id => $jobset) {
-				fwrite($fd, "\njob = ".
-					$jobset_id." ".$jobset['repeat'].(isset($jobset['time']) ? " ".$jobset['time'] : "").
-					(isset($jobset['date']) ? " ".$jobset['date'] :
-					(isset($jobset['weekday']) ? " ".$jobset['weekday'] :
-					(isset($jobset['day']) ? " ".$jobset['day'] :
-					(isset($jobset['minute']) ? " ".$jobset['minute'] : ""))))
-				);
+				// Ignore disabled jobsets
+				if (!isset($jobset['disabled'])) {
+					fwrite($fd, "\njob = ".
+						$jobset_id." ".$jobset['repeat'].(isset($jobset['time']) ? " ".$jobset['time'] : "").
+						(isset($jobset['date']) ? " ".$jobset['date'] :
+						(isset($jobset['weekday']) ? " ".$jobset['weekday'] :
+						(isset($jobset['day']) ? " ".$jobset['day'] :
+						(isset($jobset['minute']) ? " ".$jobset['minute'] : ""))))
+					);
+				}
 			}
 			// Close config file
 			fclose($fd);
