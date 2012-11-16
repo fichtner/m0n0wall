@@ -346,6 +346,7 @@
 			// Check if jobs are set & save
 			if (isset($save['job'])) {
 				// Save config
+				$save['disabled'] = (isset($_POST['disabled']) ? true : false);
 				$save['repeat'] = $_POST['repeat'];
 				$save['syslog'] = (isset($_POST['syslog']) ? true : false);
 				$save['time'] = (isset($_POST['time']) ? $_POST['time'][0].':'.$_POST['time'][1] : false);
@@ -398,7 +399,7 @@
 			$jobset_id = $_POST['id'];
 		}
 		// Add/Edit - save attempt
-		$fields = Array('job', 'repeat', 'syslog', 'descr', 'time', 'date', 'weekday', 'day', 'minute');
+		$fields = Array('job', 'disabled', 'repeat', 'syslog', 'descr', 'time', 'date', 'weekday', 'day', 'minute');
 		foreach ($fields AS $v) {
 			if (isset($_POST[$v])) {
 				$pconfig[$v] = $_POST[$v];
@@ -523,6 +524,14 @@
 						</tr>
 					</table>
 					<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
+						<tr>
+							<td width="22%" valign="top" class="vncellreq">Disabled</td>
+							<td width="78%" class="vtable"> 
+								<input name="disabled" type="checkbox" id="disabled" value="yes"'.(isset($pconfig['disabled']) ? ' checked' : '').'>
+								<strong>Disable this job</strong><br>
+								<span class="vexpl">Set this option to disable this job without removing it from the list.</span>
+							</td>
+						</tr>
 						<tr>
 							<td width="22%" valign="top" class="vncellreq">Repeat</td>
 							<td width="78%" class="vtable">
