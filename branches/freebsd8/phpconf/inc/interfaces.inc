@@ -1209,7 +1209,8 @@ function interfaces_rtadvd_configure() {
 		sigkillbyname('rtadvd', 'KILL');
 	}
 
-	/* this file is deleted here because we might create a race condition
+	/* this file is deleted here be
+	se we might create a race condition
 		when deleting it earlier */
 	unlink_if_exists("{$g['varrun_path']}/rtadvd.pid");
 

@@ -391,7 +391,6 @@ function get_interface_list($ethernet = true, $wireless = true, $serial = true) 
 	}
 	if ($serial) {
 		exec("/bin/ls /dev/cuaU*", $modemports);
-		array_shift($modemports);
 		
 		foreach ($modemports as $uport) {
 			if (preg_match("!/dev/cuaU(\d+).(\d+)$!", $uport)) {

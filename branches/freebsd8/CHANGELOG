@@ -2,6 +2,7 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix first modem port not showing
 
 - Add enable/disable scheduler jobset on 'edit job' page
 
