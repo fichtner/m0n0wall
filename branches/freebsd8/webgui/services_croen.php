@@ -191,7 +191,7 @@
 							<td width="5%" class="list">&nbsp;</td>
 						</tr>';
 		
-	// Jobs
+	// Jobsets
 	$arrow = ' <img src="in.gif" width="8" height="8" border="0"> ';
 	foreach ($pconfig['jobset'] AS $job_id => $jobset) {
 		echo '

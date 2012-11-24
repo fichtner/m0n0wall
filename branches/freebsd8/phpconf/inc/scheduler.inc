@@ -32,9 +32,26 @@
 	function croen_set_default_config() {
 		global $config;
 
+		if (is_array($config['croen']) && is_array($config['croen']['jobset'])) {
+			// Superficial corruption check
+			$config_changed = FALSE;
+			foreach ($config['croen']['jobset'] AS $k => $jobset) {
+				if (!isset($jobset['repeat']) || empty($jobset['repeat']) || !isset($jobset['job']) || (is_array($jobset['job']) && empty($jobset['job']))) {
+					unset($config['croen']['jobset'][$k]);
+					$config_changed = TRUE;
+				}
+			}
+			
+			// Changed someting: Write config
+			if ($config_changed) {
+				write_config();
+			}
+		}
+		
 		if (!is_array($config['croen'])) {
 			$config['croen'] = array();
 		}
+		
 		if (!is_array($config['croen']['jobset'])) {
 			$config['croen']['jobset'] = array();
 		}
@@ -172,6 +189,9 @@
 
 	// Parse croen.tmp and return job data
 	function croen_parse_tmpfile($file = FALSE) {
+		// Default config
+		croen_set_default_config();
+	
 		global $config, $g;
 		if (!$file) {
 			$file = $g['tmp_path'].'/croen.tmp';
@@ -359,6 +379,8 @@
 
 	// Update target(s) of job(s)
 	function croen_update_job($jobName, $oldTarget = FALSE, $newTarget = FALSE) {
+		// Default config
+		croen_set_default_config();
 		global $config;
 
 		foreach ($config['croen']['jobset'] AS $jobset_id => $jobset) {
