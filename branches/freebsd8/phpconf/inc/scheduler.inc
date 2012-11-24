@@ -32,11 +32,23 @@
 	function croen_set_default_config() {
 		global $config;
 
+		// Superficial corruption check
 		if (is_array($config['croen']) && is_array($config['croen']['jobset'])) {
-			// Superficial corruption check
 			$config_changed = FALSE;
+			
+			// Note: "<jobset/>" will be parsed to array([0] => '')
+			if (isset($config['croen']['jobset'][0]) && empty($config['croen']['jobset'][0])) {
+				$config['croen']['jobset'] = array();
+				$config_changed = TRUE;
+			}
+			
 			foreach ($config['croen']['jobset'] AS $k => $jobset) {
-				if (!isset($jobset['repeat']) || empty($jobset['repeat']) || !isset($jobset['job']) || (is_array($jobset['job']) && empty($jobset['job']))) {
+				// Exists and not empty: Repeat, Job
+				// Note: "<job/>" will be parsed to array([0] => '') so we check for that, too
+				if (
+					!isset($jobset['repeat']) || empty($jobset['repeat']) || !isset($jobset['job']) ||
+					(is_array($jobset['job']) && (empty($jobset['job']) || (isset($jobset['job'][0]) && empty($jobset['job'][0]))))
+				) {
 					unset($config['croen']['jobset'][$k]);
 					$config_changed = TRUE;
 				}
@@ -47,11 +59,11 @@
 				write_config();
 			}
 		}
-		
+
+		// Prepare scheduler arrays
 		if (!is_array($config['croen'])) {
 			$config['croen'] = array();
 		}
-		
 		if (!is_array($config['croen']['jobset'])) {
 			$config['croen']['jobset'] = array();
 		}

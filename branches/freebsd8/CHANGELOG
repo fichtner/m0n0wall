@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix corruption check of the scheduler
+
 - Add superficial corruption check for scheduler jobsets
 
 - Fix first modem port not showing
