@@ -71,10 +71,13 @@ if ($_POST) {
 		$wolent['mac'] = $_POST['mac'];
 		$wolent['descr'] = $_POST['descr'];
 
-		if (isset($id) && $a_wol[$id])
+		if (isset($id) && $a_wol[$id]) {
+			// Scheduler: update matching jobs
+			croen_update_job('wol', $a_wol[$id]['descr'], ($wolent['descr'] != '' ? $wolent['descr'] : FALSE));
 			$a_wol[$id] = $wolent;
-		else
+		} else {
 			$a_wol[] = $wolent;
+		}
 		
 		write_config();
 		

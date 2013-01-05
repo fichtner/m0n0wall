@@ -76,7 +76,7 @@
 		// Enable/Disable interface
 		if ($job['name'] == 'interface-enable' || $job['name'] == 'interface-disable') {
 			$enable = ($job['name'] == 'interface-enable' ? TRUE : FALSE);
-			$iflist = croen_get_enabled_interfaces(1);
+			$iflist = croen_get_assigned_interfaces(1);
 			if (isset($iflist['interfaces'][$job['target'][0]]) && $ifinfo = &$iflist['interfaces'][$job['target'][0]]) {
 				if (isset($iflist['wireless_interface_dependencies'][$ifinfo['parent']])) {
 					$ifdep = &$iflist['wireless_interface_dependencies'][$ifinfo['parent']];

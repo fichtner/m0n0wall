@@ -44,6 +44,8 @@ if ($_POST || $_GET['mac']) {
 		if (preg_match("/^del_(\d+)_x$/", $pn, $matches)) {
 			$id = $matches[1];
 			if ($a_wol[$id]) {
+				// Scheduler: delete matching jobs
+				croen_update_job('wol', $a_wol[$id]['descr']);
 				unset($a_wol[$id]);
 				write_config();
 				header("Location: services_wol.php");
@@ -71,11 +73,7 @@ if ($_POST || $_GET['mac']) {
 		$input_errors[] = "A valid interface must be specified.";
 
 	if (!$input_errors) {		
-		/* determine broadcast address */
-		$bcip = gen_subnet_max($config['interfaces'][$if]['ipaddr'],
-			$config['interfaces'][$if]['subnet']);
-		
-		mwexec("/usr/local/bin/wol -i {$bcip} {$mac}");
+		services_wol_send($config['interfaces'][$if]['ipaddr'], $config['interfaces'][$if]['subnet'], $mac);
 		$savemsg = "Sent magic packet to {$mac}.";
 	}
 }

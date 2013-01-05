@@ -698,7 +698,7 @@ function convert_config() {
 				}
 				/* enable/disable wlan conversion */
 				if ($job['name'] == 'enable_wlan' || $job['name'] == 'disable_wlan') {
-					foreach (croen_get_enabled_interfaces(2) AS $ifname => $ifinfo) {
+					foreach (croen_get_assigned_interfaces(2) AS $ifname => $ifinfo) {
 						if (preg_match("/^wlan/", $ifinfo['if'])) {
 							$job_data[] = Array('name' => ($job['name'] == 'enable_wlan' ? 'interface-enable' : 'interface-disable'), 'target' => $ifname);
 						}

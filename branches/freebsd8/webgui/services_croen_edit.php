@@ -39,6 +39,9 @@
 	// m0n0wall & shared functions
 	require_once("guiconfig.inc");
 
+	// Sort WOL list (workaround for freeze issue)
+	wol_sort();
+	
 	// Get job row for table in form
 	function croen_get_job_row($data, &$form, &$save, &$js, &$input_errors, $pre, $pconfig = Array(), $jobC = 0, $tree = '') {
 		if (isset($data['type']) && isset($data['name'])) {

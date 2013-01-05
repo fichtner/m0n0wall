@@ -158,6 +158,13 @@
 							),
 						),
 					),
+					// WOL service
+					'wol' => array(
+						'type'		=> 'select',
+						'name'		=> 'wol',
+						'values'	=> 'wol_list',
+					),
+					// Execute command
 					'exec_cmd' => Array(
 						'type'		=> 'text',
 						'valid'		=> FALSE,
@@ -170,10 +177,11 @@
 		// Job targets
 		if (in_array('target', $which)) {
 			$ret['target'] = Array(
-				'enabled_interfaces'	=> croen_get_enabled_interfaces(0),
-				'shaper_rule'			=> croen_get_shaper('rule'),
-				'shaper_pipe'			=> croen_get_shaper('pipe'),
-				'shaper_queue'			=> croen_get_shaper('queue'),
+				'enabled_interfaces'		=> croen_get_assigned_interfaces(0),
+				'wol_list'					=> croen_get_wol_list(),
+				'shaper_rule'				=> croen_get_shaper('rule'),
+				'shaper_pipe'				=> croen_get_shaper('pipe'),
+				'shaper_queue'				=> croen_get_shaper('queue'),
 			);
 		}
 		
@@ -185,6 +193,7 @@
 				'reconnect_wan'			=> 'Reconnect WAN',
 				'interface'				=> 'Interface',
 				'shaper'				=> 'Traffic shaper',
+				'wol'					=> 'Wake on LAN',
 				'exec_cmd'				=> 'Execute command',
 				// Instructions
 				'enable'				=> 'Enable',
@@ -336,9 +345,9 @@
 		
 		return $list;
 	}
-
+	
 	// Get assigned & enabled interfaces
-	function croen_get_enabled_interfaces($mode = 0) {
+	function croen_get_assigned_interfaces($mode = 0) {
 		// Mode 0: Return interface name => descr of interface
 		// Mode 1: Return verbose list with wireless parents
 		// Mode 2: Return verbose list without wireless parents
@@ -388,6 +397,26 @@
 		}
 		return (isset($iflist) ? $iflist : Array());
 	}
+	
+	// Get stored MAC addresses of WOL service
+	function croen_get_wol_list() {
+		global $config;
+		$list = array();
+		
+		if (is_array($config['wol']['wolentry'])) {
+			// Get interfaces (without WAN)
+			$iflist = croen_get_assigned_interfaces(0);
+			unset($iflist['wan']);
+			// Make list
+			foreach ($config['wol']['wolentry'] AS $v) {
+				if (isset($v['descr']) && is_string($v['descr']) && $v['descr'] != '' && !in_array($v['descr'], $list)) {
+					$list[] = $v['descr'];
+				}
+			}
+		}
+		
+		return $list;
+	}
 
 	// Update target(s) of job(s)
 	function croen_update_job($jobName, $oldTarget = FALSE, $newTarget = FALSE) {
@@ -426,9 +455,9 @@
 			}
 		}
 
-		echo '<pre>'.print_r(croen_get_enabled_interfaces(2))."\n".print_r($newPorts).'</pre>'; // debug
+		echo '<pre>'.print_r(croen_get_assigned_interfaces(2))."\n".print_r($newPorts).'</pre>'; // debug
 		
-		foreach (croen_get_enabled_interfaces(2) AS $ifname => $ifinfo) {
+		foreach (croen_get_assigned_interfaces(2) AS $ifname => $ifinfo) {
 			if (isset($newPorts[$ifname]) && $newPorts[$ifname] != $ifinfo['if']) {
 				// Update job where ifname = target
 				croen_update_job($jobName, $ifname, $newPorts[$ifname]);

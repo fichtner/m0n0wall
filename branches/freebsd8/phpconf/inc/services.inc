@@ -824,6 +824,13 @@ EOD;
 	return 0;
 }
 
+function services_wol_send($ipaddr, $subnet, $mac) {
+	/* determine broadcast address */
+	$bcip = gen_subnet_max($ipaddr, $subnet);
+	
+	mwexec("/usr/local/bin/wol -i {$bcip} {$mac}");
+}
+
 function services_croen_configure() {
 	global $config, $g;
 
