@@ -782,9 +782,9 @@ function vpn_endpoint_determine($tunnel, $curwanip,$rgip) {
 		
 		if (isset($oc['enable']) && $oc['if']) {
 			if (ipv6enabled() && (is_ipaddr6($rgip))) {
-				return $oc['ipaddr'];
-			} else {
 				return $oc['ipaddr6'];
+			} else {
+				return $oc['ipaddr'];
 			}
 		}
 	}
