@@ -110,6 +110,7 @@ if (typeof getURL == 'undefined') {
       }
     }
     http_request.open('GET', url, true);
+	http_request.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
     http_request.send(null);
   }
 }

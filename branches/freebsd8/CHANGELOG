@@ -3,6 +3,8 @@ $Id$
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
 
+- Fix SVG graphs on IE9/10
+
 - Fix IPsec tunnels with endpoint on optional interfaces
 
 - Add job "Wake on LAN" to the scheduler

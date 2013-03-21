@@ -71,9 +71,7 @@ foreach ($ifdescrs as $ifn => $ifd) {
 </form>
 <div align="center">
 <object data="graph.php?ifnum=<?=htmlspecialchars($ifnum);?>&amp;ifname=<?=rawurlencode($ifdescrs[$curif]);?>" type="image/svg+xml" width="550" height="275">
-<param name="src" value="graph.php?ifnum=<?=htmlspecialchars($ifnum);?>&amp;ifname=<?=rawurlencode($ifdescrs[$curif]);?>" />
-Your browser does not support the type SVG! You need to either use Firefox or download the Adobe SVG plugin.
+<embed src="graph.php?ifnum=<?=htmlspecialchars($ifnum);?>&amp;ifname=<?=rawurlencode($ifdescrs[$curif]);?>" type="image/svg+xml" width="550" height="275"/>
 </object>
 </div>
-<br><span class="red"><strong>Note:</strong></span> if you can't see the graph, you may need to download the most recent version of the <a href="http://www.mozilla.com/" target="_blank">Firefox</a> browser or install the <a href="http://www.adobe.com/svg/viewer/install/" target="_blank">Adobe SVG viewer</a>.
 <?php include("fend.inc"); ?>
