@@ -310,9 +310,6 @@ auth.info;authpriv.info;daemon.info		%/var/log/system.log
 *.emerg						*
 
 EOD;
-		if (isset($config['syslog']['bindlan'])) {
-			$snmpdconf .= "agentaddress udp:161@{$config['interfaces']['lan']['ipaddr']}\n";
-		}
 
 		if (isset($syslogcfg['filter'])) {
 			$syslogconf .= <<<EOD
