@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Add AES 256 option to IPSEC
+
 - Update timezone.tgz with Freebsd8.3 zoneinfo files
 
 - Fix SVG graphs on IE9/10

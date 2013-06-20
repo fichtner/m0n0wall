@@ -112,9 +112,9 @@ $my_identifier_list = array('myaddress' => 'My IP address',
 							'asn1dn' => 'RSA Cert Subject');
 
 $p1_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish', 
-					'cast128' => 'CAST128', 'aes' => 'AES');
+					'cast128' => 'CAST128', 'aes' => 'AES', 'rijndael 256' => 'AES256');
 $p2_ealgos = array('des' => 'DES', '3des' => '3DES', 'blowfish' => 'Blowfish',
-					'cast128' => 'CAST128', 'rijndael' => 'AES');
+					'cast128' => 'CAST128', 'rijndael' => 'AES', 'rijndael 256' => 'AES256');
 $p1_halgos = array('sha1' => 'SHA-1', 'sha256' => 'SHA-256', 'sha384' => 'SHA-384', 'sha512' => 'SHA-512', 'md5' => 'MD5');
 $p1_authentication_methods = array('pre_shared_key' => 'Pre-shared key', 'rsasig' => 'RSA signature');
 $p2_halgos = array('hmac_sha1' => 'SHA-1', 'hmac_md5' => 'MD5', 'hmac_sha256' => 'SHA-256', 'hmac_sha384' => 'SHA-384', 'hmac_sha512' => 'SHA-512');
