@@ -1127,6 +1127,7 @@ function interfaces_wan_modem_up() {
 
 function interfaces_rtadvd_configure() {
 	global $config, $g;
+	$syscfg = $config['system'];
 
 	/* kill any running rtadvd */
 	killbyname('rtadvd');
@@ -1158,7 +1159,19 @@ function interfaces_rtadvd_configure() {
 		if (isset($config['interfaces']['lan']['ipv6ramtu']) && $config['interfaces']['lan']['ipv6ramtu'] > 0) {
 			$rtadvdconf .= ":mtu#" . $config['interfaces']['lan']['ipv6ramtu'];
 		}
-		$rtadvdconf .= "\n";
+
+		$dnsservers = array();
+		if (isset($config['dnsmasq']['enable']))
+			$dnsservers = array($config['interfaces']['lan']['ipaddr6']);
+		else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0]))
+			$dnsservers = $syscfg['dnsserver'];
+		
+		$dnsservers = array_filter($dnsservers, "is_ipaddr6");
+		if (!empty($dnsservers))
+			$rtadvdconf .= ":rdnss=\"" . join(",", $dnsservers) . "\"";
+
+		$rtadvdconf .= ":dnssl=\"" . $syscfg['domain'] . "\"";
+		$rtadvdconf .= ":\n";
 
 	}
 	
@@ -1190,7 +1203,19 @@ function interfaces_rtadvd_configure() {
 			if (isset($config['interfaces']['opt' . $i]['ipv6ramtu']) && $config['interfaces']['opt' . $i]['ipv6ramtu'] > 0) {
 				$rtadvdconf .= ":mtu#" . $config['interfaces']['opt' . $i]['ipv6ramtu'];
 			}
-			$rtadvdconf .= "\n";
+
+			$dnsservers = array();
+			if (isset($config['dnsmasq']['enable']))
+				$dnsservers = array($optcfg['ipaddr6']);
+			else if (is_array($syscfg['dnsserver']) && ($syscfg['dnsserver'][0]))
+				$dnsservers = $syscfg['dnsserver'];
+			
+			$dnsservers = array_filter($dnsservers, "is_ipaddr6");
+			if (!empty($dnsservers))
+				$rtadvdconf .= ":rdnss=\"" . join(",", $dnsservers) . "\"";
+
+			$rtadvdconf .= ":dnssl=\"" . $syscfg['domain'] . "\"";
+			$rtadvdconf .= ":\n";
 		}
 	}
 
