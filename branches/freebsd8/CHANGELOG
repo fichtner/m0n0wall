@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Silence RA announce receive log message for WAN interfaces when using dhcp-pd
+
 - Add support for rdnss and dnssl.  RA ipv6 announcement will include Recursive DNS server
   and DNS search list using the same logic as dhcp server does to select these options.
 

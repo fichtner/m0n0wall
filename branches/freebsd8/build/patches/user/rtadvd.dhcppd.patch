@@ -1,0 +1,15 @@
+--- rtadvd.c.orig	2013-07-22 22:44:04.000000000 +0000
++++ rtadvd.c	2013-07-22 23:03:32.000000000 +0000
+@@ -1118,10 +1118,10 @@
+ 	 * RA consistency check according to RFC 4861 6.2.7
+ 	 */
+ 	ifi = if_indextoifinfo(pi->ipi6_ifindex);
+-	if (ifi->ifi_rainfo == NULL) {
++	if (ifi->ifi_rainfo == NULL && !check_accept_rtadv(ifi->ifi_ifindex)) {
+ 		syslog(LOG_INFO,
+ 		    "<%s> received RA from %s on non-advertising"
+-		    " interface(%s)",
++		    " interface(%s) that is not set to receive an RA",
+ 		    __func__,
+ 		    inet_ntop(AF_INET6, &from->sin6_addr, ntopbuf,
+ 			sizeof(ntopbuf)), if_indextoname(pi->ipi6_ifindex,
