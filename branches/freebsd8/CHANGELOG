@@ -4,6 +4,8 @@ $Id$
 -------------------------------------------------------------------------------
 - Silence RA announce receive log message for WAN interfaces when using dhcp-pd
 
+- Change Build to use SVN for ports, as CVS is depreciated
+
 - Add support for rdnss and dnssl.  RA ipv6 announcement will include Recursive DNS server
   and DNS search list using the same logic as dhcp server does to select these options.
 
@@ -19,7 +21,7 @@ $Id$
 
 - Fix corruption check of the scheduler
 
-- Add superficial corruption check for scheduler jobsets
+- Add superficial corruption check forwarder scheduler jobsets
 
 - Fix first modem port not showing
 
@@ -936,7 +938,7 @@ problem) - removes RADIUS IP option
 
 - captive portal reliability fixes (locking, treatment of sessions that
   have not passed any traffic by the time they end, skipping sessions
-  sometimes during periodic pruning runs) - thanks to Janåke Rönnblom
+  sometimes during periodic pruning runs) - thanks to JanÃ¥ke RÃ¶nnblom
 
 - added support for IPsec tunnels with (possibly dynamic) remote host names
   (instead of fixed IP addresses); the host name is polled at regular intervals
@@ -1847,7 +1849,7 @@ difference to 1.1 now: new SAs are preferred after 30 seconds -> PLEASE TEST AND
 
 - made PPTP VPN page tabbed
 
-- NAT on optional interfaces (Kurt Inge Smådal)
+- NAT on optional interfaces (Kurt Inge SmÃ¥dal)
 
 - generate NAT rules for the PPTP VPN subnet and static routes when
 advanced outbound NAT is disabled
@@ -2084,7 +2086,7 @@ pb23
 (- fixed abs. widths in NAT/DHCP/Log menus)
 
 - added DHCP lease view page to diagnostics section (contributed by
-  Björn Pålsson)
+  BjÃ¶rn PÃ¥lsson)
   
 - updated mini_httpd to 1.19
 

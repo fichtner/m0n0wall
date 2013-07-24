@@ -35,8 +35,17 @@ echo "Changing directory to $MW_BUILDPATH/freebsd8/build/scripts"
 cd $MW_BUILDPATH/freebsd8/build/scripts
 chmod +x *.sh
 
-echo "Updating ports to correct versions: ` grep release $MW_BUILDPATH/freebsd8/build/files/m0n0wall.1.8.supfile | grep date | cut -f3 -d'='`"
-/usr/bin/csup $MW_BUILDPATH/freebsd8/build/files/m0n0wall.1.8.supfile
+echo "Updating ports to correct versions: 2012-10-17"
+
+/usr/local/bin/svn checkout --depth empty svn://svn.freebsd.org/ports/head  $MW_BUILDPATH/tmp/ports/tree
+cd $MW_BUILDPATH/tmp/ports/tree
+
+/usr/local/bin/svn update -r '{2012-10-17}' --set-depth files Mk Templates Tools net dns security sysutils devel
+/usr/local/bin/svn update -r '{2012-10-17}' net/isc-dhcp41-server/ net/isc-dhcp41-relay/ net/isc-dhcp41-client/ net/mpd5/ net/dhcp6 net/wol dns/dnsmasq sysutils/mbmon
+/usr/local/bin/svn update -r '{2012-10-17}' security/ipsec-tools devel/libtool 
+/usr/local/bin/svn update -r '{2012-10-17}' net/sixxs-aiccu devel/gmake security/gnutls
+
+cd $MW_BUILDPATH/freebsd8/build/scripts
 
 echo 
 echo "----- Build environment prepared -----"

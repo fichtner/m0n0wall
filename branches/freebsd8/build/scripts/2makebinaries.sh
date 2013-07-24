@@ -7,21 +7,21 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
 	exit 1
 fi
 
-# set working directory for ports compilation
-		rm -Rf $MW_BUILDPATH/tmp/ports/work
-		mkdir -p $MW_BUILDPATH/tmp/ports/work
-		export WRKDIRPREFIX=$MW_BUILDPATH/tmp/ports/work
-
+# set working directory etc for ports compilation
+	rm -Rf $MW_BUILDPATH/tmp/ports/work
+	mkdir -p $MW_BUILDPATH/tmp/ports/work
+	export WRKDIRPREFIX=$MW_BUILDPATH/tmp/ports/work
+        export PORTSDIR=$MW_BUILDPATH/tmp/ports/tree
 # set port options for ports that need user input
-		rm -Rf $MW_BUILDPATH/tmp/ports/db
-		mkdir -p $MW_BUILDPATH/tmp/ports/db
-		export PORT_DBDIR=$MW_BUILDPATH/tmp/ports/db
-		
-		for portoptf in $MW_BUILDPATH/freebsd8/build/files/portoptions/* ; do
-			port=${portoptf##*/}
-			mkdir -p $PORT_DBDIR/$port
-			cp $portoptf $PORT_DBDIR/$port/options
-		done
+	rm -Rf $MW_BUILDPATH/tmp/ports/db
+	mkdir -p $MW_BUILDPATH/tmp/ports/db
+	export PORT_DBDIR=$MW_BUILDPATH/tmp/ports/db
+	
+	for portoptf in $MW_BUILDPATH/freebsd8/build/files/portoptions/* ; do
+		port=${portoptf##*/}
+		mkdir -p $PORT_DBDIR/$port
+		cp $portoptf $PORT_DBDIR/$port/options
+	done
 
 
 ######## manually compiled packages ########
@@ -29,21 +29,21 @@ fi
 # select Autoconf version 2.13
 		export AUTOCONF_VERSION=2.13
 # php 4.4.9
-		cd $MW_BUILDPATH/tmp
-		rm -Rf php-4.4.9
+	cd $MW_BUILDPATH/tmp
+	rm -Rf php-4.4.9
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/php-4.4.9.tar.bz2
         cd php-4.4.9/ext/
-		tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/radius-1.2.5.tgz
+	tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/radius-1.2.5.tgz
         mv radius-1.2.5 radius
         cd ..
-		rm configure
+	rm configure
         AUTOCONF_VERSION=2.13 ./buildconf --force
         ./configure --without-mysql --with-pear --with-openssl --enable-discard-path --enable-radius --enable-sockets --enable-bcmath
         make
         install -s sapi/cgi/php $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # mini httpd
-		cd $MW_BUILDPATH/tmp
-		rm -Rf mini_httpd-1.19
+	cd $MW_BUILDPATH/tmp
+	rm -Rf mini_httpd-1.19
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/mini_httpd-1.19.tar.gz
         cd mini_httpd-1.19/
         patch < $MW_BUILDPATH/freebsd8/build/patches/packages/mini_httpd.patch
@@ -51,7 +51,7 @@ fi
         install -s mini_httpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
 # ezipupdate
         cd $MW_BUILDPATH/tmp
-		rm -Rf ez-ipupdate-3.0.11b8
+	rm -Rf ez-ipupdate-3.0.11b8
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/ez-ipupdate-3.0.11b8.tar.gz
         cd ez-ipupdate-3.0.11b8
         patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ez-ipupdate.c.patch
@@ -59,79 +59,79 @@ fi
         make
         install -s ez-ipupdate $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # ipfilter userland tools (newer version than included with FreeBSD)
-		cd $MW_BUILDPATH/tmp
-		rm -Rf ip_fil4.1.34
+	cd $MW_BUILDPATH/tmp
+	rm -Rf ip_fil4.1.34
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/ip_fil4.1.34.tar.gz
-		cd ip_fil4.1.34
+	cd ip_fil4.1.34
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/ipfstat.c.patch
-		make freebsd8
-		install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
+	make freebsd8
+	install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
 # modem-stats
-		cd $MW_BUILDPATH/tmp
-		rm -Rf modem-stats-1.0.1
+	cd $MW_BUILDPATH/tmp
+	rm -Rf modem-stats-1.0.1
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/modem-stats-1.0.1.src.elf.tar.gz
-		cd modem-stats-1.0.1
-		make
-		install -s modem-stats $MW_BUILDPATH/m0n0fs/sbin
+	cd modem-stats-1.0.1
+	make
+	install -s modem-stats $MW_BUILDPATH/m0n0fs/sbin
 
 ######## FreeBSD ports ########
 
-# ISC dhcp-relay
-        cd /usr/ports/net/isc-dhcp41-relay
-        make
-        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-relay/work/dhcp-*/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # ISC dhcp-server
-        cd /usr/ports/net/isc-dhcp41-server
-		cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c files/
+        cd $PORTSDIR/net/isc-dhcp41-server
+        cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c files/
         make
-        install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-server/work/dhcp-*/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
-		rm files/patch-server.db.c
+        install -s $WRKDIRPREFIX/$PORTSDIR/net/isc-dhcp41-server/work/dhcp-*/server/dhcpd $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        rm files/patch-server.db.c
 # ISC dhcp-client
-		cd /usr/ports/net/isc-dhcp41-client
+        cd $PORTSDIR/net/isc-dhcp41-client
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/isc-dhcp41-client/work/dhcp-*/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
+        install -s $WRKDIRPREFIX/$PORTSDIR/net/isc-dhcp41-client/work/dhcp-*/client/dhclient $MW_BUILDPATH/m0n0fs/sbin/
+# ISC dhcp-relay
+        cd $PORTSDIR/net/isc-dhcp41-relay
+        make
+        install -s $WRKDIRPREFIX/$PORTSDIR/net/isc-dhcp41-relay/work/dhcp-*/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
 # dnsmasq
-        cd /usr/ports/dns/dnsmasq
-		cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-dnsmasq-iscreader.patch files/
+        cd $PORTSDIR/dns/dnsmasq
+	cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-dnsmasq-iscreader.patch files/
         make
-        install -s $WRKDIRPREFIX/usr/ports/dns/dnsmasq/work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+        install -s $WRKDIRPREFIX/$PORTSDIR/dns/dnsmasq/work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
         rm files/patch-dnsmasq-iscreader.patch
 # ipsec-tools
-        cd /usr/ports/security/ipsec-tools
-		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ipsec-tools.Makefile.patch
+        cd $PORTSDIR/security/ipsec-tools
+	patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ipsec-tools.Makefile.patch
         make
-        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/racoon/.libs/racoon $MW_BUILDPATH/m0n0fs/usr/local/sbin
-        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/setkey/.libs/setkey $MW_BUILDPATH/m0n0fs/usr/local/sbin
-        install -s $WRKDIRPREFIX/usr/ports/security/ipsec-tools/work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MW_BUILDPATH/m0n0fs/usr/local/lib
-		mv Makefile.orig Makefile
+        install -s $WRKDIRPREFIX/$PORTSDIR/security/ipsec-tools/work/ipsec-tools-*/src/racoon/.libs/racoon $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        install -s $WRKDIRPREFIX/$PORTSDIR/security/ipsec-tools/work/ipsec-tools-*/src/setkey/.libs/setkey $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        install -s $WRKDIRPREFIX/$PORTSDIR/security/ipsec-tools/work/ipsec-tools-*/src/libipsec/.libs/libipsec.so.0 $MW_BUILDPATH/m0n0fs/usr/local/lib
+	mv Makefile.orig Makefile
 # dhcp6
-		cd /usr/ports/net/dhcp6
+	cd $PORTSDIR/net/dhcp6
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/dhcp6/work/wide-dhc*/dhcp6c $MW_BUILDPATH/m0n0fs/usr/local/sbin
-		install -s $WRKDIRPREFIX/usr/ports/net/dhcp6/work/wide-dhc*/dhcp6s $MW_BUILDPATH/m0n0fs/usr/local/sbin
+	install -s $WRKDIRPREFIX/$PORTSDIR/net/dhcp6/work/wide-dhc*/dhcp6c $MW_BUILDPATH/m0n0fs/usr/local/sbin
+	install -s $WRKDIRPREFIX/$PORTSDIR/net/dhcp6/work/wide-dhc*/dhcp6s $MW_BUILDPATH/m0n0fs/usr/local/sbin
 # sixxs-aiccu		
-		cd /usr/ports/net/sixxs-aiccu
-		cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-aiccu-common.c files/
-		cp -p Makefile Makefile.orig
-		patch < $MW_BUILDPATH/freebsd8/build/patches/packages/sixxs-aiccu.Makefile.patch
+	cd $PORTSDIR/net/sixxs-aiccu
+	cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-aiccu-common.c files/
+	cp -p Makefile Makefile.orig
+	patch < $MW_BUILDPATH/freebsd8/build/patches/packages/sixxs-aiccu.Makefile.patch
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/sixxs-aiccu/work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
-		mv Makefile.orig Makefile
-		rm files/patch-aiccu-common.c
+	install -s $WRKDIRPREFIX/$PORTSDIR/net/sixxs-aiccu/work/aiccu/unix-console/aiccu $MW_BUILDPATH/m0n0fs/usr/local/sbin/sixxs-aiccu
+	mv Makefile.orig Makefile
+	rm files/patch-aiccu-common.c
 # mpd5
-		cd /usr/ports/net/mpd5
-		cp $MW_BUILDPATH/freebsd8/build/patches/packages/mpd5/patch-iface.c files/
+	cd $PORTSDIR/net/mpd5
+	cp $MW_BUILDPATH/freebsd8/build/patches/packages/mpd5/patch-iface.c files/
         make
-		install -s $WRKDIRPREFIX/usr/ports/net/mpd5/work/mpd-*/src/mpd5 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
-		rm files/patch-iface.c
+	install -s $WRKDIRPREFIX/$PORTSDIR/net/mpd5/work/mpd-*/src/mpd5 $MW_BUILDPATH/m0n0fs/usr/local/sbin/
+	rm files/patch-iface.c
 # mbmon
-		cd /usr/ports/sysutils/mbmon
+	cd $PORTSDIR/sysutils/mbmon
         make
-		install -s $WRKDIRPREFIX/usr/ports/sysutils/mbmon/work/xmbmon*/mbmon $MW_BUILDPATH/m0n0fs/usr/local/bin/
+	install -s $WRKDIRPREFIX/$PORTSDIR/sysutils/mbmon/work/xmbmon*/mbmon $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # wol
-		cd /usr/ports/net/wol
-		make WITHOUT_NLS=true
-        install -s $WRKDIRPREFIX/usr/ports/net/wol/work/wol-*/src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
+	cd $PORTSDIR/net/wol
+	make WITHOUT_NLS=true
+        install -s $WRKDIRPREFIX/$PORTSDIR/net/wol/work/wol-*/src/wol $MW_BUILDPATH/m0n0fs/usr/local/bin/
 
 
 # make m0n0wall tools and binaries
