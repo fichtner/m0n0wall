@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix Silence RA announce receive log message for WAN interfaces when using dhcp-pd
+
 - Silence RA announce receive log message for WAN interfaces when using dhcp-pd
 
 - Change Build to use SVN for ports, as CVS is depreciated

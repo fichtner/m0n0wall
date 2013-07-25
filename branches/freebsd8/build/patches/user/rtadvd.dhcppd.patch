@@ -5,7 +5,7 @@
  	 */
  	ifi = if_indextoifinfo(pi->ipi6_ifindex);
 -	if (ifi->ifi_rainfo == NULL) {
-+	if (ifi->ifi_rainfo == NULL && !check_accept_rtadv(ifi->ifi_ifindex)) {
++	if (ifi->ifi_rainfo == NULL && (ifi->ifi_nd_flags & ND6_IFF_ACCEPT_RTADV)) {
  		syslog(LOG_INFO,
  		    "<%s> received RA from %s on non-advertising"
 -		    " interface(%s)",
