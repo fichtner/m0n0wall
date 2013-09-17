@@ -14,8 +14,8 @@ fi
 	if [ ! -x /usr/local/bin/autoconf-2.13 ]; then
 		pkg_add -r autoconf213
 	fi
-	if [ ! -x /usr/local/bin/autoconf-2.68 ]; then
-		pkg_add -r autoconf268
+	if [ ! -x /usr/local/bin/autoconf-2.69 ]; then
+		pkg_add -r autoconf
 	fi
 
 	cd $MW_BUILDPATH
@@ -26,7 +26,7 @@ fi
 # make filesystem structure for image
 	mkdir  m0n0fs images
 	cd m0n0fs
-	mkdir -p etc/rc.d/ bin cf conf.default dev etc/mpd-modem ftmp mnt proc root sbin tmp var libexec lib usr/bin usr/lib usr/libexec usr/local usr/sbin usr/share usr/local/bin usr/local/captiveportal usr/local/lib usr/local/sbin/.libs usr/local/www usr/share/misc boot/kernel
+	mkdir -p etc/rc.d/ bin cf conf.default dev etc/mpd-modem ftmp mnt proc root sbin tmp libexec lib /var/etc/dnsmasq usr/bin usr/lib usr/libexec usr/local usr/sbin usr/share usr/local/bin usr/local/captiveportal usr/local/lib usr/local/sbin/.libs usr/local/www usr/share/misc boot/kernel
  
 # insert svn files to filesystem
 	cp -r $MW_BUILDPATH/freebsd8/phpconf/rc.* etc/

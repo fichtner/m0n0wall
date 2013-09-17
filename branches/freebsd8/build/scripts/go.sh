@@ -1,7 +1,7 @@
 #!/bin/csh 
 
 
-set MW_BUILDPATH=/usr/m0n0wall/build83
+set MW_BUILDPATH=/usr/m0n0wall/build84
 setenv MW_BUILDPATH $MW_BUILDPATH
 setenv MW_ARCH `uname -m`
 
@@ -41,7 +41,7 @@ echo "Updating ports to correct versions: 2012-10-17"
 cd $MW_BUILDPATH/tmp/ports/tree
 
 /usr/local/bin/svn update -r '{2012-10-17}' --set-depth files Mk Templates Tools net dns security sysutils devel
-/usr/local/bin/svn update -r '{2012-10-17}' net/isc-dhcp41-server/ net/isc-dhcp41-relay/ net/isc-dhcp41-client/ net/mpd5/ net/dhcp6 net/wol dns/dnsmasq sysutils/mbmon
+/usr/local/bin/svn update -r '{2012-10-17}' net/isc-dhcp41-server/ net/isc-dhcp41-relay/ net/isc-dhcp41-client/ net/mpd5/ net/dhcp6 net/wol sysutils/mbmon
 /usr/local/bin/svn update -r '{2012-10-17}' security/ipsec-tools devel/libtool 
 /usr/local/bin/svn update -r '{2012-10-17}' net/sixxs-aiccu devel/gmake security/gnutls
 

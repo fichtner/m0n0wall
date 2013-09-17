@@ -2,6 +2,16 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- upgrade dnsmasq to 2.66, remove TFTP , auth and DHCPv4 options from dnsmasq
+
+- update some README text
+
+- update go.sh to fix 404 for autconf268 (uses 269 now)
+
+- add ippool utility
+
+- refactoring to support 8.4-RELEASE (remove redunant patches etc)
+
 - Fix Silence RA announce receive log message for WAN interfaces when using dhcp-pd
 
 - Silence RA announce receive log message for WAN interfaces when using dhcp-pd

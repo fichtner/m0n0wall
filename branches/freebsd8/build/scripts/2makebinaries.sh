@@ -65,7 +65,7 @@ fi
 	cd ip_fil4.1.34
         patch < $MW_BUILDPATH/freebsd8/build/patches/user/ipfstat.c.patch
 	make freebsd8
-	install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat} $MW_BUILDPATH/m0n0fs/sbin
+	install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat,ippool} $MW_BUILDPATH/m0n0fs/sbin
 # modem-stats
 	cd $MW_BUILDPATH/tmp
 	rm -Rf modem-stats-1.0.1
@@ -73,9 +73,15 @@ fi
 	cd modem-stats-1.0.1
 	make
 	install -s modem-stats $MW_BUILDPATH/m0n0fs/sbin
-
+# dnsmasq
+        cd $MW_BUILDPATH/tmp
+        rm -Rf dnsmasq-2.66
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/dnsmasq-2.66.tar.gz
+        cd dnsmasq-2.66
+        make COPTS+=-DNO_TFTP COPTS+=-DNO_AUTH
+        install -s src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        
 ######## FreeBSD ports ########
-
 # ISC dhcp-server
         cd $PORTSDIR/net/isc-dhcp41-server
         cp $MW_BUILDPATH/freebsd8/build/patches/packages/isc-dhcpd/patch-server.db.c files/
@@ -90,12 +96,6 @@ fi
         cd $PORTSDIR/net/isc-dhcp41-relay
         make
         install -s $WRKDIRPREFIX/$PORTSDIR/net/isc-dhcp41-relay/work/dhcp-*/relay/dhcrelay $MW_BUILDPATH/m0n0fs/usr/local/sbin/
-# dnsmasq
-        cd $PORTSDIR/dns/dnsmasq
-	cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-dnsmasq-iscreader.patch files/
-        make
-        install -s $WRKDIRPREFIX/$PORTSDIR/dns/dnsmasq/work/dnsmasq-*/src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin/
-        rm files/patch-dnsmasq-iscreader.patch
 # ipsec-tools
         cd $PORTSDIR/security/ipsec-tools
 	patch < $MW_BUILDPATH/freebsd8/build/patches/packages/ipsec-tools.Makefile.patch

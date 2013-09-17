@@ -14,7 +14,7 @@
  /*
 --- sys/netinet6/in6_proto.c.orig	2010-12-21 17:09:25.000000000 +0000
 +++ sys/netinet6/in6_proto.c	2011-07-11 10:31:46.000000000 +0100
-@@ -394,6 +394,9 @@
+@@ -386,6 +386,9 @@
  VNET_DEFINE(int, ip6_defhlim) = IPV6_DEFHLIM;
  VNET_DEFINE(int, ip6_defmcasthlim) = IPV6_DEFAULT_MULTICAST_HOPS;
  VNET_DEFINE(int, ip6_accept_rtadv) = 0;
@@ -24,7 +24,7 @@
  VNET_DEFINE(int, ip6_maxfragpackets);	/* initialized in frag6.c:frag6_init() */
  VNET_DEFINE(int, ip6_maxfrags);		/* initialized in frag6.c:frag6_init() */
  VNET_DEFINE(int, ip6_log_interval) = 5;
-@@ -520,6 +523,12 @@
+@@ -512,6 +515,12 @@
  	CTLFLAG_RW, &VNET_NAME(ip6_maxfragpackets), 0, "");
  SYSCTL_VNET_INT(_net_inet6_ip6, IPV6CTL_ACCEPT_RTADV, accept_rtadv,
  	CTLFLAG_RW, &VNET_NAME(ip6_accept_rtadv), 0, "");
@@ -70,7 +70,7 @@
  
  	/* XXX: we cannot call nd6_setmtu since ifp is not fully initialized */
  	nd6_setmtu0(ifp, nd);
-@@ -817,7 +817,7 @@
+@@ -807,7 +807,7 @@
  	if (V_nd6_defifindex == ifp->if_index)
  		nd6_setdefaultiface(0);
  
@@ -79,16 +79,7 @@
  		/* refresh default router list
  		 *
  		 * 
-@@ -957,7 +957,7 @@
- 	 * XXX: we restrict the condition to hosts, because routers usually do
- 	 * not have the "default router list".
- 	 */
--	if (!V_ip6_forwarding && TAILQ_FIRST(&V_nd_defrouter) == NULL &&
-+	if (ND_IFINFO(ifp)->flags & ND6_IFF_ACCEPT_RTADV && TAILQ_FIRST(&V_nd_defrouter) == NULL &&
- 	    V_nd6_defifindex == ifp->if_index) {
- 		return (1);
- 	}
-@@ -1018,7 +1018,7 @@
+@@ -1011,7 +1011,7 @@
  
  	ifp = ln->lle_tbl->llt_ifp;
  
@@ -97,7 +88,7 @@
  
  		dr = defrouter_lookup(&L3_ADDR_SIN6(ln)->sin6_addr, ifp);
  
-@@ -1651,7 +1651,7 @@
+@@ -1679,7 +1679,7 @@
  	 * for those are not autoconfigured hosts, we explicitly avoid such
  	 * cases for safety.
  	 */
@@ -118,7 +109,7 @@
  #define	ND6_EXCLUSIVE		LLE_EXCLUSIVE
 --- sys/netinet6/nd6_nbr.c.orig	2011-07-06 00:00:01.000000000 +0000
 +++ sys/netinet6/nd6_nbr.c	2011-07-06 00:05:41.000000000 +0000
-@@ -111,9 +111,13 @@
+@@ -113,9 +113,13 @@
  	int lladdrlen = 0;
  	int anycast = 0, proxy = 0, tentative = 0;
  	int tlladdr;
@@ -132,26 +123,7 @@
  
  #ifndef PULLDOWN_TEST
  	IP6_EXTHDR_CHECK(m, off, icmp6len,);
-@@ -338,8 +342,7 @@
- 			goto bad;
- 		nd6_na_output(ifp, &in6_all, &taddr6,
- 		    ((anycast || proxy || !tlladdr) ? 0 : ND_NA_FLAG_OVERRIDE) |
--		    (V_ip6_forwarding ? ND_NA_FLAG_ROUTER : 0),
--		    tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL);
-+		    rflag, tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL);
- 		goto freeit;
- 	}
- 
-@@ -348,7 +351,7 @@
- 
- 	nd6_na_output(ifp, &saddr6, &taddr6,
- 	    ((anycast || proxy || !tlladdr) ? 0 : ND_NA_FLAG_OVERRIDE) |
--	    (V_ip6_forwarding ? ND_NA_FLAG_ROUTER : 0) | ND_NA_FLAG_SOLICITED,
-+	    rflag | ND_NA_FLAG_SOLICITED,
- 	    tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL);
-  freeit:
- 	if (ifa != NULL)
-@@ -850,7 +853,8 @@
+@@ -858,7 +861,8 @@
  			dr = defrouter_lookup(in6, ln->lle_tbl->llt_ifp);
  			if (dr)
  				defrtrlist_del(dr);
@@ -163,7 +135,7 @@
  				 * router list, the neighbor may be used
 --- sys/netinet6/nd6_rtr.c.orig	2010-12-21 17:09:25.000000000 +0000
 +++ sys/netinet6/nd6_rtr.c	2011-07-11 10:40:21.000000000 +0100
-@@ -127,9 +127,12 @@
+@@ -130,9 +130,12 @@
  	union nd_opts ndopts;
  	char ip6bufs[INET6_ADDRSTRLEN], ip6bufd[INET6_ADDRSTRLEN];
  
@@ -179,7 +151,7 @@
  
  	/* Sanity checks */
  	if (ip6->ip6_hlim != 255) {
-@@ -213,10 +216,9 @@
+@@ -216,10 +219,9 @@
  	char ip6bufs[INET6_ADDRSTRLEN], ip6bufd[INET6_ADDRSTRLEN];
  
  	/*
@@ -193,7 +165,7 @@
  	if (V_ip6_accept_rtadv == 0)
  		goto freeit;
  	if (!(ndi->flags & ND6_IFF_ACCEPT_RTADV))
-@@ -268,7 +270,15 @@
+@@ -271,7 +273,15 @@
  	bzero(&dr0, sizeof(dr0));
  	dr0.rtaddr = saddr6;
  	dr0.flags  = nd_ra->nd_ra_flags_reserved;
@@ -210,7 +182,7 @@
  	dr0.expire = time_second + dr0.rtlifetime;
  	dr0.ifp = ifp;
  	/* unspecified or not? (RFC 2461 6.3.4) */
-@@ -559,7 +569,7 @@
+@@ -560,7 +577,7 @@
  	 * Flush all the routing table entries that use the router
  	 * as a next hop.
  	 */
@@ -219,7 +191,7 @@
  		rt6_flush(&dr->rtaddr, dr->ifp);
  
  	if (dr->installed) {
-@@ -618,20 +628,6 @@
+@@ -619,20 +629,6 @@
  	struct llentry *ln = NULL;
  
  	/*
@@ -240,3 +212,37 @@
  	 * Let's handle easy case (3) first:
  	 * If default router list is empty, there's nothing to be done.
  	 */
+--- sys/netinet6/nd6_nbr.c.orig	2013-06-02 22:47:22.000000000 +0100
++++ sys/netinet6/nd6_nbr.c	2013-09-13 19:23:46.000000000 +0100
+@@ -347,8 +347,7 @@
+ 			goto bad;
+ 		nd6_na_output_fib(ifp, &in6_all, &taddr6,
+ 		    ((anycast || proxy || !tlladdr) ? 0 : ND_NA_FLAG_OVERRIDE) |
+-		    (V_ip6_forwarding ? ND_NA_FLAG_ROUTER : 0),
+-		    tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL,
++		    rflag, tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL,
+ 		    M_GETFIB(m));
+ 		goto freeit;
+ 	}
+--- sys/netinet6/nd6_nbr.c.orig	2013-06-02 22:47:22.000000000 +0100
++++ sys/netinet6/nd6_nbr.c	2013-09-13 19:32:44.000000000 +0100
+@@ -354,7 +354,7 @@
+ 
+ 	nd6_na_output_fib(ifp, &saddr6, &taddr6,
+ 	    ((anycast || proxy || !tlladdr) ? 0 : ND_NA_FLAG_OVERRIDE) |
+-	    (V_ip6_forwarding ? ND_NA_FLAG_ROUTER : 0) | ND_NA_FLAG_SOLICITED,
++	    rflag | ND_NA_FLAG_SOLICITED,
+ 	    tlladdr, proxy ? (struct sockaddr *)&proxydl : NULL, M_GETFIB(m));
+  freeit:
+ 	if (ifa != NULL)
+--- sys/netinet6/nd6.c.orig	2013-06-02 22:47:22.000000000 +0100
++++ sys/netinet6/nd6.c	2013-09-13 19:37:36.000000000 +0100
+@@ -950,7 +950,7 @@
+ 	 * XXX: we restrict the condition to hosts, because routers usually do
+ 	 * not have the "default router list".
+ 	 */
+-	if (!V_ip6_forwarding && TAILQ_EMPTY(&V_nd_defrouter) &&
++	if (ND_IFINFO(ifp)->flags & ND6_IFF_ACCEPT_RTADV && TAILQ_FIRST(&V_nd_defrouter) == NULL &&
+ 	    V_nd6_defifindex == ifp->if_index) {
+ 		return (1);
+ 	}

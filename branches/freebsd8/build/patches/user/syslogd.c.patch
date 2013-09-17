@@ -59,7 +59,7 @@
  };
  
  static struct filed *Files;	/* Log files that we write to */
-@@ -327,6 +338,8 @@
+@@ -328,6 +339,8 @@
  static void	printline(const char *, char *, int);
  static void	printsys(char *);
  static int	p_open(const char *, pid_t *);
@@ -68,7 +68,7 @@
  static void	readklog(void);
  static void	reapchild(int);
  static void	usage(void);
-@@ -1277,6 +1290,21 @@
+@@ -1282,6 +1305,21 @@
  		}
  		break;
  
@@ -90,7 +90,7 @@
  	case F_PIPE:
  		dprintf(" %s\n", f->f_un.f_pipe.f_pname);
  		v->iov_base = lf;
-@@ -1589,6 +1617,10 @@
+@@ -1594,6 +1622,10 @@
  			}
  			f->f_un.f_pipe.f_pid = 0;
  			break;
@@ -101,7 +101,7 @@
  		}
  		next = f->f_next;
  		if (f->f_program) free(f->f_program);
-@@ -1730,6 +1762,10 @@
+@@ -1735,6 +1767,10 @@
  				}
  				break;
  
@@ -112,7 +112,7 @@
  			case F_PIPE:
  				printf("%s", f->f_un.f_pipe.f_pname);
  				break;
-@@ -1780,6 +1816,7 @@
+@@ -1785,6 +1821,7 @@
  	const char *p, *q;
  	char *bp;
  	char buf[MAXLINE], ebuf[100];
@@ -120,25 +120,7 @@
  
  	dprintf("cfline(\"%s\", f, \"%s\", \"%s\")\n", line, prog, host);
  
-@@ -1942,9 +1979,16 @@
- 			tp = f->f_un.f_forw.f_hname;
- 			p++;
- 
--			while (*p && (*p != ':') && (i-- > 0)) {
-+			while (*p && (*p != ':') && (*p != '[') && (i-- > 0)) {
- 				*tp++ = *p++;
- 			}
-+			if (*p == '[') {
-+				p++;
-+				while (*p && (*p != ']') && (i-- > 0)) {
-+					*tp++ = *p++;
-+				}
-+				p++;
-+			}
- 			*tp = '\0';
- 		}
- 		/* See if we copied a domain and have a port */
-@@ -1987,6 +2031,38 @@
+@@ -2005,6 +2053,38 @@
  		}
  		break;
  
@@ -177,7 +159,7 @@
  	case '|':
  		f->f_un.f_pipe.f_pid = 0;
  		(void)strlcpy(f->f_un.f_pipe.f_pname, p + 1,
-@@ -2697,3 +2773,45 @@
+@@ -2728,3 +2804,45 @@
  		setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &len, slen);
  	}
  }
