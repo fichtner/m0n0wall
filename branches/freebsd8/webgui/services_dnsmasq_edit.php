@@ -46,6 +46,8 @@ if (isset($id) && $a_hosts[$id]) {
 	$pconfig['host'] = $a_hosts[$id]['host'];
 	$pconfig['domain'] = $a_hosts[$id]['domain'];
 	$pconfig['ip'] = $a_hosts[$id]['ip'];
+	$pconfig['aliases'] = $a_hosts[$id]['aliases'];
+	$pconfig['mx'] = isset($a_hosts[$id]['mx']);
 	$pconfig['descr'] = $a_hosts[$id]['descr'];
 }
 
@@ -75,6 +77,13 @@ if ($_POST) {
 		if (isset($id) && ($a_hosts[$id]) && ($a_hosts[$id] === $hostent))
 			continue;
 
+		if (($hostent['aliases']) && ($_POST['aliases'])) {
+			$duplicates = array_intersect(explode(' ', $hostent['aliases']), explode(' ', $_POST['aliases']));
+			if (count($duplicates)) {
+				$input_errors[] = 'The alias(es) '. implode(', ', $duplicates) . ' already exists.';
+				break;
+			}
+		}
 		if (($hostent['host'] == $_POST['host']) && ($hostent['domain'] == $_POST['domain']) && ((is_ipaddr($_POST['ip']) && is_ipaddr($hostent['ip'])) || (is_ipaddr6($_POST['ip']) && is_ipaddr6($hostent['ip'])) )) {
 			$input_errors[] = "This host/domain already exists.";
 			break;
@@ -86,6 +95,8 @@ if ($_POST) {
 		$hostent['host'] = $_POST['host'];
 		$hostent['domain'] = $_POST['domain'];
 		$hostent['ip'] = $_POST['ip'];
+		$hostent['aliases'] = $_POST['aliases'];
+		$hostent['mx'] = ($_POST['mx']) ? true : false;
 		$hostent['descr'] = $_POST['descr'];
 
 		if (isset($id) && $a_hosts[$id])
@@ -127,6 +138,20 @@ if ($_POST) {
                     <?=$mandfldhtml;?><input name="ip" type="text" class="formfld" id="ip" size="40" value="<?=htmlspecialchars($pconfig['ip']);?>">
                     <br> <span class="vexpl">IP address of the host<br>
                     e.g. <em>192.168.100.100</em></span></td>
+                </tr>
+                <tr>
+                  <td width="22%" valign="top" class="vncell">Aliases</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="aliases" type="text" class="formfld" id="aliases" size="40" value="<?=htmlspecialchars($pconfig['aliases']);?>">
+                    <br> <span class="vexpl">Aliases to the host, without
+                    domain part, and separated by spaces.<br>
+                    e.g. <em>mail smtp pop imap</em></span></td>
+                </tr>
+                <tr>
+                  <td width="22%" valign="top" class="vncell">Extra settings</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="mx" type="checkbox" id="mx" value="yes" <?php if ($pconfig['mx']) echo "checked";?>>
+                    This host is the MX for its domain.</td>
                 </tr>
 				<tr>
                   <td width="22%" valign="top" class="vncell">Description</td>

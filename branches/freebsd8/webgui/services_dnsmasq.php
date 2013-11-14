@@ -37,6 +37,7 @@ $pconfig['regdhcp'] = isset($config['dnsmasq']['regdhcp']);
 $pconfig['allservers'] = isset($config['dnsmasq']['allservers']);
 $pconfig['strictorder'] = isset($config['dnsmasq']['strictorder']);
 $pconfig['stoprebind'] = isset($config['dnsmasq']['stoprebind']);
+$pconfig['log'] = isset($config['dnsmasq']['log']);
 
 if (!is_array($config['dnsmasq']['hosts'])) {
 	$config['dnsmasq']['hosts'] = array();
@@ -82,6 +83,7 @@ if ($_POST) {
 	$config['dnsmasq']['allservers'] = ($_POST['allservers']) ? true : false;
 	$config['dnsmasq']['strictorder'] = ($_POST['strictorder']) ? true : false;
 	$config['dnsmasq']['stoprebind'] = ($_POST['stoprebind']) ? true : false;
+	$config['dnsmasq']['log'] = ($_POST['log']) ? true : false;
 
 	write_config();
 	
@@ -145,6 +147,14 @@ if ($_POST) {
                       in the DNS forwarder, so that their name can be resolved. 
                       You should also set the domain in <a href="system.php">System: 
                       General setup</a> to the proper value.
+                    </td>
+                </tr>
+                <tr> 
+                  <td class="vtable">
+                      <input name="log" type="checkbox" id="log" value="yes" <?php if ($pconfig['log']) echo "checked";?>>
+                      <strong>Log DNS requests to system log<br>
+                      </strong>If this option is set, then every request
+					  received by the DNS forwarder will be logged into the system log.
                     </td>
                 </tr>
                 <tr> 

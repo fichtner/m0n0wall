@@ -625,42 +625,65 @@ function services_dnsmasq_configure() {
 		/* generate hosts file */
 		system_hosts_generate();
 		
-		$args = "--edns-packet-max=4096";
+		/* generate dnsmasq.conf */
+		$fd = fopen("{$g['varetc_path']}/dnsmasq.conf", "w");
+		if (!$fd) {
+			printf("Error: cannot open dnsmasq.conf in services_dnsmasq_configure().\n");
+			return 1;
+		}
+		$dnsmasqconf = "edns-packet-max=4096\n";
 		
 		if (isset($config['dnsmasq']['regdhcp'])) {
-			
-			$args .= " -l {$g['vardb_path']}/dhcpd.leases" . 
-				" -s {$config['system']['domain']}";
+			$dnsmasqconf .= "dhcp-leasefile={$g['vardb_path']}/dhcpd.leases\n" .
+					"domain={$config['system']['domain']}\n";
 		}
-		
 		$dnsmasqcfg = $config['dnsmasq'];
 		if (is_array($dnsmasqcfg['hosts'])) {
 			foreach ($dnsmasqcfg['hosts'] as $host) {
-			if (($host['host']) && ($host['host'] == '*'))
-				$args .= " " . escapeshellarg('--address=/.' . $host['domain'] . '/' . $host['ip']);
+				if (($host['host']) && ($host['host'] == '*')) {
+					$dnsmasqconf .= "address=/{$host['domain']}/{$host['ip']}\n";
+				}
+				if ($host['aliases']) {
+					$aliases = explode(' ', $host['aliases']);
+					foreach ($aliases as $alias) {
+						$dnsmasqconf .= "cname={$alias},{$host['host']}\n";
+						$dnsmasqconf .= "cname={$alias}.{$host['domain']}," .
+								"{$host['host']}.{$host['domain']}\n";
+					}
+				}
+				if (isset($host['mx'])) {
+					$dnsmasqconf .=	"mx-host={$host['domain']}," .
+									"{$host['host']}.{$host['domain']}\n";
+				}
 			}
 		}
 
 		if (isset($config['dnsmasq']['allservers'])) {
-			$args .= " --all-servers";
+			$dnsmasqconf .= "all-servers\n";
 		}
 		
 		if (isset($config['dnsmasq']['strictorder'])) {
-			$args .= " --strict-order";
+			$dnsmasqconf .= "strict-order\n";
 		}
 		
 		if (isset($config['dnsmasq']['domainoverrides']) && is_array($config['dnsmasq']['domainoverrides'])) {
 			foreach($config['dnsmasq']['domainoverrides'] as $override) {
-				$args .= " " . escapeshellarg('--server=/' . $override['domain'] . '/' . $override['ip']);
+				$dnsmasqconf .= "server=/{$override['domain']}/{$override['ip']}\n";
 			}
 		}
 
 		if (isset($config['dnsmasq']['stoprebind'])) {
-			$args .= " --stop-dns-rebind";
+			$dnsmasqconf .= "stop-dns-rebind\n";
 		}
-		
+		if (isset($config['dnsmasq']['log'])) {
+			$dnsmasqconf .= "log-queries\n";
+		}
+
+		fwrite($fd, $dnsmasqconf);
+		fclose($fd);
+
 		/* run dnsmasq */
-		mwexec("/usr/local/sbin/dnsmasq {$args}");
+		mwexec("/usr/local/sbin/dnsmasq -C {$g['varetc_path']}/dnsmasq.conf");
 
 		if ($g['booting'])
 			echo "done\n";
