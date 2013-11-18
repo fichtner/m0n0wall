@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- clarify instructions on firmware upgrade page
+  (contributed by Pierre Nast)
+
 - DNS forwarder: add option to log DNS queries, add aliases (CNAMEs) and MXs
   (contributed by Pierre Nast)
 

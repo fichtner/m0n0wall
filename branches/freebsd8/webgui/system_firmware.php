@@ -126,6 +126,8 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 						unlink("{$g['ftmp_path']}/firmware.img");
 					}
 				}
+			} else {
+				$input_errors[] = "No image file has been uploaded.";
 			}
 
 			if (!$input_errors && !file_exists($d_firmwarelock_path) && (!$sig_warning || $_POST['sig_override'])) {			
@@ -163,10 +165,16 @@ print_info_box($sig_warning);
 </form>
 <?php else: ?>
             <?php if (!file_exists($d_firmwarelock_path)): ?>
-            <p>Click &quot;Enable firmware 
-              upload&quot; below, then choose the image file (<?=$g['fullplatform'];?>-*.img)
-			  to be uploaded.<br>Click &quot;Upgrade firmware&quot; 
+			<?php if (!file_exists($d_fwupenabled_path)): ?>
+            <p>To enable firmware upload, click &quot;Enable firmware 
+              upload&quot; below.</p>
+			<?php else: ?>
+            <p>To disable firmware upload, click &quot;Enable firmware 
+              upload&quot; below.<br /><strong>OR</strong><br />
+			  Choose the image file (<?=$g['fullplatform'];?>-*.img)
+			  to be uploaded and click &quot;Upgrade firmware&quot; 
               to start the upgrade process.</p>
+			<?php endif; ?>
             <form action="system_firmware.php" method="post" enctype="multipart/form-data">
               <table width="100%" border="0" cellpadding="6" cellspacing="0" summary="content pane">
                 <tr> 
