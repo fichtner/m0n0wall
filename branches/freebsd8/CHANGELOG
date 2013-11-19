@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- Fix a regression in the firmware upgrade page
+  Fix a typo in the firmware upgrade instructions
+
 - clarify instructions on firmware upgrade page
   (contributed by Pierre Nast)
 

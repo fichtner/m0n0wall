@@ -126,7 +126,8 @@ if ($_POST && !file_exists($d_firmwarelock_path)) {
 						unlink("{$g['ftmp_path']}/firmware.img");
 					}
 				}
-			} else {
+			} else if (!(isset($_POST['sig_override']) ||
+				isset($_POST['sig_no']))) {
 				$input_errors[] = "No image file has been uploaded.";
 			}
 
@@ -169,7 +170,7 @@ print_info_box($sig_warning);
             <p>To enable firmware upload, click &quot;Enable firmware 
               upload&quot; below.</p>
 			<?php else: ?>
-            <p>To disable firmware upload, click &quot;Enable firmware 
+            <p>To disable firmware upload, click &quot;Disable firmware 
               upload&quot; below.<br /><strong>OR</strong><br />
 			  Choose the image file (<?=$g['fullplatform'];?>-*.img)
 			  to be uploaded and click &quot;Upgrade firmware&quot; 
