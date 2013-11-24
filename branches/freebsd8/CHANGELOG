@@ -2,6 +2,14 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- add basic support for run devices
+  IMPORTANT: You have to enforce loading the runfw module on the webinterface page System -> Advanced -> Miscellaneous. Tick the checkbox "Enable Ralink USB wireless devices" and reboot!
+  add runfw to the kernel modules list
+  add function load_kernel_modules() in system.inc which can be used to load kernel modules at an early stage (have a look at rc.bootup)
+  add system -> ralink option to config.xml
+  fix a bug that caused a warning while using the scheduler with an early configuration
+  update a few dates
+
 - Fix a regression in the firmware upgrade page
   Fix a typo in the firmware upgrade instructions
 

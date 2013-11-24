@@ -46,7 +46,7 @@ fi
         gzip -9 kernel
         mv kernel.gz $MW_BUILDPATH/tmp/
         cd modules/$MW_BUILDPATH/tmp/sys/modules
-        cp aesni/aesni.ko glxsb/glxsb.ko padlock/padlock.ko if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
+        cp aesni/aesni.ko glxsb/glxsb.ko padlock/padlock.ko if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko runfw/runfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
 		if [ $MW_ARCH = "i386" ]; then
                 cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
         fi

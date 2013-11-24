@@ -48,6 +48,7 @@ $pconfig['tcpidletimeout'] = $config['filter']['tcpidletimeout'];
 $pconfig['preferoldsa_enable'] = isset($config['ipsec']['preferoldsa']);
 $pconfig['polling_enable'] = isset($config['system']['polling']);
 $pconfig['ipfstatentries'] = $config['diag']['ipfstatentries'];
+$pconfig['ralink_enable'] = isset($config['system']['ralink']);
 $pconfig['portrangelow'] = $config['nat']['portrange-low'];
 $pconfig['portrangehigh'] = $config['nat']['portrange-high'];
 
@@ -123,6 +124,8 @@ if ($_POST) {
 			unset($config['diag']['ipfstatentries']);
 		else
 			$config['diag']['ipfstatentries'] = $_POST['ipfstatentries'];	
+		$oldralink = isset($config['system']['ralink']);
+		$config['system']['ralink'] = $_POST['ralink_enable'] ? true : false;
 		$config['nat']['portrange-low'] = $_POST['portrangelow'];
 		$config['nat']['portrange-high'] = $_POST['portrangehigh'];
 		
@@ -131,7 +134,8 @@ if ($_POST) {
 		if (($config['system']['webgui']['certificate'] != $oldcert)
 				|| ($config['system']['webgui']['private-key'] != $oldkey)
 				|| ($config['filter']['tcpidletimeout'] != $oldtcpidletimeout)
-				|| (isset($config['system']['polling']) != $oldpolling)) {
+				|| (isset($config['system']['polling']) != $oldpolling)
+				|| (isset($config['system']['ralink']) != $oldralink)) {
 			touch($d_sysrebootreqd_path);
 		}
 		if (($g['platform'] == "generic-pc" || $g['platform'] == "generic-pc-serial") && ($config['system']['harddiskstandby'] != $oldharddiskstandby)) {
@@ -359,6 +363,15 @@ if ($_POST) {
     				Default is 300. Setting this to a very high value will cause a slowdown when viewing the
     				firewall states page, depending on your system's processing power.</span></td>
 			    </tr>
+				<tr>
+				  <td width="22%" valign="top" class="vncell">Additional firmware</td>
+                  <td width="78%" class="vtable"> 
+                    <input name="ralink_enable" type="checkbox" id="ralink_enable" value="yes" <?php if ($pconfig['ralink_enable']) echo "checked"; ?>>
+                    <strong>Enable Ralink USB wireless devices</strong><br>
+					Load additional kernel modules that will allow using network devices that require a specific firmware module.
+					Do not enable any of these modules if all of your network interfaces show up as expected.
+					</td>
+				</tr>
                 <tr> 
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%"> 

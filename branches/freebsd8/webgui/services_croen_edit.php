@@ -40,6 +40,10 @@
 	require_once("guiconfig.inc");
 
 	// Sort WOL list (workaround for freeze issue)
+	// Note: Workaround that probably should have been in wol_sort in the first place
+	if (!is_array($config['wol']['wolentry'])) {
+		$config['wol']['wolentry'] = array();
+	}
 	wol_sort();
 	
 	// Get job row for table in form

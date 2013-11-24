@@ -4,7 +4,7 @@ cpu		I586_CPU
 cpu		I686_CPU
 ident		M0N0WALL_GENERIC
 
-makeoptions	MODULES_OVERRIDE="dummynet glxsb aesni padlock ipfw acpi if_tap if_vlan"
+makeoptions	MODULES_OVERRIDE="dummynet glxsb aesni padlock ipfw acpi if_tap if_vlan runfw"
 
 options		HZ=1000
 
@@ -217,7 +217,7 @@ device          wlan_ccmp               #802.11 CCMP support
 device          wlan_tkip               #802.11 TKIP support
 device		wlan_amrr	# AMRR transmit rate control algorithm
 device          wlan_xauth              #802.11 external authenticator support
-device          wlan_acl
+device          wlan_acl				#802.11 MAC-based ACL support
 device		an		# Aironet 4500/4800 802.11 wireless NICs.
 device          ath             # Atheros pci/cardbus NIC's
 device          ath_hal         # pci/cardbus chip support
@@ -290,3 +290,4 @@ device		udav		# Davicom DM9601E USB
 device		rum		# Ralink Technology RT2501USB wireless NICs
 device		ural		# Ralink Technology RT2500USB wireless NICs
 device		zyd		# ZyDAS zb1211/zb1211b wireless NICs
+device		run		# Ralink Technology RT2700U/RT2800U/RT3000U wireless NICs

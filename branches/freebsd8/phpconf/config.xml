@@ -47,6 +47,7 @@
 		<!-- <earlyshellcmd></earlyshellcmd> -->
 		<!-- <harddiskstandby></harddiskstandby> -->
 		<!-- <polling/> -->
+		<!-- <ralink/> -->
 		<!-- <notes></notes> -->
 		<!-- <enableipv6/> -->
 	</system>

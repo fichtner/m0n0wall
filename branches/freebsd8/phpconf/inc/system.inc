@@ -65,6 +65,14 @@ function enable_cpuhwcrypto() {
 		mwexec("/sbin/kldload aesni.ko");
 }
 
+/* Additional kernel modules that have been activated */
+function load_kernel_modules() {
+	/* Load Ralink firmware */
+	if (isset($config['system']['ralink'])) {
+		mwexec("/sbin/kldload runfw");
+	}
+}
+
 function system_resolvconf_generate($dynupdate = false) {
 	global $config, $g;
 	
