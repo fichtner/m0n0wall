@@ -78,8 +78,11 @@ fi
         rm -Rf dnsmasq-2.66
         tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/dnsmasq-2.66.tar.gz
         cd dnsmasq-2.66
+        cp $MW_BUILDPATH/freebsd8/build/patches/packages/patch-dnsmasq-iscreader.patch .
+        patch < patch-dnsmasq-iscreader.patch
         make COPTS+=-DNO_TFTP COPTS+=-DNO_AUTH
         install -s src/dnsmasq $MW_BUILDPATH/m0n0fs/usr/local/sbin
+        rm patch-dnsmasq-iscreader.patch
         
 ######## FreeBSD ports ########
 # ISC dhcp-server

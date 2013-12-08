@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix patching of dnsmasq for ISC leases, dropped when updating dnsmasq to 2.66
+
 - add basic support for run devices
   IMPORTANT: You have to enforce loading the runfw module on the webinterface page System -> Advanced -> Miscellaneous. Tick the checkbox "Enable Ralink USB wireless devices" and reboot!
   add runfw to the kernel modules list

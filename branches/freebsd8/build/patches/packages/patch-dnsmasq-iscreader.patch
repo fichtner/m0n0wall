@@ -1,19 +1,6 @@
-diff -urN dnsmasq-2.60.orig/Makefile dnsmasq-2.60/Makefile
---- Makefile	2012-04-25 17:52:14.000000000 +0200
-+++ Makefile	2012-10-17 16:30:41.000000000 +0200
-@@ -65,7 +65,7 @@
- objs = cache.o rfc1035.o util.o option.o forward.o network.o \
-        dnsmasq.o dhcp.o lease.o rfc2131.o netlink.o dbus.o bpf.o \
-        helper.o tftp.o log.o conntrack.o dhcp6.o rfc3315.o \
--       dhcp-common.o outpacket.o radv.o slaac.o
-+       dhcp-common.o outpacket.o radv.o slaac.o isc.o
- 
- hdrs = dnsmasq.h config.h dhcp-protocol.h dhcp6-protocol.h \
-        dns-protocol.h radv-protocol.h
-diff -urN dnsmasq-2.60.orig/src/config.h dnsmasq-2.60/src/config.h
---- src/config.h	2012-03-04 21:04:22.000000000 +0100
-+++ src/config.h	2012-04-25 17:52:43.000000000 +0200
-@@ -60,6 +60,10 @@
+--- ./src/config.h.orig	2013-04-17 12:52:49.000000000 +0000
++++ ./src/config.h	2013-12-08 14:38:15.000000000 +0000
+@@ -65,6 +65,10 @@
     NOTE: when enabling or disabling this, be sure to delete any old
     leases file, otherwise dnsmasq may get very confused.
  
@@ -24,8 +11,8 @@ diff -urN dnsmasq-2.60.orig/src/config.h dnsmasq-2.60/src/config.h
  HAVE_TFTP
     define this to get dnsmasq's built-in TFTP server.
  
-@@ -121,10 +125,15 @@
- #define HAVE_SCRIPT
+@@ -138,10 +142,15 @@
+ #define HAVE_IPSET 
  /* #define HAVE_LUASCRIPT */
  /* #define HAVE_BROKEN_RTC */
 +#define HAVE_ISC_READER
@@ -38,9 +25,9 @@ diff -urN dnsmasq-2.60.orig/src/config.h dnsmasq-2.60/src/config.h
 +#endif
 +
  
- 
  /* Default locations for important system files. */
-@@ -322,6 +331,10 @@
+ 
+@@ -351,6 +360,10 @@
  #ifdef NO_FORK
  "no-MMU "
  #endif
@@ -51,10 +38,9 @@ diff -urN dnsmasq-2.60.orig/src/config.h dnsmasq-2.60/src/config.h
  #ifndef HAVE_DBUS
  "no-"
  #endif
-diff -urN dnsmasq-2.60.orig/src/dnsmasq.c dnsmasq-2.60/src/dnsmasq.c
---- src/dnsmasq.c	2012-03-04 21:04:22.000000000 +0100
-+++ src/dnsmasq.c	2012-04-25 17:52:44.000000000 +0200
-@@ -90,6 +90,10 @@
+--- ./src/dnsmasq.c.orig	2013-04-17 12:52:49.000000000 +0000
++++ ./src/dnsmasq.c	2013-12-08 14:38:15.000000000 +0000
+@@ -92,6 +92,10 @@
        if (daemon->dhcp || daemon->dhcp6)
  	daemon->lease_file = LEASEFILE;
      }
@@ -65,7 +51,7 @@ diff -urN dnsmasq-2.60.orig/src/dnsmasq.c dnsmasq-2.60/src/dnsmasq.c
  #endif
    
    /* Close any file descriptors we inherited apart from std{in|out|err} 
-@@ -751,6 +755,11 @@
+@@ -841,6 +845,11 @@
  	  difftime(now, daemon->last_resolv) > 1.0 || 
  	  difftime(now, daemon->last_resolv) < -1.0)
  	{
@@ -77,10 +63,9 @@ diff -urN dnsmasq-2.60.orig/src/dnsmasq.c dnsmasq-2.60/src/dnsmasq.c
  	  /* poll_resolv doesn't need to reload first time through, since 
  	     that's queued anyway. */
  
-diff -urN dnsmasq-2.60.orig/src/dnsmasq.h dnsmasq-2.60/src/dnsmasq.h
---- src/dnsmasq.h	2012-03-04 21:04:22.000000000 +0100
-+++ src/dnsmasq.h	2012-04-25 17:52:44.000000000 +0200
-@@ -972,6 +972,11 @@
+--- ./src/dnsmasq.h.orig	2013-04-17 12:52:49.000000000 +0000
++++ ./src/dnsmasq.h	2013-12-08 14:38:15.000000000 +0000
+@@ -1115,6 +1115,11 @@
  void clear_cache_and_reload(time_t now);
  void poll_resolv(int force, int do_reload, time_t now);
  
@@ -92,9 +77,8 @@ diff -urN dnsmasq-2.60.orig/src/dnsmasq.h dnsmasq-2.60/src/dnsmasq.h
  /* netlink.c */
  #ifdef HAVE_LINUX_NETWORK
  void netlink_init(void);
-diff -urN dnsmasq-2.60.orig/src/isc.c dnsmasq-2.60/src/isc.c
---- src/isc.c	1970-01-01 01:00:00.000000000 +0100
-+++ src/isc.c	2012-04-25 17:52:44.000000000 +0200
+--- ./src/isc.c.orig	2013-12-08 14:38:15.000000000 +0000
++++ ./src/isc.c	2013-12-08 14:38:15.000000000 +0000
 @@ -0,0 +1,249 @@
 +/* dnsmasq is Copyright (c) 2000-2007 Simon Kelley
 +
@@ -345,3 +329,14 @@ diff -urN dnsmasq-2.60.orig/src/isc.c dnsmasq-2.60/src/isc.c
 +}
 +
 +#endif
+--- Makefile.orig	2013-12-08 14:42:24.000000000 +0000
++++ Makefile	2013-12-08 14:42:59.000000000 +0000
+@@ -65,7 +65,7 @@
+ objs = cache.o rfc1035.o util.o option.o forward.o network.o \
+        dnsmasq.o dhcp.o lease.o rfc2131.o netlink.o dbus.o bpf.o \
+        helper.o tftp.o log.o conntrack.o dhcp6.o rfc3315.o \
+-       dhcp-common.o outpacket.o radv.o slaac.o auth.o ipset.o
++       dhcp-common.o outpacket.o radv.o slaac.o auth.o ipset.o isc.o
+ 
+ hdrs = dnsmasq.h config.h dhcp-protocol.h dhcp6-protocol.h \
+        dns-protocol.h radv-protocol.h
