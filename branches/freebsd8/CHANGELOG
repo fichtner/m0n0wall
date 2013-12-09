@@ -2,6 +2,9 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix interfaces' status display for interfaces that do not have a mac address
+  like MPD links (reviewed by Andrew White)
+
 - fix patching of dnsmasq for ISC leases, dropped when updating dnsmasq to 2.66
 
 - add basic support for run devices

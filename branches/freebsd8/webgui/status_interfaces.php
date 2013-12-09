@@ -98,22 +98,20 @@ function get_interface_info($ifdescr) {
 		$ifinfo['status'] = "up";
 	}
 	
-	if (strstr($ifinfo['if'],'tun') || (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "modem"))) {
-		$ifinfo['inpkts'] = $linkinfo[3];
-		$ifinfo['inbytes'] = $linkinfo[6];
-		$ifinfo['outpkts'] = $linkinfo[7];
-		$ifinfo['outbytes'] = $linkinfo[9];
-	} else {
-		$ifinfo['macaddr'] = $linkinfo[3];
-		$ifinfo['inpkts'] = $linkinfo[4];
-		$ifinfo['inerrs'] = $linkinfo[5];
-		$ifinfo['indrops'] = $linkinfo[6];
-		$ifinfo['inbytes'] = $linkinfo[7];
-		$ifinfo['outpkts'] = $linkinfo[8];
-		$ifinfo['outerrs'] = $linkinfo[9];
-		$ifinfo['outbytes'] = $linkinfo[10];
-		$ifinfo['collisions'] = $linkinfo[11];
+	/* netstat outputs no mac addr for some interface types */
+	if (count($linkinfo) < 12) {
+		array_splice($linkinfo, 3, 0, "Not Supported");
 	}
+
+	$ifinfo['macaddr'] = $linkinfo[3];
+	$ifinfo['inpkts'] = $linkinfo[4];
+	$ifinfo['inerrs'] = $linkinfo[5];
+	$ifinfo['indrops'] = $linkinfo[6];
+	$ifinfo['inbytes'] = $linkinfo[7];
+	$ifinfo['outpkts'] = $linkinfo[8];
+	$ifinfo['outerrs'] = $linkinfo[9];
+	$ifinfo['outbytes'] = $linkinfo[10];
+	$ifinfo['collisions'] = $linkinfo[11];
 	
 	/* DHCP? -> see if dhclient is up */
 	if (($ifdescr == "wan") && ($config['interfaces']['wan']['ipaddr'] == "dhcp")) {
@@ -376,13 +374,13 @@ function get_interface_info($ifdescr) {
 				  <input type="submit" name="submit" value="Connect" class="formbtns">
 				  <?php endif; ?>
                 </td>
-              </tr><?php  endif; if ($ifinfo['macaddr']): ?>
+              </tr><?php  endif; ?>
               <tr> 
                 <td width="22%" class="vncellt">MAC address</td>
                 <td width="78%" class="listr"> 
                   <?=htmlspecialchars($ifinfo['macaddr']);?>
                 </td>
-              </tr><?php endif; if ($ifinfo['status'] != "down"): ?>
+              </tr><?php if ($ifinfo['status'] != "down"): ?>
 			  <?php if ($ifinfo['dhcplink'] != "down" && $ifinfo['pppoelink'] != "down" && $ifinfo['pptplink'] != "down" && $ifinfo['modemlink'] != "down"): ?>
 			
 			  <?php if (!empty($ifaddr4s)): ?>
