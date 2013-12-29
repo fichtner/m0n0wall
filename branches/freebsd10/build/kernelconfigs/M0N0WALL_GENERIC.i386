@@ -4,7 +4,7 @@ cpu		I586_CPU
 cpu		I686_CPU
 ident		M0N0WALL_GENERIC
 
-makeoptions	MODULES_OVERRIDE="dummynet glxsb aesni padlock ipfw acpi if_tap if_vlan runfw"
+makeoptions	MODULES_OVERRIDE="dummynet glxsb aesni padlock ipfw acpi if_tap if_vlan"
 
 options		HZ=1000
 
@@ -50,7 +50,6 @@ options		IPFILTER_LOG
 options		IPFILTER_DEFAULT_BLOCK
 options		IPSTATE_SIZE=42859
 options		IPSTATE_MAX=30000
-options		IPFIREWALL_FORWARD
 options		IPSTEALTH
 
 # Bus support.
@@ -60,41 +59,51 @@ device		pci
 # Floppy drives
 device		fdc
 
-# ATA and ATAPI devices
-device		ata
-device		atadisk		# ATA disk drives
-device		ataraid		# ATA RAID drives
-device		atapicd		# ATAPI CDROM drives
-device		atapifd		# ATAPI floppy drives
-options 	ATA_STATIC_ID	# Static device numbering
+# ATA controllers
+device			ahci			  # AHCI-compatible SATA controllers
+device			ata			# Legacy ATA/SATA controllers
+options         ATA_STATIC_ID   # Static device numbering
+device			mvs			# Marvell 88SX50XX/88SX60XX/88SX70XX/SoC SATA
+device			siis			  # SiliconImage SiI3124/SiI3132/SiI3531 SATA
 
 # SCSI Controllers
-device		ahb		# EISA AHA1742 family
-device		ahc		# AHA2940 and onboard AIC7xxx devices
-options 	AHC_REG_PRETTY_PRINT	# Print register bitfields in debug
-					# output.  Adds ~128k to driver.
-device		ahd		# AHA39320/29320 and onboard AIC79xx devices
-options 	AHD_REG_PRETTY_PRINT	# Print register bitfields in debug
-					# output.  Adds ~215k to driver.
-device		amd		# AMD 53C974 (Tekram DC-390(T))
-device		hptiop		# Highpoint RocketRaid 3xxx series
-device		isp		# Qlogic family
-#device		ispfw		# Firmware for QLogic HBAs- normally a module
-device		mpt		# LSI-Logic MPT-Fusion
-#device		ncr		# NCR/Symbios Logic
-device		sym		# NCR/Symbios Logic (newer chipsets + those of `ncr')
-device		trm		# Tekram DC395U/UW/F DC315U adapters
+device			ahb			# EISA AHA1742 family
+device			ahc			# AHA2940 and onboard AIC7xxx devices
+options         AHC_REG_PRETTY_PRINT    # Print register bitfields in debug
+												# output.  Adds ~128k to driver.
+device			ahd			# AHA39320/29320 and onboard AIC79xx devices
+options         AHD_REG_PRETTY_PRINT    # Print register bitfields in debug
+												# output.  Adds ~215k to driver.
+device			esp			# AMD Am53C974 (Tekram DC-390(T))
+device			hptiop			# Highpoint RocketRaid 3xxx series
+device			isp			# Qlogic family
+#device         ispfw			 # Firmware for QLogic HBAs- normally a module
+device			mpt			# LSI-Logic MPT-Fusion
+device			mps			# LSI-Logic MPT-Fusion 2
+#device         ncr			# NCR/Symbios Logic
+device			sym			# NCR/Symbios Logic (newer chipsets + those of `ncr')
+device			trm			# Tekram DC395U/UW/F DC315U adapters
 
-device		adv		# Advansys SCSI adapters
-device		adw		# Advansys wide SCSI adapters
-device		aha		# Adaptec 154x SCSI adapters
-device		aic		# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
-device		bt		# Buslogic/Mylex MultiMaster SCSI adapters
+device			adv			# Advansys SCSI adapters
+device			adw			# Advansys wide SCSI adapters
+device			aha			# Adaptec 154x SCSI adapters
+device			aic			# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
+device			bt			 # Buslogic/Mylex MultiMaster SCSI adapters
 
-device		ncv		# NCR 53C500
-device		nsp		# Workbit Ninja SCSI-3
-device		stg		# TMC 18C30/18C50
-device		isci		# Intel C600 SAS controller
+device			ncv			# NCR 53C500
+device			nsp			# Workbit Ninja SCSI-3
+device			stg			# TMC 18C30/18C50
+device			isci			  # Intel C600 SAS controller
+
+
+# RAID controllers
+device		aac				# Adaptec FSA RAID
+device		aacp			# SCSI passthrough for aac (requires CAM)
+device		aacraid			# Adaptec by PMC RAID
+device		ida				# Compaq Smart RAID
+device		mlx				# Mylex DAC960 family
+device		pst				# Promise Supertrak SX6000
+device		twe			# 3ware ATA RAID
 
 # SCSI peripherals
 device		scbus		# SCSI bus (required for SCSI)
@@ -118,15 +127,6 @@ device		ips		# IBM (Adaptec) ServeRAID
 device		mly		# Mylex AcceleRAID/eXtremeRAID
 device		twa		# 3ware 9000 series PATA/SATA RAID
 device		tws		# LSI 3ware 9750 SATA+SAS 6Gb/s RAID controller
-
-# RAID controllers
-device		aac		# Adaptec FSA RAID
-device		aacp		# SCSI passthrough for aac (requires CAM)
-device		ida		# Compaq Smart RAID
-device		mfi		# LSI MegaRAID SAS
-device		mlx		# Mylex DAC960 family
-device		pst		# Promise Supertrak SX6000
-device		twe		# 3ware ATA RAID
 
 # atkbdc0 controls both the keyboard and the PS/2 mouse
 device		atkbdc		# AT keyboard controller
@@ -209,22 +209,22 @@ device		sn		# SMC's 9000 series of Ethernet chips
 device		xe		# Xircom pccard Ethernet
 
 # Wireless NIC cards
-device		wlan		# 802.11 support
-options 	IEEE80211_AMPDU_AGE # age frames in AMPDU reorder q's
-options 	IEEE80211_SUPPORT_MESH	# enable 802.11s draft support
-device          wlan_wep                #802.11 WEP support
-device          wlan_ccmp               #802.11 CCMP support
-device          wlan_tkip               #802.11 TKIP support
-device		wlan_amrr	# AMRR transmit rate control algorithm
-device          wlan_xauth              #802.11 external authenticator support
-device          wlan_acl				#802.11 MAC-based ACL support
-device		an		# Aironet 4500/4800 802.11 wireless NICs.
-device          ath             # Atheros pci/cardbus NIC's
-device          ath_hal         # pci/cardbus chip support
+device			wlan		# 802.11 support
+options 		IEEE80211_AMPDU_AGE # age frames in AMPDU reorder q's
+options 		IEEE80211_SUPPORT_MESH	# enable 802.11s draft support
+device			wlan_wep			#802.11 WEP support
+device			wlan_ccmp			  #802.11 CCMP support
+device			wlan_tkip			  #802.11 TKIP support
+device			wlan_amrr	# AMRR transmit rate control algorithm
+device			wlan_xauth			 #802.11 external authenticator support
+device			wlan_acl				#802.11 MAC-based ACL support
+device			an		# Aironet 4500/4800 802.11 wireless NICs.
+device			ath			# Atheros pci/cardbus NIC's
+device			ath_hal         # pci/cardbus chip support
 options         AH_SUPPORT_AR5416       # enable AR5416 tx/rx descriptors
-device          ath_rate_sample # SampleRate tx rate control for ath
-device		ral		# Ralink Technology RT2500 wireless NICs.
-device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
+device			ath_rate_sample # SampleRate tx rate control for ath
+device			ral		# Ralink Technology RT2500 wireless NICs.
+device			wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 
 # Pseudo devices.
 device		loop		# Network loopback
@@ -237,7 +237,7 @@ device		gif		# IPv6 and IPv4 tunneling
 device		stf		# 6to4 IPv6 over IPv4 encapsulation
 device		firmware	# firmware assist module
 device		if_bridge	#Bridge interface
-device          vlan
+device		vlan
 
 # The `bpf' device enables the Berkeley Packet Filter.
 # Be aware of the administrative consequences of enabling this!

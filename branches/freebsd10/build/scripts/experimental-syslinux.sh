@@ -6,7 +6,7 @@ if [ -z "$MW_BUILDPATH" -o ! -d "$MW_BUILDPATH" ]; then
         exit 1
 fi
 
-VERSION=`cat $MW_BUILDPATH/freebsd8/version`
+VERSION=`cat $MW_BUILDPATH/freebsd10/version`
 if [ $MW_ARCH = "amd64" ]; then
         VERSION=$VERSION.$MW_ARCH       
 fi
@@ -18,12 +18,12 @@ cd  $MW_BUILDPATH/microfs
 mkdir -p lib libexec bin sbin etc dev usr/sbin mnt/m0n0wall
 
 # Populate microfs
-perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl $MW_BUILDPATH/freebsd8/build/minibsd/micro.files /  $MW_BUILDPATH/microfs
-perl $MW_BUILDPATH/freebsd8/build/minibsd/mklibs.pl $MW_BUILDPATH/microfs > /tmp/m0n0wallmicro.libs
-perl $MW_BUILDPATH/freebsd8/build/minibsd/mkmini.pl /tmp/m0n0wallmicro.libs / $MW_BUILDPATH/microfs
+perl $MW_BUILDPATH/freebsd10/build/minibsd/mkmini.pl $MW_BUILDPATH/freebsd10/build/minibsd/micro.files /  $MW_BUILDPATH/microfs
+perl $MW_BUILDPATH/freebsd10/build/minibsd/mklibs.pl $MW_BUILDPATH/microfs > /tmp/m0n0wallmicro.libs
+perl $MW_BUILDPATH/freebsd10/build/minibsd/mkmini.pl /tmp/m0n0wallmicro.libs / $MW_BUILDPATH/microfs
 
-cp  $MW_BUILDPATH/freebsd8/build/files/rc.microfs $MW_BUILDPATH/microfs/etc/rc
-cp $MW_BUILDPATH/freebsd8/build/files/ttys.microfs $MW_BUILDPATH/microfs/etc/ttys
+cp  $MW_BUILDPATH/freebsd10/build/files/rc.microfs $MW_BUILDPATH/microfs/etc/rc
+cp $MW_BUILDPATH/freebsd10/build/files/ttys.microfs $MW_BUILDPATH/microfs/etc/ttys
 
 # Shrink by strip microfs
 find $MW_BUILDPATH/microfs/ | xargs strip -s 2> /dev/null
@@ -83,9 +83,9 @@ makeimage() {
 		cp $MW_BUILDPATH/tmp/mfsroot-$PLATFORM.gz /mnt/mfsroot.gz
 		mkdir -p /mnt/boot/kernel
 		cp /boot/loader /mnt/boot
-		cp $MW_BUILDPATH/freebsd8/build/boot/$PLATFORM/loader.rc /mnt/boot
-		if [ -r $MW_BUILDPATH/freebsd8/build/boot/$PLATFORM/boot.config ]; then
-		        cp $MW_BUILDPATH/freebsd8/build/boot/$PLATFORM/boot.config /mnt
+		cp $MW_BUILDPATH/freebsd10/build/boot/$PLATFORM/loader.rc /mnt/boot
+		if [ -r $MW_BUILDPATH/freebsd10/build/boot/$PLATFORM/boot.config ]; then
+		        cp $MW_BUILDPATH/freebsd10/build/boot/$PLATFORM/boot.config /mnt
 		fi
 		if [ $MW_ARCH = "i386" ]; then
 		        cp $MW_BUILDPATH/tmp/acpi.ko /mnt/boot/kernel

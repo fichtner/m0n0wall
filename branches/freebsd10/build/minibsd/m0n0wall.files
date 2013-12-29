@@ -27,8 +27,10 @@ sbin/atacontrol
 sbin/dmesg
 sbin/fastboot:sbin/fasthalt:sbin/halt:sbin/reboot
 sbin/init
+sbin/ifconfig
 sbin/ipfw
 sbin/kldload
+sbin/kldstat
 sbin/kldunload
 sbin/ldconfig
 sbin/mdconfig

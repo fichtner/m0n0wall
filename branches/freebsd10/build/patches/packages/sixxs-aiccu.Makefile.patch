@@ -1,21 +1,21 @@
---- Makefile.orig	2010-10-16 00:02:32.000000000 +0200
-+++ Makefile	2011-04-27 12:59:40.000000000 +0200
-@@ -17,16 +17,14 @@
- MAINTAINER=	dinoex@FreeBSD.org
- COMMENT=	SixXS IPv6 TIC+ tunnel broker heartbeat client
- 
--LIB_DEPENDS=	gnutls-openssl.27:${PORTSDIR}/security/gnutls
+--- Makefile.orig       2013-12-23 11:47:01.000000000 +0000
++++ Makefile    2013-12-23 11:48:18.000000000 +0000
+@@ -12,16 +12,14 @@
+ MAINTAINER=    dinoex@FreeBSD.org
+ COMMENT=       SixXS IPv6 TIC+ tunnel broker heartbeat client
+
+-LIB_DEPENDS=   gnutls-openssl:${PORTSDIR}/security/gnutls
 -
- LICENSE=	BSD
- LICENSE_FILE=	${WRKSRC}/doc/LICENSE
- 
- USE_RC_SUBR=	sixxs-aiccu
- USE_GMAKE=	yes
- 
--CFLAGS+=	${PTHREAD_CFLAGS} -D_REENTRANT -DAICCU_GNUTLS -I${LOCALBASE}/include
--LDFLAGS+=	${PTHREAD_LIBS} -L${LOCALBASE}/lib -lgnutls
-+CFLAGS+=	${PTHREAD_CFLAGS} -D_REENTRANT -I${LOCALBASE}/include
-+LDFLAGS+=	${PTHREAD_LIBS} -L${LOCALBASE}/lib
- MAKE_ARGS+=	CC="${CC}" LDFLAGS="${LDFLAGS}"
- WRKSRC=		${WRKDIR}/aiccu
- BUILD_WRKSRC=	${WRKDIR}/aiccu/unix-console
+ LICENSE=       BSD
+ LICENSE_FILE=  ${WRKSRC}/doc/LICENSE
+
+ USE_RC_SUBR=   sixxs-aiccu
+ USE_GMAKE=     yes
+
+-CFLAGS+=       ${PTHREAD_CFLAGS} -D_REENTRANT -DAICCU_GNUTLS -I${LOCALBASE}/include
+-LDFLAGS+=      ${PTHREAD_LIBS} -L${LOCALBASE}/lib -lgnutls
++CFLAGS+=       ${PTHREAD_CFLAGS} -D_REENTRANT -I${LOCALBASE}/include
++LDFLAGS+=      ${PTHREAD_LIBS} -L${LOCALBASE}/lib
+ MAKE_ARGS+=    CC="${CC}" LDFLAGS="${LDFLAGS}"
+ WRKSRC=                ${WRKDIR}/aiccu
+ BUILD_WRKSRC=  ${WRKDIR}/aiccu/unix-console

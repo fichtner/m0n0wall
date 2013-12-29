@@ -84,7 +84,7 @@ function filter_configure($ipv4only = false) {
 	/* generate ipf rules */
 	$ipfrules = filter_rules_generate();
 	
-	$fd = popen("/sbin/ipf -Fa -f - > /dev/null 2>&1", "w");
+	$fd = popen("/sbin/ipf -I -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
 		unlock_file("{$g['varrun_path']}/filter.lock");	
@@ -99,6 +99,7 @@ function filter_configure($ipv4only = false) {
 	if ($g['booting'])
 		echo "done\n";
 	unlock_file("{$g['varrun_path']}/filter.lock");	
+	mwexec("/sbin/ipf -s");
 	return 0;
 }
 
@@ -108,7 +109,7 @@ function filter_configure6() {
 
 	/* generate ipf rules for IPv6 */
 	$ipfrules_ipv6 = filter_rules_generate_ipv6();
-	$fd = popen("/sbin/ipf -6 -Fa -f - > /dev/null 2>&1", "w");
+	$fd = popen("/sbin/ipf -6 -I -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
 		unlock_file("{$g['varrun_path']}/filter6.lock");	
@@ -117,7 +118,7 @@ function filter_configure6() {
 	fwrite($fd, $ipfrules_ipv6);
 	pclose($fd);
 	
-	unlock_file("{$g['varrun_path']}/filter6.lock");	
+	unlock_file("{$g['varrun_path']}/filter6.lock");
 	return 0;
 }
 

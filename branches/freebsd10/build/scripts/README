@@ -1,14 +1,16 @@
-Build m0n0wall on FreeBSD 8.4
+Build m0n0wall on FreeBSD 10.0 RC2
 
-Install freebsd 8.4 with developer features and login, su to root then.
+Install freebsd 10.0 with src features and login, su to root then.
+
+bootstrap pkg utility by running 'pkg'
 
 At this point, you can either;
 
-a) check out the repository (svn co http://svn.m0n0.ch/wall/branches/freebsd8),
+a) check out the repository (svnlite co http://svn.m0n0.ch/wall/branches/freebsd10/build/scripts),
    make any desired local changes, then execute go.sh while outside
    the working copy:
 
-	# freebsd8/build/scripts/go.sh
+	# scripts/go.sh
 
    Note that any new files must be 'svn add'ed in order to appear in
    the exported build directory (but no need to commit yet)
@@ -18,15 +20,15 @@ OR the easy way;
 b) Run the following commands to automatically get the latest version
    from the repository:
 
-   # fetch http://svn.m0n0.ch/wall/branches/freebsd8/build/scripts/go.sh
+   # fetch http://svn.m0n0.ch/wall/branches/freebsd10/build/scripts/go.sh
    # chmod +x go.sh
    # ./go.sh
 
 This will give you a bash prompt where you should execute './doall.sh'  or execute each of the 5 shell scripts.
 
-if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build84/images/
+if all goes well, you will have generic iso and generic img in /usr/m0n0wall/build10/images/
 
-To start from scratch again, it should be sufficient to delete /usr/m0n0wall/build84 and repeat the steps above.
+To start from scratch again, it should be sufficient to delete /usr/m0n0wall/build10 and repeat the steps above.
 
 For the syslinux image, 1) make a fat32 disk/usb 2) run syslinux to create the MBR 3) place syslinux.sys on the disk, 
 4) copy memdisk from the syslinux files onto the root of the disk.  Now extract the m0n0wall tgz syslinux image onto the 

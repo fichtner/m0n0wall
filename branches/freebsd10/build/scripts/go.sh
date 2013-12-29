@@ -1,51 +1,47 @@
 #!/bin/csh 
 
-
-set MW_BUILDPATH=/usr/m0n0wall/build84
+set MW_BUILDPATH=/usr/m0n0wall/build10
 setenv MW_BUILDPATH $MW_BUILDPATH
 setenv MW_ARCH `uname -m`
 
 # ensure prerequisite tools are installed
 if ( ! -x /usr/local/bin/bash ) then
-	pkg_add -r bash
-endif
-if ( ! -x /usr/local/bin/svn ) then
-	pkg_add -r subversion
+	pkg install -y -g 'bash-4.2.*'
 endif
 
 # figure out if we're already running from within a repository
-set svninfo=`/usr/local/bin/svn info freebsd8 >& /dev/null`
+set svnliteinfo=`/usr/bin/svnlite info freebsd10 >& /dev/null`
 if  ( $status != 1 ) then
 	echo "Found existing working copy"
 else
 	echo "No working copy found; checking out current version from repository"
-	/usr/local/bin/svn checkout http://svn.m0n0.ch/wall/branches/freebsd8
+	/usr/bin/svnlite checkout svn://svn.m0n0.ch/wall/branches/freebsd10
 endif
 
-cd freebsd8
+cd freebsd10
 
 echo "Creating build directory $MW_BUILDPATH."
 mkdir -p $MW_BUILDPATH
 
-echo "Exporting repository to $MW_BUILDPATH/freebsd8."
-/usr/local/bin/svn export --force . $MW_BUILDPATH/freebsd8
-/usr/local/bin/svnversion -n . > $MW_BUILDPATH/freebsd8/svnrevision
+echo "Exporting repository to $MW_BUILDPATH/freebsd10."
+/usr/bin/svnlite export --force . $MW_BUILDPATH/freebsd10
+/usr/bin/svnliteversion -n . > $MW_BUILDPATH/freebsd10/svnrevision
 
-echo "Changing directory to $MW_BUILDPATH/freebsd8/build/scripts"
-cd $MW_BUILDPATH/freebsd8/build/scripts
+echo "Changing directory to $MW_BUILDPATH/freebsd10/build/scripts"
+cd $MW_BUILDPATH/freebsd10/build/scripts
 chmod +x *.sh
 
-echo "Updating ports to correct versions: 2012-10-17"
+echo "Updating ports to correct versions: 2013-12-20"
 
-/usr/local/bin/svn checkout --depth empty svn://svn.freebsd.org/ports/head  $MW_BUILDPATH/tmp/ports/tree
+/usr/bin/svnlite checkout --depth empty svn://svn.freebsd.org/ports/head  $MW_BUILDPATH/tmp/ports/tree
 cd $MW_BUILDPATH/tmp/ports/tree
 
-/usr/local/bin/svn update -r '{2012-10-17}' --set-depth files Mk Templates Tools net dns security sysutils devel
-/usr/local/bin/svn update -r '{2012-10-17}' net/isc-dhcp41-server/ net/isc-dhcp41-relay/ net/isc-dhcp41-client/ net/mpd5/ net/dhcp6 net/wol sysutils/mbmon
-/usr/local/bin/svn update -r '{2012-10-17}' security/ipsec-tools devel/libtool 
-/usr/local/bin/svn update -r '{2012-10-17}' net/sixxs-aiccu devel/gmake security/gnutls
+/usr/bin/svnlite update -r '{2013-12-20}' --set-depth files Templates Tools net dns security sysutils devel
+/usr/bin/svnlite update -r '{2013-12-20}' Mk net/isc-dhcp41-server/ net/isc-dhcp41-relay/ net/isc-dhcp41-client/ net/mpd5/ net/dhcp6 net/wol sysutils/mbmon
+/usr/bin/svnlite update -r '{2013-12-20}' security/ipsec-tools devel/libtool 
+/usr/bin/svnlite update -r '{2013-12-20}' net/sixxs-aiccu devel/gmake security/gnutls
 
-cd $MW_BUILDPATH/freebsd8/build/scripts
+cd $MW_BUILDPATH/freebsd10/build/scripts
 
 echo 
 echo "----- Build environment prepared -----"
