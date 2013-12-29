@@ -1,0 +1,88 @@
+<?php
+/*
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
+	
+	Copyright (C) 2012 Lennart Grahl <lennart.grahl@gmail.com>.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+	if (isset($job['name']) && isset($config['shaper']) && isset($d_shaperconfdirty_path)) {
+		require_once("functions.inc");
+		$changed = FALSE;
+
+		// Enable/Disable traffic shaper
+		if ($job['name'] == 'shaper-enable' || $job['name'] == 'shaper-disable') {
+			$enable = ($job['name'] == 'shaper-enable' ? TRUE : FALSE);
+			if ($enable == !isset($config['shaper']['enable'])) {
+				$config['shaper']['enable'] = $enable;
+				$changed = TRUE;
+			}
+		}
+		
+		// Enable/Disable rule
+		if (isset($job['target']) && ($job['name'] == 'shaper-enable_rule' || $job['name'] == 'shaper-disable_rule')) {
+			$enable = ($job['name'] == 'shaper-enable_rule' ? TRUE : FALSE);
+			if (isset($config['shaper']['rule']) && is_array($config['shaper']['rule'])) {
+				foreach ($config['shaper']['rule'] AS $k => $rule) {
+					if (isset($rule['descr']) && $rule['descr'] == $job['target'][0] && $enable == isset($rule['disabled'])) {
+						$config['shaper']['rule'][$k]['disabled'] = !$enable;
+						$changed = TRUE;
+					}
+				}
+			}
+		}
+		
+		// Set pipe bandwidth
+		if (isset($job['target']) && isset($job['value']) && $job['name'] == 'shaper-set_pipe_bandwidth') {
+			if (isset($config['shaper']['pipe']) && is_array($config['shaper']['pipe'])) {
+				foreach ($config['shaper']['pipe'] AS $k => $pipe) {
+					if (isset($pipe['descr']) && $pipe['descr'] == $job['target'][0] && $pipe['bandwidth'] != $job['value']) {
+						$config['shaper']['pipe'][$k]['bandwidth'] = $job['value'];
+						$changed = TRUE;
+					}
+				}
+			}
+		}
+		
+		// Set queue weight
+		if (isset($job['target']) && isset($job['value']) && $job['name'] == 'shaper-set_queue_weight') {
+			if (isset($config['shaper']['queue']) && is_array($config['shaper']['queue'])) {
+				foreach ($config['shaper']['queue'] AS $k => $queue) {
+					if (isset($queue['descr']) && $queue['descr'] == $job['target'][0] && $queue['weight'] != $job['value']) {
+						$config['shaper']['queue'][$k]['weight'] = $job['value'];
+						$changed = TRUE;
+					}
+				}
+			}
+		}
+
+		// Save & reconfigure
+		if ($changed) {
+			$reconfigure_data['shaper']['func'] = 'shaper_configure';
+			$reconfigure_data['shaper']['unlink'] = $d_shaperconfdirty_path;
+		}
+	}
+
+?>

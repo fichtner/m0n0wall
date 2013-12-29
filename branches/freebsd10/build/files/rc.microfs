@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# sleep to let usb devices settle
+/bin/sleep 5
+
+# Find where m0n0wall file system is
+/sbin/mount_msdosfs /dev/da0s1 /mnt/m0n0wall > /dev/null 2>&1
+/sbin/mount_msdosfs /dev/ad0s1 /mnt/m0n0wall > /dev/null 2>&1
+/sbin/mount_msdosfs /dev/ad0  /mnt/m0n0wall > /dev/null 2>&1
+
+# setup devfs in m0n0wall file system before we chroot
+/mnt/m0n0wall/m0n0fs/sbin/mount -t devfs dev /mnt/m0n0wall/m0n0fs/dev
+
+# now chroot and run rc.syslinux
+/usr/sbin/chroot /mnt/m0n0wall/m0n0fs /etc/rc.syslinux

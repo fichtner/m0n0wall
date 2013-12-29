@@ -1,0 +1,22 @@
+--- af_inet6.c.orig	2011-07-05 22:51:36.000000000 +0000
++++ af_inet6.c	2011-07-05 22:56:43.000000000 +0000
+@@ -498,6 +498,8 @@
+ 	DEF_CMD("-autoconf",	-IN6_IFF_AUTOCONF,	setip6flags),
+ 	DEF_CMD("accept_rtadv",	ND6_IFF_ACCEPT_RTADV,	setnd6flags),
+ 	DEF_CMD("-accept_rtadv",-ND6_IFF_ACCEPT_RTADV,	setnd6flags),
++	DEF_CMD("no_radr",	ND6_IFF_NO_RADR,	setnd6flags),
++	DEF_CMD("-no_radr",	-ND6_IFF_NO_RADR,	setnd6flags),
+ 	DEF_CMD("defaultif",	1,			setnd6defif),
+ 	DEF_CMD("-defaultif",	-1,			setnd6defif),
+ 	DEF_CMD("ifdisabled",	ND6_IFF_IFDISABLED,	setnd6flags),
+--- af_nd6.c.orig	2011-07-05 22:51:43.000000000 +0000
++++ af_nd6.c	2011-07-05 22:57:21.000000000 +0000
+@@ -58,7 +58,7 @@
+ #define	MAX_SYSCTL_TRY	5
+ #define	ND6BITS	"\020\001PERFORMNUD\002ACCEPT_RTADV\003PREFER_SOURCE" \
+ 		"\004IFDISABLED\005DONT_SET_IFROUTE\006AUTO_LINKLOCAL" \
+-		"\020DEFAULTIF"
++		"\007NO_RADR\020DEFAULTIF"
+ 
+ static int isnd6defif(int);
+ void setnd6flags(const char *, int, int, const struct afswtch *);

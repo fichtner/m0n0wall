@@ -1,0 +1,12 @@
+--- config.h.orig	2011-02-20 14:43:08.000000000 +0000
++++ config.h	2011-02-20 14:42:45.000000000 +0000
+@@ -51,10 +51,8 @@
+ /* #undef _REENTRANT */
+ 
+ /* debugging stuff */
+-/* #undef SNMP_NO_DEBUGGING */           /* if defined, we optimize the code
+-                                      to exclude all debugging calls. */
+-#define SNMP_ALWAYS_DEBUG 1
+-                                      ignore the -D flag passed to the cmds */
++#define SNMP_NO_DEBUGGING
++#define SNMP_ALWAYS_DEBUG 0

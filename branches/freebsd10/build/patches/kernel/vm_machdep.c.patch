@@ -1,0 +1,27 @@
+--- sys/i386/i386/vm_machdep.c.orig	2010-12-21 18:09:25.000000000 +0100
++++ sys/i386/i386/vm_machdep.c	2012-02-12 11:15:28.000000000 +0100
+@@ -655,11 +655,6 @@
+ 		elan_mmcr->RESCFG = 1;
+ #endif
+ 
+-	if (cpu == CPU_GEODE1100) {
+-		/* Attempt Geode's own reset */
+-		outl(0xcf8, 0x80009044ul);
+-		outl(0xcfc, 0xf);
+-	}
+ 
+ #ifdef PC98
+ 	/*
+@@ -711,6 +706,12 @@
+ 	}
+ #endif /* PC98 */
+ 
++	if (cpu == CPU_GEODE1100) {
++		/* Attempt Geode's own reset */
++		outl(0xcf8, 0x80009044ul);
++		outl(0xcfc, 0xf);
++	}
++
+ 	printf("No known reset method worked, attempting CPU shutdown\n");
+ 	DELAY(1000000); /* wait 1 sec for printf to complete */
+ 
