@@ -1,6 +1,6 @@
---- tools/ipfstat.c.orig	2009-07-21 11:13:58.000000000 +0200
-+++ tools/ipfstat.c	2011-04-29 10:30:14.000000000 +0200
-@@ -46,6 +46,9 @@
+--- ipfstat.c.orig	2013-12-23 11:53:44.000000000 +0000
++++ ipfstat.c	2013-12-23 11:58:26.000000000 +0000
+@@ -47,6 +47,9 @@
  #  endif
  # endif
  #endif
@@ -10,7 +10,7 @@
  #if defined(STATETOP) && !defined(linux)
  # include <netinet/ip_var.h>
  # include <netinet/tcp_fsm.h>
-@@ -59,9 +59,6 @@
+@@ -60,9 +63,6 @@
  #  ifdef ERR
  #   undef ERR
  #  endif
@@ -20,27 +20,27 @@
  # endif /* SOLARIS */
  #endif /* STATETOP */
  #include "kmem.h"
-@@ -151,8 +148,6 @@
+@@ -179,8 +179,6 @@
  #ifdef STATETOP
  static	void	topipstates __P((i6addr_t, i6addr_t, int, int, int,
- 				 int, int, int));
+ 				 int, int, int, int *));
 -static	void	sig_break __P((int));
 -static	void	sig_resize __P((int));
  static	char	*getip __P((int, i6addr_t *));
  static	char	*ttl_to_string __P((long));
  static	int	sort_p __P((const void *, const void *));
-@@ -1182,8 +1177,6 @@
+@@ -1294,8 +1292,6 @@
  
  
  #ifdef STATETOP
 -static int handle_resize = 0, handle_break = 0;
 -
  static void topipstates(saddr, daddr, sport, dport, protocol, ver,
- 		        refreshtime, topclosed)
- i6addr_t saddr;
-@@ -1195,39 +1188,17 @@
- int refreshtime;
- int topclosed;
+ 		        refreshtime, topclosed, filter)
+ 	i6addr_t saddr;
+@@ -1308,39 +1304,17 @@
+ 	int topclosed;
+ 	int *filter;
  {
 -	char str1[STSTRSIZE], str2[STSTRSIZE], str3[STSTRSIZE], str4[STSTRSIZE];
 +	char str1[STSTRSIZE], str2[STSTRSIZE];
@@ -81,7 +81,7 @@
  
  	/* init ipfobj_t stuff */
  	bzero((caddr_t)&ipfo, sizeof(ipfo));
-@@ -1236,15 +1207,12 @@
+@@ -1349,15 +1323,12 @@
  	ipfo.ipfo_size = sizeof(*ipsstp);
  	ipfo.ipfo_ptr = (void *)ipsstp;
  
@@ -98,7 +98,7 @@
  		}
  
  		/* clear the history */
-@@ -1388,132 +1356,11 @@
+@@ -1504,132 +1475,11 @@
  			}
  		}
  
@@ -231,7 +231,7 @@
  		for (i = 0; i <= tsentry; i++) {
  			/* print src/dest and port */
  			if ((tp->st_p == IPPROTO_TCP) ||
-@@ -1530,14 +1377,11 @@
+@@ -1646,14 +1496,11 @@
  				sprintf(str2, "%s", getip(tp->st_v,
  				    &tp->st_dst));
  			}
@@ -248,7 +248,7 @@
  
  			/* print protocol */
  			proto = getprotobynumber(tp->st_p);
-@@ -1550,16 +1394,18 @@
+@@ -1666,16 +1513,18 @@
  			/* just print icmp for IPv6-ICMP */
  			if (tp->st_p == IPPROTO_ICMPV6)
  				strcpy(str1, "icmp");
@@ -271,7 +271,7 @@
  
  			if (reverse)
  				tp--;
-@@ -1567,55 +1413,6 @@
+@@ -1683,55 +1532,6 @@
  				tp++;
  		}
  
@@ -327,22 +327,22 @@
  	free(tstable);
  	if (ret != 0)
  		perror(errstr);
-@@ -1842,18 +1639,6 @@
+@@ -1959,18 +1759,6 @@
  
  
  #ifdef STATETOP
 -static void sig_resize(s)
--int s;
+-	int s;
 -{
 -	handle_resize = 1;
 -}
 -
 -static void sig_break(s)
--int s;
+-	int s;
 -{
 -	handle_break = 1;
 -}
 -
  static char *getip(v, addr)
- int v;
- i6addr_t *addr;
+ 	int v;
+ 	i6addr_t *addr;
