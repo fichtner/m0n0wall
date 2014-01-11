@@ -67,6 +67,9 @@ function filter_configure($ipv4only = false) {
 	mwexec("/sbin/sysctl net.inet.ip.portrange.first=64536");
 	mwexec("/sbin/sysctl net.inet.ip.portrange.hifirst=64536");
 	
+	mwexec("/sbin/sysctl net.inet.ipf.fr_tcphalfclosed=240");
+	mwexec("/sbin/sysctl net.inet.ipf.fr_udptimeout=240");
+	
 	/* generate ipnat rules */
 	$ipnatrules = filter_nat_rules_generate();
 	
@@ -84,7 +87,7 @@ function filter_configure($ipv4only = false) {
 	/* generate ipf rules */
 	$ipfrules = filter_rules_generate();
 	
-	$fd = popen("/sbin/ipf -I -f - > /dev/null 2>&1", "w");
+	$fd = popen("/sbin/ipf -Fa -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
 		unlock_file("{$g['varrun_path']}/filter.lock");	
@@ -93,13 +96,13 @@ function filter_configure($ipv4only = false) {
 
 	fwrite($fd, $ipfrules);
 	pclose($fd);
-	if (!$ipv4only)
+	if (ipv6enabled())
 		filter_configure6();
 	
 	if ($g['booting'])
 		echo "done\n";
 	unlock_file("{$g['varrun_path']}/filter.lock");	
-	mwexec("/sbin/ipf -s");
+
 	return 0;
 }
 
@@ -109,7 +112,7 @@ function filter_configure6() {
 
 	/* generate ipf rules for IPv6 */
 	$ipfrules_ipv6 = filter_rules_generate_ipv6();
-	$fd = popen("/sbin/ipf -6 -I -f - > /dev/null 2>&1", "w");
+	$fd = popen("/sbin/ipf -6 -f - > /dev/null 2>&1", "w");
 	if (!$fd) {
 		printf("Cannot open /sbin/ipf in filter_configure()\n");
 		unlock_file("{$g['varrun_path']}/filter6.lock");	
@@ -342,8 +345,8 @@ function filter_rules_generate_ipv6() {
 		return filter_rules_generate(true);
 	} else {
 		return <<<EOD
-block in quick all
-block out quick all
+block in quick family $inetfamily all
+block out quick family $inetfamily all
 
 EOD;
 	}
@@ -352,6 +355,12 @@ EOD;
 function filter_rules_generate($ipv6 = false) {
 	global $config, $g;
 	
+	if ($ipv6) {
+		$inetfamily = 'inet6';
+	} else {
+		$inetfamily = 'inet';
+	}
+
 	$wancfg = $config['interfaces']['wan'];
 	$lancfg = $config['interfaces']['lan'];
 	$pptpdcfg = $config['pptpd'];
@@ -465,23 +474,23 @@ function filter_rules_generate($ipv6 = false) {
 	
 	$ipfrules = <<<EOD
 # loopback
-pass in quick on lo0 all
-pass out quick on lo0 all
+pass in quick on lo0 family $inetfamily all
+pass out quick on lo0 family $inetfamily all
 
 EOD;
 
 	if (!$ipv6) {
 		$ipfrules .= <<<EOD
 # block short packets
-block in $log quick all with short
+block in $log quick family $inetfamily all with short
 
 # block IP options
-block in $log quick all with ipopts
+block in $log quick family $inetfamily all with ipopts
 
 # allow access to DHCP server on LAN
-pass in quick on $lanif proto udp from any port = 68 to 255.255.255.255 port = 67
-pass in quick on $lanif proto udp from any port = 68 to $lanip port = 67
-pass out quick on $lanif proto udp from $lanip port = 67 to any port = 68
+pass in quick on $lanif family $inetfamily proto udp from any port = 68 to 255.255.255.255 port = 67
+pass in quick on $lanif family $inetfamily proto udp from any port = 68 to $lanip port = 67
+pass out quick on $lanif family $inetfamily proto udp from $lanip port = 67 to any port = 68
 
 EOD;
 
@@ -493,9 +502,9 @@ EOD;
 				$ipfrules .= <<<EOD
 
 # allow access to DHCP server on {$on}
-pass in quick on {$oc['if']} proto udp from any port = 68 to 255.255.255.255 port = 67
-pass in quick on {$oc['if']} proto udp from any port = 68 to {$oc['ip']} port = 67
-pass out quick on {$oc['if']} proto udp from {$oc['ip']} port = 67 to any port = 68
+pass in quick on {$oc['if']} family $inetfamily proto udp from any port = 68 to 255.255.255.255 port = 67
+pass in quick on {$oc['if']} family $inetfamily proto udp from any port = 68 to {$oc['ip']} port = 67
+pass out quick on {$oc['if']} family $inetfamily proto udp from {$oc['ip']} port = 67 to any port = 68
 
 EOD;
 			}
@@ -504,25 +513,25 @@ EOD;
 		$ipfrules .= <<<EOD
 		
 # allow link-local traffic on LAN
-pass in quick on $lanif from fe80::/10 to fe80::/10
-pass out quick on $lanif from fe80::/10 to fe80::/10
+pass in quick on $lanif family $inetfamily from fe80::/10 to fe80::/10
+pass out quick on $lanif family $inetfamily from fe80::/10 to fe80::/10
 		
 # allow access to DHCPv6 server on LAN
-pass in quick on $lanif proto udp from any port = 546 to ff02::1:2 port = 547
+pass in quick on $lanif family $inetfamily proto udp from any port = 546 to ff02::1:2 port = 547
 
 EOD;
 		/* allow access to DHCP server on optional interfaces */
 		foreach ($optcfg as $on => $oc) {
 			$ipfrules .= "# allow link-local traffic on {$on}\n";
-			$ipfrules .= "pass in quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
-			$ipfrules .= "pass out quick on {$oc['if']} from fe80::/10 to fe80::/10\n";
+			$ipfrules .= "pass in quick on {$oc['if']} family $inetfamily from fe80::/10 to fe80::/10\n";
+			$ipfrules .= "pass out quick on {$oc['if']} family $inetfamily from fe80::/10 to fe80::/10\n";
 			if ((isset($config['dhcpd'][$on]['v6enable']) && !$oc['bridge']) ||
 					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['v6enable']))) {
 
 				$ipfrules .= <<<EOD
 
 # allow access to DHCP server on {$on}
-pass in quick on {$oc['if']} proto udp from any port = 546 to ff02::1:2 port = 547
+pass in quick on {$oc['if']} family $inetfamily proto udp from any port = 546 to ff02::1:2 port = 547
 
 EOD;
 			}
@@ -534,28 +543,28 @@ EOD;
 		$ipfrules .= <<<EOD
 
 # allow essential ICMPv6 messages: router and neighbor soliciation/advertisement
-pass in quick proto ipv6-icmp from any to any icmp-type 133
-pass in quick proto ipv6-icmp from any to any icmp-type 134
-pass in quick proto ipv6-icmp from any to any icmp-type 135
-pass in quick proto ipv6-icmp from any to any icmp-type 136
-pass out quick proto ipv6-icmp from any to any icmp-type 133
-pass out quick proto ipv6-icmp from any to any icmp-type 134
-pass out quick proto ipv6-icmp from any to any icmp-type 135
-pass out quick proto ipv6-icmp from any to any icmp-type 136
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 133
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 134
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 135
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 136
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 133
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 134
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 135
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 136
 
 # also allow ICMPv6 destination unreachable, packet too big (PMTUD) and time exceeded
-pass in quick proto ipv6-icmp from any to any icmp-type 1
-pass out quick proto ipv6-icmp from any to any icmp-type 1
-pass in quick proto ipv6-icmp from any to any icmp-type 2
-pass out quick proto ipv6-icmp from any to any icmp-type 2
-pass in quick proto ipv6-icmp from any to any icmp-type 3
-pass out quick proto ipv6-icmp from any to any icmp-type 3
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 1
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 1
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 2
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 2
+pass in quick family $inetfamily proto ipv6-icmp from any to any icmp-type 3
+pass out quick family $inetfamily proto ipv6-icmp from any to any icmp-type 3
 
 # allow our DHCPv6 client out to the WAN
 # XXX - should be more restrictive
 # (not possible at the moment - need 'me' like in ipfw)
-pass out quick on $wanif proto udp from any port = 546 to any port = 547
-pass in quick on $wanif proto udp from any to any port = 546
+pass out quick on $wanif family $inetfamily proto udp from any port = 546 to any port = 547
+pass in quick on $wanif family $inetfamily proto udp from any to any port = 546
 
 
 EOD;
@@ -567,8 +576,8 @@ EOD;
 			$ipfrules .= <<<EOD
 
 # allow ping to make tunnel broker happy
-pass in quick proto ipv6-icmp from any to $curwanip icmp-type 128
-pass out quick proto ipv6-icmp from $curwanip to any icmp-type 129
+pass in quick family $inetfamily proto ipv6-icmp from any to $curwanip icmp-type 128
+pass out quick family $inetfamily proto ipv6-icmp from $curwanip to any icmp-type 129
 
 EOD;
 		}
@@ -582,8 +591,8 @@ EOD;
 			$ipfrules .= <<<EOD
 
 # allow 6to4 on WAN
-pass in quick on $wanif proto ipv6 from $tunep to $curwanip
-pass out quick on $wanif proto ipv6 from $curwanip to $tunep
+pass in quick on $wanif family $inetfamily proto ipv6 from $tunep to $curwanip
+pass out quick on $wanif family $inetfamily proto ipv6 from $curwanip to $tunep
 
 EOD;
 		}
@@ -614,11 +623,11 @@ EOD;
 			
 			if ($sa) {
 				$ipfrules .= <<<EOD
-skip 2 in on {$if} from any to {$ip}
-pass in quick on {$if} from {$sa}/{$sn} to {$route['network']}
-pass in quick on {$if} from {$route['network']} to {$sa}/{$sn}
-pass out quick on {$if} from {$sa}/{$sn} to {$route['network']}
-pass out quick on {$if} from {$route['network']} to {$sa}/{$sn}
+skip 2 in on {$if} family $inetfamily from any to {$ip}
+pass in quick on {$if} family $inetfamily from {$sa}/{$sn} to {$route['network']}
+pass in quick on {$if} family $inetfamily from {$route['network']} to {$sa}/{$sn}
+pass out quick on {$if} family $inetfamily from {$sa}/{$sn} to {$route['network']}
+pass out quick on {$if} family $inetfamily from {$route['network']} to {$sa}/{$sn}
 
 EOD;
 			/* this would be a good place to insert code here to pass traffic from subnets to secondaries etc.*/
@@ -648,10 +657,10 @@ EOD;
 
 				$ipfrules .= <<<EOD
 
-pass in quick on {$if} from {$sa}/{$sn} to {$ip}/{$sn}
-pass in quick on {$if} from {$ip}/{$sn} to {$sa}/{$sn}
-pass out quick on {$if} from {$sa}/{$sn} to {$ip}/{$sn}
-pass out quick on {$if} from {$ip}/{$sn} to {$sa}/{$sn}
+pass in quick on {$if} family $inetfamily from {$sa}/{$sn} to {$ip}/{$sn}
+pass in quick on {$if} family $inetfamily from {$ip}/{$sn} to {$sa}/{$sn}
+pass out quick on {$if} family $inetfamily from {$sa}/{$sn} to {$ip}/{$sn}
+pass out quick on {$if} family $inetfamily from {$ip}/{$sn} to {$sa}/{$sn}
 
 EOD;
 		}
@@ -661,13 +670,13 @@ EOD;
 	$ipfrules .= <<<EOD
 
 # WAN spoof check
-block in $log quick on $wanif from $lansa/$lansn to any
+block in $log quick on $wanif family $inetfamily from $lansa/$lansn to any
 
 EOD;
 
 	foreach ($optcfg as $oc) {
 		if (!$oc['bridge'])
-			$ipfrules .= "block in $log quick on $wanif from {$oc['sa']}/{$oc['sn']} to any\n";
+			$ipfrules .= "block in family {$inetfamily} $log quick on $wanif from {$oc['sa']}/{$oc['sn']} to any\n";
 	}
 	
 	/* allow PPTP traffic if PPTP client is enabled on WAN */
@@ -675,10 +684,10 @@ EOD;
 		$ipfrules .= <<<EOD
 
 # allow PPTP client
-pass in quick on {$wancfg['if']} proto gre from any to any
-pass out quick on {$wancfg['if']} proto gre from any to any
-pass in quick on {$wancfg['if']} proto tcp from any port = 1723 to any
-pass out quick on {$wancfg['if']} proto tcp from any to any port = 1723
+pass in quick on {$wancfg['if']} family $inetfamily proto gre from any to any
+pass out quick on {$wancfg['if']} family $inetfamily proto gre from any to any
+pass in quick on {$wancfg['if']} family $inetfamily proto tcp from any port = 1723 to any
+pass out quick on {$wancfg['if']} family $inetfamily proto tcp from any to any port = 1723
 
 EOD;
 	}
@@ -689,9 +698,9 @@ EOD;
 # allow our DHCP client out to the WAN
 # XXX - should be more restrictive
 # (not possible at the moment - need 'me' like in ipfw)
-pass out quick on $wanif proto udp from any port = 68 to any port = 67
-block in $log quick on $wanif proto udp from any port = 67 to $lansa/$lansn port = 68
-pass in quick on $wanif proto udp from any port = 67 to any port = 68
+pass out quick on $wanif family $inetfamily proto udp from any port = 68 to any port = 67
+block in $log quick on $wanif family $inetfamily proto udp from any port = 67 to $lansa/$lansn port = 68
+pass in quick on $wanif family $inetfamily proto udp from any port = 67 to any port = 68
 
 # LAN/OPT spoof check (needs to be after DHCP because of broadcast addresses)
 
@@ -732,10 +741,10 @@ EOD;
 			$ipfrules .= <<<EOD
 
 # block anything from private networks on WAN interface
-block in $log quick on $wanif from 10.0.0.0/8 to any
-block in $log quick on $wanif from 127.0.0.0/8 to any
-block in $log quick on $wanif from 172.16.0.0/12 to any
-block in $log quick on $wanif from 192.168.0.0/16 to any
+block in $log quick on $wanif family $inetfamily from 10.0.0.0/8 to any
+block in $log quick on $wanif family $inetfamily from 127.0.0.0/8 to any
+block in $log quick on $wanif family $inetfamily from 172.16.0.0/12 to any
+block in $log quick on $wanif family $inetfamily from 192.168.0.0/16 to any
 
 EOD;
 		} else {
@@ -745,46 +754,46 @@ EOD;
 			$ipfrules .= <<<EOD
 			
 # Stop site-local on the outside interface
-block in $log quick on $wanif from fec0::/10 to any
-block in $log quick on $wanif from any to fec0::/10
+block in $log quick on $wanif family $inetfamily from fec0::/10 to any
+block in $log quick on $wanif family $inetfamily from any to fec0::/10
 
 # Disallow "internal" addresses to appear on the wire.
-block in $log quick on $wanif from ::ffff:0.0.0.0/96 to any
-block in $log quick on $wanif from any to ::ffff:0.0.0.0/96
+block in $log quick on $wanif family $inetfamily from ::ffff:0.0.0.0/96 to any
+block in $log quick on $wanif family $inetfamily from any to ::ffff:0.0.0.0/96
 
 # Disallow packets to malicious IPv4 compatible prefix.
-block in $log quick on $wanif from ::224.0.0.0/100 to any
-block in $log quick on $wanif from any to ::224.0.0.0/100
-block in $log quick on $wanif from ::127.0.0.0/104 to any
-block in $log quick on $wanif from any to ::127.0.0.0/104
-block in $log quick on $wanif from ::0.0.0.0/104 to any
-block in $log quick on $wanif from any to ::0.0.0.0/104
-block in $log quick on $wanif from ::255.0.0.0/104 to any
-block in $log quick on $wanif from any to ::255.0.0.0/104
+block in $log quick on $wanif family $inetfamily from ::224.0.0.0/100 to any
+block in $log quick on $wanif family $inetfamily from any to ::224.0.0.0/100
+block in $log quick on $wanif family $inetfamily from ::127.0.0.0/104 to any
+block in $log quick on $wanif family $inetfamily from any to ::127.0.0.0/104
+block in $log quick on $wanif family $inetfamily from ::0.0.0.0/104 to any
+block in $log quick on $wanif family $inetfamily from any to ::0.0.0.0/104
+block in $log quick on $wanif family $inetfamily from ::255.0.0.0/104 to any
+block in $log quick on $wanif family $inetfamily from any to ::255.0.0.0/104
 
-block in $log quick on $wanif from ::0.0.0.0/96 to any
-block in $log quick on $wanif from any to ::0.0.0.0/96
+block in $log quick on $wanif family $inetfamily from ::0.0.0.0/96 to any
+block in $log quick on $wanif family $inetfamily from any to ::0.0.0.0/96
 
 # Disallow packets to malicious 6to4 prefix.
-block in $log quick on $wanif from 2002:e000::/20 to any
-block in $log quick on $wanif from any to 2002:e000::/20
-block in $log quick on $wanif from 2002:7f00::/24 to any
-block in $log quick on $wanif from any to 2002:7f00::/24
-block in $log quick on $wanif from 2002:0000::/24 to any
-block in $log quick on $wanif from any to 2002:0000::/24
-block in $log quick on $wanif from 2002:ff00::/24 to any
-block in $log quick on $wanif from any to 2002:ff00::/24
-block in $log quick on $wanif from 2002:0a00::/24 to any
-block in $log quick on $wanif from any to 2002:0a00::/24
-block in $log quick on $wanif from 2002:ac10::/28 to any
-block in $log quick on $wanif from any to 2002:ac10::/28
-block in $log quick on $wanif from 2002:c0a8::/32 to any
-block in $log quick on $wanif from any to 2002:c0a8::/32
+block in $log quick on $wanif family $inetfamily from 2002:e000::/20 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:e000::/20
+block in $log quick on $wanif family $inetfamily from 2002:7f00::/24 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:7f00::/24
+block in $log quick on $wanif family $inetfamily from 2002:0000::/24 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:0000::/24
+block in $log quick on $wanif family $inetfamily from 2002:ff00::/24 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:ff00::/24
+block in $log quick on $wanif family $inetfamily from 2002:0a00::/24 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:0a00::/24
+block in $log quick on $wanif family $inetfamily from 2002:ac10::/28 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:ac10::/28
+block in $log quick on $wanif family $inetfamily from 2002:c0a8::/32 to any
+block in $log quick on $wanif family $inetfamily from any to 2002:c0a8::/32
 
-block in $log quick on $wanif from ff05::/16 to any
-block in $log quick on $wanif from any to ff05::/16
+block in $log quick on $wanif family $inetfamily from ff05::/16 to any
+block in $log quick on $wanif family $inetfamily from any to ff05::/16
 
-pass in quick on $wanif proto udp from any to any  port = 546
+pass in quick on $wanif family $inetfamily proto udp from any to any  port = 546
 
 EOD;
 		}
@@ -819,24 +828,24 @@ EOD;
 	$ipfrules .= <<<EOD
 
 # Block TCP packets that do not mark the start of a connection
-skip 1 in proto tcp all flags S/SAFR
-block in $log quick proto tcp all
+skip 1 in family $inetfamily proto tcp all flags S/SAFR
+block in $log quick family $inetfamily proto tcp all
 
 #---------------------------------------------------------------------------
 # group head {$ifgroups['lan']} - LAN interface
 #---------------------------------------------------------------------------
-block in $log quick on $lanif all head {$ifgroups['lan']}
+block in $log quick on $lanif family $inetfamily all head {$ifgroups['lan']}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on $lanif all keep state $out_kf
+pass out quick on $lanif family $inetfamily all keep state $out_kf
 
 #---------------------------------------------------------------------------
 # group head {$ifgroups['wan']} - WAN interface
 #---------------------------------------------------------------------------
-block in $log quick on $wanif all head {$ifgroups['wan']}
+block in $log quick on $wanif family $inetfamily all head {$ifgroups['wan']}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on $wanif all keep state $out_kf
+pass out quick on $wanif family $inetfamily all keep state $out_kf
 
 EOD;
 
@@ -850,10 +859,10 @@ EOD;
 #---------------------------------------------------------------------------
 # group head {$ingroup} - {$on} interface
 #---------------------------------------------------------------------------
-block in $log quick on {$oc['if']} all head {$ingroup}
+block in $log quick on {$oc['if']} family $inetfamily all head {$ingroup}
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
-pass out quick on {$oc['if']} all keep state $out_kf
+pass out quick on {$oc['if']} family $inetfamily all keep state $out_kf
 
 EOD;
 	
@@ -863,7 +872,7 @@ EOD;
 		$ipfrules .= <<<EOD
 
 # always pass outgoing IPsec encapsulated packets
-pass out quick on enc0 all keep state $out_kf
+pass out quick on enc0 family $inetfamily all keep state $out_kf
 
 EOD;
 	}
@@ -872,7 +881,7 @@ EOD;
 		$ipfrules .= <<<EOD
 
 # make sure the user cannot lock himself out of the webGUI
-pass in quick from $lansa/$lansn to $lanip keep state group {$ifgroups['lan']}
+pass in quick family $inetfamily from $lansa/$lansn to $lanip keep state group {$ifgroups['lan']}
 
 EOD;
 	}
@@ -889,8 +898,8 @@ EOD;
 			$ipfrules .= <<<EOD
 
 # PPTP rules
-pass in quick proto gre from any to $pptpdtarget keep state group 200
-pass in quick proto tcp from any to $pptpdtarget port = 1723 keep state group 200
+pass in quick family $inetfamily proto gre from any to $pptpdtarget keep state group 200
+pass in quick family $inetfamily proto tcp from any to $pptpdtarget port = 1723 keep state group 200
 
 EOD;
 		}
@@ -1004,6 +1013,8 @@ EOD;
 			else if ($isipsec)
 				$line .= "on enc0 ";
 			
+			$line .= "family $inetfamily ";
+
 			if (isset($rule['protocol'])) {
 				$line .= "proto {$rule['protocol']} ";
 			}
@@ -1153,8 +1164,8 @@ EOD;
 #---------------------------------------------------------------------------
 # default rules (just to be sure)
 #---------------------------------------------------------------------------
-block in $log quick all
-block out $log quick all
+block in $log quick family $inetfamily all
+block out $log quick family $inetfamily all
 
 EOD;
 	
@@ -1164,6 +1175,11 @@ EOD;
 function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log, $ipv6 = false) {
 
 	global $g, $config;
+	if ($ipv6) {
+		$inetfamily = 'inet6';
+	} else {
+		$inetfamily = 'inet';
+	}
 	
 	$ipfrules = "";
 
@@ -1179,15 +1195,15 @@ function filter_rules_spoofcheck_generate($ifname, $if, $sa, $sn, $log, $ipv6 = 
 		/* output skip rules */
 		foreach ($config['staticroutes'][$strtconf] as $route) {
 			if ($route['interface'] == $ifname) {
-				$ipfrules .= "skip $n in on $if from {$route['network']} to any\n";
+				$ipfrules .= "skip $n in on $if family $inetfamily from {$route['network']} to any\n";
 				$n--;
 			}
 		}
 
-		$ipfrules .= "skip 1 in on $if from $sa/$sn to any\n";
-		$ipfrules .= "block in $log quick on $if all\n";
+		$ipfrules .= "skip 1 in on family $inetfamily $if from $sa/$sn to any\n";
+		$ipfrules .= "block in $log quick on $if family $inetfamily  all\n";
 	} else {
-		$ipfrules .= "block in $log quick on $if from ! $sa/$sn to any\n";
+		$ipfrules .= "block in $log quick on $if family $inetfamily  from ! $sa/$sn to any\n";
 	}
 	
 	return $ipfrules;
@@ -1198,20 +1214,20 @@ function filter_rules_ipsec_generate($ifname, $ip) {
 	$ipfrules = <<<EOD
 
 # Pass IKE packets
-pass in quick on {$ifname} proto udp from any to {$ip} port = 500 keep frags
-pass out quick on {$ifname} proto udp from {$ip} port = 500 to any keep frags
+pass in quick on {$ifname} family $inetfamily proto udp from any to {$ip} port = 500 keep frags
+pass out quick on {$ifname} family $inetfamily proto udp from {$ip} port = 500 to any keep frags
 
 # Pass NAT-T encapsulated ESP packets
-pass in quick on {$ifname} proto udp from any to {$ip} port = 4500 keep frags
-pass out quick on {$ifname} proto udp from {$ip} port = 4500 to any keep frags
+pass in quick on {$ifname} family $inetfamily proto udp from any to {$ip} port = 4500 keep frags
+pass out quick on {$ifname} family $inetfamily proto udp from {$ip} port = 4500 to any keep frags
 
 # Pass ESP packets
-pass in quick on {$ifname} proto esp from any to {$ip} keep frags
-pass out quick on {$ifname} proto esp from {$ip} to any keep frags
+pass in quick on {$ifname} family $inetfamily proto esp from any to {$ip} keep frags
+pass out quick on {$ifname} family $inetfamily proto esp from {$ip} to any keep frags
 
 # Pass AH packets
-pass in quick on {$ifname} proto ah from any to {$ip} keep frags
-pass out quick on {$ifname} proto ah from {$ip} to any keep frags
+pass in quick on {$ifname} family $inetfamily proto ah from any to {$ip} keep frags
+pass out quick on {$ifname} family $inetfamily proto ah from {$ip} to any keep frags
 
 EOD;
 	

@@ -47,8 +47,8 @@
 		sleep($argv[1]);
 	}
 	
-	/* reload firewall rules ipv6 only (WAN IPv6 address may be referenced from
+	/* reload firewall rules (WAN IPv6 address may be referenced from
 	   user-defined firewall rules) */
-	filter_configure6();
+	filter_configure();
 	
 ?>

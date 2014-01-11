@@ -1,11 +1,11 @@
---- sys/contrib/ipfilter/netinet/ip_nat.c.orig	2008-10-02 04:57:24.000000000 +0200
-+++ sys/contrib/ipfilter/netinet/ip_nat.c	2009-08-04 23:00:53.000000000 +0200
-@@ -2279,7 +2289,7 @@
+--- sys/contrib/ipfilter/netinet/ip_nat.c.orig	2014-01-09 18:17:20.000000000 +0000
++++ sys/contrib/ipfilter/netinet/ip_nat.c	2014-01-09 18:22:06.000000000 +0000
+@@ -3044,7 +3044,7 @@
  			     (u_int)fin->fin_p, inb, fin->fin_src);
  	fin->fin_data[0] = sp;
  	fin->fin_data[1] = dp;
--	if (natl != NULL)
-+	if (natl != NULL && natl->nat_redir == NAT_REDIRECT)
+-	if (natl != NULL) {
++	if (natl != NULL && natl->nat_redir == NAT_REDIRECT) {
+ 		DT2(ns_new_xlate_exists, fr_info_t *, fin, nat_t *, natl);
+ 		NBUMPSIDE(0, ns_xlate_exists);
  		return -1;
- 
- 	nat->nat_inip.s_addr = htonl(in.s_addr);

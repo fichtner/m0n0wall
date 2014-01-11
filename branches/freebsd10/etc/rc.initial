@@ -49,6 +49,8 @@ PLATFORM=`cat /etc/platform`
 if [ "$PLATFORM" = "generic-pc-cdrom" ]; then
 echo "7) Install on Hard Drive";
 fi
+echo "8) Show IPF rules"
+echo "9) Set IPF to allow all"
 echo
 
 read -p "Enter a number: " opmode
@@ -78,6 +80,12 @@ case ${opmode} in
 		/etc/rc.initial.install
 	fi
 	;;
+8)
+	/etc/rc.initial.shipf
+	;;
+9)
+	/etc/rc.initial.openipf
+	;;	
 esac
 
 done

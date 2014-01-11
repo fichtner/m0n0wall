@@ -1,16 +1,16 @@
---- sys/sys/mbuf.h.orig	2010-12-21 18:09:25.000000000 +0100
-+++ sys/sys/mbuf.h	2012-01-18 11:35:55.000000000 +0100
-@@ -200,6 +200,7 @@
- #define	M_PROTO7	0x00100000 /* protocol-specific */
- #define	M_PROTO8	0x00200000 /* protocol-specific */
- #define	M_FLOWID	0x00400000 /* flowid is valid */
-+#define	M_IPIN_SKIPPFIL	0x00800000 /* m0n0wall: skip pfil processing in ip_input */
- /*
-  * For RELENG_{6,7} steal these flags for limited multiple routing table
-  * support. In RELENG_8 and beyond, use just one flag and a tag.
---- sys/netinet/ip_input.c.orig	2010-12-21 18:09:25.000000000 +0100
-+++ sys/netinet/ip_input.c	2012-01-23 20:03:04.000000000 +0100
-@@ -460,18 +460,22 @@
+--- sys/sys/mbuf.h.orig	2014-01-09 17:58:33.000000000 +0000
++++ sys/sys/mbuf.h	2014-01-09 17:59:00.000000000 +0000
+@@ -223,6 +223,7 @@
+ #define	M_VLANTAG	0x00000080 /* ether_vtag is valid */
+ #define	M_FLOWID	0x00000100 /* deprecated: flowid is valid */
+ #define	M_NOFREE	0x00000200 /* do not free mbuf, embedded in cluster */
++#define M_IPIN_SKIPPFIL 0x00800000 /* m0n0wall: skip pfil processing in ip_input */
+ 
+ #define	M_PROTO1	0x00001000 /* protocol-specific */
+ #define	M_PROTO2	0x00002000 /* protocol-specific */
+--- sys/netinet/ip_input.c.orig	2014-01-09 16:44:50.000000000 +0000
++++ sys/netinet/ip_input.c	2014-01-09 18:08:01.000000000 +0000
+@@ -449,18 +449,22 @@
  		}
  	}
  
@@ -43,7 +43,7 @@
  	}
  
  #ifdef ALTQ
-@@ -528,6 +532,22 @@
+@@ -513,6 +517,22 @@
  	if (!PFIL_HOOKED(&V_inet_pfil_hook))
  		goto passin;
  
@@ -66,12 +66,12 @@
  	odst = ip->ip_dst;
  	if (pfil_run_hooks(&V_inet_pfil_hook, &m, ifp, PFIL_IN, NULL) != 0)
  		return;
---- sys/netinet/ipfw/ip_dn_io.c.orig	2010-12-28 13:18:46.000000000 +0100
-+++ sys/netinet/ipfw/ip_dn_io.c	2012-01-18 11:35:00.000000000 +0100
-@@ -601,6 +601,7 @@
+--- sys/netpfil/ipfw/ip_dn_io.c.orig	2014-01-09 18:01:24.000000000 +0000
++++ sys/netpfil/ipfw/ip_dn_io.c	2014-01-09 18:06:05.000000000 +0000
+@@ -662,6 +662,7 @@
+ 			break ;
+ 
  		case DIR_IN :
- 			/* put header in network format for ip_input() */
- 			//SET_NET_IPLEN(mtod(m, struct ip *));
 +			m->m_flags |= M_IPIN_SKIPPFIL;
  			netisr_dispatch(NETISR_IP, m);
  			break;

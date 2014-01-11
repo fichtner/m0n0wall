@@ -1,19 +1,16 @@
 critical areas
-	ipfstat to be compiled, patched ok
-	kernel patches for ipfilter and dummynet to be reviewed
-	runfw, acpi and vlan removed from kernel for now as breaks build
-	kernel doesn't like options		IPSTATE_SIZE=42859 or IPSTATE_MAX=30000 , so removed for now
-	doesn't detect WAN interface for some reason on first boot
-	ipfilter ipf command not working correctly, using active/inactive switch to workaround.
-	all the kernel patches to be reviewed, several commented out.
 
 areas to investigate impact
 	Check removing ifconfig patches ok , basically does dhcp-pd work ? (randr etc)
 	Check rtadvd patch for logging is good, looks fine
+	firewall tuneables are now sysctl's like net.inet.ipf.fr_udptimeout , we could make these user configurable
+	amd64 kernel config has not been update for freebsd 10
+	ipfw supports redirect for ipv6 now, captiveportal should be updated
+ 	ralink option should be removed from webgui as not a kmod anymore
+ 	runfw and acpi are not kmods anymore, they are built into the kernel
 
 	syslinux build maybe reduced a fraction if not boot kmods are moved out of kernel into chroot for kldload after init/rc
 	DHCP relay cannot start when DHCP server is running (even on different interfaces)
-	ipfw supports redirect for ipv6 now, captiveportal should be updated
 	
 areas to improve
 	wireless LAN country code selection ("ifconfig xxx list countries")

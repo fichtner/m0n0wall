@@ -1,0 +1,213 @@
+--- sys/dev/glxsb/glxsb.c.orig	2013-12-31 18:38:29.000000000 +0000
++++ sys/dev/glxsb/glxsb.c	2014-01-11 12:30:46.000000000 +0000
+@@ -42,6 +42,7 @@
+ #include <sys/rwlock.h>
+ #include <sys/sysctl.h>
+ #include <sys/taskqueue.h>
++#include <vm/uma.h>
+ 
+ #include <machine/bus.h>
+ #include <machine/cpufunc.h>
+@@ -174,6 +175,7 @@
+ 	struct cryptop		*to_crp;	/* cryptop to perfom */
+ 	struct cryptodesc	*to_enccrd;	/* enccrd to perform */
+ 	struct cryptodesc	*to_maccrd;	/* maccrd to perform */
++	TAILQ_ENTRY(glxsb_taskop) to_next;
+ };
+ 
+ struct glxsb_softc {
+@@ -192,8 +194,9 @@
+ 	struct mtx		sc_task_mtx;	/* task mutex */
+ 	struct taskqueue	*sc_tq;		/* task queue */
+ 	struct task		sc_cryptotask;	/* task */
+-	struct glxsb_taskop	sc_to;		/* task's crypto operation */
+-	int			sc_task_count;	/* tasks count */
++	TAILQ_HEAD(to_head, glxsb_taskop)
++				sc_taskops;	/* tasks operations */
++	uma_zone_t 		sc_taskops_zone;/* tasks operations' zone */
+ };
+ 
+ static int glxsb_probe(device_t);
+@@ -349,13 +352,21 @@
+ 	struct glxsb_softc *sc = device_get_softc(dev);
+ 	struct glxsb_session *ses;
+ 
++	/* do not detach if there are pending tasks */
++	if (!mtx_trylock(&sc->sc_task_mtx))
++		goto busy;
++	if (!TAILQ_EMPTY(&sc->sc_taskops)) {
++		mtx_unlock(&sc->sc_task_mtx);
++		goto busy;
++	}
++	mtx_unlock(&sc->sc_task_mtx);
++	
++	/* do not detach if there are active sessions */
+ 	rw_wlock(&sc->sc_sessions_lock);
+ 	TAILQ_FOREACH(ses, &sc->sc_sessions, ses_next) {
+ 		if (ses->ses_used) {
+ 			rw_wunlock(&sc->sc_sessions_lock);
+-			device_printf(dev,
+-				"cannot detach, sessions still active.\n");
+-			return (EBUSY);
++			goto busy;
+ 		}
+ 	}
+ 	while (!TAILQ_EMPTY(&sc->sc_sessions)) {
+@@ -373,7 +384,13 @@
+ 	taskqueue_free(sc->sc_tq);
+ 	rw_destroy(&sc->sc_sessions_lock);
+ 	mtx_destroy(&sc->sc_task_mtx);
++	uma_zdestroy(sc->sc_taskops_zone);
+ 	return (0);
++
++busy:
++	device_printf(dev,
++	    "cannot detach, sessions still active.\n");
++	return (EBUSY);
+ }
+ 
+ /*
+@@ -495,9 +512,17 @@
+ 
+ 	TAILQ_INIT(&sc->sc_sessions);
+ 	sc->sc_sid = 1;
++	TAILQ_INIT(&sc->sc_taskops);
++	sc->sc_taskops_zone = uma_zcreate("glxsb_taskop", 
++	    sizeof(struct glxsb_taskop), 0, 0, 0, 0,
++	    UMA_ALIGN_PTR, UMA_ZONE_ZINIT);	
+ 	rw_init(&sc->sc_sessions_lock, "glxsb_sessions_lock");
+ 	mtx_init(&sc->sc_task_mtx, "glxsb_crypto_mtx", NULL, MTX_DEF);
+ 
++	if (sc->sc_taskops_zone == NULL) {
++		device_printf(sc->sc_dev, "cannot setup taskops zone\n");
++		goto crypto_fail;
++	}
+ 	if (crypto_register(sc->sc_cid, CRYPTO_AES_CBC, 0, 0) != 0)
+ 		goto crypto_fail;
+ 	if (crypto_register(sc->sc_cid, CRYPTO_NULL_HMAC, 0, 0) != 0)
+@@ -522,6 +547,7 @@
+ 	crypto_unregister_all(sc->sc_cid);
+ 	rw_destroy(&sc->sc_sessions_lock);
+ 	mtx_destroy(&sc->sc_task_mtx);
++	uma_zdestroy(sc->sc_taskops_zone);
+ 	return (ENOMEM);
+ }
+ 
+@@ -820,41 +846,52 @@
+ glxsb_crypto_task(void *arg, int pending)
+ {
+ 	struct glxsb_softc *sc = arg;
++	struct glxsb_taskop *taskop;
+ 	struct glxsb_session *ses;
+ 	struct cryptop *crp;
+ 	struct cryptodesc *enccrd, *maccrd;
+ 	int error;
+ 
+-	maccrd = sc->sc_to.to_maccrd;
+-	enccrd = sc->sc_to.to_enccrd;
+-	crp = sc->sc_to.to_crp;
+-	ses = sc->sc_to.to_ses;
+-
+-	/* Perform data authentication if requested before encryption */
+-	if (maccrd != NULL && maccrd->crd_next == enccrd) {
+-		error = glxsb_hash_process(ses, maccrd, crp);
+-		if (error != 0)
+-			goto out;
+-	}
+-
+-	error = glxsb_crypto_encdec(crp, enccrd, ses, sc);
+-	if (error != 0)
+-		goto out;
++	for (; pending > 0; pending--) {
++		/* pop crypto request */
++		mtx_lock(&sc->sc_task_mtx);
++		taskop = TAILQ_FIRST(&sc->sc_taskops);
++		if (taskop != NULL) {
++			TAILQ_REMOVE(&sc->sc_taskops, taskop, to_next);
++			mtx_unlock(&sc->sc_task_mtx);
++		} else {
++			/* should not happen */
++			mtx_unlock(&sc->sc_task_mtx);
++			continue;
++		}
++		maccrd = taskop->to_maccrd;
++		enccrd = taskop->to_enccrd;
++		crp = taskop->to_crp;
++		ses = taskop->to_ses;
++		uma_zfree(sc->sc_taskops_zone, taskop);
++
++		/* Perform data authentication if requested before encryption */
++		if (maccrd != NULL && maccrd->crd_next == enccrd) {
++			error = glxsb_hash_process(ses, maccrd, crp);
++			if (error != 0)
++				goto crypto_out;
++		}
+ 
+-	/* Perform data authentication if requested after encryption */
+-	if (maccrd != NULL && enccrd->crd_next == maccrd) {
+-		error = glxsb_hash_process(ses, maccrd, crp);
++		error = glxsb_crypto_encdec(crp, enccrd, ses, sc);
+ 		if (error != 0)
+-			goto out;
+-	}
+-out:
+-	mtx_lock(&sc->sc_task_mtx);
+-	sc->sc_task_count--;
+-	mtx_unlock(&sc->sc_task_mtx);
++			goto crypto_out;
+ 
+-	crp->crp_etype = error;
+-	crypto_unblock(sc->sc_cid, CRYPTO_SYMQ);
+-	crypto_done(crp);
++		/* Perform data authentication if requested after encryption */
++		if (maccrd != NULL && enccrd->crd_next == maccrd) {
++			error = glxsb_hash_process(ses, maccrd, crp);
++			if (error != 0)
++				goto crypto_out;
++		}
++
++crypto_out:
++		crp->crp_etype = error;
++		crypto_done(crp);
++	} /* for */
+ }
+ 
+ static int
+@@ -863,6 +900,7 @@
+ 	struct glxsb_softc *sc = device_get_softc(dev);
+ 	struct glxsb_session *ses;
+ 	struct cryptodesc *crd, *enccrd, *maccrd;
++	struct glxsb_taskop *taskop;
+ 	uint32_t sid;
+ 	int error = 0;
+ 
+@@ -922,19 +960,20 @@
+ 		goto fail;
+ 	}
+ 
++	/* queue the crypto request */
+ 	mtx_lock(&sc->sc_task_mtx);
+-	if (sc->sc_task_count != 0) {
++	taskop = uma_zalloc(sc->sc_taskops_zone, M_NOWAIT);
++	if (taskop == NULL) {
+ 		mtx_unlock(&sc->sc_task_mtx);
+-		return (ERESTART);
++		error = ENOMEM;
++		goto fail;
+ 	}
+-	sc->sc_task_count++;
+-
+-	sc->sc_to.to_maccrd = maccrd;
+-	sc->sc_to.to_enccrd = enccrd;
+-	sc->sc_to.to_crp = crp;
+-	sc->sc_to.to_ses = ses;
++	taskop->to_maccrd = maccrd;
++	taskop->to_enccrd = enccrd;
++	taskop->to_crp = crp;
++	taskop->to_ses = ses;
++	TAILQ_INSERT_TAIL(&sc->sc_taskops, taskop, to_next);
+ 	mtx_unlock(&sc->sc_task_mtx);
+-
+ 	taskqueue_enqueue(sc->sc_tq, &sc->sc_cryptotask);
+ 	return(0);
+ 

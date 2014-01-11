@@ -61,16 +61,17 @@ export CC=gcc46
         ./configure
         make
         install -s ez-ipupdate $MW_BUILDPATH/m0n0fs/usr/local/bin/
-# ipfilter userland tools (newer version than included with FreeBSD)
-#	cd $MW_BUILDPATH/tmp
-#	rm -Rf ip_fil4.1.34
-#        tar -zxf $MW_BUILDPATH/freebsd10/build/local-sources/ip_fil4.1.34.tar.gz
-#	cd ip_fil4.1.34
-#        patch < $MW_BUILDPATH/freebsd10/build/patches/user/ipfstat.c.patch
-#	make freebsd10
-#	install -s BSD/FreeBSD-8.*-$MW_ARCH/{ipf,ipfs,ipfstat,ipmon,ipnat,ippool} $MW_BUILDPATH/m0n0fs/sbin
+# ipfilter userland tools
+        export CC=cc
         cd /sbin
-        cp ipf ipfs ipfstat ipmon ipnat ippool $MW_BUILDPATH/m0n0fs/sbin
+        cp ipf ipfs ipmon ipnat ippool $MW_BUILDPATH/m0n0fs/sbin
+        cd /usr/src/contrib/ipfilter/tools/
+        patch < $MW_BUILDPATH/freebsd10/build/patches/user/ipfstat.c.patch
+        cd /usr/src/sbin/ipf/
+        make libipf ipfstat
+        cp /usr/src/sbin/ipf/ipfstat/ipfstat $MW_BUILDPATH/m0n0fs/sbin
+        make clean
+        export CC=gcc46
 # modem-stats
 	cd $MW_BUILDPATH/tmp
 	rm -Rf modem-stats-1.0.1

@@ -15,29 +15,33 @@ fi
 
 # patch kernel / sources
 		cd $MW_BUILDPATH/tmp
-#  Bypass packet filtering for packets from a tunnel (gif).
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip6_input.c.patch
 #  6RD support
-#		patch -p0 < $MW_BUILDPATH/freebsd10/build/patches/kernel/stf_6rd_20100923-1.diff
+#		patch -p0 < $MW_BUILDPATH/freebsd10/build/patches/kernel/stf_6rd_20100923-1.diff , 6RD not used yet
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/Makefile.orig.patch
+#
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/options.orig.patch
+#
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_ftp_pxy.c.orig.patch
 # NAT redirect fix
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_nat.c.orig.patch
-# 
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/fil.c.orig.patch
-# Reduce fr_tcphalfclosed and increase fr_udpacktimeout
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_state.c.orig.patch
-		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/mlfk_ipl.c.orig.patch
-# change order of calls to ipfw to ensure nat works
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/pfil.c.orig.patch 
-# Fix for psuedo checksum NIC's
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_fil_freebsd.c.patch
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_nat.c.orig.patch
+# Not really sure what this was for, don't think we need this anymore
+#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/fil.c.orig.patch. 
 #
-#		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/dummynet_with_ipnat.patch
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/mlfk_ipl.c.orig.patch
+# change order of calls to ipfw to ensure ipnat works
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/pfil.c.orig.patch 
+# Fix for psuedo checksum NIC's
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/ip_fil_freebsd.c.patch
+# Fix for using dummynet and ipnat
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/dummynet_with_ipnat.patch
+#
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/vm_machdep.c.patch
+# fix for noika ip120 intel nic
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/if_em.c.patch
+#
 		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/if_fxp.c.patch
+# glxsb crypto speed increase kern/132622
+		patch < $MW_BUILDPATH/freebsd10/build/patches/kernel/glxsb.c.orig.patch
 		
 # kernel compile
         cd $MW_BUILDPATH/tmp/sys/$MW_ARCH/conf
@@ -52,10 +56,6 @@ fi
         mv kernel.gz $MW_BUILDPATH/tmp/
         cd modules/$MW_BUILDPATH/tmp/sys/modules
         cp aesni/aesni.ko glxsb/glxsb.ko padlock/padlock.ko if_tap/if_tap.ko if_vlan/if_vlan.ko dummynet/dummynet.ko ipfw/ipfw.ko $MW_BUILDPATH/m0n0fs/boot/kernel
-#		if [ $MW_ARCH = "i386" ]; then
-#                cp acpi/acpi/acpi.ko $MW_BUILDPATH/tmp
-#       fi
-
 
 # make libs
 		cd $MW_BUILDPATH/tmp

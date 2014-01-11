@@ -1,30 +1,30 @@
---- sys/contrib/ipfilter/netinet/ip_fil_freebsd.c.orig	2010-12-21 18:09:25.000000000 +0100
-+++ sys/contrib/ipfilter/netinet/ip_fil_freebsd.c	2012-03-21 16:56:52.000000000 +0100
-@@ -1352,12 +1352,26 @@
- 	ip = fin->fin_ip;
- 
+--- sys/contrib/ipfilter/netinet/ip_fil_freebsd.c.orig	2014-01-09 14:41:04.000000000 +0000
++++ sys/contrib/ipfilter/netinet/ip_fil_freebsd.c	2014-01-09 14:45:39.000000000 +0000
+@@ -1123,12 +1123,26 @@
+ 		return -1;
+ 	}
  	if (m->m_pkthdr.csum_flags & CSUM_DATA_VALID) {
 +		/* UDP may have zero checksum field (= no checksum) */
 +		if (fin->fin_p == IPPROTO_UDP && (fin->fin_flx & (FI_FRAG|FI_SHORT|FI_BAD)) == 0) {
 +			udphdr_t *udp = fin->fin_dp;
 +			if (udp->uh_sum == 0) {
 +				/* we're good no matter what the hardware checksum flags
-+				   and csum_data say (handling of csum_data for zero UDP
-+				   checksum is not consistent across all drivers) */
++				and csum_data say (handling of csum_data for zero UDP
++				checksum is not consistent across all drivers) */
 +				fin->fin_cksum = 1;
-+				return;
++				return 0;
 +			}
 +		}
-+		
++
  		if (m->m_pkthdr.csum_flags & CSUM_PSEUDO_HDR)
  			sum = m->m_pkthdr.csum_data;
  		else
  			sum = in_pseudo(ip->ip_src.s_addr, ip->ip_dst.s_addr,
  					htonl(m->m_pkthdr.csum_data +
--					fin->fin_ip->ip_len + fin->fin_p));
+-					fin->fin_dlen + fin->fin_p));
 +					fin->fin_ip->ip_len -
 +					(fin->fin_ip->ip_hl << 2) +
 +					fin->fin_p));
  		sum ^= 0xffff;
  		if (sum != 0) {
- 			fin->fin_flx |= FI_BAD;
+ 			fin->fin_cksum = FI_CK_BAD;
