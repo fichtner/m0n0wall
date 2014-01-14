@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- always allow required MAC types for WPA authentication in captive portal ipfw config
+
 - fix interfaces' status display for interfaces that do not have a mac address
   like MPD links (reviewed by Andrew White)
 
