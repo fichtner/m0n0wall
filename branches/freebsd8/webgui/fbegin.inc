@@ -67,7 +67,7 @@ function dynamic_menu(&$menu, $menu_title) {
 			}
 			else { 
 				if (!isset($header_displayed)) {
-					if (isset($config['system']['webgui']['expanddiags']) || strstr($_SERVER['SCRIPT_FILENAME'], "diag_") || strstr($_SERVER['SCRIPT_FILENAME'], "reboot")): ?>
+					if (isset($config['system']['webgui']['expanddiags']) || strstr($_SERVER['SCRIPT_FILENAME'], "diag_") || strstr($_SERVER['SCRIPT_FILENAME'], "reboot") || strstr($_SERVER['SCRIPT_FILENAME'], "status_graph_cpu")): ?>
 					<a href="javascript:showhide('diag','tri_diag')"><img src="/tri_o.gif" id="tri_diag" width="14" height="10" border="0" alt=""></a><strong><a href="javascript:showhide('diag','tri_diag')" class="navlnk">Diagnostics</a></strong><br>
 					<span id="diag">
 					<?php else: ?>
