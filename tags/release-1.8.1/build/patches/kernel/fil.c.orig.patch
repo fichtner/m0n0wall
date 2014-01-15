@@ -1,0 +1,28 @@
+--- sys/contrib/ipfilter/netinet/fil.c.orig	2007-12-01 01:53:16.000000000 +0100
++++ sys/contrib/ipfilter/netinet/fil.c	2008-02-23 19:34:31.000000000 +0100
+@@ -103,6 +103,12 @@
+ # include <sys/hashing.h>
+ # include <netinet/in_var.h>
+ #endif
++#if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
++# include <sys/malloc.h>
++# if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#  include "opt_ipfilter.h"
++# endif
++#endif
+ #include <netinet/tcp.h>
+ #if (!defined(__sgi) && !defined(AIX)) || defined(_KERNEL)
+ # include <netinet/udp.h>
+@@ -142,12 +148,6 @@
+ #if defined(IPFILTER_BPF) && defined(_KERNEL)
+ # include <net/bpf.h>
+ #endif
+-#if defined(__FreeBSD_version) && (__FreeBSD_version >= 300000)
+-# include <sys/malloc.h>
+-# if defined(_KERNEL) && !defined(IPFILTER_LKM)
+-#  include "opt_ipfilter.h"
+-# endif
+-#endif
+ #include "netinet/ipl.h"
+ /* END OF INCLUDES */
+ 

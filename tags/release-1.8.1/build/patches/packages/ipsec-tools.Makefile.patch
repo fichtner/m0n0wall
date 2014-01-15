@@ -1,0 +1,11 @@
+--- Makefile.orig	2011-02-21 22:54:13.000000000 +0000
++++ Makefile	2011-02-21 22:54:27.000000000 +0000
+@@ -26,7 +26,7 @@
+ USE_AUTOTOOLS=	libtool:22
+ GNU_CONFIGURE=	yes
+ USE_LDCONFIG=	yes
+-CONFIGURE_ARGS=	--enable-shared --sysconfdir=${PREFIX}/etc/racoon \
++CONFIGURE_ARGS=	--without-readline --enable-shared --sysconfdir=${PREFIX}/etc/racoon \
+ 		--localstatedir=${STATEDIR:S/\/racoon//} \
+ 		--with-pkgversion=freebsd-${PORTVERSION}
+ 

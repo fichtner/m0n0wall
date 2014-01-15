@@ -1,0 +1,17 @@
+--- sys/netinet6/ip6_input.c.orig	2010-12-21 18:09:25.000000000 +0100
++++ sys/netinet6/ip6_input.c	2011-05-18 18:28:36.000000000 +0200
+@@ -480,6 +480,14 @@
+ 	}
+ #endif
+ 
++#ifdef IPSEC
++	/*
++	 * Bypass packet filtering for packets from a tunnel (gif).
++	 */
++	if (ip6_ipsec_filtertunnel(m))
++		goto passin;
++#endif /* IPSEC */
++
+ 	/*
+ 	 * Run through list of hooks for input packets.
+ 	 *

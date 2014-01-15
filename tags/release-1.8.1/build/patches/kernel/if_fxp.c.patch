@@ -1,0 +1,15 @@
+--- sys/dev/fxp/if_fxp.c.orig	2012-06-11 21:45:16.000000000 +0000
++++ sys/dev/fxp/if_fxp.c	2012-06-11 21:55:38.000000000 +0000
+@@ -612,12 +612,6 @@
+ 		sc->flags |= FXP_FLAG_SAVE_BAD;
+ 	}
+ 
+-	/* For 82559 or later chips, Rx checksum offload is supported. */
+-	if (sc->revision >= FXP_REV_82559_A0) {
+-		/* 82559ER does not support Rx checksum offloading. */
+-		if (sc->ident->devid != 0x1209)
+-			sc->flags |= FXP_FLAG_82559_RXCSUM;
+-	}
+ 	/*
+ 	 * Enable use of extended RFDs and TCBs for 82550
+ 	 * and later chips. Note: we need extended TXCB support

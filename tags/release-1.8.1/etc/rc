@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# $Id$
+# part of m0n0wall (http://m0n0.ch/wall)
+#
+# Copyright (C) 2003-2005 Manuel Kasper <mk@neon1.net>.
+# All rights reserved.
+# 
+# Check if syslinx ran, it will have created md2
+
+if [ ! -e /dev/md2 ]; then
+	# Remonut mfs as RW if not syslinux boot
+	/sbin/mount -o rw /dev/md0 /
+fi
+
+
+stty status '^T'
+
+trap : 2
+trap : 3
+
+HOME=/
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+export HOME PATH
+
+set -T
+trap "echo 'Reboot interrupted'; exit 1" 3
+
+# make some directories in /var
+mkdir -p /var/run /var/log /var/etc /var/db /var/empty /var/spool/lock
+
+if [ -e /dev/md2 ]; then
+	# If syslinux boot, we need new links as fat32 in freebsd doesn't support symlinks
+	rm /etc/resolv.conf /etc/hosts /usr/local/www/.htpasswd > /dev/null 2>&1
+	touch /etc/resolv.conf /etc/hosts /usr/local/www/.htpasswd
+	/bin/ln -s  /etc/resolv.conf /var/etc/resolv.conf
+	/bin/ln -s  /etc/hosts /var/etc/hosts
+	/bin/ln -s  /usr/local/www/.htpasswd /var/run/htpasswd
+fi
+
+# generate circular logfiles
+clog -i -s 262144 /var/log/system.log
+clog -i -s 262144 /var/log/filter.log
+clog -i -s 65536 /var/log/vpn.log
+clog -i -s 32768 /var/log/portalauth.log
+clog -i -s 32768 /var/log/dhcpd.log
+chmod 0600 /var/log/*.log
+
+adjkerntz -i
+
+# Create an initial utmp file
+cd /var/run && cp /dev/null utmp && chmod 644 utmp
+
+# Run ldconfig
+/sbin/ldconfig -elf /usr/lib /usr/local/lib
+
+# disable core dumping (to avoid running out of MFS space)
+/sbin/sysctl kern.coredump=0
+
+# if_enc: send packet to filter after stripping off the outer header
+/sbin/sysctl sysctl net.enc.in.ipsec_filter_mask=0x00000002
+
+# let the PHP-based configuration subsystem set up the system now
+/etc/rc.bootup
+exit 0

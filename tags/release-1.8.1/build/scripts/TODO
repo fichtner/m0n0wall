@@ -1,0 +1,12 @@
+critical areas
+	syslinux build needs rework for symlinks not being supported on FAT32 (mac os supports symlinks on fat32 and there is a patch 
+		for linux)  .htpasswd, config.xml , etc/hosts and /etc/resolv.conf are broken.  It may be ok to just use them without the symlink
+		as modern flash drives can handle a lot of r/w before 'wearing out'
+
+areas to investigate impact
+	syslinux build maybe reduced a fraction if not boot kmods are moved out of kernel into chroot for kldload after init/rc
+	DHCP relay cannot start when DHCP server is running (even on different interfaces)
+	
+areas to improve
+	wireless LAN country code selection ("ifconfig xxx list countries")
+	revamp bridge support: use virtual interfaces, configured on Interfaces: Assign page (new tab

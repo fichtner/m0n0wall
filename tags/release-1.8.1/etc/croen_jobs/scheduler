@@ -1,0 +1,101 @@
+#!/usr/local/bin/php -f
+<?php
+/*
+	$Id$
+	part of m0n0wall (http://m0n0.ch/wall)
+	
+	Copyright (C) 2012 Lennart Grahl <lennart.grahl@gmail.com>.
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+	require_once("functions.inc");
+	global $config, $g;
+	
+	// Dirty paths
+	$d_natconfdirty_path = $g['varrun_path'] . "/nat.conf.dirty";
+	$d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
+	$d_ipsecconfdirty_path = $g['varrun_path'] . "/ipsec.conf.dirty";
+	$d_shaperconfdirty_path = $g['varrun_path'] . "/shaper.conf.dirty";
+	$d_pptpuserdirty_path = $g['varrun_path'] . "/pptpd.user.dirty";
+	$d_dnsmasqdirty_path = $g['varrun_path'] . "/dnsmasq.dirty";
+	$d_staticmapsdirty_path = $g['varrun_path'] . "/staticmaps.dirty";
+	$d_staticroutesdirty_path = $g['varrun_path'] . "/staticroutes.dirty";
+	$d_aliasesdirty_path = $g['varrun_path'] . "/aliases.dirty";
+	$d_proxyarpdirty_path = $g['varrun_path'] . "/proxyarp.dirty";
+	$d_fwupenabled_path = $g['varrun_path'] . "/fwup.enabled";
+	$d_firmwarelock_path = $g['varrun_path'] . "/firmware.lock";
+	$d_sysrebootreqd_path = $g['varrun_path'] . "/sysreboot.reqd";
+	$d_passthrumacsdirty_path = $g['varrun_path'] . "/passthrumacs.dirty";
+	$d_allowedipsdirty_path = $g['varrun_path'] . "/allowedips.dirty";
+
+	// Parse temp file
+	$jobset = croen_parse_tmpfile();
+	$jobs_dir = '/etc/croen_jobs/';
+	$jobs_filename_ending = '.cjob';
+	
+	// Called by croen daemon
+	if ($jobset !== FALSE) {
+		if ($jobset['syslog']) {
+			croen_syslog("Executing job ".($jobset['descr'] && $jobset['descr'] != '' ? "'".$jobset['descr']."'" : $jobset['id']));
+		}
+
+		// Execute job
+		foreach ($jobset['jobs'] AS $job) {
+			$file = explode("-", $job['name'][0]);
+			if (file_exists($jobs_dir.$file[0].$jobs_filename_ending)) {
+				if ($jobset['syslog']) {
+					croen_syslog($job['name'][1]);
+				}
+				$job['name'] = $job['name'][0];
+
+				// Include
+				require($jobs_dir.$file[0].$jobs_filename_ending);
+			}
+		}
+
+		// Write config, unlink & reconfigure if required
+		if (isset($reconfigure_data) && is_array($reconfigure_data)) {
+			write_config();
+			foreach ($reconfigure_data AS $v) {
+				$retval = 0;
+				if (!file_exists($d_sysrebootreqd_path) && isset($v['func'])) {
+					config_lock();
+					$retval = call_user_func($v['func']);
+					config_unlock();
+				}
+				if ($retval == 0 && isset($v['unlink']) && file_exists($v['unlink'])) {
+					unlink($v['unlink']);
+				}
+			}
+		}
+	}
+	
+	// Called by minicron
+	else {
+		services_croen_configure();
+	}
+	
+	return 1;
+
+?>

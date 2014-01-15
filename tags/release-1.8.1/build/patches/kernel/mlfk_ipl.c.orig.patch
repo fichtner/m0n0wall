@@ -1,0 +1,14 @@
+--- sys/contrib/ipfilter/netinet/mlfk_ipl.c.orig	2007-11-18 12:03:29.000000000 +0100
++++ sys/contrib/ipfilter/netinet/mlfk_ipl.c	2008-02-23 19:35:35.000000000 +0100
+@@ -23,6 +23,11 @@
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
+ 
++#if __FreeBSD_version >= 300000
++# if defined(_KERNEL) && !defined(IPFILTER_LKM)
++#  include "opt_ipfilter.h"
++# endif
++#endif
+ 
+ #include <netinet/ipl.h>
+ #include <netinet/ip_compat.h>
