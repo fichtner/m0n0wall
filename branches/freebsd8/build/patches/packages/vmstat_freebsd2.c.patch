@@ -1,0 +1,35 @@
+--- ./agent/mibgroup/ucd-snmp/vmstat_freebsd2.c.orig	2001-09-16 22:16:16.000000000 +0100
++++ ./agent/mibgroup/ucd-snmp/vmstat_freebsd2.c	2014-01-20 23:58:27.000000000 +0000
+@@ -110,9 +110,11 @@
+ {
+ 	static time_t now, boottime;
+ 	time_t uptime;
++	int size;
+ 
+ 	if (boottime == 0)
+-		auto_nlist(BOOTTIME_SYMBOL, (char *)&boottime, sizeof (boottime));
++		size = sizeof(boottime);
++		sysctlbyname("kern.boottime", &boottime, &size, NULL, 0);
+ 
+ 	time(&now);
+ 	uptime = now - boottime;
+@@ -132,6 +134,7 @@
+     int loop;
+ 
+     time_t time_new = getuptime();
++    int size;
+     static time_t time_old;
+     static time_t time_diff;
+ 
+@@ -159,8 +162,9 @@
+ 	time_old = time_new;
+ 
+ 	/* CPU usage */
+-	auto_nlist(CPTIME_SYMBOL, (char *)cpu_new, sizeof (cpu_new));
+-	
++	size = sizeof(cpu_new);
++	sysctlbyname("kern.cp_time", &cpu_new, &size, NULL, 0);
++
+ 	cpu_total = 0;
+ 	
+ 	for (loop = 0; loop < CPUSTATES; loop++)

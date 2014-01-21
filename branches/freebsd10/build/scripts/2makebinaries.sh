@@ -171,12 +171,13 @@ export CC=gcc46
         cd ucd-snmp-4.2.7.1
         ./configure  --without-openssl --disable-debugging --enable-static \
         --enable-mini-agent --disable-privacy --disable-testing-code \
-        --disable-shared-version --disable-shared \
+        --disable-shared-version --disable-shared --target=i386-unknown-freebsd6.4 \
         '--with-out-transports=TCP Unix' \
-        '--with-mib-modules=host/hr_system mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
+        '--with-mib-modules=host mibII/interfaces mibII/var_route ucd-snmp/vmstat_freebsd2' \
 		--with-defaults
 		patch < $MW_BUILDPATH/freebsd10/build/patches/packages/ucd-snmp.patch
 		patch < $MW_BUILDPATH/freebsd10/build/patches/packages/ucd-snmp.config.h.patch
+                patch < $MW_BUILDPATH/freebsd10/build/patches/packages/vmstat_freebsd2.c.patch
 	    make
         install -s agent/snmpd $MW_BUILDPATH/m0n0fs/usr/local/sbin
 

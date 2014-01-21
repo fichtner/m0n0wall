@@ -1,5 +1,7 @@
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix snmpd for cpu and uptime, and some host mib stuff
+
 - fix keep diagnostics in navigation expanded after accessing diagnostics page "CPU Graph"
 
 -- fixup scripts, fix patches for kernel/ipfilter, make ipfilter 5 work (ipv4 and ipv6 are one table now), acpi and runfw in the kernel.
