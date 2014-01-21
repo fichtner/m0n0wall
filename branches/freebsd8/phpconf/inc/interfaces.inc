@@ -987,6 +987,7 @@ EOD;
 	$mpdconf .= <<<EOD
 	
 	create link static L1 pptp
+	set link action bundle B1
 	set auth authname "{$pptpcfg['username']}"
 	set auth password "{$pptpcfg['password']}"
 	set link keep-alive 10 60

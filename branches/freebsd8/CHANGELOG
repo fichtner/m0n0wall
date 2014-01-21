@@ -2,9 +2,14 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix PPTP client on WAN
+
 - fix snmpd for cpu and uptime, and some host mib stuff
 
 - fix keep diagnostics in navigation expanded after accessing diagnostics page "CPU Graph"
+
+1.8.1
+-----
 
 - always allow required MAC types for WPA authentication in captive portal ipfw config
 
