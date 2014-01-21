@@ -1,5 +1,7 @@
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- fix PPTP client on WAN
+
 - fix snmpd for cpu and uptime, and some host mib stuff
 
 - fix keep diagnostics in navigation expanded after accessing diagnostics page "CPU Graph"
