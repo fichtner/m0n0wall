@@ -1,5 +1,7 @@
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- automatically add filter rules for DHCP on optional interfaces if the DHCP relay is enabled
+
 - fix PPTP client on WAN
 
 - fix snmpd for cpu and uptime, and some host mib stuff

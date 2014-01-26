@@ -496,8 +496,8 @@ EOD;
 
 		/* allow access to DHCP server on optional interfaces */
 		foreach ($optcfg as $on => $oc) {
-			if ((isset($config['dhcpd'][$on]['enable']) && !$oc['bridge']) ||
-					($oc['bridge'] && isset($config['dhcpd'][$oc['bridge_if']]['enable']))) {
+			if (((isset($config['dhcpd'][$on]['enable']) || isset($config['dhcrelay'][$on]['enable'])) && !$oc['bridge']) ||
+				($oc['bridge'] && (isset($config['dhcpd'][$oc['bridge_if']]['enable']) || isset($config['dhcrelay'][$oc['bridge_if']]['enable'])))) {
 
 				$ipfrules .= <<<EOD
 
