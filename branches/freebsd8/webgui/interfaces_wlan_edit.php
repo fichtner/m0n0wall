@@ -56,6 +56,7 @@ if (isset($id) && $a_wlans[$id]) {
 	$pconfig['if'] = $a_wlans[$id]['if'];
 	$pconfig['descr'] = $a_wlans[$id]['descr'];
 	$pconfig['standard'] = $a_wlans[$id]['standard'];
+	$pconfig['ht'] = isset($a_wlans[$id]['ht']);
 	$pconfig['mode'] = $a_wlans[$id]['mode'];
 	$pconfig['ssid'] = $a_wlans[$id]['ssid'];
 	$pconfig['channel'] = $a_wlans[$id]['channel'];
@@ -125,11 +126,11 @@ if ($_POST) {
 		if (!$input_errors) {
 			/* if an 11a channel is selected, the mode must be 11a too, and vice versa */
 			$is_chan_11a = (strpos($wlchannels[$_POST['channel']]['mode'], "11a") !== false);
-			$is_std_11a = ($_POST['standard'] == "11a");
+			$is_std_11a = ($_POST['standard'] == "11a" || $_POST['standard'] == "11na");
 			if ($is_chan_11a && !$is_std_11a)
-				$input_errors[] = "802.11a channels can only be selected if the standard is set to 802.11a too.";
+				$input_errors[] = "802.11a channels can only be selected if the standard is set to 802.11(n)a too.";
 			else if (!$is_chan_11a && $is_std_11a)
-				$input_errors[] = "802.11a can only be selected if an 802.11a channel is selected too.";
+				$input_errors[] = "802.11(n)a can only be selected if an 802.11a channel is selected too.";
 		
 			/* currently, WPA is only supported in AP (hostap) mode */
 			if ($_POST['wpamode'] != "none" && $pconfig['mode'] != "hostap")
@@ -142,6 +143,7 @@ if ($_POST) {
 			$wlan['descr'] = $_POST['descr'];
 		
 			$wlan['standard'] = $_POST['standard'];
+			$wlan['ht'] = $_POST['ht'] ? true : false;
 			$wlan['mode'] = $_POST['mode'];
 			$wlan['ssid'] = $_POST['ssid'];
 			$wlan['channel'] = $_POST['channel'];
@@ -277,6 +279,9 @@ function wireless_get_channellist($if) {
 <script type="text/javascript">
 <!--
 function wlan_enable_change(enable_over) {
+    
+    // HT only in 11n mode
+    var ht_enable = (document.iform.standard.options[document.iform.standard.selectedIndex].value.indexOf("11n") > -1) || enable_over;
 	
 	// WPA only in hostap mode
 	var wpa_enable = (document.iform.mode.options[document.iform.mode.selectedIndex].value == "hostap") || enable_over;
@@ -305,6 +310,8 @@ function wlan_enable_change(enable_over) {
 	document.iform.radiusauthport.disabled = !wpa_ent_enable;
 	document.iform.radiusacctport.disabled = !wpa_ent_enable;
 	document.iform.radiussecret.disabled = !wpa_ent_enable;
+	
+	document.iform.ht.disabled = !ht_enable;
 }
 //-->
 </script>
@@ -336,7 +343,7 @@ function wlan_enable_change(enable_over) {
                 </tr>
                 <tr>
                   <td valign="top" class="vncellreq">Standard</td>
-                  <td class="vtable"><select name="standard" class="formfld" id="standard">
+                  <td class="vtable"><select name="standard" class="formfld" id="standard" onChange="wlan_enable_change(false)">
                       <?php
 					  foreach ($wlstandards as $sn): ?>
                       <option value="<?=htmlspecialchars($sn);?>" <?php if ($sn == $pconfig['standard']) echo "selected";?>>
@@ -344,6 +351,10 @@ function wlan_enable_change(enable_over) {
                       </option>
                       <?php endforeach; ?>
                     </select></td>
+                </tr>
+                <tr>
+                  <td valign="top" class="vncellreq">HT</td>
+                  <td class="vtable"><input type="checkbox" name="ht" id="ht" value="1" <?php if ($pconfig['ht']) echo "checked";?>><strong>Enable HT</strong></td>
                 </tr>
                 <tr> 
                   <td valign="top" class="vncellreq">Mode</td>

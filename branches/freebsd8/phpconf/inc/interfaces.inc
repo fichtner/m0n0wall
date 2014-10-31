@@ -457,6 +457,11 @@ function interfaces_wlan_configure() {
 			
 			if ($wlan['standard'])
 				$ifcargs .= " mode " . escapeshellarg($wlan['standard']);
+			
+			if (isset($wlan['ht']))
+				$ifcargs .= " ht";
+			else
+				$ifcargs .= " -ht";
 
 			$ifcargs .= " ssid " . escapeshellarg($wlan['ssid']) . " channel " . 
 				escapeshellarg($wlan['channel']);

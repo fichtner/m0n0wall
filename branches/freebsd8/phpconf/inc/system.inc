@@ -827,6 +827,9 @@ function system_identify_specific_platform() {
 	
 	if (strpos($dmesg, "PC Engines ALIX") !== false)
 		return array('name' => 'alix', 'descr' => 'PC Engines ALIX');
+	
+	if (strpos($dmesg, "AMD G-T40E") !== false && strpos($dmesg, "re0: Ethernet address: 00:0d:b9:") !== false)
+		return array('name' => 'apu', 'descr' => 'PC Engines APU');
 
 	if (preg_match("/Soekris net45../", $dmesg, $matches))
 		return array('name' => 'net45xx', 'descr' => $matches[0]);
