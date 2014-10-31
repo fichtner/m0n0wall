@@ -90,7 +90,19 @@ if ($_POST) {
 
 	unset($input_errors);
 	$pconfig = $_POST;
+}
 
+/* If a physical interface has been selected at this point, we can
+   determine the supported standards and channels */
+if ($pconfig['if']) {
+	$wlstandards = wireless_get_standards($pconfig['if']);
+	$wlchannels = wireless_get_channellist($pconfig['if']);
+} else {
+	$wlstandards = array();
+	$wlchannels = array();
+}
+
+if ($_POST) {
 	if (!$_POST['chgifonly']) {
 		/* input validation */
 		$reqdfields = "if mode ssid channel txpower";
@@ -184,16 +196,6 @@ if ($_POST) {
 			exit;
 		}
 	}
-}
-
-/* If a physical interface has been selected at this point, we can
-   determine the supported standards and channels */
-if ($pconfig['if']) {
-	$wlstandards = wireless_get_standards($pconfig['if']);
-	$wlchannels = wireless_get_channellist($pconfig['if']);
-} else {
-	$wlstandards = array();
-	$wlchannels = array();
 }
 
 if (!isset($pconfig['txpower']) || strlen($pconfig['txpower']) == 0)
