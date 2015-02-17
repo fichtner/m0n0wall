@@ -43,9 +43,9 @@ fi
         install -s sapi/cgi/php $MW_BUILDPATH/m0n0fs/usr/local/bin/
 # mini httpd
 	cd $MW_BUILDPATH/tmp
-	rm -Rf mini_httpd-1.19
-        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/mini_httpd-1.19.tar.gz
-        cd mini_httpd-1.19/
+	rm -Rf mini_httpd-1.21
+        tar -zxf $MW_BUILDPATH/freebsd8/build/local-sources/mini_httpd-1.21.tar.gz
+        cd mini_httpd-1.21/
         patch < $MW_BUILDPATH/freebsd8/build/patches/packages/mini_httpd.patch
         make
         install -s mini_httpd $MW_BUILDPATH/m0n0fs/usr/local/sbin

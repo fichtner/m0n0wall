@@ -726,6 +726,9 @@ function interfaces_wan_configure6($newwanip = false) {
 			/* can only start AICCU once the IPv4 connectivity is
 			   ready; otherwise it will exit immediately... */
 			if ($newwanip || is_ipaddr($wancfg['ipaddr'])) {
+				if (is_ipaddr($wancfg['ipaddr'])) {
+					sleep(10);
+				}
 				$aiccuconf = <<<EOD
 username {$wancfg['aiccu']['username']}
 password {$wancfg['aiccu']['password']}
