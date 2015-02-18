@@ -43,7 +43,7 @@ if ($ipv6rules = ($_GET['type'] == 'ipv6')) {
 $pgtitle = array("Firewall", "Rules", "Edit");	/* make group manager happy */
 $pgtitle = array("Firewall", ipv6enabled() ? ($ipv6rules ? 'IPv6 Rules' : 'IPv4 Rules') : 'Rules', "Edit");
 
-$specialsrcdst = explode(" ", "any wanip lan pptp");
+$specialsrcdst = explode(" ", "any wanip lan pptp l2tp");
 
 if (!is_array($config['filter'][$configname])) {
 	$config['filter'][$configname] = array();
@@ -475,7 +475,7 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
 					  if ($ipv6rules)
 					      $interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'ipsec' => 'IPsec');
 					  else
-					      $interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'ipsec' => 'IPsec');
+					      $interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'l2tp' => 'L2TP', 'ipsec' => 'IPsec');
 					  for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 					  	$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 					  }
@@ -583,6 +583,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
 							<?php if (!$ipv6rules): ?>
                             <option value="pptp" <?php if ($pconfig['src'] == "pptp") { echo "selected"; } ?>>
                             PPTP clients</option>
+                            <option value="l2tp" <?php if ($pconfig['src'] == "l2tp") { echo "selected"; } ?>>
+                            L2TP clients</option>
 							<?php endif; ?>
 							<?php for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++): ?>
                             <option value="opt<?=$i;?>" <?php if ($pconfig['src'] == "opt" . $i) { echo "selected"; } ?>>
@@ -671,6 +673,8 @@ Hint: the difference between block and reject is that with reject, a packet (TCP
 							<?php if (!$ipv6rules): ?>
                             <option value="pptp" <?php if ($pconfig['dst'] == "pptp") { echo "selected"; } ?>>
                             PPTP clients</option>
+                            <option value="l2tp" <?php if ($pconfig['dst'] == "l2tp") { echo "selected"; } ?>>
+                            L2TP clients</option>
 							<?php endif; ?>
 							<?php for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++): ?>
                             <option value="opt<?=$i;?>" <?php if ($pconfig['dst'] == "opt" . $i) { echo "selected"; } ?>>

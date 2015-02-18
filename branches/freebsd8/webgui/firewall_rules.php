@@ -53,8 +53,11 @@ if ($_POST['if'])
 	
 $iflist = array("lan" => "LAN", "wan" => "WAN");
 
-if ($config['pptpd']['mode'] == "server" && !$ipv6rules)
+if ((($config['pptpd']['mode'] == "server" )) && !$ipv6rules)
 	$iflist['pptp'] = "PPTP VPN";
+
+if ((($config['l2tp']['mode'] == "server" )) && !$ipv6rules)
+	$iflist['l2tp'] = "L2TP VPN";
 
 if (isset($config['ipsec']['enable']))
 	$iflist['ipsec'] = "IPsec VPN";

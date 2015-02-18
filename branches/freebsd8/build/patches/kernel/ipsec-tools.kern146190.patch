@@ -1,0 +1,291 @@
+--- sys/netipsec/esp_var.h.orig	2010-04-30 19:42:06.000000000 +0400
++++ sys/netipsec/esp_var.h	2010-04-30 12:12:23.000000000 +0400
+@@ -76,5 +76,7 @@
+ #define	V_esp_enable	VNET(esp_enable)
+ VNET_DECLARE(struct espstat, espstat);
+ #define	V_espstat	VNET(espstat)
++VNET_DECLARE(int, esp_ignore_natt_cksum);
++#define V_esp_ignore_natt_cksum	    VNET(esp_ignore_natt_cksum)
+ #endif /* _KERNEL */
+ #endif /*_NETIPSEC_ESP_VAR_H_*/
+--- sys/netipsec/ipsec.c.orig	2010-04-30 19:42:35.000000000 +0400
++++ sys/netipsec/ipsec.c	2010-04-30 13:11:12.000000000 +0400
+@@ -592,7 +592,7 @@
+ 	IPSEC_ASSERT(m->m_pkthdr.len >= sizeof(struct ip),("packet too short"));
+ 
+ 	/* NB: ip_input() flips it into host endian. XXX Need more checking. */
+-	if (m->m_len < sizeof (struct ip)) {
++	if (m->m_len >= sizeof (struct ip)) {
+ 		struct ip *ip = mtod(m, struct ip *);
+ 		if (ip->ip_off & (IP_MF | IP_OFFMASK))
+ 			goto done;
+--- sys/netipsec/ipsec_input.c.orig	2009-08-03 12:13:06.000000000 +0400
++++ sys/netipsec/ipsec_input.c	2010-04-30 12:23:24.000000000 +0400
+@@ -76,6 +76,11 @@
+ #include <netinet/icmp6.h>
+ #endif
+ 
++#ifdef IPSEC_NAT_T
++#include <netinet/tcp.h>
++#include <netinet/udp.h>
++#endif
++
+ #include <netipsec/ipsec.h>
+ #ifdef INET6
+ #include <netipsec/ipsec6.h>
+@@ -347,6 +352,34 @@
+ 	}
+ 	prot = ip->ip_p;
+ 
++#ifdef IPSEC_NAT_T
++	if (saidx->mode == IPSEC_MODE_TRANSPORT && sproto == IPPROTO_ESP &&
++	    sav->natt_cksum != 0) {
++		if (V_esp_ignore_natt_cksum != 0) {
++			/* Ignore checksum of packet protected by ESP.  */
++			if (prot == IPPROTO_TCP || prot == IPPROTO_UDP) {
++				m->m_pkthdr.csum_flags |= (CSUM_DATA_VALID | CSUM_PSEUDO_HDR);
++				m->m_pkthdr.csum_data = 0xffff;
++
++			}
++		} else {
++			if (prot == IPPROTO_TCP || prot == IPPROTO_UDP) {
++				u_int16_t proto_cksum;
++				int off = sizeof(struct ip);
++				if (prot == IPPROTO_TCP) {
++					off += offsetof(struct tcphdr, th_sum);
++				} else if (prot == IPPROTO_UDP) {
++					off += offsetof(struct udphdr, uh_sum);
++				}
++				m_copydata(m, off, sizeof(u_int16_t), (caddr_t)&proto_cksum);
++				proto_cksum = in_addword(sav->natt_cksum, ~ntohs(proto_cksum));
++				proto_cksum = ~htons(proto_cksum);
++				m_copyback(m, off, sizeof(u_int16_t), (caddr_t)&proto_cksum);
++			}
++		}
++	}
++#endif
++
+ #ifdef notyet
+ 	/* IP-in-IP encapsulation */
+ 	if (prot == IPPROTO_IPIP) {
+--- sys/netipsec/key.c.orig	2009-08-03 12:13:06.000000000 +0400
++++ sys/netipsec/key.c	2010-04-30 12:09:55.000000000 +0400
+@@ -459,6 +459,8 @@
+ #ifdef IPSEC_NAT_T
+ static struct mbuf *key_setsadbxport(u_int16_t, u_int16_t);
+ static struct mbuf *key_setsadbxtype(u_int16_t);
++static u_int16_t key_compute_natt_cksum(struct sockaddr*, 
++	struct sockaddr*, struct sockaddr*, struct sockaddr*);
+ #endif
+ static void key_porttosaddr(struct sockaddr *, u_int16_t);
+ #define	KEY_PORTTOSADDR(saddr, port)				\
+@@ -3083,6 +3085,7 @@
+ 	/*  Initialize even if NAT-T not compiled in: */
+ 	sav->natt_type = 0;
+ 	sav->natt_esp_frag_len = 0;
++	sav->natt_cksum = 0;
+ 
+ 	/* SA */
+ 	if (mhp->ext[SADB_EXT_SA] != NULL) {
+@@ -3505,7 +3508,19 @@
+ 			break;
+ 
+ 		case SADB_X_EXT_NAT_T_OAI:
++			m = key_setsadbaddr(SADB_X_EXT_NAT_T_OAI,
++			    &sav->natt_oa_src.sa,
++			    FULLMASK, IPSEC_ULPROTO_ANY);
++			if (!m)
++				goto fail;
++			break;
+ 		case SADB_X_EXT_NAT_T_OAR:
++			m = key_setsadbaddr(SADB_X_EXT_NAT_T_OAR,
++			    &sav->natt_oa_dst.sa,
++			    FULLMASK, IPSEC_ULPROTO_ANY);
++			if (!m)
++				goto fail;
++			break;
+ 		case SADB_X_EXT_NAT_T_FRAG:
+ 			/* We do not (yet) support those. */
+ 			continue;
+@@ -3786,6 +3801,56 @@
+ 			__func__, sa->sa_family));
+ 	return (0);
+ }
++
++/* 
++ * Compute checksum delta to be applied to incoming TCP/UDP packet
++ * after packet has been decrypted
++ */
++static u_int16_t
++key_compute_natt_cksum(struct sockaddr *src, struct sockaddr *dst,
++	struct sockaddr *natt_src, struct sockaddr *natt_dst)
++{
++	u_int32_t total_sum = 0;
++	u_int32_t sum_old, sum_new;
++	if (natt_src && key_sockaddrcmp(src, natt_src, 0)) {
++		IPSEC_ASSERT(src->sa.sa_family == AF_INET, ("bad address family"));
++		sum_old = *(u_int32_t*)(&((struct sockaddr_in*)src)->sin_addr);
++		sum_old = ntohl(sum_old);
++		sum_old = (sum_old & 0xFFFF) + (sum_old >> 16);
++		sum_old = (sum_old & 0xFFFF) + (sum_old >> 16);
++
++		sum_new = *(u_int32_t*)(&((struct sockaddr_in*)natt_src)->sin_addr);
++		sum_new = ntohl(sum_new);
++		sum_new = (sum_new & 0xFFFF) + (sum_new >> 16);
++		sum_new = (sum_new & 0xFFFF) + (sum_new >> 16);
++
++		if (sum_new < sum_old)
++			sum_new--;
++
++		total_sum += sum_new - sum_old;
++	}
++	if (natt_dst && key_sockaddrcmp(dst, natt_dst, 0)) {
++		IPSEC_ASSERT(dst->sa.sa_family == AF_INET, ("bad address family"));
++		sum_old = *(u_int32_t*)(&((struct sockaddr_in*)natt_dst)->sin_addr);
++		sum_old = ntohl(sum_old);
++		sum_old = (sum_old & 0xFFFF) + (sum_old >> 16);
++		sum_old = (sum_old & 0xFFFF) + (sum_old >> 16);
++
++		sum_new = *(u_int32_t*)(&((struct sockaddr_in*)dst)->sin_addr);
++		sum_new = ntohl(sum_new);
++		sum_new = (sum_new & 0xFFFF) + (sum_new >> 16);
++		sum_new = (sum_new & 0xFFFF) + (sum_new >> 16);
++
++		if (sum_new < sum_old)
++			sum_new--;
++
++		total_sum += sum_new - sum_old;
++	}
++	total_sum = (total_sum & 0xFFFF) + (total_sum >> 16);
++	total_sum = (total_sum & 0xFFFF) + (total_sum >> 16);
++	return (u_int16_t)total_sum;
++}
++
+ #endif /* IPSEC_NAT_T */
+ 
+ /*
+@@ -4656,7 +4721,7 @@
+ 	struct mbuf *m;
+ 	const struct sadb_msghdr *mhp;
+ {
+-	struct sadb_address *src0, *dst0;
++	struct sadb_address *src0, *dst0, *iaddr, *raddr;
+ 	struct secasindex saidx;
+ 	struct secashead *newsah;
+ 	struct secasvar *newsav;
+@@ -4747,10 +4812,24 @@
+ 	 * We made sure the port numbers are zero above, so we do
+ 	 * not have to worry in case we do not update them.
+ 	 */
+-	if (mhp->ext[SADB_X_EXT_NAT_T_OAI] != NULL)
++	if (mhp->ext[SADB_X_EXT_NAT_T_OAI] != NULL) {
+ 		ipseclog((LOG_DEBUG, "%s: NAT-T OAi present\n", __func__));
+-	if (mhp->ext[SADB_X_EXT_NAT_T_OAR] != NULL)
++		if (mhp->extlen[SADB_X_EXT_NAT_T_OAI] < sizeof(struct sadb_address)) {
++			ipseclog((LOG_DEBUG, "%s: invalid message is passed.\n",
++			    __func__));
++			return key_senderror(so, m, EINVAL);
++		}
++		iaddr = (struct sadb_address *)(mhp->ext[SADB_X_EXT_NAT_T_OAI]);
++	}
++	if (mhp->ext[SADB_X_EXT_NAT_T_OAR] != NULL) {
+ 		ipseclog((LOG_DEBUG, "%s: NAT-T OAr present\n", __func__));
++		if (mhp->extlen[SADB_X_EXT_NAT_T_OAR] < sizeof(struct sadb_address)) {
++			ipseclog((LOG_DEBUG, "%s: invalid message is passed.\n",
++			    __func__));
++			return key_senderror(so, m, EINVAL);
++		}
++		raddr = (struct sadb_address *)(mhp->ext[SADB_X_EXT_NAT_T_OAR]);
++	}
+ 
+ 	if (mhp->ext[SADB_X_EXT_NAT_T_TYPE] != NULL &&
+ 	    mhp->ext[SADB_X_EXT_NAT_T_SPORT] != NULL &&
+@@ -5081,6 +5160,11 @@
+ 		iaddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OAI];
+ 		raddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OAR];
+ 		ipseclog((LOG_DEBUG, "%s: NAT-T OAi/r present\n", __func__));
++	} else if (mhp->ext[SADB_X_EXT_NAT_T_OA] != NULL) {
++	    iaddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OA];
++	    raddr = NULL;
++	    ipseclog((LOG_DEBUG, "%s: NAT-T OA present\n", __func__));
++
+ 	} else {
+ 		iaddr = raddr = NULL;
+ 	}
+@@ -5177,6 +5261,16 @@
+ 	if (dport)
+ 		KEY_PORTTOSADDR(&sav->sah->saidx.dst,
+ 		    dport->sadb_x_nat_t_port_port);
++	if (iaddr)
++		bcopy(iaddr + 1, &sav->natt_oa_src, ((const struct sockaddr *)(iaddr + 1))->sa_len);
++	if (raddr)
++		bcopy(raddr + 1, &sav->natt_oa_dst, ((const struct sockaddr *)(raddr + 1))->sa_len);
++	if (sav->sah->saidx.src.sa.sa_family == AF_INET) {
++		struct sockaddr *natt_src_sa = iaddr ? &sav->natt_oa_src.sa : NULL;
++		struct sockaddr *natt_dst_sa = raddr ? &sav->natt_oa_dst.sa : NULL;
++		sav->natt_cksum = key_compute_natt_cksum(&sav->sah->saidx.src.sa,
++		    &sav->sah->saidx.dst.sa, natt_src_sa, natt_dst_sa);
++	}
+ 
+ #if 0
+ 	/*
+@@ -5377,6 +5471,11 @@
+ 		iaddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OAI];
+ 		raddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OAR];
+ 		ipseclog((LOG_DEBUG, "%s: NAT-T OAi/r present\n", __func__));
++	} else if (mhp->ext[SADB_X_EXT_NAT_T_OA] != NULL) {
++		iaddr = (struct sadb_address *)mhp->ext[SADB_X_EXT_NAT_T_OAI];
++		raddr = NULL;
++		ipseclog((LOG_DEBUG, "%s: NAT-T OA present\n", __func__));
++
+ 	} else {
+ 		iaddr = raddr = NULL;
+ 	}
+@@ -5436,6 +5535,16 @@
+ 	 */
+ 	if (type)
+ 		newsav->natt_type = type->sadb_x_nat_t_type_type;
++	if (iaddr)
++		bcopy(iaddr + 1, &newsav->natt_oa_src, ((const struct sockaddr *)(iaddr + 1))->sa_len);
++	if (raddr)
++		bcopy(raddr + 1, &newsav->natt_oa_dst, ((const struct sockaddr *)(raddr + 1))->sa_len);
++	if (newsav->sah->saidx.src.sa.sa_family == AF_INET) {
++		struct sockaddr *natt_src_sa = iaddr ? &newsav->natt_oa_src.sa : NULL;
++		struct sockaddr *natt_dst_sa = raddr ? &newsav->natt_oa_dst.sa : NULL;
++		newsav->natt_cksum = key_compute_natt_cksum(&newsav->sah->saidx.src.sa,
++		    &newsav->sah->saidx.dst.sa, natt_src_sa, natt_dst_sa);
++	}
+ 
+ #if 0
+ 	/*
+--- sys/netipsec/keydb.h.orig	2009-08-03 12:13:06.000000000 +0400
++++ sys/netipsec/keydb.h	2010-04-30 12:09:55.000000000 +0400
+@@ -157,6 +157,9 @@
+ 	 */
+ 	u_int16_t natt_type;		/* IKE/ESP-marker in output. */
+ 	u_int16_t natt_esp_frag_len;	/* MTU for payload fragmentation. */
++	union sockaddr_union natt_oa_src; /* NATT source address */
++	union sockaddr_union natt_oa_dst; /* NATT destination address */
++	u_int16_t natt_cksum;             /* checksum delta for inbound packets */
+ };
+ 
+ #define	SECASVAR_LOCK_INIT(_sav) \
+--- sys/netipsec/xform_esp.c.orig	2010-04-30 19:43:50.000000000 +0400
++++ sys/netipsec/xform_esp.c	2010-04-30 12:19:36.000000000 +0400
+@@ -78,12 +78,16 @@
+ 
+ VNET_DEFINE(int, esp_enable) = 1;
+ VNET_DEFINE(struct espstat, espstat);
++VNET_DEFINE(int, esp_ignore_natt_cksum) = 0;
+ 
+ SYSCTL_DECL(_net_inet_esp);
+ SYSCTL_VNET_INT(_net_inet_esp, OID_AUTO,
+ 	esp_enable,	CTLFLAG_RW,	&VNET_NAME(esp_enable),	0, "");
+ SYSCTL_VNET_STRUCT(_net_inet_esp, IPSECCTL_STATS,
+ 	stats,		CTLFLAG_RD,	&VNET_NAME(espstat),	espstat, "");
++SYSCTL_VNET_INT(_net_inet_esp, OID_AUTO,
++	esp_ignore_natt_cksum,	CTLFLAG_RW,	&VNET_NAME(esp_ignore_natt_cksum), 0, 
++	"Do not validate checksums of ESP protected packets in case of NAT-T");
+ 
+ /* max iv length over all algorithms */
+ static VNET_DEFINE(int, esp_max_ivlen) = 0;

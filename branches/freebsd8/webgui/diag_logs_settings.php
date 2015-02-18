@@ -135,7 +135,7 @@ function enable_change(enable_over) {
            		  'Firewall' => 'diag_logs_filter.php',
            		  'DHCP' => 'diag_logs_dhcp.php',
            		  'Captive portal' => 'diag_logs_portal.php',
-           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'PPTP/L2TP VPN' => 'diag_logs_vpn.php',
            		  'Settings' => 'diag_logs_settings.php');
 	dynamic_tab_menu($tabs);
 ?> 
@@ -207,7 +207,7 @@ function enable_change(enable_over) {
 								  <input name="portalauth" id="portalauth" type="checkbox" value="yes" <?php if ($pconfig['portalauth']) echo "checked"; ?>>
 		                          Captive portal<br> 
 								  <input name="vpn" id="vpn" type="checkbox" value="yes" <?php if ($pconfig['vpn']) echo "checked"; ?>>
-		                          PPTP VPN events
+		                          PPTP/L2TP VPN events
 							  </td>
 	                        </tr>
 	                      </table>

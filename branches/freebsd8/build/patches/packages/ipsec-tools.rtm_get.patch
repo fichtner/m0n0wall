@@ -1,0 +1,20 @@
+diff -rup srca/racoon/grabmyaddr.c srcb/racoon/grabmyaddr.c
+--- src/racoon/grabmyaddr.c	2011-03-14 14:18:12.000000000 -0300
++++ src/racoon/grabmyaddr.c	2011-04-25 15:56:41.000000000 -0300
+@@ -753,6 +753,7 @@ kernel_handle_message(msg)
+ 	case RTM_ADD:
+ 	case RTM_DELETE:
+ 	case RTM_CHANGE:
++	case RTM_GET:
+ 	case RTM_MISS:
+ 	case RTM_IFINFO:
+ #ifdef RTM_OIFINFO
+@@ -768,7 +769,7 @@ kernel_handle_message(msg)
+ 		break;
+ 	default:
+ 		plog(LLV_WARNING, LOCATION, NULL,
+-		     "unrecognized route message with rtm_type: %d",
++		     "unrecognized route message with rtm_type: %d\n",
+ 		     rtm->rtm_type);
+ 		break;
+ 	}

@@ -72,12 +72,14 @@ if ($fd) {
 		if ($line == "No SPD entries.")
 			break;
 		if ($line[0] != "\t") {
-			if (is_array($cursp))
-				$spd[] = $cursp;
+			if (is_array($cursp)) {
+				$spi=$cursp['spi'];
+				$spd[$spi] = $cursp;
+			}
 			$cursp = array();
 			$linea = explode(" ", $line);
-			$cursp['src'] = substr($linea[0], 0, strpos($linea[0], "["));
-			$cursp['dst'] = substr($linea[1], 0, strpos($linea[1], "["));
+			$cursp['src'] = $linea[0];
+			$cursp['dst'] = $linea[1];
 			$i = 0;
 		} else if (is_array($cursp)) {
 			$linea = explode(" ", trim($line));
@@ -90,12 +92,16 @@ if ($fd) {
 				$upperspec = explode("/", $linea[0]);
 				$cursp['proto'] = $upperspec[0];
 				list($cursp['ep_src'], $cursp['ep_dst']) = explode("-", $upperspec[2]);
+			} else if ($i == 3) {
+				$upperspec = explode("=", $linea[0]);
+				$cursp['spi'] = $upperspec[1];
 			}
 		}
 		$i++;
 	}
 	if (is_array($cursp) && count($cursp))
-		$spd[] = $cursp;
+		$spi=$cursp['spi'];
+		$spd[$spi] = $cursp;
 	pclose($fd);
 }
 if (count($spd)):
@@ -112,6 +118,7 @@ if (count($spd)):
                 <td nowrap class="list"></td>
 	</tr>
 <?php
+ksort($spd);
 foreach ($spd as $sp): ?>
 	<tr>
 		<?php

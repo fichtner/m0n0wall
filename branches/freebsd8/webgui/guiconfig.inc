@@ -59,6 +59,7 @@ $d_filterconfdirty_path = $g['varrun_path'] . "/filter.conf.dirty";
 $d_ipsecconfdirty_path = $g['varrun_path'] . "/ipsec.conf.dirty";
 $d_shaperconfdirty_path = $g['varrun_path'] . "/shaper.conf.dirty";
 $d_pptpuserdirty_path = $g['varrun_path'] . "/pptpd.user.dirty";
+$d_l2tpuserdirty_path = $g['varrun_path'] . "/l2tpd.user.dirty";
 $d_dnsmasqdirty_path = $g['varrun_path'] . "/dnsmasq.dirty";
 $d_staticmapsdirty_path = $g['varrun_path'] . "/staticmaps.dirty";
 $d_staticroutesdirty_path = $g['varrun_path'] . "/staticroutes.dirty";
@@ -88,7 +89,7 @@ $iptos = array("lowdelay", "throughput", "reliability", "mincost", "congestion")
 /* TCP flags */
 $tcpflags = array("fin", "syn", "rst", "psh", "ack", "urg");
 
-$specialnets = array("wanip" => "WAN address", "lan" => "LAN net", "pptp" => "PPTP clients");
+$specialnets = array("wanip" => "WAN address", "lan" => "LAN net", "pptp" => "PPTP clients", "l2tp" => "L2TP clients");
 
 for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 	$specialnets['opt' . $i] = $config['interfaces']['opt' . $i]['descr'] . " net";
@@ -125,6 +126,7 @@ $p2_pfskeygroups = array('0' => 'off', '1' => '1 (768 bit)', '2' => '2 (1024 bit
 	'15' => '15 (3072 bit)', '16' => '16 (4096 bit)', '17' => '17 (6144 bit)', '18' => '18 (8192 bit)');
 
 $pptpd_subnet_sizes = array(16 => 28, 32 => 27, 64 => 26, 128 => 25, 256 => 24);
+$ipsec_l2tp_subnet_sizes = array(16 => 28, 32 => 27, 64 => 26, 128 => 25, 256 => 24);
 
 function do_input_validation($postdata, $reqdfields, $reqdfieldsn, $input_errors) {
 	
@@ -338,6 +340,16 @@ function pptpd_users_sort() {
 	}
 	
 	usort($config['pptpd']['user'], "usercmp");
+}
+
+function l2tp_users_sort() {
+	global $g, $config;
+	
+	function usercmp($a, $b) {
+		return strcasecmp($a['name'], $b['name']);
+	}
+	
+	usort($config['l2tp']['user'], "usercmp");
 }
 
 function captiveportal_users_sort() {

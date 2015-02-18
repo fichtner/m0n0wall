@@ -82,10 +82,14 @@ if ($fd) {
 			if ($i == 1) {
 				$cursa['proto'] = $linea[0];
 				$cursa['spi'] = substr($linea[2], strpos($linea[2], "x")+1, -1);
-			} else if ($i == 2) {
+			} else if (substr($linea[0],0,2) == "E:") {
 				$cursa['ealgo'] = $linea[1];
-			} else if ($i == 3) {
+			} else if (substr($linea[0],0,2) == "A:") {
 				$cursa['aalgo'] = $linea[1];
+			} else if (substr($linea[0],0,3) == "NAT" && $i == 2) {
+				$cursa['natoai'] = $linea[1];
+			} else if (substr($linea[0],0,3) == "NAT" && $i == 3) {
+				$cursa['natoar'] = $linea[1];
 			}
 		}
 		$i++;
@@ -106,6 +110,7 @@ if (count($sad)):
                 <td nowrap class="listhdrr">SPI</td>
                 <td nowrap class="listhdrr">Enc. alg.</td>
                 <td nowrap class="listhdr">Auth. alg.</td>
+                <td nowrap class="listhdr">NAT</td>
                 <td nowrap class="list"></td>
 	</tr>
 <?php
@@ -121,13 +126,14 @@ foreach ($sad as $sa): ?>
 		<td class="listr"><?=htmlspecialchars($sa['spi']);?></td>
 		<td class="listr"><?=htmlspecialchars($sa['ealgo']);?></td>
 		<td class="listr"><?=htmlspecialchars($sa['aalgo']);?></td>
+		<td class="listr"><?=htmlspecialchars($sa['natoai']);?> <?=htmlspecialchars($sa['natoar']);?></td>
 	</tr>
 <?php endforeach; ?>
 	 <tr> 
 	   <td></td>
 	 </tr> 
 	 <tr> 
-	   <td class="list" colspan="7"></td>
+	   <td class="list" colspan="8"></td>
 	   <td class="list"><input name="del" type="image" src="x.gif" width="17" height="17" title="delete selected SAs" alt="delete selected SAs" onclick="return confirm('Do you really want to delete the selected security associations?')"></td>
 	 </tr>
 </table>

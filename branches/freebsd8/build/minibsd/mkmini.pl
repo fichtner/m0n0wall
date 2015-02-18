@@ -27,14 +27,17 @@ sub populate_tree {
 		$srcfile = shift(@srcfiles);
 		@srcstat = stat($args[1] . "/" . $srcfile);		
 
-		if (copy($args[1] . "/" . $srcfile, $args[2] . "/" . $srcfile)) {
-			printf "Copy $args[1]/$srcfile -> $args[2]/$srcfile ($srcstat[4]/$srcstat[5]/%04o)\n", ($srcstat[2] & 07777);
-			chown $srcstat[4], $srcstat[5], $args[2] . "/" . $srcfile;
-			chmod $srcstat[2] & 07777, $args[2] . "/" . $srcfile;
+		if (! -e $args[2] . "/" . $srcfile) {
+			if (copy($args[1] . "/" . $srcfile, $args[2] . "/" . $srcfile)) {
+				printf "Copy $args[1]/$srcfile -> $args[2]/$srcfile ($srcstat[4]/$srcstat[5]/%04o)\n", ($srcstat[2] & 07777);
+				chown $srcstat[4], $srcstat[5], $args[2] . "/" . $srcfile;
+				chmod $srcstat[2] & 07777, $args[2] . "/" . $srcfile;
+			} else {
+				print "ERROR while copying file $args[1]/$srcfile\n";
+			}
 		} else {
-			print "ERROR while copying file $args[1]/$srcfile\n";
+			printf "Skipping as exists; Copy $args[1]/$srcfile -> $args[2]/$srcfile ($srcstat[4]/$srcstat[5]/%04o)\n", ($srcstat[2] & 07777);
 		}
-
 		foreach $lnfile (@srcfiles) {
 			if (link($args[2] . "/" . $srcfile, $args[2] . "/" . $lnfile)) {
 				print "Link $args[2]/$srcfile -> $args[2]/$lnfile\n";

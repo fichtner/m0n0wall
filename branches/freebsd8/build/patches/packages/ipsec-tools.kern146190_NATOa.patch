@@ -1,0 +1,95 @@
+diff -rup sys/netipsec/isakmp_quick.c sys/netipsec/isakmp_quick.c
+--- src/racoon/isakmp_quick.c.orig	2012-11-28 19:52:20.000000000 +0100
++++ src/racoon/isakmp_quick.c	2012-11-28 20:24:07.000000000 +0100
+@@ -562,6 +562,8 @@ quick_i2recv(iph2, msg0)
+ 			if (daddr == NULL)
+ 				goto end;
+ 
++			plog(LLV_DEBUG2, LOCATION, NULL, "daddr = %s, natoa_src = %s, natoa_dst = %s\n", saddr2str(daddr), saddr2str(iph2->natoa_src), saddr2str(iph2->natoa_dst));
++
+ 			if (iph2->natoa_src == NULL)
+ 				iph2->natoa_src = daddr;
+ 			else if (iph2->natoa_dst == NULL)
+@@ -1262,6 +1264,8 @@ quick_r1recv(iph2, msg0)
+ 			if (daddr == NULL)
+ 				goto end;
+ 
++			plog(LLV_DEBUG2, LOCATION, NULL, "daddr = %s, natoa_src = %s, natoa_dst = %s\n", saddr2str(daddr), saddr2str(iph2->natoa_src), saddr2str(iph2->natoa_dst));
++
+ 			if (iph2->natoa_dst == NULL)
+ 				iph2->natoa_dst = daddr;
+ 			else if (iph2->natoa_src == NULL)
+@@ -1309,6 +1313,29 @@ quick_r1recv(iph2, msg0)
+ 		plogdump(LLV_DEBUG, iph2->id->v, iph2->id->l);
+ 	}
+ 
++#ifdef ENABLE_NATT
++	if (iph2->ph1->natt_flags&  NAT_DETECTED)
++	{
++		struct sockaddr_storage addr;
++		u_int8_t prefix;
++		u_int16_t ul_proto;
++
++		if (iph2->natoa_src == NULL)
++			if (!ipsecdoi_id2sockaddr(iph2->id, (struct sockaddr *)&addr, &prefix, &ul_proto))
++			{
++				iph2->natoa_src = dupsaddr((struct sockaddr *)&addr);
++				plog(LLV_DEBUG2, LOCATION, NULL, "natoa_src set from IDcr2: natoa_src = %s\n", saddr2str(iph2->natoa_src));
++			}
++
++		if (iph2->natoa_dst == NULL)
++			if (!ipsecdoi_id2sockaddr(iph2->id_p, (struct sockaddr *)&addr, &prefix, &ul_proto))
++			{
++				iph2->natoa_dst = dupsaddr((struct sockaddr *)&addr);
++				plog(LLV_DEBUG2, LOCATION, NULL, "natoa_dst set from IDci2: natoa_dst = %s\n", saddr2str(iph2->natoa_dst));
++			}
++	}
++#endif
++
+ 	/* adjust buffer length for HASH */
+ 	hbuf->l = tlen;
+ 
+@@ -2297,6 +2324,11 @@ get_proposal_r(iph2)
+ 		}
+ #endif
+ 
++#ifdef ENABLE_NATT
++		if (iph2->ph1->natt_flags & NAT_DETECTED)
++			memcpy(&((struct sockaddr_in *)&spidx.dst)->sin_addr,&((struct sockaddr_in *)iph2->src)->sin_addr, sizeof(in_addr_t));
++#endif
++
+ 		if (_XIDT(iph2->id) == IPSECDOI_ID_IPV4_ADDR
+ 		 || _XIDT(iph2->id) == IPSECDOI_ID_IPV6_ADDR)
+ 			idi2type = _XIDT(iph2->id);
+@@ -2356,6 +2388,10 @@ get_proposal_r(iph2)
+ 		}
+ #endif
+ 
++#ifdef ENABLE_NATT
++		if (iph2->ph1->natt_flags & NAT_DETECTED)
++			memcpy(&((struct sockaddr_in *)&spidx.src)->sin_addr,&((struct sockaddr_in *)iph2->dst)->sin_addr, sizeof(in_addr_t));
++#endif
+ 		/* Before setting iph2->[sa_src, sa_dst] with the addresses
+ 		 * provided in ID payloads, we check:
+ 		 * - they are both addresses of same family
+diff -rup sys/netipsec/pfkey.c sys/netipsec/pfkey.c
+--- src/racoon/pfkey.c.orig	2012-11-28 19:52:20.000000000 +0100
++++ src/racoon/pfkey.c	2012-11-28 20:11:11.000000000 +0100
+@@ -1195,6 +1195,8 @@ pk_sendupdate(iph2)
+ #ifdef SADB_X_EXT_NAT_T_FRAG
+ 			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+ #endif
++			plog(LLV_DEBUG2, LOCATION, NULL, "sa_args.l_natt_oa = %s\n", saddr2str(sa_args.l_natt_oa));
++			plog(LLV_DEBUG2, LOCATION, NULL, "sa_args.l_natt_oa_dst = %s\n", saddr2str(sa_args.l_natt_oa_dst));
+ 		}
+ #endif
+ 
+@@ -1483,6 +1485,8 @@ pk_sendadd(iph2)
+ #ifdef SADB_X_EXT_NAT_T_FRAG
+ 			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+ #endif
++			plog(LLV_DEBUG2, LOCATION, NULL, "sa_args.l_natt_oa = %s\n", saddr2str(sa_args.l_natt_oa));
++			plog(LLV_DEBUG2, LOCATION, NULL, "sa_args.l_natt_oa_dst = %s\n", saddr2str(sa_args.l_natt_oa_dst));
+ 		}
+ #endif
+ 		/* more info to fill in */

@@ -2,6 +2,8 @@ $Id$
 
 *** Note: Please add new entries to the top of this file. ***
 -------------------------------------------------------------------------------
+- L2TP/IPsec option for VPN, as PPTP is not deemed secure anymore
+
 - fix aiccu not starting with static wan ipv4 addr
 
 - update mini_httpd to 1.21, which disable SSL 3 because of the "poodle" attack.

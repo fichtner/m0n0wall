@@ -78,7 +78,7 @@ function dump_clog($logfile, $tail) {
            		  'Firewall' => 'diag_logs_filter.php',
            		  'DHCP' => 'diag_logs_dhcp.php',
            		  'Captive portal' => 'diag_logs_portal.php',
-           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'PPTP/L2TP VPN' => 'diag_logs_vpn.php',
            		  'Settings' => 'diag_logs_settings.php');
 	dynamic_tab_menu($tabs);
 ?> 
@@ -88,7 +88,7 @@ function dump_clog($logfile, $tail) {
     <td class="tabcont">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0" summary="content pane"><tr>
 		  <td colspan="4" class="listtopic"> 
-			    Last <?=$nentries;?> PPTP VPN log entries</td>
+			    Last <?=$nentries;?> PPTP/L2TP VPN log entries</td>
 			</tr>
 			<tr>
 			  <td class="listhdrr">Time</td>

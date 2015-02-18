@@ -150,6 +150,9 @@
 	
 	/* start pptpd */
 	vpn_pptpd_configure();
+
+	/* start l2tp */
+	vpn_ipsec_l2tp_configure();
 	
 	/* start traffic shaper */
 	shaper_configure();

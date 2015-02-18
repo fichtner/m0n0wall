@@ -143,6 +143,8 @@ function conv_clog($logfile, $tail) {
 			$flent['interface'] = $iftable[$ipfa[$i]];
 		else if (strpos($ipfa[$i], "ng") !== false)
 			$flent['interface'] = "PPTP";
+		else if (strpos($ipfa[$i], "l2tp") !== false)
+			$flent['interface'] = "L2TP";
 		else if ($ipfa[$i] == "enc0")
 			$flent['interface'] = "IPsec";
 		else if ($ipfa[$i] == "gif0")
@@ -215,7 +217,7 @@ function format_ipf_ip($ipfip,$uport) {
            		  'Firewall' => 'diag_logs_filter.php',
            		  'DHCP' => 'diag_logs_dhcp.php',
            		  'Captive portal' => 'diag_logs_portal.php',
-           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'PPTP/L2TP VPN' => 'diag_logs_vpn.php',
            		  'Settings' => 'diag_logs_settings.php');
 	dynamic_tab_menu($tabs);
 ?> 

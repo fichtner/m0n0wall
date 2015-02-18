@@ -1,0 +1,214 @@
+Index: src/libipsec/key_debug.c
+===================================================================
+RCS file: /cvsroot/src/crypto/dist/ipsec-tools/src/libipsec/key_debug.c,v
+retrieving revision 1.9
+diff -c -r1.9 key_debug.c
+*** src/libipsec/key_debug.c	5 Dec 2008 06:02:20 -0000	1.9
+--- src/libipsec/key_debug.c	29 Apr 2010 06:40:34 -0000
+***************
+*** 189,195 ****
+--- 189,200 ----
+  		case SADB_X_EXT_NAT_T_DPORT:
+  			kdebug_sadb_x_nat_t_port(ext);
+  			break;
++ #ifdef SADB_X_EXT_NAT_T_OAR
++ 		case SADB_X_EXT_NAT_T_OAI:
++ 		case SADB_X_EXT_NAT_T_OAR:
++ #else
+  		case SADB_X_EXT_NAT_T_OA:
++ #endif
+  			kdebug_sadb_address(ext);
+  			break;
+  #endif
+Index: src/libipsec/libpfkey.h
+===================================================================
+RCS file: /cvsroot/src/crypto/dist/ipsec-tools/src/libipsec/libpfkey.h,v
+retrieving revision 1.17
+diff -c -r1.17 libpfkey.h
+*** src/libipsec/libpfkey.h	17 Aug 2009 13:52:14 -0000	1.17
+--- src/libipsec/libpfkey.h	29 Apr 2010 06:40:34 -0000
+***************
+*** 86,91 ****
+--- 86,92 ----
+  	u_int8_t	l_natt_type;
+  	u_int16_t	l_natt_sport, l_natt_dport;
+  	struct sockaddr *l_natt_oa;
++ 	struct sockaddr *l_natt_oa_dst;
+  	u_int16_t	l_natt_frag;
+  	u_int8_t ctxdoi, ctxalg;	/* Security context DOI and algorithm */
+  	caddr_t ctxstr;			/* Security context string */
+Index: src/libipsec/pfkey.c
+===================================================================
+RCS file: /cvsroot/src/crypto/dist/ipsec-tools/src/libipsec/pfkey.c,v
+retrieving revision 1.19
+diff -c -r1.19 pfkey.c
+*** src/libipsec/pfkey.c	3 Jul 2009 06:40:10 -0000	1.19
+--- src/libipsec/pfkey.c	29 Apr 2010 06:40:35 -0000
+***************
+*** 1405,1410 ****
+--- 1405,1413 ----
+  		if (sa_parms->l_natt_oa)
+  			len += sizeof(struct sadb_address) +
+  			  PFKEY_ALIGN8(sysdep_sa_len(sa_parms->l_natt_oa));
++ 		if (sa_parms->l_natt_oa_dst)
++ 			len += sizeof(struct sadb_address) +
++ 			  PFKEY_ALIGN8(sysdep_sa_len(sa_parms->l_natt_oa_dst));
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  		if (sa_parms->l_natt_frag)
+  			len += sizeof(struct sadb_x_nat_t_frag);
+***************
+*** 1520,1526 ****
+--- 1523,1533 ----
+  		}
+  
+  		if (sa_parms->l_natt_oa) {
++ #ifdef SADB_X_EXT_NAT_T_OAI
++ 			p = pfkey_setsadbaddr(p, ep, SADB_X_EXT_NAT_T_OAI,
++ #else
+  			p = pfkey_setsadbaddr(p, ep, SADB_X_EXT_NAT_T_OA,
++ #endif
+  					      sa_parms->l_natt_oa,
+  					      (u_int)PFKEY_ALIGN8(sysdep_sa_len(sa_parms->l_natt_oa)),
+  					      IPSEC_ULPROTO_ANY);
+***************
+*** 1530,1535 ****
+--- 1537,1555 ----
+  			}
+  		}
+  
++ #ifdef SADB_X_EXT_NAT_T_OAR
++ 		if (sa_parms->l_natt_oa_dst) {
++ 			p = pfkey_setsadbaddr(p, ep, SADB_X_EXT_NAT_T_OAR,
++ 					      sa_parms->l_natt_oa_dst,
++ 					      (u_int)PFKEY_ALIGN8(sysdep_sa_len(sa_parms->l_natt_oa_dst)),
++ 					      IPSEC_ULPROTO_ANY);
++ 			if (!p) {
++ 				free(newmsg);
++ 				return -1;
++ 			}
++ 		}
++ #endif
++ 
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  		if (sa_parms->l_natt_frag) {
+  			p = pfkey_set_natt_frag(p, ep, SADB_X_EXT_NAT_T_FRAG,
+***************
+*** 2107,2114 ****
+--- 2127,2139 ----
+  		case SADB_X_EXT_NAT_T_TYPE:
+  		case SADB_X_EXT_NAT_T_SPORT:
+  		case SADB_X_EXT_NAT_T_DPORT:
++ #ifdef SADB_X_EXT_NAT_T_OAR
++ 		case SADB_X_EXT_NAT_T_OAI:
++ 		case SADB_X_EXT_NAT_T_OAR:
++ #else
+  		case SADB_X_EXT_NAT_T_OA:
+  #endif
++ #endif
+  #ifdef SADB_X_EXT_TAG
+  		case SADB_X_EXT_TAG:
+  #endif
+Index: src/libipsec/pfkey_dump.c
+===================================================================
+RCS file: /cvsroot/src/crypto/dist/ipsec-tools/src/libipsec/pfkey_dump.c,v
+retrieving revision 1.17
+diff -c -r1.17 pfkey_dump.c
+*** src/libipsec/pfkey_dump.c	2 Apr 2010 15:13:26 -0000	1.17
+--- src/libipsec/pfkey_dump.c	29 Apr 2010 06:40:36 -0000
+***************
+*** 253,259 ****
+  #ifdef SADB_X_EXT_NAT_T_TYPE
+  	struct sadb_x_nat_t_type *natt_type;
+  	struct sadb_x_nat_t_port *natt_sport, *natt_dport;
+! 	struct sadb_address *natt_oa;
+  
+  	int use_natt = 0;
+  #endif
+--- 253,259 ----
+  #ifdef SADB_X_EXT_NAT_T_TYPE
+  	struct sadb_x_nat_t_type *natt_type;
+  	struct sadb_x_nat_t_port *natt_sport, *natt_dport;
+! 	struct sadb_address *natt_oa, *natt_oar;
+  
+  	int use_natt = 0;
+  #endif
+***************
+*** 293,299 ****
+--- 293,304 ----
+  	natt_type = (void *)mhp[SADB_X_EXT_NAT_T_TYPE];
+  	natt_sport = (void *)mhp[SADB_X_EXT_NAT_T_SPORT];
+  	natt_dport = (void *)mhp[SADB_X_EXT_NAT_T_DPORT];
++ #ifdef SADB_X_EXT_NAT_T_OAR
++ 	natt_oa = (void *)mhp[SADB_X_EXT_NAT_T_OAI];
++ 	natt_oar = (void *)mhp[SADB_X_EXT_NAT_T_OAR];
++ #else
+  	natt_oa = (void *)mhp[SADB_X_EXT_NAT_T_OA];
++ #endif
+  
+  	if (natt_type && natt_type->sadb_x_nat_t_type_type)
+  		use_natt = 1;
+***************
+*** 362,371 ****
+--- 367,385 ----
+  
+  #ifdef SADB_X_EXT_NAT_T_TYPE
+  	/* other NAT-T information */
++ #ifdef SADB_X_EXT_NAT_T_OAR
++ 	if (use_natt && natt_oa)
++ 		printf("\tNAT OAi=%s\n",
++ 		       str_ipaddr((void *)(natt_oa + 1)));
++ 	if (use_natt && natt_oar)
++ 		printf("\tNAT OAr=%s\n",
++ 		       str_ipaddr((void *)(natt_oar + 1)));
++ #else
+  	if (use_natt && natt_oa)
+  		printf("\tNAT OA=%s\n",
+  		       str_ipaddr((void *)(natt_oa + 1)));
+  #endif
++ #endif
+  
+  	/* encryption key */
+  	if (m->sadb_msg_satype == SADB_X_SATYPE_IPCOMP) {
+Index: src/racoon/pfkey.c
+===================================================================
+RCS file: /cvsroot/src/crypto/dist/ipsec-tools/src/racoon/pfkey.c,v
+retrieving revision 1.52
+diff -c -r1.52 pfkey.c
+*** src/racoon/pfkey.c	9 Feb 2010 23:05:16 -0000	1.52
+--- src/racoon/pfkey.c	29 Apr 2010 06:40:37 -0000
+***************
+*** 1190,1196 ****
+  			sa_args.l_natt_type = iph2->ph1->natt_options->encaps_type;
+  			sa_args.l_natt_sport = extract_port(iph2->ph1->remote);
+  			sa_args.l_natt_dport = extract_port(iph2->ph1->local);
+! 			sa_args.l_natt_oa = iph2->natoa_src;
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+  #endif
+--- 1190,1197 ----
+  			sa_args.l_natt_type = iph2->ph1->natt_options->encaps_type;
+  			sa_args.l_natt_sport = extract_port(iph2->ph1->remote);
+  			sa_args.l_natt_dport = extract_port(iph2->ph1->local);
+!  			sa_args.l_natt_oa = iph2->natoa_dst;
+!  			sa_args.l_natt_oa_dst = iph2->natoa_src;
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+  #endif
+***************
+*** 1477,1483 ****
+  			sa_args.l_natt_type = UDP_ENCAP_ESPINUDP;
+  			sa_args.l_natt_sport = extract_port(iph2->ph1->local);
+  			sa_args.l_natt_dport = extract_port(iph2->ph1->remote);
+! 			sa_args.l_natt_oa = iph2->natoa_dst;
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+  #endif
+--- 1478,1485 ----
+  			sa_args.l_natt_type = UDP_ENCAP_ESPINUDP;
+  			sa_args.l_natt_sport = extract_port(iph2->ph1->local);
+  			sa_args.l_natt_dport = extract_port(iph2->ph1->remote);
+! 			sa_args.l_natt_oa = iph2->natoa_src;
+! 			sa_args.l_natt_oa_dst = iph2->natoa_dst;
+  #ifdef SADB_X_EXT_NAT_T_FRAG
+  			sa_args.l_natt_frag = iph2->ph1->rmconf->esp_frag;
+  #endif

@@ -56,10 +56,13 @@ function hwcrypto_descr() {
 
 function enable_cpuhwcrypto() {
 	$dmesg = system_get_dmesg_boot();
+	global $config, $g;
+
+        $l2tpdcfg = $config['l2tp'];
 	
 	if (preg_match("/^ *VIA Padlock Features=.*/m", $dmesg))
 		mwexec("/sbin/kldload padlock.ko");
-	if (preg_match("/^CPU: Geode/m", $dmesg))
+	if (preg_match("/^CPU: Geode/m", $dmesg) && ($l2tpdcfg['mode'] != "server"))
 		mwexec("/sbin/kldload glxsb.ko");
 	if (preg_match("/^ *Features2=.*AESNI/m", $dmesg))
 		mwexec("/sbin/kldload aesni.ko");

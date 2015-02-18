@@ -69,7 +69,7 @@ function dump_clog($logfile, $tail) {
            		  'Firewall' => 'diag_logs_filter.php',
            		  'DHCP' => 'diag_logs_dhcp.php',
            		  'Captive portal' => 'diag_logs_portal.php',
-           		  'PPTP VPN' => 'diag_logs_vpn.php',
+           		  'PPTP/L2TP VPN' => 'diag_logs_vpn.php',
            		  'Settings' => 'diag_logs_settings.php');
 	dynamic_tab_menu($tabs);
 ?> 

@@ -1,7 +1,7 @@
---- Makefile.orig	2011-02-21 22:54:13.000000000 +0000
-+++ Makefile	2011-02-21 22:54:27.000000000 +0000
-@@ -26,7 +26,7 @@
- USE_AUTOTOOLS=	libtool:22
+--- Makefile.orig	2015-02-16 13:12:05.000000000 +0000
++++ Makefile	2015-02-16 17:35:48.000000000 +0000
+@@ -27,7 +27,7 @@
+ USE_AUTOTOOLS=	libtool
  GNU_CONFIGURE=	yes
  USE_LDCONFIG=	yes
 -CONFIGURE_ARGS=	--enable-shared --sysconfdir=${PREFIX}/etc/racoon \
@@ -9,3 +9,14 @@
  		--localstatedir=${STATEDIR:S/\/racoon//} \
  		--with-pkgversion=freebsd-${PORTVERSION}
  
+--- Makefile.orig	2015-02-16 13:12:05.000000000 +0000
++++ Makefile	2015-02-16 17:34:29.000000000 +0000
+@@ -61,7 +61,7 @@
+ .include <bsd.port.pre.mk>
+ 
+ .if ${OSVERSION} < 900007
+-EXTRA_PATCHES=	${FILESDIR}/patch8-utmp.diff
++EXTRA_PATCHES=	${FILESDIR}/patch8-utmp.diff ${FILESDIR}/ipsec-tools.rtm_get.patch ${FILESDIR}/ipsec-tools.wildcard.patch ${FILESDIR}/ipsec-tools.fqdn.patch ${FILESDIR}/ipsec-tools.patch-zz-local-3.diff ${FILESDIR}/ipsec-tools.kern146190_NATOa.patch
+ .endif
+ 
+ .ifdef(WITH_DEBUG)

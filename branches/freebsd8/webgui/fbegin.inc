@@ -154,6 +154,8 @@ $menu['VPN']['IPsec']  				= array('vpn_ipsec.php',
 											'vpn_ipsec_mobile.php',
 							  				'vpn_ipsec_keys.php',
 											'vpn_ipsec_ca.php');
+$menu['VPN']['L2TP/IPsec']  		= array('vpn_ipsec_l2tp.php',
+											'vpn_l2tp_users.php');
 $menu['VPN']['PPTP']  				= array('vpn_pptp.php',
 											'vpn_pptp_users.php');
 											
